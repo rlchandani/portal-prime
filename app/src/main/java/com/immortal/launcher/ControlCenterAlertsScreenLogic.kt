@@ -121,8 +121,10 @@ internal object CcAlertRules {
 
   /** Derives a card: icon, "body · time", and the one button (or none when it can't act). */
   fun item(alert: CcAlert, active: Boolean, entities: Map<String, CcEntity>, roomOf: (String) -> String?, canControl: Boolean,
-           now: Long, time: (Long) -> String, zone: TimeZone = TimeZone.getDefault()): CcAlertItem {
-    val line = listOfNotNull(alert.body, alert.since.takeIf { it > 0 }?.let(time)).joinToString(" · ")
+           now: Long, time: (Long) -> String, zone: TimeZone = TimeZone.getDefault(),
+           day: (Long) -> String = { dayLabel(it, zone) }): CcAlertItem {
+    val line = listOfNotNull(alert.body, alert.since.takeIf { it > 0 }?.let { stamp(it, now, time, day, zone) })
+        .joinToString(" · ")
     val icon = icon(alert, entities[alert.entityId])
     val op: CcAlertOp? = if (!active) null else when (alert.action) {
       CcAlertAction.CLOSE -> garageFor(alert, entities)?.takeIf { it.isOpen }?.let { CcAlertOp.Act(it, CcCalls.coverClose(it)) }
@@ -133,6 +135,19 @@ internal object CcAlertRules {
     val enabled = op !is CcAlertOp.Act || canControl
     return CcAlertItem(alert, active, icon, line, op?.let { label(alert.action, now, zone) }, alert.severity == CcSeverity.CRITICAL, enabled, op)
   }
+
+  /** "2:33 pm" today; "Sat 7 Nov 2:33 pm" on any other day, so an old alert's time isn't read as today's. */
+  fun stamp(since: Long, now: Long, time: (Long) -> String, day: (Long) -> String, zone: TimeZone): String =
+      if (sameDay(since, now, zone)) time(since) else "${day(since)} ${time(since)}"
+
+  private fun sameDay(a: Long, b: Long, zone: TimeZone): Boolean {
+    val ca = Calendar.getInstance(zone).apply { timeInMillis = a }
+    val cb = Calendar.getInstance(zone).apply { timeInMillis = b }
+    return ca.get(Calendar.YEAR) == cb.get(Calendar.YEAR) && ca.get(Calendar.DAY_OF_YEAR) == cb.get(Calendar.DAY_OF_YEAR)
+  }
+
+  private fun dayLabel(ms: Long, zone: TimeZone): String =
+      java.text.SimpleDateFormat("EEE d MMM", java.util.Locale.getDefault()).apply { timeZone = zone }.format(java.util.Date(ms))
 
   fun list(filter: CcAlertFilter, active: List<CcAlert>, resolved: List<CcResolvedAlert>): List<Pair<CcAlert, Boolean>> {
     val activeIds = active.map { it.id }.toSet()

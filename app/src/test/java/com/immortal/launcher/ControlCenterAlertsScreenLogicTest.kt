@@ -92,7 +92,7 @@ class ControlCenterAlertsScreenLogicTest {
     val t: (Long) -> String = { "7:25 pm" }
     val garage = CcEntity("cover.garage", "open", mapOf("device_class" to "garage"))
     val ents = mapOf(garage.id to garage)
-    val close = CcAlertRules.item(CcAlert("g", CcSeverity.WARNING, CcKind.GARAGE, garage.id, "Garage door is open", "Open 17 min", 5L,
+    val close = CcAlertRules.item(CcAlert("g", CcSeverity.WARNING, CcKind.GARAGE, garage.id, "Garage door is open", "Open 17 min", now - 17 * 60_000L,
         CcAlertAction.CLOSE), true, ents, { null }, canControl = false, now = now, time = t, zone = utc)
     assertEquals("Close", close.label)
     assertEquals("Open 17 min · 7:25 pm", close.line)
@@ -109,5 +109,20 @@ class ControlCenterAlertsScreenLogicTest {
     assertNull(noValve.label)
     val resolved = CcAlertRules.item(alert("r", CcAlertAction.SNOOZE), false, emptyMap(), { null }, true, now, t, utc)
     assertNull(resolved.op)
+  }
+
+  @Test fun item_oldAlertStampCarriesItsDay() {
+    val now = at(19, 42)
+    val t: (Long) -> String = { "2:33 pm" }
+    val old = CcAlert("w", CcSeverity.WARNING, CcKind.WINDOW, "binary_sensor.w", "Window is open",
+        "Open ${CcAlerts.duration(12 * 24 * 60L + 75)}", now - (12 * 24 * 60L + 75) * 60_000L, CcAlertAction.REMIND)
+    val item = CcAlertRules.item(old, true, emptyMap(), { null }, true, now, t, utc, day = { "Sat 7 Nov" })
+    assertEquals("Open 12 days · Sat 7 Nov 2:33 pm", item.line)
+  }
+
+  @Test fun stamp_todayIsJustTheTime() {
+    val now = at(19, 42)
+    assertEquals("7:25 pm", CcAlertRules.stamp(at(19, 25), now, { "7:25 pm" }, { "Fri" }, utc))
+    assertEquals("Fri 7:25 pm", CcAlertRules.stamp(at(19, 25) - 24 * 3_600_000L, now, { "7:25 pm" }, { "Fri" }, utc))
   }
 }

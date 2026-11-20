@@ -61,11 +61,11 @@ private fun RowScope.SceneTile(tile: CcSceneTile, enabled: Boolean, ui: CcUi) {
   val look = remember(tile.tone, c) { SceneLook.of(tile.tone, c) }
   val run = remember(tile.entity, ui) { { ui.runScene(tile.entity) } }
   Column(Modifier.weight(1f).height(118.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(SCENE).background(look.bg)
-      .clickable(enabled = enabled, role = Role.Button, onClick = run).ccSpeak(CcSpeech.scene(tile.entity.name, tile.subtitle))
+      .clickable(enabled = enabled, role = Role.Button, onClick = run).ccSpeak(CcSpeech.scene(tile.title, tile.subtitle))
       .padding(horizontal = 22.dp),
       verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
     CcIcon(CcSideLogic.icon(tile.tone), look.fg, 36.dp)
-    Text(tile.entity.name, color = look.fg, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(tile.title, color = look.fg, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     Text(tile.subtitle, color = look.sub, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }

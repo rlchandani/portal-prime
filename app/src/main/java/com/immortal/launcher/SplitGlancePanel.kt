@@ -31,10 +31,14 @@ import java.util.Locale
  */
 internal class SplitGlancePanel(private val context: Context) {
   private val density = context.resources.displayMetrics.density
-  /** Type scale from the panel's short side: 1 on the Portal+, 0.72 on a Portal Mini. */
+  /**
+   * Type scale from the panel's short side (0.72 on a Portal Mini), times the mock unit on a
+   * Portal+ ([HearthMockUnit]: 1.33, so the clock is the approved 234.7 dp, not 176 dp).
+   */
   private val scale = run {
     val m = context.resources.displayMetrics
-    (minOf(m.widthPixels, m.heightPixels) / density / 1219f).coerceIn(.72f, 1f)
+    (minOf(m.widthPixels, m.heightPixels) / density / 1219f).coerceIn(.72f, 1f) *
+        HearthMockUnit.boost(m.widthPixels, m.heightPixels, density)
   }
   val view = LinearLayout(context).apply {
     orientation = LinearLayout.VERTICAL
@@ -228,15 +232,17 @@ internal class SplitGlancePanel(private val context: Context) {
 
     /** Card and panel rectangles for a viewport, in px: landscape side by side, portrait stacked. */
     fun layout(width: Int, height: Int, density: Float): Pair<Box, Box> {
-      val m = (44 * density).toInt()
+      // Margins are mock units too (44 / 64 / 48 / 24), so the card keeps the mock's proportions.
+      val unit = density * HearthMockUnit.boost(width, height, density)
+      val m = (44 * unit).toInt()
       return if (width >= height) {
         val pw = (width * .56f).toInt()
         val card = Box(width - pw - m, m, width - m, height - m)
-        card to Box((64 * density).toInt(), m, card.left - (48 * density).toInt(), height - m)
+        card to Box((64 * unit).toInt(), m, card.left - (48 * unit).toInt(), height - m)
       } else {
         val ch = (height * .56f).toInt()
         val card = Box(m, m, width - m, m + ch)
-        card to Box(m, card.bottom + (24 * density).toInt(), width - m, height - m)
+        card to Box(m, card.bottom + (24 * unit).toInt(), width - m, height - m)
       }
     }
   }

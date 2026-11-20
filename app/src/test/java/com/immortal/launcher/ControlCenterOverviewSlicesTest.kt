@@ -57,6 +57,26 @@ class ControlCenterOverviewSlicesTest {
     assertEquals(tiles, CcSideLogic.tiles(listOf(CcEntity("scene.dinner", "x"), night), plan, kids = false))
   }
 
+  @Test fun sceneTiles_tidyGroupTaggedNames() {
+    val fans = CcEntity("script.fans_off", "off", mapOf("friendly_name" to "[All Fans]: Turn Off"))
+    val lights = CcEntity("script.lights_off", "off", mapOf("friendly_name" to "[All Light]: Turn Off"))
+    val night = CcEntity("scene.good_night", "x", mapOf("friendly_name" to "Good night", "entity_id" to listOf(garage.id)))
+    val tiles = CcSideLogic.tiles(listOf(fans, lights, night), plan, kids = false).associateBy { it.entity.id }
+    assertEquals("Turn Off", tiles.getValue(fans.id).title)
+    assertEquals("All Fans", tiles.getValue(fans.id).subtitle)
+    assertEquals("All Light", tiles.getValue(lights.id).subtitle)
+    assertEquals("Good night", tiles.getValue(night.id).title)
+    assertEquals("Garage", tiles.getValue(night.id).subtitle)
+  }
+
+  @Test fun sceneName_onlySplitsALeadingTag() {
+    assertEquals("Ring" to "Arm Away", CcSideLogic.sceneName("[Ring]: Arm Away"))
+    assertEquals("Ring" to "Arm Away", CcSideLogic.sceneName("[Ring] Arm Away"))
+    assertEquals(null to "Movie time", CcSideLogic.sceneName("Movie time"))
+    assertEquals(null to "[Ring]:", CcSideLogic.sceneName("[Ring]:"))
+    assertEquals(null to "Lights [on]", CcSideLogic.sceneName("Lights [on]"))
+  }
+
   @Test fun legendPerLens() {
     val climate = CcEntity("climate.down", "heat", mapOf("friendly_name" to "Downstairs", "hvac_action" to "heating", "current_temperature" to 70))
     val ents = mapOf(climate.id to climate, garage.id to garage)
