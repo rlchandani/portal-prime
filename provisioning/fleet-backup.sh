@@ -4,18 +4,19 @@
 # (e.g. a debug-key reinstall, which wipes app data). Pairs with fleet-restore.sh.
 #
 # For each target it saves, under backups/<serial>/<timestamp>-<unique-id>/:
-#   info.json       — /info (identity, version, install state, installed apps)
-#   apps.json       — /apps (catalog + what's installed → the reinstall list)
-#   registry.json   — the local fleet/<serial>.json (host/port/token)
-#   shared_prefs/*.xml — every readable Immortal pref file. THIS is the config +
-#                        credential store (fleet token, screensaver sources incl.
-#                        Immich/SMB/WebDAV creds, multiroom user/pass, weather, …).
+#   info.json           — /info (identity, version, install state, installed apps)
+#   apps.json           — /apps (catalog + what's installed → the reinstall list)
+#   registry.json       — the local fleet/<serial>.json (host/port/token)
+#   sealed-backup.json  — the Portal's preferences, data files and household settings,
+#                         sealed ON THE PORTAL to this Mac's backup key (AES-256-GCM, data
+#                         key wrapped with RSA-OAEP-256). Only this Mac's private key opens it;
+#                         the plaintext never touches the Portal's storage, the wire or this disk.
 #
-# The agent runs as com.immortal.launcher, so it can read its own /data/data
-# shared_prefs over /fs/read — no root or adb needed. Hearthpane 1.274 and later
-# refuse that read (the prefs hold the household key, tokens and sessions), so
-# against those agents the backup fails at the preferences step and keeps the
-# previous snapshot.
+# The first run creates this Mac's backup key (RSA-3072) in the login Keychain (or in
+# ~/.config/hearthpane/fleet-backup-key, mode 600, when the Keychain isn't available) and
+# enrols its public key with each Portal (POST /backup/key; the first enrolled key wins).
+# Needs Hearthpane 1.275+ and Python's `cryptography` package. 1.274 and later refuse the
+# old /fs/read of shared_prefs, which held the household key, tokens and sessions.
 #
 # Usage:
 #   ./fleet-backup.sh                 # back up every registered device
@@ -23,8 +24,8 @@
 #   ./fleet-backup.sh "Portal Mini"   # one device by name
 #   ./fleet-backup.sh 819LCM01Z09E4D12  # …or by serial
 #
-# The backups/ tree holds tokens + passwords in cleartext — it is git-ignored;
-# keep it private and treat it like any other secret store.
+# registry.json holds the fleet token in cleartext. The backups/ tree is git-ignored;
+# keep it private. Keep the backup key too: without it a sealed snapshot can't be restored.
 set -euo pipefail
 umask 077
 # A closed progress-output pipe must not stop capture or reverse a committed result.
@@ -37,7 +38,6 @@ FLEETCTL="${FLEETCTL:-./fleetctl}"
 FLEET_DIR="${IMMORTAL_FLEET_DIR:-./fleet}"
 PYTHON3="${PYTHON3:-python3}"
 APP_PACKAGE="${IMMORTAL_BACKUP_PACKAGE-com.immortal.launcher}"
-PREFS_DIR="/data/data/$APP_PACKAGE/shared_prefs"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 
 command -v "$PYTHON3" >/dev/null 2>&1 || {
@@ -79,23 +79,14 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 capture() {
-  local serial="$1" n err
+  local serial="$1"
   "$FLEETCTL" info --device "$serial" > "$stage/info.json" 2>/dev/null || return 1
   "$PYTHON3" "$here/fleet-backup-data.py" json info "$stage/info.json" || return 1
   "$FLEETCTL" apps --device "$serial" > "$stage/apps.json" 2>/dev/null || return 1
   "$PYTHON3" "$here/fleet-backup-data.py" json apps "$stage/apps.json" || return 1
   cp "$FLEET_DIR/$serial.json" "$stage/registry.json" || return 1
-  "$FLEETCTL" ls "$PREFS_DIR" --device "$serial" > "$stage/listing.json" 2>/dev/null || return 1
-  "$PYTHON3" "$here/fleet-backup-data.py" names "$stage/listing.json" "$PREFS_DIR" > "$stage/preferences.txt" || return 1
-  while IFS= read -r n; do
-    if ! err="$("$FLEETCTL" pull "$PREFS_DIR/$n" "$stage/shared_prefs/$n" --device "$serial" 2>&1 >/dev/null)"; then
-      case "$err" in
-        *protected_path*) report "  error: this agent refuses preference reads (Hearthpane 1.274+ keeps keys and tokens off /fs/read)" >&2;;
-      esac
-      return 1
-    fi
-    "$PYTHON3" "$here/fleet-backup-data.py" xml "$stage/shared_prefs/$n" || return 1
-  done < "$stage/preferences.txt"
+  # Enrol this Mac's backup key if needed, then fetch and verify the Portal-sealed export.
+  "$PYTHON3" "$here/fleet-backup-seal.py" export "$FLEET_DIR/$serial.json" "$stage" || return 1
   "$PYTHON3" "$here/fleet-backup-data.py" manifest "$stage" "$serial" "$STAMP" "$APP_PACKAGE" || return 1
 }
 
@@ -103,7 +94,6 @@ prepare() {
   local serial="$1"
   "$PYTHON3" "$here/fleet-backup-data.py" directory "backups/$serial" || return 1
   stage="$(mktemp -d "backups/$serial/.partial-$STAMP.XXXXXX")" || return 1
-  mkdir "$stage/shared_prefs" || return 1
 }
 
 backed_up=0
@@ -127,5 +117,5 @@ done
 
 report ""
 report "backed up $backed_up device(s) to $here/backups/"
-report "WARNING: these files contain tokens and cleartext credentials — keep private (git-ignored)."
+report "WARNING: registry.json holds the fleet token — keep backups/ private (git-ignored)."
 exit "$failed"

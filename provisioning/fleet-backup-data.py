@@ -212,32 +212,6 @@ def validate_config_result(path):
         raise ValueError("contradictory config response")
 
 
-def preference_names(path, expected):
-    value = success_json(path)
-    if value.get("path") != expected or not isinstance(value.get("entries"), list):
-        raise ValueError("invalid preference listing")
-    names = []
-    for entry in value["entries"]:
-        if not isinstance(entry, dict) or not isinstance(entry.get("name"), str):
-            raise ValueError("invalid preference entry")
-        name = entry["name"]
-        if entry.get("type") != "file" or not name.endswith(".xml"):
-            continue
-        if entry.get("readable") is not True or "/" in name or "\\" in name or any(ord(c) < 32 or ord(c) == 127 for c in name):
-            raise ValueError("unreadable or unsafe preference entry")
-        if name in names:
-            raise ValueError("duplicate preference entry")
-        names.append(name)
-    if not names:
-        raise ValueError("no preferences captured")
-    return sorted(names)
-
-
-def validate_xml(path):
-    if ET.parse(path).getroot().tag != "map":
-        raise ValueError("not a preference map")
-
-
 def restore_preference_name(name):
     if (
         not name.endswith(".xml") or "/" in name or "\\" in name
@@ -329,14 +303,27 @@ def restore_preferences(backup, destination, plan):
         os.close(backup_descriptor)
 
 
+def sealed_summary(stage, serial):
+    """The counts recorded with a sealed export; the archive itself stays sealed."""
+    snapshot = read_json(stage / "sealed-backup.json")
+    if (not isinstance(snapshot, dict) or snapshot.get("format") != "hearthpane-sealed-snapshot"
+            or snapshot.get("serial") != serial or not isinstance(snapshot.get("keyId"), str)
+            or not re.fullmatch(r"[0-9a-f]{16}", snapshot["keyId"])
+            or not isinstance(snapshot.get("summary"), dict)):
+        raise ValueError("invalid sealed backup")
+    summary = snapshot["summary"]
+    counts = [summary.get(name) for name in ("prefFiles", "prefValues", "dataFiles", "householdSettings")]
+    if any(type(count) is not int or count < 0 for count in counts):
+        raise ValueError("invalid sealed backup summary")
+    if counts[0] == 0:
+        raise ValueError("no preferences captured")
+    return snapshot["keyId"], counts
+
+
 def manifest(stage, serial, stamp, package):
     info = validate_json("info", stage / "info.json")
     apps = validate_json("apps", stage / "apps.json")["apps"]
-    files = sorted((stage / "shared_prefs").glob("*.xml"))
-    if not files:
-        raise ValueError("no preferences captured")
-    for path in files:
-        validate_xml(path)
+    key, counts = sealed_summary(stage, serial)
     registry = read_json(stage / "registry.json")
     if not isinstance(registry, dict) or registry.get("serial") != serial:
         raise ValueError("invalid registry copy")
@@ -347,7 +334,8 @@ def manifest(stage, serial, stamp, package):
         "versionCode: " + str(info["app"]["versionCode"]),
         "model: " + str(info.get("model", "")),
         "installed apps:", *("  " + name for name in installed),
-        "shared_prefs:", *("  " + path.name for path in files),
+        "sealed backup: sealed-backup.json (backup key " + key + ")",
+        "  %d preference files, %d values, %d data files, %d household settings" % tuple(counts),
     ]
     (stage / "MANIFEST.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -399,10 +387,6 @@ def main():
             restore_preferences(*args)
         elif mode == "config-result" and len(args) == 1:
             validate_config_result(args[0])
-        elif mode == "names" and len(args) == 2:
-            print("\n".join(preference_names(*args)))
-        elif mode == "xml" and len(args) == 1:
-            validate_xml(args[0])
         elif mode == "manifest" and len(args) == 4:
             manifest(Path(args[0]), *args[1:])
         elif mode == "publish" and len(args) == 2:

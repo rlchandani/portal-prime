@@ -9,18 +9,29 @@
 #
 # Modes (combine freely; default = --apps --prefs):
 #   --apps     reinstall the third-party apps that were installed (from apps.json)
-#   --prefs    push the saved shared_prefs back verbatim → FULL fidelity, restores
-#              every credential (Immich/SMB/WebDAV, multiroom, etc.). fleet_agent.xml
-#              is skipped so the freshly-provisioned token is kept. A reboot follows
-#              so the app reloads prefs from disk.
+#   --prefs    restore the saved preferences → FULL fidelity, every credential included.
+#              A sealed snapshot (sealed-backup.json, Hearthpane 1.275+) is opened in memory
+#              with this Mac's backup key, checked, and handed to the Portal re-sealed to a
+#              one-time key (POST /backup/import); the Portal validates and applies it. Only
+#              onto the Portal it came from, unless --cross-device. The fleet token is never
+#              part of a backup, so the freshly provisioned one is kept. Reboot afterwards.
+#              An older plaintext snapshot (shared_prefs/*.xml) is pushed back verbatim, as
+#              before; fleet_agent.xml is skipped and a reboot is requested.
+#   --cross-device  with a sealed snapshot: restore onto another Portal, household settings
+#              only. Device-local and secret items (room name, phone sessions, the household
+#              key, tokens, data files) stay behind; Who's there templates are never backed up.
+#   --same-serial  with a sealed snapshot of THIS serial: restore everything although the
+#              Portal reports a different app identity (a reinstall with another signing key
+#              gives the app a new ANDROID_ID). You vouch it is the same Portal.
 #   --config   instead of raw prefs, re-apply only the endpoint-covered screensaver
-#              + calendar subset (no stored credentials). Use when you don't want to
-#              overwrite the fresh install's prefs wholesale.
-#   --dry-run  print what would happen, change nothing.
+#              + calendar subset (no stored credentials). Older plaintext snapshots only.
+#   --dry-run  print what would happen, change nothing (a sealed snapshot is opened and
+#              checked locally; the Portal isn't contacted).
 #
 # Usage:
-#   ./fleet-restore.sh 819LCM01Z09E4D12                       # apps + prefs + reboot
-#   ./fleet-restore.sh "Portal Mini" --config --dry-run
+#   ./fleet-restore.sh 819LCM01Z09E4D12                       # apps + prefs
+#   ./fleet-restore.sh "Portal Mini" --prefs --dry-run
+#   ./fleet-restore.sh "Portal Mini" --prefs --cross-device --backup backups/819LCM01Z09E4D12/latest
 #   ./fleet-restore.sh 819LCM01Z09E4D12 --backup backups/819LCM01Z09E4D12/20260620-200000
 set -euo pipefail
 umask 077
@@ -34,7 +45,7 @@ FLEET_DIR="${IMMORTAL_FLEET_DIR:-./fleet}"
 PYTHON3="${PYTHON3:-python3}"
 PREFS_DIR="/data/data/com.immortal.launcher/shared_prefs"
 
-usage() { sed -n '2,30p' "$0"; exit 2; }
+usage() { sed -n '2,41p' "$0"; exit 2; }
 
 target="${1:-}"; [ -n "$target" ] || usage; shift || true
 
@@ -46,7 +57,7 @@ command -v "$PYTHON3" >/dev/null 2>&1 || {
 serial="$("$PYTHON3" "$here/fleet-backup-data.py" restore-target "$FLEET_DIR" "$target")" || exit 1
 
 backup="backups/$serial/latest"
-do_apps=0; do_prefs=0; do_config=0; dry=0
+do_apps=0; do_prefs=0; do_config=0; dry=0; cross=0; same_serial=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --backup) backup="$2"; shift 2;;
@@ -54,6 +65,8 @@ while [ $# -gt 0 ]; do
     --prefs)  do_prefs=1; shift;;
     --config) do_config=1; shift;;
     --dry-run) dry=1; shift;;
+    --cross-device) cross=1; shift;;
+    --same-serial) same_serial=1; shift;;
     *) echo "unknown option: $1" >&2; usage;;
   esac
 done
@@ -62,6 +75,20 @@ done
 
 [ -d "$backup" ] || { echo "error: backup not found: $backup" >&2; exit 1; }
 [ -x "$FLEETCTL" ] || { echo "error: $FLEETCTL not built (rustc -O fleet.rs -o fleetctl)" >&2; exit 1; }
+sealed=0
+if [ -e "$backup/sealed-backup.json" ] || [ -L "$backup/sealed-backup.json" ]; then sealed=1; fi
+if [ $((cross + same_serial)) -gt 0 ] && { [ $sealed -eq 0 ] || [ $do_prefs -eq 0 ]; }; then
+  report "error: --cross-device and --same-serial need --prefs and a sealed snapshot (Hearthpane 1.275+)" >&2
+  exit 2
+fi
+if [ $cross -eq 1 ] && [ $same_serial -eq 1 ]; then
+  report "error: --cross-device and --same-serial can't be combined" >&2
+  exit 2
+fi
+if [ $sealed -eq 1 ] && [ $do_config -eq 1 ]; then
+  report "error: a sealed snapshot restores with --prefs (--config reads an older plaintext snapshot)" >&2
+  exit 2
+fi
 
 pkgs=""
 scratch=""
@@ -79,7 +106,10 @@ cal_args=()
 if [ $dry -eq 0 ] || [ $do_prefs -eq 1 ] || { [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; }; then
   scratch="$(mktemp -d "${TMPDIR:-/tmp}/immortal-restore-apps.XXXXXX")" || exit 1
 fi
-if [ $do_prefs -eq 1 ]; then
+if [ $do_prefs -eq 1 ] && [ $sealed -eq 1 ]; then
+  # Open and check the sealed archive in memory before installs or any device call.
+  "$PYTHON3" "$here/fleet-backup-seal.py" inspect "$backup" || exit 1
+elif [ $do_prefs -eq 1 ]; then
   # Validate and freeze every raw file before installs, writes or config calls.
   # Dry-run uses the same preflight without calling the device CLI.
   "$PYTHON3" "$here/fleet-backup-data.py" restore-preferences \
@@ -102,7 +132,7 @@ if [ $dry -eq 0 ]; then
   export IMMORTAL_FLEET_DIR="$scratch/registry"
 fi
 
-report "restoring '$serial' from $backup  (apps=$do_apps prefs=$do_prefs config=$do_config dry-run=$dry)"
+report "restoring '$serial' from $backup  (apps=$do_apps prefs=$do_prefs config=$do_config cross-device=$cross same-serial=$same_serial dry-run=$dry)"
 run() { if [ $dry -eq 1 ]; then report "  + $*"; else "$@"; fi; }
 run_config() {
   local domain="$1"; shift
@@ -144,8 +174,22 @@ if [ $do_apps -eq 1 ]; then
   done <<< "$pkgs"
 fi
 
-# 2) Push raw shared_prefs back = full-fidelity restore of config + credentials.
-if [ $do_prefs -eq 1 ]; then
+# 2a) Sealed snapshot: the Portal opens, validates, scopes and applies it.
+if [ $do_prefs -eq 1 ] && [ $sealed -eq 1 ]; then
+  report "-- prefs (sealed import) --"
+  seal_args=()
+  [ $cross -eq 1 ] && seal_args+=(--cross-device)
+  [ $same_serial -eq 1 ] && seal_args+=(--same-serial)
+  if [ $dry -eq 1 ]; then
+    report "  + import the sealed backup${seal_args[*]:+ (${seal_args[*]})}"
+  elif ! "$PYTHON3" "$here/fleet-backup-seal.py" import "$scratch/registry/$serial.json" "$backup" ${seal_args[@]+"${seal_args[@]}"}; then
+    report "error: sealed import unconfirmed; inspect the device before retrying" >&2
+    exit 1
+  fi
+fi
+
+# 2b) Older plaintext snapshot: push raw shared_prefs back (full fidelity).
+if [ $do_prefs -eq 1 ] && [ $sealed -eq 0 ]; then
   echo "-- prefs (full restore) --"
   pushed=0
   while IFS= read -r -d '' n; do

@@ -20,6 +20,8 @@ import unittest
 
 
 SOURCE = Path(__file__).resolve().parent
+sys.path.insert(0, str(SOURCE))
+from sealed_portal_fake import FAKE_ADB, FakeSealedPortal, SECRET_MARKERS  # noqa: E402
 PACKAGE = "com.immortal.launcher"
 STAMP = "20261102-225614"
 XML = b'<?xml version="1.0" encoding="utf-8"?>\n<map><string name="label">Public</string></map>\n'
@@ -84,12 +86,17 @@ class FleetBackupTest(unittest.TestCase):
         self.kit = self.root / "kit"
         self.kit.mkdir()
         shutil.copyfile(SOURCE / "fleet-backup.sh", self.kit / "fleet-backup.sh")
-        helper = SOURCE / "fleet-backup-data.py"
-        if helper.exists():
-            shutil.copyfile(helper, self.kit / helper.name)
+        for helper in (SOURCE / "fleet-backup-data.py", SOURCE / "fleet-backup-seal.py"):
+            if helper.exists():
+                shutil.copyfile(helper, self.kit / helper.name)
+        self.portals = {}
+        self.key_file = self.root / "mac" / "fleet-backup-key"
         self.bin = self.root / "bin"
         self.bin.mkdir()
         self.executable(self.bin / "fleetctl", FAKE_CLI)
+        self.executable(self.bin / "adb", FAKE_ADB)
+        self.adb_calls = self.root / "adb-calls.jsonl"
+        self.usb = set()  # serials whose adb is connected
         self.executable(self.bin / "date", "#!/bin/sh\nprintf '%s\\n' '" + STAMP + "'\n")
         self.registry = self.kit / "fleet"
         self.registry.mkdir(mode=0o700)
@@ -103,10 +110,14 @@ class FleetBackupTest(unittest.TestCase):
         path.chmod(0o700)
 
     def write_device(self, serial, name):
+        portal = FakeSealedPortal(FAKE_TOKEN)
+        self.addCleanup(portal.close)
+        self.portals[serial] = portal
+        self.usb.add(serial)
         path = self.registry / (serial + ".json")
         path.write_text(json.dumps({
-            "serial": serial, "name": name, "ip": "192.0.2.10",
-            "agentPort": 8723, "token": FAKE_TOKEN,
+            "serial": serial, "name": name, "ip": "127.0.0.1",
+            "agentPort": portal.port, "token": FAKE_TOKEN,
         }), encoding="utf-8")
         path.chmod(0o600)
         return path
@@ -124,6 +135,11 @@ class FleetBackupTest(unittest.TestCase):
                "IMMORTAL_FLEET_DIR": str(self.registry),
                "FAKE_BACKUP_CALLS": str(self.calls),
                "FAKE_BACKUP_CONFIG": str(self.config),
+               "IMMORTAL_BACKUP_KEYSTORE": "file",
+               "IMMORTAL_BACKUP_KEY_FILE": str(self.key_file),
+               "IMMORTAL_BACKUP_ADB": str(self.bin / "adb"),
+               "FAKE_ADB_CALLS": str(self.adb_calls),
+               "FAKE_ADB_PORTS": json.dumps({s: self.portals[s].port for s in self.usb}),
                "PATH": str(self.bin) + os.pathsep + os.environ["PATH"]}
         env.pop("IMMORTAL_BACKUP_PACKAGE", None)
         env.pop("PYTHON3", None)
@@ -139,12 +155,16 @@ class FleetBackupTest(unittest.TestCase):
         result = subprocess.run(
             ["/bin/bash", "-c", 'umask 022; exec /bin/bash "$1" "$2"',
              "backup-test", str(self.kit / "fleet-backup.sh"), target],
-            env=env, capture_output=True, text=True, timeout=10,
+            env=env, capture_output=True, text=True, timeout=60,
         )
         output = result.stdout + result.stderr
         self.assertNotIn(FAKE_TOKEN, output)
+        for marker in SECRET_MARKERS:
+            self.assertNotIn(marker, output)
         for args in self.commands():
-            self.assertIn(args[0], {"info", "apps", "ls", "pull"}, "backup must stay read-only")
+            self.assertIn(args[0], {"info", "apps"}, "backup must stay read-only")
+        for portal in self.portals.values():
+            self.assertTrue(set(portal.paths()) <= {"/backup/key", "/backup/export"}, "backup must stay read-only")
         return result.returncode, output
 
     def commands(self):
@@ -191,17 +211,16 @@ class FleetBackupTest(unittest.TestCase):
         self.assertEqual(target.parent, root)
         if unique:
             self.assertRegex(target.name, "^" + STAMP + r"[.-][A-Za-z0-9_-]+$")
-        self.assertEqual((target / "shared_prefs" / "prefs.xml").read_bytes(), XML)
+        sealed = json.loads((target / "sealed-backup.json").read_text())
+        self.assertEqual(sealed["serial"], serial)
+        for path in target.rglob("*"):
+            if path.is_file():
+                for marker in SECRET_MARKERS:
+                    self.assertNotIn(marker.encode(), path.read_bytes(), "no plaintext preference may reach the disk")
+        self.assertFalse((target / "shared_prefs").exists())
         self.assertEqual((target / "registry.json").read_bytes(),
                          (self.registry / (serial + ".json")).read_bytes())
         return target
-
-    def listing(self, **changes):
-        value = {"ok": True, "path": "/data/data/" + PACKAGE + "/shared_prefs",
-                 "entries": [{"name": "prefs.xml", "type": "file", "readable": True,
-                              "size": len(XML), "mtime": 1}]}
-        value.update(changes)
-        return value
 
     def test_success_preserves_exact_data_and_private_permissions_under_umask022(self):
         code, output = self.run_backup()
@@ -263,45 +282,6 @@ class FleetBackupTest(unittest.TestCase):
                 manifest = (target / "MANIFEST.txt").read_text()
                 self.assertEqual("  org.example\n" in manifest,
                                  marker is True or type(marker) is int)
-
-    def test_ls_requires_literal_success_valid_json_and_exact_path(self):
-        previous = self.seed_previous()
-        for body, exit_code in ((self.listing(ok=False), 0), (self.listing(ok=1), 0),
-                                ("not JSON", 0), ([], 0),
-                                (self.listing(path="/data/data/other.app/shared_prefs"), 0),
-                                (self.listing(), 1)):
-            with self.subTest(body=body, exit_code=exit_code):
-                self.reply("ls", body, exit_code)
-                self.assert_failure_preserves_previous(previous)
-
-    def test_no_readable_safe_xml_file_means_backup_is_incomplete(self):
-        previous = self.seed_previous()
-        for change in ({"name": "../escaped.xml"}, {"name": "/absolute.xml"},
-                       {"name": ""}, {"name": "prefs.xml", "type": "directory"},
-                       {"readable": False}, {"readable": 1}, {"name": "unrelated.txt"}):
-            with self.subTest(change=change):
-                entry = dict(self.listing()["entries"][0], **change)
-                self.reply("ls", self.listing(entries=[entry]))
-                self.assert_failure_preserves_previous(previous)
-                self.assertFalse((self.device_root() / "escaped.xml").exists())
-
-    def test_failed_pull_removes_partial_and_preserves_previous_latest(self):
-        previous = self.seed_previous()
-        self.reply("pull", exit_code=1, xml="<map>public partial")
-        self.assert_failure_preserves_previous(previous)
-        self.assertTrue(any(args[0] == "pull" for args in self.commands()))
-
-    def test_empty_or_invalid_xml_cannot_publish_complete_snapshot(self):
-        previous = self.seed_previous()
-        for xml in ("", "<map>", "not XML", "<map></different>", "<map/><map/>"):
-            with self.subTest(xml=xml):
-                self.reply("pull", xml=xml)
-                self.assert_failure_preserves_previous(previous)
-
-    def test_empty_listing_cannot_claim_complete_backup(self):
-        previous = self.seed_previous()
-        self.reply("ls", self.listing(entries=[]))
-        self.assert_failure_preserves_previous(previous)
 
     def test_one_failed_device_does_not_prevent_next_device_backup(self):
         previous = self.seed_previous()
@@ -413,7 +393,7 @@ class FleetBackupTest(unittest.TestCase):
             self.assertIn(b"backing up family-public", banner)
             process.stdout.close()
             process.stdout = None  # communicate drains stderr only when it has a separate pipe.
-            _, stderr = process.communicate(timeout=10)
+            _, stderr = process.communicate(timeout=60)
         finally:
             if process.poll() is None:
                 process.kill()
@@ -424,7 +404,7 @@ class FleetBackupTest(unittest.TestCase):
                 process.stderr.close()
         self.assertNotIn(FAKE_TOKEN.encode(), banner + (stderr or b""))
         commands = self.commands()
-        self.assertTrue(all(args[0] in {"info", "apps", "ls", "pull"} for args in commands))
+        self.assertTrue(all(args[0] in {"info", "apps"} for args in commands))
         return process.returncode, commands
 
     def test_wrapper_closed_stdout_after_first_banner_still_completes_both_devices(self):
@@ -449,7 +429,7 @@ class FleetBackupTest(unittest.TestCase):
         self.assertEqual([args[0] for args in commands if args[-1] == "family-public"],
                          ["info", "apps"])
         self.assertEqual([args[0] for args in commands if args[-1] == "living-public"],
-                         ["info", "apps", "ls", "pull"])
+                         ["info", "apps"])
 
     def test_same_second_successes_have_distinct_paths_and_preserve_first_bytes(self):
         code, output = self.run_backup()
@@ -488,14 +468,6 @@ class FleetBackupTest(unittest.TestCase):
         self.assertFalse(missing, "latest must be replaced atomically")
         self.completed()
 
-    def test_debug_package_reads_only_requested_shared_prefs(self):
-        code, output = self.run_backup(package="com.immortal.launcher.debug")
-        self.assertEqual(code, 0, output)
-        self.completed()
-        for args in self.commands():
-            if args[0] in {"ls", "pull"}:
-                self.assertTrue(args[1].startswith("/data/data/com.immortal.launcher.debug/shared_prefs"))
-
     def test_invalid_package_is_rejected_before_any_cli_call(self):
         for package in ("../other", "com.immortal.launcher/../other", "com.example;echo nope", ""):
             with self.subTest(package=package):
@@ -518,6 +490,93 @@ class FleetBackupTest(unittest.TestCase):
         self.assertTrue(marker.exists(), "PYTHON3 must select the validation runtime")
         self.completed()
 
+
+    def test_first_backup_creates_a_private_key_and_enrols_it_once(self):
+        code, output = self.run_backup()
+        self.assertEqual(code, 0, output)
+        self.assertEqual(stat.S_IMODE(self.key_file.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(self.key_file.parent.stat().st_mode), 0o700)
+        self.assertIn("created this Mac's backup key", output)
+        self.assertIn("confirmed this Mac's backup key", output)
+        adb = [json.loads(line) for line in self.adb_calls.read_text().splitlines()]
+        self.assertTrue(adb and all(args[:2] == ["-s", "family-public"] for args in adb),
+                        "every adb command must name this Portal")
+        key_bytes = self.key_file.read_bytes()
+        self.assertNotIn(key_bytes.strip().decode()[:40], output)
+        first = json.loads((self.completed() / "sealed-backup.json").read_text())
+        code, output = self.run_backup()
+        self.assertEqual(code, 0, output)
+        self.assertNotIn("created", output)
+        self.assertNotIn("confirmed", output)
+        self.assertEqual(self.key_file.read_bytes(), key_bytes)
+        second = json.loads((self.completed() / "sealed-backup.json").read_text())
+        self.assertEqual(first["keyId"], second["keyId"])
+        self.assertNotEqual(first["backup"]["ciphertext"], second["backup"]["ciphertext"])
+
+    def test_snapshot_records_counts_not_values(self):
+        code, output = self.run_backup()
+        self.assertEqual(code, 0, output)
+        target = self.completed()
+        manifest = (target / "MANIFEST.txt").read_text()
+        self.assertIn("sealed backup: sealed-backup.json", manifest)
+        self.assertIn("4 preference files, 5 values, 1 data files, 1 household settings", manifest)
+        self.assertIn("sealed export: 4 preference files", output)
+        self.assertEqual(stat.S_IMODE((target / "sealed-backup.json").stat().st_mode), 0o600)
+
+    def test_portal_enrolled_with_another_key_fails_and_keeps_previous(self):
+        previous = self.seed_previous()
+        self.portals["family-public"].enrolled = b"another key"
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("enrolled with another backup key", output)
+        self.assertIn("FORGET_BACKUP_KEY", output)
+        self.assertNotIn("/backup/export", self.portals["family-public"].paths())
+
+    def test_tampered_or_foreign_sealed_exports_are_not_published(self):
+        previous = self.seed_previous()
+        portal = self.portals["family-public"]
+        portal.tamper_export = True
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("seal does not verify", output)
+        portal.tamper_export = False
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        portal.export_key = rsa.generate_private_key(public_exponent=65537, key_size=3072).public_key()
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("can't open the snapshot", output)
+
+    def test_refused_or_malformed_exports_are_not_published(self):
+        previous = self.seed_previous()
+        portal = self.portals["family-public"]
+        for reply in ((503, {"ok": False, "error": "device_identity_unavailable"}),
+                      (429, {"ok": False, "error": "backup_rate_limited", "retryAfterSec": 2}),
+                      (200, {"ok": True}),
+                      (200, {"ok": True, "backup": {"format": "hearthpane-sealed-backup", "version": 1}}),
+                      (200, b"not json")):
+            with self.subTest(reply=reply):
+                portal.override["/backup/export"] = reply
+                self.assert_failure_preserves_previous(previous)
+
+    def test_unconfirmed_key_without_usb_fails_with_the_confirm_command(self):
+        previous = self.seed_previous()
+        self.usb.clear()
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("waiting for USB confirmation", output)
+        self.assertIn("CONFIRM_BACKUP_KEY --es keyId", output)
+        self.assertNotIn("/backup/export", self.portals["family-public"].paths())
+        self.assertIsNotNone(self.portals["family-public"].pending)
+
+    def test_agent_without_sealed_routes_asks_for_an_update(self):
+        previous = self.seed_previous()
+        self.portals["family-public"].override["/backup/key"] = (404, b"")
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("1.275", output)
+
+    def test_shared_key_file_is_refused(self):
+        code, output = self.run_backup()
+        self.assertEqual(code, 0, output)
+        self.key_file.chmod(0o644)
+        previous = self.snapshot(self.device_root())
+        output = self.assert_failure_preserves_previous(previous)
+        self.assertIn("chmod 600", output)
 
 if __name__ == "__main__":
     unittest.main()
