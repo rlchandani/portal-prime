@@ -172,14 +172,30 @@ internal class HearthpaneReminders(
   private fun due(args: JSONObject): Due {
     val timeRaw = (args.opt("time") as? String)?.trim().orEmpty()
     val dateRaw = (args.opt("date") as? String)?.trim().orEmpty()
-    if (timeRaw.isEmpty() && dateRaw.isEmpty()) return Due.None
+    val dayRaw = (args.opt("day") as? String)?.trim()?.lowercase().orEmpty()
+    if (timeRaw.isEmpty() && dateRaw.isEmpty() && dayRaw.isEmpty()) return Due.None
     val clock = if (timeRaw.isEmpty()) null else ReminderTimeText.parse(timeRaw) ?: return Due.Bad("time must look like 18:00")
     val nowMs = now()
+    // The model's own "today" can be a UTC date; relative days are resolved here, on the Portal's clock.
+    if (dayRaw.isNotEmpty()) {
+      val offset = dayOffset(dayRaw, nowMs) ?: return Due.Bad("day must be today, tomorrow or a weekday")
+      return ReminderDue.dueFrom(offset, clock, nowMs, zone())?.let { Due.At(it) } ?: Due.Bad("that time has already passed")
+    }
     if (dateRaw.isEmpty()) return Due.At(ReminderDue.nextAt(clock!!.hour, clock.minute, nowMs, zone()))
     val m = DATE.matchEntire(dateRaw) ?: return Due.Bad("date must look like 2026-11-20")
     val ms = ReminderDue.at(m.groupValues[1].toInt(), m.groupValues[2].toInt(), m.groupValues[3].toInt(),
         clock?.hour ?: DEFAULT_HOUR, clock?.minute ?: 0, zone()) ?: return Due.Bad("that date doesn't exist")
     return if (ms <= nowMs) Due.Bad("that time has already passed") else Due.At(ms)
+  }
+
+  /** today 0, tomorrow 1, a weekday its next occurrence (1..7 days ahead); null for anything else. */
+  private fun dayOffset(day: String, nowMs: Long): Int? = when (day) {
+    "today", "tonight" -> 0
+    "tomorrow" -> 1
+    else -> WEEKDAYS.indexOf(day).takeIf { it >= 0 }?.let { target ->
+      val today = java.util.Calendar.getInstance(zone()).apply { timeInMillis = nowMs }.get(java.util.Calendar.DAY_OF_WEEK) - 1
+      ((target - today + 7) % 7).let { if (it == 0) 7 else it }
+    }
   }
 
   private fun spokenWhen(ms: Long): String {
@@ -205,6 +221,7 @@ internal class HearthpaneReminders(
     private const val MAX_LIST = 10
     private const val MATCH = 0.6
     private const val DEFAULT_HOUR = 9
+    private val WEEKDAYS = listOf("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")
     private val DATE = Regex("^(\\d{4})-(\\d{2})-(\\d{2})$")
     private val ME_WORDS = setOf("me", "myself", "i", "mine", "my")
     private val HOUSEHOLD_WORDS = setOf("household", "home", "everyone", "everybody", "family", "us", "all", "the household")

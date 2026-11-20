@@ -50,7 +50,7 @@ class HearthpaneToolDeclarationsTest {
     val r = (0 until decls.length()).map { decls.getJSONObject(it) }.single { it.getString("name") == HearthpaneTools.REMINDERS }
     assertEquals("action", r.getJSONObject("parameters").getJSONArray("required").getString(0))
     val props = r.getJSONObject("parameters").getJSONObject("properties")
-    for (key in listOf("action", "title", "for", "time", "date", "private", "id")) assertTrue(key, props.has(key))
+    for (key in listOf("action", "title", "for", "time", "day", "date", "private", "id")) assertTrue(key, props.has(key))
     assertEquals("BOOLEAN", props.getJSONObject("private").getString("type"))
     assertTrue(r.getString("description").contains("needs_person"))
     assertTrue(r.getString("description").contains("never read out"))
