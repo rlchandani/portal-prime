@@ -45,9 +45,16 @@ internal object ControlCenter {
     e.post { e.ui = e.ui.copy(settings = ControlCenterConfig.load(e.app)); e.restart() }
   }
 
+  /** Presence and recognitions changed ([RoomSignals]); republished only while someone looks. */
+  fun setSignals(context: Context, signals: CcRoomSignals) {
+    val e = engine(context)
+    e.post { if (e.ui.signals != signals) { e.ui = e.ui.copy(signals = signals); if (e.foreground) e.publish() } }
+  }
+
   fun reloadSettings(context: Context) {
     val e = engine(context)
     e.post { e.ui = e.ui.copy(settings = ControlCenterConfig.load(e.app)); e.publish(); e.ensure() }
+    RoomSignals.refresh()
   }
 
   fun retryNow(context: Context) { val e = engine(context); e.post { e.attempt = 0; e.restart() } }

@@ -25,9 +25,14 @@ internal data class CcOpeningView(
     val progress: Float,
 )
 
-internal enum class CcMapPulseTone { MOTION, OPEN, LEAK }
+/** [OCCUPIED]: someone is in the room (fused occupancy); drawn in the motion blue, as soft as its confidence. */
+internal enum class CcMapPulseTone { MOTION, OPEN, LEAK, OCCUPIED }
 
-internal data class CcMapPulse(val x: Float, val y: Float, val radius: Float, val tone: CcMapPulseTone)
+/** [strength] 0..1 scales the ring's opacity (a fading motion trail pulses softer than a Portal that sees someone). */
+internal data class CcMapPulse(val x: Float, val y: Float, val radius: Float, val tone: CcMapPulseTone, val strength: Float = 1f)
+
+/** A person Who's there? recognised in a room, as the mock's avatar chip (initial on their colour). */
+internal data class CcMapPerson(val key: String, val x: Float, val y: Float, val initial: String, val rgb: Int, val name: String)
 
 internal enum class CcMapBadgeKind { LOCKED, UNLOCKED, CAMERA, CLIMATE, APPLIANCE, APPLIANCE_DONE, LEAK }
 
@@ -50,6 +55,7 @@ internal data class CcPlanModel(
     val dots: List<CcMapDot>,
     val chips: List<CcMapChip>,
     val lightsOn: Int,
+    val people: List<CcMapPerson> = emptyList(),
 ) {
   fun view(roomId: String): CcRoomView? = views.firstOrNull { it.room.id == roomId }
 
@@ -69,6 +75,10 @@ internal data class CcPlanModel(
     private const val CAMERA_CORNER = 1.4f
     private const val APPLIANCE_STEP = 2.4f
     private const val LEAK_RAISE = 2.5f
+    /** The mock's people row and "someone" ripple sit below the room name (plan units 62 / 40 on its 20-unit grid). */
+    private const val PEOPLE_DROP = 3.1f
+    private const val PEOPLE_STEP = 2.6f
+    private const val OCCUPIED_DROP = 2f
 
     fun build(
         floor: CcFloor,
@@ -76,6 +86,8 @@ internal data class CcPlanModel(
         settings: ControlCenterConfig.Settings,
         now: Long,
         appliancesDone: Map<String, Long> = emptyMap(),
+        /** This floor's fused occupancy ([CcOccupancy.forFloor]); already filtered by [CcPeoplePolicy]. */
+        occupancy: Map<String, CcRoomOcc> = emptyMap(),
     ): CcPlanModel {
       // Only kids mode hides anything; otherwise reuse the map as is (no copy of every entity).
       val visible = if (settings.kids) entities.filterValues { !CcPolicy.hidden(it, settings) } else entities
@@ -85,8 +97,18 @@ internal data class CcPlanModel(
       val badges = views.flatMap { badges(it, visible, appliancesDone) }
       val dots = views.flatMap(::dots)
       val chips = openings.mapNotNull { chip(it, entities, now) }
-      return CcPlanModel(floor, CcPlanGeo.bounds(floor), views, openings, pulses(views, openings, visible), badges, dots, chips,
-          views.sumOf { it.lightsOn })
+      val rooms = CcPeoplePolicy.anonymous(settings)
+      return CcPlanModel(floor, CcPlanGeo.bounds(floor), views, openings, pulses(views, openings, visible, if (rooms) occupancy else null),
+          badges, dots, chips, views.sumOf { it.lightsOn }, if (rooms) people(views, occupancy) else emptyList())
+    }
+
+    /** Each room's recognised people in a row under its name, centred (the mock's `.pp`). */
+    fun people(views: List<CcRoomView>, occupancy: Map<String, CcRoomOcc>): List<CcMapPerson> = views.flatMap { v ->
+      val ps = occupancy[v.room.id]?.people.orEmpty()
+      val c = CcPlanGeo.center(v.room.rect)
+      ps.mapIndexed { i, p ->
+        CcMapPerson(p.key, c.x - (ps.size - 1) * PEOPLE_STEP / 2f + i * PEOPLE_STEP, c.y + PEOPLE_DROP, p.initial, p.rgb, p.name)
+      }
     }
 
     private fun opening(o: CcOpening, floor: CcFloor, entities: Map<String, CcEntity>, s: ControlCenterConfig.Settings): CcOpeningView? {
@@ -101,15 +123,24 @@ internal data class CcPlanModel(
       return CcOpeningView(o, kind, CcPlanGeo.opening(room.rect, o.side, o.at, o.span), open, progress)
     }
 
-    /** Leaks first, then open things, then motion; never more than [MAX_PULSES]. */
-    fun pulses(views: List<CcRoomView>, openings: List<CcOpeningView>, entities: Map<String, CcEntity>): List<CcMapPulse> {
+    /**
+     * Leaks first, then open things, then people; never more than [MAX_PULSES]. With [occupancy] (the map
+     * shows who's where) each occupied room without a chip gets one soft ring at its centre — motion sensors
+     * feed that fusion, so they don't ring again at their own spot. Null (setting Off): motion rings as before.
+     */
+    fun pulses(views: List<CcRoomView>, openings: List<CcOpeningView>, entities: Map<String, CcEntity>,
+               occupancy: Map<String, CcRoomOcc>? = null): List<CcMapPulse> {
       val leaks = views.filter { v -> v.markers.any { it.kind == CcKind.LEAK && it.active } }
           .map { v -> CcPlanGeo.center(v.room.rect).let { CcMapPulse(it.x, it.y, LEAK_R, CcMapPulseTone.LEAK) } }
       val open = openings.filter { it.open }.map { o ->
         val m = o.line.mid
         CcMapPulse(m.x, m.y, if (o.kind == CcMapOpeningKind.GARAGE) GARAGE_R else OPEN_R, CcMapPulseTone.OPEN)
       }
-      val motion = views.flatMap { v ->
+      val motion = if (occupancy != null) views.mapNotNull { v ->
+        val o = occupancy[v.room.id]?.takeIf { it.occupied && it.people.isEmpty() } ?: return@mapNotNull null
+        val c = CcPlanGeo.center(v.room.rect)
+        CcMapPulse(c.x, c.y + OCCUPIED_DROP, MOTION_R, CcMapPulseTone.OCCUPIED, o.confidence)
+      } else views.flatMap { v ->
         v.markers.filter { it.kind == CcKind.MOTION && it.active && entities[it.entityId] != null }
             .map { m -> CcPlanGeo.device(v.room.rect, m.fx, m.fy).let { CcMapPulse(it.x, it.y, MOTION_R, CcMapPulseTone.MOTION) } }
       }

@@ -34,9 +34,15 @@ internal data class WhosTherePerson(
     val createdMs: Long,
     val pausedUntilMs: Long = 0L,
     val calendarUrl: String? = null,
+    /** "Never recognise me on this Portal": their templates are never matched here. */
+    val neverHere: Boolean = false,
+    /** "Show my room on the home map": opt-in (off by default, kids included) — see [CcPeoplePolicy]. */
+    val onMap: Boolean = false,
 ) {
   val initial: String get() = name.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "?"
   fun pausedAt(nowMs: Long): Boolean = pausedUntilMs > nowMs
+  /** Matched by a glance only when neither paused nor opted out of this Portal. */
+  fun recognisableAt(nowMs: Long): Boolean = !neverHere && !pausedAt(nowMs)
   val color: WhosThereColor get() = WhosThereColors.at(colorIndex)
 }
 

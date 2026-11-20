@@ -90,6 +90,14 @@ internal object CcSpeech {
     return "$floor floor plan, $view. $list. Tap a room to open it"
   }
 
+  /** Who the plan shows in [room]: "Maya here", "someone here", or "" (as the map draws it, so the same privacy). */
+  fun who(model: CcPlanModel, room: CcRoom): String {
+    val r = room.rect
+    val names = model.people.filter { r.contains(it.x, it.y) }.map { it.name }
+    if (names.isNotEmpty()) return "${names.joinToString(" and ")} here"
+    return if (model.pulses.any { it.tone == CcMapPulseTone.OCCUPIED && r.contains(it.x, it.y) }) "someone here" else ""
+  }
+
   /** A scene tile: "Good night, scene. Turns 8 things off". */
   fun scene(name: String, subtitle: String): String = if (subtitle.isBlank()) name else "$name. $subtitle"
 

@@ -64,6 +64,9 @@ internal class CcEngine(val app: Context) {
   @Volatile var clock: () -> Long = System::currentTimeMillis
   /** Floor models for the plan, kept between snapshots (engine thread only). */
   private val planModels = CcPlanModelCache()
+  /** One republish queued for when an occupancy signal next decays (motion fading, a sighting ageing out). */
+  private var decay: ScheduledFuture<*>? = null
+  private var decayAt: Long? = null
 
   private val client by lazy { OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS).connectTimeout(CONNECT_S, TimeUnit.SECONDS).build() }
 
@@ -321,11 +324,25 @@ internal class CcEngine(val app: Context) {
     }
     // Derive what every screen reads once, here on the engine thread, not inside a frame.
     ui = ui.copy(now = clock())
+    fuseOccupancy()
     ui = ui.copy(planModels = if (visible > 0) planModels.of(ui) else emptyMap()).warm()
     if (visible == 0) planModels.clear()
     flow.value = ui
     HomeControlDotStore.update(ui, visible > 0)
     if (alertsToo && ui.connection.phase == CcPhase.LIVE) presentNewAlerts()
+  }
+
+  /** People in rooms, only while someone looks (screen or phone); unchanged results keep their instance. */
+  private fun fuseOccupancy() {
+    val s = ui.settings
+    val occ = if (!foreground) CcOccupancy.NONE
+    else CcOccupancyFusion.fuse(ui.plan, ui.entities, ui.registry, ui.signals, CcPeoplePolicy.anonymous(s), CcPeoplePolicy.named(s), ui.now)
+    if (occ != ui.occupancy) ui = ui.copy(occupancy = occ)
+    val at = occ.nextChangeMs
+    if (at == decayAt) return
+    decay?.cancel(false)
+    decayAt = at
+    decay = at?.let { exec.schedule({ post { decayAt = null; publish() } }, (it - ui.now).coerceAtLeast(0L) + DECAY_SLACK_MS, TimeUnit.MILLISECONDS) }
   }
 
   private fun presentNewAlerts() {
@@ -345,6 +362,8 @@ internal class CcEngine(val app: Context) {
     private const val REGISTRY_PARTS = 5
     /** Websocket bursts are batched for this long before the UI sees them (~10 updates/s max). */
     const val FLUSH_MS = 100L
+    /** Republish just after a signal's decay boundary, so it has certainly passed. */
+    private const val DECAY_SLACK_MS = 250L
   }
 }
 

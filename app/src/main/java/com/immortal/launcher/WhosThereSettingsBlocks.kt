@@ -71,6 +71,7 @@ private fun personLine(p: WhosTherePerson, h: WhosThereHousehold): String {
   val looks = h.templatesOf(p.id)?.looks?.size ?: 0
   val role = if (p.role == WhosThereRole.KID) "Kid · managed by adults" else p.role.label
   return when {
+    p.neverHere -> "$role · not recognised on this Portal"
     p.pausedAt(System.currentTimeMillis()) -> "$role · paused"
     looks == 0 -> "$role · face not set up yet"
     else -> "$role · face set up"

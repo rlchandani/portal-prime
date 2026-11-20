@@ -133,6 +133,9 @@ internal object SettingsPageSections {
             section("Control Center · kids & confirmations", rows("controlcenter", "kidsHideLocks", "kidsHideGarage",
                 "kidsHideSecurity", "kidsHideCameras", "kidsHideValve", "kidsLockThermostat", "askUnlock", "askGarage", "askValve",
                 "askScenes"), footer = "Kids mode is enforced on this Portal only: Home Assistant can't limit what a token may do."),
+            section("Control Center · people on the map", rows("controlcenter", "mapPeople", "planRoom"),
+                footer = "Names appear only for people who turned on Show my room on the home map in People & Recognition. " +
+                    "Pick this Portal's room in Control Center › Settings › Portals."),
             section("Control Center · look", rows("controlcenter", "darkTheme", "planStyle", "reducedMotion", "pinLength", "exitDelaySec"),
                 advanced = true),
             section("MQTT", link("MQTT publishing", P.MQTT, "broker"), advanced = true),

@@ -32,6 +32,8 @@ internal class CcPlanTextPaints(c: CcColors, d: Density) {
   val bigCaption = paint(d, NAME_SP, c.text, W_SEMI, shadow = true)
   val chip = paint(d, CHIP_SP, CcStyle.EmberInk, W_EXTRA)
   val badge = paint(d, CHIP_SP, c.text, W_BOLD)
+  /** The initial on a person's chip (the mock's `.pp text`: 19, extra-bold, dark ink on every colour). */
+  val person = paint(d, CHIP_SP, PERSON_INK, W_EXTRA)
 
   private fun paint(d: Density, sp: Float, color: Color, weight: Int, shadow: Boolean = false) = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     textSize = with(d) { sp.sp.toPx() }
@@ -57,6 +59,7 @@ internal class CcPlanTextPaints(c: CcColors, d: Density) {
     const val SHADOW_LIGHT = 0.18f
     const val SHADOW_Y_DP = 1f
     const val SHADOW_BLUR_DP = 2f
+    val PERSON_INK = Color(0xFF14161B)
   }
 }
 
@@ -87,10 +90,12 @@ internal fun roomTexts(model: CcPlanModel, lens: CcLens, p: CcPlanTextPaints): M
     }
 
 /** Badge and chip texts (looked up by id while drawing). */
-internal class CcMapChipText(val badge: Map<String, CcPlanLabel>, val chip: Map<String, CcPlanLabel>)
+internal class CcMapChipText(val badge: Map<String, CcPlanLabel>, val chip: Map<String, CcPlanLabel>,
+                              val person: Map<String, CcPlanLabel> = emptyMap())
 
 internal fun chipTexts(model: CcPlanModel, p: CcPlanTextPaints): CcMapChipText {
   val badge = model.badges.filter { it.kind == CcMapBadgeKind.CLIMATE }.mapNotNull { b -> b.label?.let { b.entityId to CcPlanLabel(it, p.badge) } }.toMap()
   val chip = model.chips.associate { ch -> ch.entityId to CcPlanLabel(ch.text, p.chip) }
-  return CcMapChipText(badge, chip)
+  val person = model.people.associate { pp -> pp.key to CcPlanLabel(pp.initial, p.person) }
+  return CcMapChipText(badge, chip, person)
 }
