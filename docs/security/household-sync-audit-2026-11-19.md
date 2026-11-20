@@ -171,7 +171,7 @@ key refused, tampering refused before any write, method checks, rate limits),
 `test_fleet_sealed_restore.py` (12) run the scripts against a loopback stand-in Portal and check
 that no token, key or preference value reaches output or disk.
 
-Family (Portal+, `2221B01C7T01C0`), performance build of this branch (sha256 `906704f1...`), then
+Family (Portal+, `<family-serial>`), performance build of this branch (sha256 `906704f1...`), then
 restored to official 1.274 (sha256 `1aea49e8...a9d5`, matching the OTA log):
 
 | Check | Result |
