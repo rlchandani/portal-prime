@@ -41,11 +41,7 @@ internal object SettingsSyncNet {
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return null
-      val text = conn.inputStream.use { input ->
-        val buf = input.readNBytesCompat(MAX_BODY + 1)
-        if (buf.size > MAX_BODY) return null
-        String(buf, Charsets.UTF_8)
-      }
+      val text = BoundedRead.reply(conn, MAX_BODY) ?: return null
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       return payload.takeIf { SettingsSyncWire.verifyResponse(key, nonce, it, envelope.optString("sig")) }
@@ -59,6 +55,9 @@ internal object SettingsSyncNet {
     if (req.method != "POST") return RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
     if (req.contentLength !in 1..MAX_BODY) return RemoteFeatureRoutes.json(413, RemoteFeatureRoutes.error("body_too_large"))
     val key = HouseholdKey.get(context) ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("no_household_key"))
+    // Header first: an unsigned or stale request never gets its body read.
+    if (!PeerRequestGate.admits(req.header(SettingsSyncWire.HEADER), SettingsSyncWire.REQUEST_TYPE, key, System.currentTimeMillis()))
+      return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val text = try { req.bodyText(MAX_BODY) } catch (e: Exception) {
       return FleetHttpServer.requestBodyError(e) ?: RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_body"))
     }
@@ -69,17 +68,5 @@ internal object SettingsSyncNet {
         ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("unavailable"))
     return RemoteFeatureRoutes.json(200, JSONObject().put("payload", payload)
         .put("sig", SettingsSyncWire.signResponse(key, caller.nonce, payload)))
-  }
-
-  /** Reads at most [limit] bytes (InputStream.readNBytes is API 33+). */
-  private fun java.io.InputStream.readNBytesCompat(limit: Int): ByteArray {
-    val out = java.io.ByteArrayOutputStream()
-    val buf = ByteArray(8192)
-    while (out.size() < limit) {
-      val n = read(buf, 0, minOf(buf.size, limit - out.size()))
-      if (n < 0) break
-      out.write(buf, 0, n)
-    }
-    return out.toByteArray()
   }
 }

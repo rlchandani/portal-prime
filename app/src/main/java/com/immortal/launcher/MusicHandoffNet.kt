@@ -9,8 +9,6 @@ package com.immortal.launcher
 import android.content.Context
 import android.util.Log
 import android.os.SystemClock
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.SecureRandom
@@ -36,6 +34,9 @@ internal object MusicHandoffNet {
     if (req.method != "POST") return RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
     if (req.contentLength !in 1..MAX_REQUEST) return RemoteFeatureRoutes.json(413, RemoteFeatureRoutes.error("body_too_large"))
     val key = HouseholdKey.get(context) ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("no_household_key"))
+    // Header first: an unsigned or stale request never gets its body read.
+    if (!PeerRequestGate.admits(req.header(MusicHandoffAuth.HEADER), MusicHandoffAuth.FETCH_TYPE, key, System.currentTimeMillis()))
+      return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val text = try { req.bodyText(MAX_REQUEST) } catch (e: Exception) {
       return FleetHttpServer.requestBodyError(e) ?: RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_body"))
     }
@@ -77,7 +78,7 @@ internal object MusicHandoffNet {
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return null.also { Log.i(TAG, "fetch: HTTP ${conn.responseCode}") }
-      val text = conn.inputStream.use { readCapped(it, MAX_RESPONSE) } ?: return null
+      val text = BoundedRead.reply(conn, MAX_RESPONSE) ?: return null
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       if (!MusicHandoffAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) {
@@ -91,17 +92,4 @@ internal object MusicHandoffNet {
 
   /** The envelope wraps the payload as a JSON string, so allow escaping headroom over the payload cap. */
   private const val MAX_RESPONSE = MusicHandoffCodec.MAX_BODY_BYTES * 2
-
-  /** Reads at most [max] bytes; null when the body is longer. */
-  private fun readCapped(input: InputStream, max: Int): String? {
-    val out = ByteArrayOutputStream()
-    val buf = ByteArray(8 * 1024)
-    while (true) {
-      val n = input.read(buf)
-      if (n < 0) break
-      if (out.size() + n > max) return null
-      out.write(buf, 0, n)
-    }
-    return out.toString(Charsets.UTF_8.name())
-  }
 }

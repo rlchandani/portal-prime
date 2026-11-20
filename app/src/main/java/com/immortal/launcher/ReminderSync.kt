@@ -85,7 +85,7 @@ internal object ReminderSync {
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return false
-      val text = conn.inputStream.use { input -> readBounded(input, MAX_RESPONSE) } ?: return false
+      val text = BoundedRead.reply(conn, MAX_RESPONSE) ?: return false
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       if (!ReminderPeerAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return false
@@ -95,19 +95,6 @@ internal object ReminderSync {
     } finally {
       conn.disconnect()
     }
-  }
-
-  /** At most [max] bytes as UTF-8, or null if there are more: a peer can't make us buffer an unbounded reply. */
-  internal fun readBounded(input: java.io.InputStream, max: Int): String? {
-    val out = java.io.ByteArrayOutputStream()
-    val buf = ByteArray(16 * 1024)
-    while (true) {
-      val n = input.read(buf)
-      if (n < 0) break
-      if (out.size() + n > max) return null
-      out.write(buf, 0, n)
-    }
-    return String(out.toByteArray(), Charsets.UTF_8)
   }
 
   private fun clearRetry() {

@@ -48,6 +48,16 @@ internal data class HouseholdMessage(
 
     /** The message if [wire] is well-formed, signed with [key], fresh and not a replay; else null. */
     fun decode(wire: String, key: ByteArray, nowMs: Long, replay: ReplayGuard): HouseholdMessage? {
+      val message = authenticate(wire, key, nowMs) ?: return null
+      if (!replay.firstSighting(message.from, message.nonce)) return null
+      return message
+    }
+
+    /**
+     * Signature, shape and freshness only — the replay guard is not consulted or updated. Peer
+     * routes use it as a cheap gate before reading a large body; [decode] still decides.
+     */
+    fun authenticate(wire: String, key: ByteArray, nowMs: Long): HouseholdMessage? {
       if (wire.length > MAX_WIRE_CHARS || !wire.startsWith("$MAGIC|") || !HouseholdKey.isValidKey(key)) return null
       val cut = wire.lastIndexOf('|')
       if (cut <= MAGIC.length) return null
@@ -62,7 +72,6 @@ internal data class HouseholdMessage(
       }.getOrNull() ?: return null
       if (!TYPE.matches(message.type) || !TOKEN.matches(message.from) || !TOKEN.matches(message.nonce)) return null
       if (kotlin.math.abs(nowMs - message.ts) > MAX_SKEW_MS) return null
-      if (!replay.firstSighting(message.from, message.nonce)) return null
       return message
     }
 
