@@ -98,6 +98,10 @@ HPLcom/immortal/launcher/HomeHeaderStatusKt;->**(**)**
 HPLcom/immortal/launcher/HomeHeaderStatusKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeaderBarKt;->**(**)**
 HPLcom/immortal/launcher/HomeHeaderBarKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeGreetingKt;->**(**)**
+HPLcom/immortal/launcher/HomeGreetingKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeMusicCardKt;->**(**)**
+HPLcom/immortal/launcher/HomeMusicCardKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**

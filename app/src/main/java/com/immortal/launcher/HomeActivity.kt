@@ -136,9 +136,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -170,12 +167,8 @@ import com.immortal.launcher.ui.components.launchSafely
 import com.immortal.launcher.ui.components.pollingState
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
 import com.immortal.launcher.ui.theme.ContentSecondary
-import com.immortal.launcher.ui.theme.PrimeBlue
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -482,69 +475,6 @@ class HomeActivity : ComponentActivity() {
    */
   private fun launchStockHome() {
     PortalHomeBridge.launch(this)
-  }
-}
-
-/**
- * The mock's hero card: a 56sp thin clock over "Good evening, Name", with the current temp
- * (26sp light) + condition bottom-right. Ticks by the minute; honors the 12/24h setting.
- */
-@Composable
-private fun HeroClockCard(
-    greetingWord: String,
-    userName: String,
-    weather: Weather.Current?,
-    modifier: Modifier = Modifier,
-) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val use24 = remember { ImmortalSettings.use24HourClock(context) }
-  val fmt = remember(use24) { SimpleDateFormat(if (use24) "H:mm" else "h:mm", Locale.getDefault()) }
-  var now by remember { mutableStateOf(Date()) }
-  LaunchedEffect(Unit) {
-    while (true) {
-      now = Date()
-      delay(15_000)
-    }
-  }
-  LiquidGlassWidget(modifier = modifier) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.Bottom,
-    ) {
-      Column(Modifier.weight(1f)) {
-        Text(
-            fmt.format(now),
-            color = Color.White,
-            fontSize = 56.sp,
-            fontWeight = FontWeight.ExtraLight,
-            letterSpacing = (-2.5).sp,
-            lineHeight = 56.sp,
-        )
-        Text(
-            if (userName.isNotBlank()) "$greetingWord, $userName" else greetingWord,
-            color = Color.White.copy(alpha = 0.66f),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-      if (weather != null) {
-        Column(horizontalAlignment = Alignment.End) {
-          Text(
-              "${weather.temp}°",
-              color = Color.White,
-              fontSize = 26.sp,
-              fontWeight = FontWeight.Light,
-          )
-          Text(
-              weatherConditionText(weather.code),
-              color = Color.White.copy(alpha = 0.6f),
-              fontSize = 12.5.sp,
-              maxLines = 1,
-          )
-        }
-      }
-    }
   }
 }
 
@@ -1840,22 +1770,6 @@ private fun LauncherScreen(
 
 }
 
-// Minimal weather condition text without network deps
-internal fun weatherConditionText(code: Int): String = when (code) {
-  0 -> "Clear Sky"
-  in 1..3 -> "Partly Cloudy"
-  in 45..48 -> "Foggy"
-  in 51..67 -> "Rainy"
-  in 71..77 -> "Snowy"
-  in 80..82 -> "Showers"
-  in 95..99 -> "Thunderstorm"
-  else -> "Cloudy"
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// WiFi signal indicator
-// ─────────────────────────────────────────────────────────────────────────────
-
 @Composable
 private fun FadingDivider() {
   Box(
@@ -1892,7 +1806,7 @@ private fun FadingDivider() {
  * edge. No drop shadow (it bleeds through the translucent fill and muddies the centre), no gradient.
  */
 @Composable
-private fun LiquidGlass(
+internal fun LiquidGlass(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = Glass.Radius,
     content: @Composable BoxScope.() -> Unit = {},
@@ -1905,7 +1819,7 @@ private fun LiquidGlass(
 
 /** Liquid Glass widget tile (rounded 22dp). */
 @Composable
-private fun LiquidGlassWidget(
+internal fun LiquidGlassWidget(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -2143,354 +2057,6 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
       else -> "Widget"
     }
-
-/**
- * Home-header mini-player: premium card with rounded album art, glass-style card background,
- * a subtle left PrimeBlue border indicating active playback, and refined typography.
- * The art area is the play/pause touch target. Driven by [NowPlayingHub].
- */
-/**
- * Left-column "Now Playing" card. Subscribes to [NowPlayingHub] and renders the current track with
- * a tap-to-play/pause art target; self-hides (renders nothing) when nothing is playing, matching the
- * other self-hiding dashboard cards. Replaces the old always-present "Tap to play" stub.
- */
-@Composable
-private fun NowPlayingCard(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
-  var state by remember { mutableStateOf(NowPlayingHub.current) }
-  DisposableEffect(Unit) {
-    val l = NowPlayingHub.Listener { s -> mainHandler.post { state = s } }
-    NowPlayingHub.addListener(l) // replays current immediately
-    onDispose { NowPlayingHub.removeListener(l) }
-  }
-  val np = state ?: return // nothing playing → card hides entirely
-
-  var urlArt by remember(np.artUrl, np.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
-  LaunchedEffect(np.artUrl, np.artBitmap) {
-    if (np.artBitmap == null && np.artUrl.isNotBlank()) {
-      MediaArt.deliverUri(context, np.artUrl) { urlArt = it }
-    } else urlArt = null
-  }
-  val cover = np.artBitmap ?: urlArt
-
-  LiquidGlassWidget(modifier = modifier.height(80.dp)) {
-    Row(
-        modifier = Modifier.fillMaxSize().padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-      LiquidGlass(
-          modifier = Modifier.size(48.dp).tvFocusable(RoundedCornerShape(8.dp)) {
-            NowPlayingHub.playPause()
-          },
-          cornerRadius = 8.dp,
-      ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-          if (cover != null) {
-            Image(
-                bitmap = cover.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-          } else {
-            Text("♫", color = Color.White, fontSize = 18.sp)
-          }
-        }
-      }
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-            np.title.ifBlank { "Now Playing" },
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        if (np.artist.isNotBlank()) {
-          Text(
-              np.artist,
-              color = Color.White.copy(alpha = 0.55f),
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Light,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-          )
-        }
-      }
-    }
-  }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier, onOpenMusic: () -> Unit) {
-  // Playback/position notifications invalidate only the player, not the widget dashboard.
-  var state by remember { mutableStateOf(NowPlayingHub.current) }
-  val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
-  DisposableEffect(Unit) {
-    val listener = homeNowPlayingListener({ mainHandler.post(it) }) { state = it }
-    NowPlayingHub.addListener(listener)
-    onDispose { NowPlayingHub.removeListener(listener) }
-  }
-  state?.takeIf { it.active && it.source != SOURCE_YOUTUBE }?.let { MiniPlayer(it, modifier, onOpenMusic) }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-internal fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier, onOpenMusic: () -> Unit) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  // Some media apps hand cover art as a URI rather than an embedded bitmap. Resolve it off the
-  // main thread (content:// or http) so the header shows the cover too — the screensaver and the
-  // phone remote already do this via [MediaArt]; the mini-player was the one place that didn't.
-  var urlArt by remember(state.artUrl, state.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
-  androidx.compose.runtime.LaunchedEffect(state.artUrl, state.artBitmap) {
-    if (state.artBitmap == null && state.artUrl.isNotBlank()) {
-      MediaArt.deliverUri(context, state.artUrl) { urlArt = it }
-    } else urlArt = null
-  }
-  val cover = state.artBitmap ?: urlArt
-  Row(
-      modifier =
-          modifier
-              .clip(RoundedCornerShape(16.dp))
-              .background(ApprovedHomePalette.Chrome)
-              .border(1.dp, ApprovedHomePalette.Border, RoundedCornerShape(16.dp))
-              .padding(horizontal = 12.dp, vertical = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    // Album art with 8dp rounded corners; tapping toggles playback.
-    Box(
-        modifier =
-            Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .tvFocusable(RoundedCornerShape(8.dp)) { NowPlayingHub.playPause() },
-        contentAlignment = Alignment.Center,
-    ) {
-      val bmp = cover
-      if (bmp != null) {
-        Image(
-            bitmap = bmp.asImageBitmap(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(56.dp),
-        )
-      } else {
-        ApprovedHomeIcon("music", Modifier.size(40.dp), ApprovedHomePalette.Secondary)
-      }
-      // Subtle dark scrim + play/pause glyph overlay on the art.
-      Box(
-          Modifier.size(56.dp).background(Color(0x3D000000)),
-          contentAlignment = Alignment.Center,
-      ) {
-        PlayPauseGlyph(playing = state.state == PlaybackState.PLAYING)
-      }
-    }
-    Spacer(Modifier.size(12.dp))
-    Column(modifier = Modifier.weight(1f).semantics { contentDescription = "Open music player" }
-        .tvFocusable { onOpenMusic() }) {
-      Text(
-          state.title,
-          color = ApprovedHomePalette.Text,
-          fontSize = 26.sp,
-          lineHeight = 35.sp,
-          fontWeight = FontWeight.Medium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-      )
-      if (state.artist.isNotBlank()) {
-        Text(
-            state.artist,
-            color = ApprovedHomePalette.Secondary,
-            fontSize = 22.sp,
-            lineHeight = 30.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun PlayPauseGlyph(playing: Boolean) {
-  Canvas(modifier = Modifier.size(30.dp)) {
-    val w = size.minDimension
-    if (playing) {
-      // Two slim, fully-rounded bars with a clear gap between them — close-set square
-      // bars blur into a single block from across the room.
-      val barW = w * 0.13f
-      val top = w * 0.24f
-      val barH = w * 0.52f
-      val r = CornerRadius(barW * 0.5f, barW * 0.5f)
-      drawRoundRect(Color.White, topLeft = Offset(w * 0.30f, top), size = Size(barW, barH), cornerRadius = r)
-      drawRoundRect(Color.White, topLeft = Offset(w * 0.57f, top), size = Size(barW, barH), cornerRadius = r)
-    } else {
-      drawPath(
-          Path().apply {
-            moveTo(w * 0.32f, w * 0.22f)
-            lineTo(w * 0.32f, w * 0.78f)
-            lineTo(w * 0.80f, w * 0.50f)
-            close()
-          },
-          Color.White,
-      )
-    }
-  }
-}
-
-/** What the forecast widget currently has to show. */
-private sealed interface ForecastState {
-  /** First fetch still in flight — render nothing so the bar doesn't flash. */
-  object Loading : ForecastState
-  /** Tried and failed with nothing cached — show a friendly note instead. */
-  object Unavailable : ForecastState
-  data class Ready(val forecast: Weather.Forecast) : ForecastState
-}
-
-// The two swipeable forecast pages, in left-to-right order.
-private const val PAGE_HOURLY = 0
-private const val PAGE_DAILY = 1
-
-/**
- * Optional home-screen forecast, shown full-width below the app grid when enabled in
- * Immortal Settings ▸ Weather. One network call fetches both views; the user swipes
- * left/right between the hourly and 7-day pages. [mode] picks which page shows first
- * (and jumps to it if the setting changes). [fahrenheit] only keys a re-fetch when the
- * unit changes — the unit itself is resolved inside [Weather.fetchForecast].
- *
- * Failure handling: the fetch retries every minute until it succeeds. While the very
- * first attempt is in flight nothing is drawn (no flash). If it can't be reached and
- * we have no forecast yet, a quiet "unavailable" note replaces the data; once a
- * forecast has loaded, a later failed refresh keeps the last good one on screen rather
- * than blanking it.
- */
-@Composable
-private fun WeatherWidget(mode: String, fahrenheit: Boolean) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  // Keyed on the unit only: switching pages is a local swipe, not a re-fetch.
-  val state by
-      produceState<ForecastState>(initialValue = ForecastState.Loading, fahrenheit) {
-        while (true) {
-          val f = withContext(Dispatchers.IO) { Weather.fetchForecast(context) }
-          if (f != null) {
-            value = ForecastState.Ready(f)
-            delay(30L * 60 * 1000) // refresh every 30 min
-          } else {
-            // Keep showing the last good forecast if we have one; only surface the
-            // note when there's nothing to display.
-            if (value !is ForecastState.Ready) value = ForecastState.Unavailable
-            delay(60L * 1000) // retry in 1 min
-          }
-        }
-      }
-  if (state is ForecastState.Loading) return
-
-  val startPage = if (mode == ImmortalSettings.WIDGET_DAILY) PAGE_DAILY else PAGE_HOURLY
-  val pagerState = rememberPagerState(initialPage = startPage) { 2 }
-  // Follow the setting: if the user changes the default in Immortal Settings, jump to
-  // that page when they come back (no-op on first composition, where it already matches).
-  LaunchedEffect(mode) {
-    if (pagerState.currentPage != startPage) pagerState.scrollToPage(startPage)
-  }
-
-  val ready = state as? ForecastState.Ready
-  Surface(
-      color = Color(0x14FFFFFF),
-      shape = RoundedCornerShape(20.dp),
-      modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-  ) {
-    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-      // Header: the current page's title, plus a two-dot indicator hinting the swipe.
-      Row(
-          modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 12.dp),
-          verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(
-            when {
-              ready == null -> "Forecast"
-              pagerState.currentPage == PAGE_DAILY -> "7-day forecast"
-              else -> "Hourly forecast"
-            },
-            color = Color(0xFFBFBFBF),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.weight(1f),
-        )
-        if (ready != null) PageDots(selected = pagerState.currentPage, count = 2)
-      }
-      if (ready != null) {
-        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth()) { page ->
-          // Each page's cells share the width evenly, spanning the whole card.
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(8.dp),
-          ) {
-            if (page == PAGE_HOURLY) {
-              ready.forecast.hours.forEach { HourCell(it, Modifier.weight(1f)) }
-            } else {
-              ready.forecast.days.forEach { DayCell(it, Modifier.weight(1f)) }
-            }
-          }
-        }
-      } else {
-        // Unavailable: no connection / location yet. Retries quietly in the
-        // background, so no action is needed from the user.
-        Text(
-            "Forecast unavailable. It'll appear once your Portal is back online.",
-            color = Color(0xFF9A9A9A),
-            fontSize = 14.sp,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
-        )
-      }
-    }
-  }
-}
-
-/** Small page-position dots, hinting the forecast can be swiped between its pages. */
-@Composable
-private fun PageDots(selected: Int, count: Int) {
-  Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-    repeat(count) { i ->
-      val isActive = i == selected
-      Box(
-          modifier =
-              Modifier.size(if (isActive) 6.dp else 4.dp)
-                  .clip(androidx.compose.foundation.shape.CircleShape)
-                  .background(if (isActive) PrimeBlue else Color(0x55FFFFFF)))
-    }
-  }
-}
-
-@Composable
-private fun HourCell(h: Weather.HourForecast, modifier: Modifier = Modifier) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = modifier.padding(vertical = 4.dp),
-  ) {
-    Text(h.label, color = Color(0xFFCFCFCF), fontSize = 13.sp, maxLines = 1)
-    Text(Weather.emoji(h.code), fontSize = 26.sp, modifier = Modifier.padding(vertical = 6.dp))
-    Text("${h.temp}°", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-  }
-}
-
-@Composable
-private fun DayCell(d: Weather.DayForecast, modifier: Modifier = Modifier) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = modifier.padding(vertical = 4.dp),
-  ) {
-    Text(d.label, color = Color(0xFFCFCFCF), fontSize = 13.sp, maxLines = 1)
-    Text(Weather.emoji(d.code), fontSize = 26.sp, modifier = Modifier.padding(vertical = 6.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      Text("${d.hi}°", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-      Text("${d.lo}°", color = Color(0xFF9A9A9A), fontSize = 16.sp)
-    }
-  }
-}
 
 @Composable
 private fun PortalHomeTile(onClick: () -> Unit) {
@@ -3467,88 +3033,4 @@ private fun ApprovedWidgetLibrary(
       onHome = onHome, onCustomize = onCustomize, onRefresh = onRefresh,
       onPair = onPair, onSleep = onSleep, onSearch = onSearch, onSettings = onSettings,
   )
-}
-
-/** Minute ticking is scoped to this chrome; the dashboard never reads this clock state. */
-@Composable
-private fun ApprovedHomeGreeting(
-    welcome: WelcomeConfig.Settings,
-    use24: Boolean,
-    compact: Boolean = false,
-    layout: LayoutClass = LayoutClass.LARGE,
-) {
-  val now by produceState(initialValue = Date()) {
-    while (true) {
-      delay(60_000L - System.currentTimeMillis() % 60_000L)
-      value = Date()
-    }
-  }
-  val timeFmt = remember(use24) { SimpleDateFormat(if (use24) "H:mm" else "h:mm", Locale.getDefault()) }
-  val dayFmt = remember { SimpleDateFormat("EEEE", Locale.getDefault()) }
-  val dateFmt = remember { SimpleDateFormat("MMMM d", Locale.getDefault()) }
-  val zone = TimeZone.getDefault()
-  timeFmt.timeZone = zone
-  dayFmt.timeZone = zone
-  dateFmt.timeZone = zone
-  val hour = java.util.Calendar.getInstance(zone).apply { time = now }.get(java.util.Calendar.HOUR_OF_DAY)
-  val greeting = when (hour) {
-    in 5..11 -> welcome.greetingMorning
-    in 12..16 -> welcome.greetingAfternoon
-    in 17..21 -> welcome.greetingEvening
-    else -> welcome.greetingNight
-  }
-  val greetingText = if (welcome.userName.isBlank()) greeting.trimEnd('.', '!') + "."
-      else greeting.trimEnd('.', '!') + ", " + welcome.userName
-  if (layout.compact) {
-    CompactHomeGreeting(greetingText, timeFmt.format(now), dayFmt.format(now), dateFmt.format(now),
-        offline = compact, portrait = layout.compactPortrait)
-    return
-  }
-  // Minimum, not fixed, height: a fixed 96dp clipped the subtitle's descenders on device.
-  Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 68.dp else 96.dp), verticalAlignment = Alignment.CenterVertically) {
-    Column(Modifier.weight(1f)) {
-      Text(greetingText, color = ApprovedHomePalette.Text, fontSize = 52.sp, lineHeight = 58.sp,
-          fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      if (!compact) Text("Everything within reach.", color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
-          lineHeight = 32.sp, modifier = Modifier.padding(top = 4.dp))
-    }
-    Text(timeFmt.format(now), color = ApprovedHomePalette.Text, fontSize = 80.sp, lineHeight = 88.sp,
-        fontWeight = FontWeight.Normal, letterSpacing = (-2).sp)
-    Text(dayFmt.format(now) + "\n" + dateFmt.format(now), color = ApprovedHomePalette.Secondary,
-        fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(start = 24.dp))
-  }
-}
-
-/**
- * The compact greeting. Upright (800 dp): the greeting on its own line above the clock and date,
- * so neither truncates the other. Turned (1280×740 dp): one row, smaller, to leave the widgets height.
- * Every line is single-line; nothing can wrap mid-word.
- */
-@Composable
-private fun CompactHomeGreeting(greeting: String, time: String, day: String, date: String, offline: Boolean,
-                                portrait: Boolean) {
-  if (portrait) {
-    Column(Modifier.fillMaxWidth()) {
-      Text(greeting, color = ApprovedHomePalette.Text, fontSize = 36.sp, lineHeight = 44.sp,
-          fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Row(Modifier.fillMaxWidth().padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(time, color = ApprovedHomePalette.Text, fontSize = 56.sp, lineHeight = 64.sp,
-            fontWeight = FontWeight.Normal, letterSpacing = (-1.5).sp, maxLines = 1, softWrap = false)
-        Text("$day, $date", color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(start = 20.dp))
-      }
-      if (!offline) Text("Everything within reach.", color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
-          lineHeight = 28.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-  } else {
-    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp), verticalAlignment = Alignment.CenterVertically) {
-      Text(greeting, color = ApprovedHomePalette.Text, fontSize = 40.sp, lineHeight = 48.sp,
-          fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-      Text(time, color = ApprovedHomePalette.Text, fontSize = 60.sp, lineHeight = 66.sp,
-          fontWeight = FontWeight.Normal, letterSpacing = (-1.5).sp, maxLines = 1, softWrap = false,
-          modifier = Modifier.padding(start = 24.dp))
-      Text(day + "\n" + date, color = ApprovedHomePalette.Secondary, fontSize = 20.sp, lineHeight = 26.sp,
-          maxLines = 2, softWrap = false, modifier = Modifier.padding(start = 20.dp))
-    }
-  }
 }
