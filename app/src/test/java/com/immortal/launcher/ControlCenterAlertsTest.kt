@@ -54,6 +54,8 @@ class ControlCenterAlertsTest {
     assertEquals("Washer is done", alerts.single().title)
     assertEquals("Laundry", alerts.single().body)
     assertEquals("17 min", CcAlerts.duration(17)); assertEquals("1 h 5 min", CcAlerts.duration(65)); assertEquals("just now", CcAlerts.duration(0))
+    assertEquals("23 h 59 min", CcAlerts.duration(24 * 60L - 1)); assertEquals("1 day", CcAlerts.duration(24 * 60L))
+    assertEquals("12 days", CcAlerts.duration(310 * 60L + 15))
   }
 
   @Test fun banners_followDecisions() {

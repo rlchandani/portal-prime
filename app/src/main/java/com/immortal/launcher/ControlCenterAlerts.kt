@@ -106,11 +106,16 @@ internal object CcAlerts {
 
   private fun id(e: CcEntity) = "${e.id}@${e.lastChanged}"
 
+  /** "just now", "17 min", "1 h 5 min", then whole days ("1 day", "12 days") instead of "310 h 15 min". */
   fun duration(mins: Long): String = when {
     mins < 1 -> "just now"
-    mins < 60 -> "$mins min"
-    else -> "${mins / 60} h ${mins % 60} min"
+    mins < MIN_PER_H -> "$mins min"
+    mins < MIN_PER_DAY -> "${mins / MIN_PER_H} h ${mins % MIN_PER_H} min"
+    else -> (mins / MIN_PER_DAY).let { d -> if (d == 1L) "1 day" else "$d days" }
   }
+
+  private const val MIN_PER_H = 60L
+  private const val MIN_PER_DAY = 24 * MIN_PER_H
 }
 
 /** How an alert reaches this Portal (pure). The Portal-wide banner policy from Decisions #5. */

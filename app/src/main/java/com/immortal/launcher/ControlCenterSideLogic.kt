@@ -31,7 +31,8 @@ internal data class CcCameraList(val cams: List<CcFloorTab>)
 
 /** One scene tile: the entity to run, its look and what it touches. */
 @Immutable
-internal data class CcSceneTile(val entity: CcEntity, val tone: CcSceneTone, val subtitle: String)
+internal data class CcSceneTile(val entity: CcEntity, val tone: CcSceneTone, val subtitle: String,
+    val title: String = entity.name)
 
 /**
  * The overview side column's whole input, derived once per snapshot ([CcUiState.side]). The engine
@@ -102,7 +103,26 @@ internal object CcSideLogic {
 
   /** The scene grid's tiles, picked and described once per state change. */
   fun tiles(all: List<CcEntity>, plan: CcPlan?, kids: Boolean): List<CcSceneTile> =
-      pick(all, kids).map { CcSceneTile(it, tone(it), subtitle(it, plan)) }
+      pick(all, kids).map { e ->
+        val (group, title) = sceneName(e.name)
+        val sub = subtitle(e, plan)
+        // The group tag replaces the generic second line ("Turn Off" / "All Fans"), so two tagged
+        // tiles with the same action still read apart.
+        CcSceneTile(e, tone(e), if (group != null && sub in GENERIC_SUBTITLES) group else sub, title)
+      }
+
+  /**
+   * Splits a Home Assistant "[Group]: Action" naming tag off a scene or script name, so a tile reads
+   * "Arm Away" (mock: "Good night"), not "[Ring]: Arm Away". Names without the tag are unchanged.
+   */
+  fun sceneName(name: String): Pair<String?, String> {
+    val m = SCENE_TAG.matchEntire(name.trim()) ?: return null to name
+    val title = m.groupValues[2].trim()
+    return if (title.none { it.isLetterOrDigit() }) null to name else m.groupValues[1].trim().ifEmpty { null } to title
+  }
+
+  private val SCENE_TAG = Regex("""\[([^\]]{1,40})]\s*[:\-–·]?\s*(.+)""")
+  private val GENERIC_SUBTITLES = setOf("Runs a script", "Scene")
 
   /** What the scene touches: "Living room", "Kitchen & Dining", "Walks the house", "4 devices". */
   fun subtitle(e: CcEntity, plan: CcPlan?): String {
