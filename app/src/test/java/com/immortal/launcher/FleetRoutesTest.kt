@@ -19,34 +19,34 @@ class FleetRoutesTest {
   @Test
   fun modeFor_silentWhenDaemonUp_elsePausedOrDialog() {
     // The daemon (silent path) wins regardless of the paused flag.
-    assertEquals("silent", FleetRoutes.modeFor(daemonAvailable = true, paused = true))
-    assertEquals("silent", FleetRoutes.modeFor(daemonAvailable = true, paused = false))
+    assertEquals("silent", FleetInstallApi.modeFor(daemonAvailable = true, paused = true))
+    assertEquals("silent", FleetInstallApi.modeFor(daemonAvailable = true, paused = false))
     // No daemon: paused on a broken-installer Gen-1, else the system dialog.
-    assertEquals("paused", FleetRoutes.modeFor(daemonAvailable = false, paused = true))
-    assertEquals("dialog", FleetRoutes.modeFor(daemonAvailable = false, paused = false))
+    assertEquals("paused", FleetInstallApi.modeFor(daemonAvailable = false, paused = true))
+    assertEquals("dialog", FleetInstallApi.modeFor(daemonAvailable = false, paused = false))
   }
 
   @Test
   fun terminalResult_mapsStoreStatusStrings() {
-    assertEquals(true, FleetRoutes.terminalResult("Installed ✓"))
-    assertEquals(false, FleetRoutes.terminalResult("Install failed"))
-    assertEquals(false, FleetRoutes.terminalResult("Error: boom"))
-    assertEquals(false, FleetRoutes.terminalResult("Paused — connect to your computer to add apps"))
+    assertEquals(true, FleetInstallApi.terminalResult("Installed ✓"))
+    assertEquals(false, FleetInstallApi.terminalResult("Install failed"))
+    assertEquals(false, FleetInstallApi.terminalResult("Error: boom"))
+    assertEquals(false, FleetInstallApi.terminalResult("Paused — connect to your computer to add apps"))
     // Progress messages are not terminal.
-    assertNull(FleetRoutes.terminalResult("Downloading…"))
-    assertNull(FleetRoutes.terminalResult("Installing…"))
-    assertNull(FleetRoutes.terminalResult("Resolving…"))
+    assertNull(FleetInstallApi.terminalResult("Downloading…"))
+    assertNull(FleetInstallApi.terminalResult("Installing…"))
+    assertNull(FleetInstallApi.terminalResult("Resolving…"))
   }
 
   @Test
   fun progressDoesNotInvalidateButEveryTerminalOutcomeDoes() {
     var invalidations = 0
     val invalidate = { invalidations++; Unit }
-    assertNull(FleetRoutes.terminalResultAndInvalidate("Downloading…", invalidate))
+    assertNull(FleetInstallApi.terminalResultAndInvalidate("Downloading…", invalidate))
     assertEquals(0, invalidations)
-    assertEquals(true, FleetRoutes.terminalResultAndInvalidate("Installed ✓", invalidate))
+    assertEquals(true, FleetInstallApi.terminalResultAndInvalidate("Installed ✓", invalidate))
     assertEquals(1, invalidations)
-    assertEquals(false, FleetRoutes.terminalResultAndInvalidate("Error: generated failure", invalidate))
+    assertEquals(false, FleetInstallApi.terminalResultAndInvalidate("Error: generated failure", invalidate))
     assertEquals(2, invalidations)
   }
 
@@ -62,16 +62,16 @@ class FleetRoutesTest {
     cache.invalidate()
     assertEquals(1L, requireNotNull(cache.snapshot(context, setOf("app"))).versionCode("app"))
     version = 2L
-    assertEquals(true, FleetRoutes.terminalResultAndInvalidate("Installed ✓", cache::invalidate))
+    assertEquals(true, FleetInstallApi.terminalResultAndInvalidate("Installed ✓", cache::invalidate))
     assertEquals(2L, requireNotNull(cache.snapshot(context, setOf("app"))).versionCode("app"))
   }
 
   @Test
   fun constantTimeEquals_matchesOnlyIdentical() {
-    assertTrue(FleetRoutes.constantTimeEquals("abc123", "abc123"))
-    assertTrue(FleetRoutes.constantTimeEquals("", ""))
-    assertFalse(FleetRoutes.constantTimeEquals("abc123", "abc124"))
-    assertFalse(FleetRoutes.constantTimeEquals("abc", "abcd")) // length mismatch
-    assertFalse(FleetRoutes.constantTimeEquals("", "x"))
+    assertTrue(FleetAuth.constantTimeEquals("abc123", "abc123"))
+    assertTrue(FleetAuth.constantTimeEquals("", ""))
+    assertFalse(FleetAuth.constantTimeEquals("abc123", "abc124"))
+    assertFalse(FleetAuth.constantTimeEquals("abc", "abcd")) // length mismatch
+    assertFalse(FleetAuth.constantTimeEquals("", "x"))
   }
 }

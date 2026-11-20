@@ -194,7 +194,7 @@ object RemotePairing {
   fun isValidSession(c: Context, token: String, now: Long = System.currentTimeMillis()): Boolean {
     if (token.isBlank()) return false
     val current = loadReconciled(c, now)
-    val match = current.tokens.firstOrNull { FleetRoutes.constantTimeEquals(it, token) } ?: return false
+    val match = current.tokens.firstOrNull { FleetAuth.constantTimeEquals(it, token) } ?: return false
     val id = RemoteSessionPolicy.idOf(match)
     val record = current.records[id] ?: return false
     RemoteSessionPolicy.touched(record, now)?.let { bookkeeping { store(c, current.tokens, current.records + (id to it)) } }
@@ -325,7 +325,7 @@ object RemotePairing {
   internal fun pinMatches(stored: String?, expiresAt: Long, candidate: String, now: Long): Boolean {
     if (stored.isNullOrBlank()) return false
     if (now >= expiresAt) return false
-    return FleetRoutes.constantTimeEquals(stored, candidate.trim())
+    return FleetAuth.constantTimeEquals(stored, candidate.trim())
   }
 
   private val rng = SecureRandom()
