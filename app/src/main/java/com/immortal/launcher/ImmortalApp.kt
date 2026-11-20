@@ -151,6 +151,9 @@ class ImmortalApp : Application() {
     // Publish this Portal to Home Assistant over MQTT if the user configured a broker
     // (no-op otherwise). Off by default.
     MqttService.sync(this)
+
+    // Baseline profile for OTA installs, well after startup (replaces androidx's initializer).
+    BackgroundProfileInstall.schedule(this)
   }
 
   /** Shrinks the decoded-image caches under memory pressure or once our UI is hidden. */

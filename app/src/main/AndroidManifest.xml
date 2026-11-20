@@ -838,6 +838,17 @@
             <meta-data android:name="com.portal.assistant.tools" android:value="@string/jarvis_tools" />
             <meta-data android:name="com.portal.assistant.tools.summary" android:value="@string/jarvis_tools_summary" />
         </provider>
+
+        <!-- Cold start: none of androidx Startup's initializers belong in bindApplication here.
+             EmojiCompat can't load a font on a Portal (no font provider, no GMS) and nothing reads
+             ProcessLifecycleOwner, yet together they cost ~130 ms of storage waits on a cold boot.
+             ProfileInstallerInitializer requests a Choreographer frame from bindApplication, which
+             made Home's first frame count from inside Application.onCreate; BackgroundProfileInstall
+             does the same install later, off the main thread. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove" />
     </application>
 
 </manifest>
