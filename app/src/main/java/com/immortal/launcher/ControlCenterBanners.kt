@@ -30,7 +30,10 @@ import java.util.TimeZone
  * `TYPE_ACCESSIBILITY_OVERLAY` host ([BarWatchService]) so they show over Home, any app or the
  * photo frame. [CcBannerPolicy] decides: critical alerts take over the screen on every Portal
  * (kids mode and banners-only too); warnings/info are a top banner on Full Portals. Sound obeys
- * the household quiet hours (Settings › Sounds, 22:00–08:00 by default). Main thread only.
+ * the household quiet hours (Settings › Sounds, 22:00–08:00 by default). A real alert outlives its
+ * window: an accessibility unbind (UiAutomation, an app update) parks it in an [OverlayHold], and the
+ * next bind draws it again for the rest of its time; dismissals and expiry while parked still count.
+ * Main thread only.
  */
 internal object ControlCenterBanners {
   private const val TAG = "HearthpaneBanner"
@@ -47,16 +50,34 @@ internal object ControlCenterBanners {
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null
+  private var app: Context? = null
   private var view: View? = null
   /** The window manager [view] was added to (the accessibility host's, or a preview's Control Center window). */
   private var viewWm: WindowManager? = null
   private var viewHost: CcBannerHost = CcBannerHost.NONE
+  /** What [view] draws: a real alert or a preview. */
   private var showing: CcBannerSlot.Showing? = null
-  private val timeout = Runnable { remove() }
+  /** The real alert, kept through an accessibility unbind (see [OverlayHold]); previews are never held. */
+  private var real = OverlayHold<CcBannerHold.Entry>()
+  private var restored = false
+  private val previewTimeout = Runnable { if (showing?.preview == true) removeView() }
+  private val realExpiry = Runnable { expireReal() }
 
-  fun attach(service: AccessibilityService) = main.post { host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager }
+  /** The accessibility host bound: a real alert parked by an unbind (or an app update) comes back. */
+  fun attach(service: AccessibilityService) = main.post {
+    host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+    restoreOnce(service.applicationContext)
+    real = real.hostReady(OverlayHoldStore.now())
+    if (real.shown) { Log.i(TAG, "real alert back after a rebind"); drawReal() } else persist()
+  }
 
-  fun detach() = main.post { if (CcBannerHost.removedOnDetach(viewHost)) remove(); host = null; wm = null }
+  /** [service] unbound: the system takes its windows; the real alert stays held until it binds again. */
+  fun detach(service: AccessibilityService) = main.post {
+    if (host !== service) return@post // an older instance's unbind after the new one bound
+    if (CcBannerHost.removedOnDetach(viewHost)) removeView()
+    if (real.held != null) Log.i(TAG, "accessibility host unbound; real alert held")
+    real = real.hostLost(); host = null; wm = null
+  }
 
   /** From the engine thread when an alert first becomes active. */
   fun offer(context: Context, alert: CcAlert, settings: ControlCenterConfig.Settings, appVisible: Boolean, dryRun: Boolean = false) {
@@ -75,18 +96,35 @@ internal object ControlCenterBanners {
     if (appVisible && decision.show != CcBannerPolicy.Show.TAKEOVER) return
     Log.i(TAG, "control center ${alert.severity.name.lowercase()} alert shown")
     main.post {
-      if (!CcBannerSlot.admitReal(showing, alert)) return@post
-      val ctx = host ?: run { Log.w(TAG, "banner before the accessibility host attached; not shown"); return@post }
-      val wmgr = wm ?: return@post
-      ScreenControl.wake(app)
       val takeover = decision.show == CcBannerPolicy.Show.TAKEOVER
-      show(ctx, wmgr, alert, takeover, if (takeover) TAKEOVER_MS else BANNER_MS, preview = false,
-          CcBannerHost.ACCESSIBILITY)
+      if (!holdReal(app, alert, takeover)) return@post
       if (decision.sound) {
         val volume = ((chime?.volume ?: 0) / PERCENT).coerceIn(MIN_VOLUME, 1f)
         runCatching { ChimePlayer.playPing(app, CRITICAL_RINGS, volume) }.onFailure { Log.w(TAG, "alert sound failed", it) }
       }
     }
+  }
+
+  /**
+   * Fleet `cc_debug` `showTestTakeover` (operator only, dry run on): [alert] as a real takeover, held
+   * like one, so the unbind and update paths can be checked on a device. Silent; no relay, gate or history.
+   */
+  fun offerTest(context: Context, alert: CcAlert) {
+    val app = context.applicationContext
+    main.post { if (holdReal(app, alert, takeover = true)) Log.i(TAG, "test takeover shown (silent)") }
+  }
+
+  /** Main thread. Holds [alert] (replacing whatever was held) and draws it when the host is up. */
+  private fun holdReal(app: Context, alert: CcAlert, takeover: Boolean): Boolean {
+    restoreOnce(app)
+    if (!CcBannerSlot.admitReal(CcBannerHold.slot(real, showing), alert)) return false
+    ScreenControl.wake(app)
+    val now = OverlayHoldStore.now()
+    real = real.offer(alert.id, CcBannerHold.Entry(alert, takeover), now + if (takeover) TAKEOVER_MS else BANNER_MS)
+    persist()
+    if (real.shown) drawReal()
+    else { scheduleExpiry(now); Log.w(TAG, "real alert held until the accessibility host binds") }
+    return true
   }
 
   /**
@@ -99,24 +137,27 @@ internal object ControlCenterBanners {
     val req = CcBannerPreview.request(alert) ?: return
     main.post {
       val sev = req.alert.severity.name.lowercase()
-      if (!CcBannerSlot.admitPreview(showing)) { Log.i(TAG, "banner preview $sev skipped: a real alert is showing"); return@post }
+      if (!CcBannerSlot.admitPreview(CcBannerHold.slot(real, showing))) {
+        Log.i(TAG, "banner preview $sev skipped: a real alert is showing"); return@post
+      }
       val a11y = host
       val a11yWm = wm
       val usable = activity?.takeUnless { it.isFinishing || it.isDestroyed }
       val where = CcBannerHost.forPreview(a11y != null && a11yWm != null, usable != null)
       Log.i(TAG, "banner preview $sev host=${where.name.lowercase()}")
-      when {
-        where == CcBannerHost.ACCESSIBILITY && a11y != null && a11yWm != null -> show(a11y, a11yWm, req.alert, req.takeover, req.timeoutMs,
-            preview = true, CcBannerHost.ACCESSIBILITY)
-        where == CcBannerHost.ACTIVITY && usable != null -> show(usable, usable.windowManager, req.alert, req.takeover, req.timeoutMs,
+      val drawn = when {
+        where == CcBannerHost.ACCESSIBILITY && a11y != null && a11yWm != null ->
+          draw(a11y, a11yWm, req.alert, req.takeover, preview = true, CcBannerHost.ACCESSIBILITY)
+        where == CcBannerHost.ACTIVITY && usable != null -> draw(usable, usable.windowManager, req.alert, req.takeover,
             preview = true, CcBannerHost.ACTIVITY, usable.window?.decorView?.windowToken)
-        else -> Log.w(TAG, "banner preview $sev: no window to draw in; not shown")
+        else -> { Log.w(TAG, "banner preview $sev: no window to draw in; not shown"); false }
       }
+      if (drawn) main.postDelayed(previewTimeout, req.timeoutMs)
     }
   }
 
   /** [activity] is leaving the screen: a preview drawn in its window goes with it. */
-  fun releaseActivity(activity: Activity) = main.post { if (viewWm === activity.windowManager) remove() }
+  fun releaseActivity(activity: Activity) = main.post { if (viewWm === activity.windowManager) removeView() }
 
   /** Household quiet hours now (Settings › Sounds); unreadable settings count as quiet, so nothing sounds by mistake. */
   fun quietNow(context: Context): Boolean = quietNow(runCatching { ChimeConfig.load(context.applicationContext) }.getOrNull())
@@ -124,25 +165,77 @@ internal object ControlCenterBanners {
   private fun quietNow(chime: ChimeConfig.Settings?): Boolean =
       chime?.let { DinnerQuiet.isQuiet(it, System.currentTimeMillis(), TimeZone.getDefault()) } ?: true
 
-  private fun show(ctx: Context, wmgr: WindowManager, alert: CcAlert, takeover: Boolean, timeoutMs: Long, preview: Boolean,
-                   where: CcBannerHost, token: android.os.IBinder? = null) {
+  /** The held real alert, in the accessibility overlay, for the rest of its time. */
+  private fun drawReal() {
+    val held = real.held ?: return
+    val ctx = host ?: return
+    val wmgr = wm ?: return
+    val now = OverlayHoldStore.now()
+    if (real.remainingMs(now) == null) { expireReal(); return }
+    if (!draw(ctx, wmgr, held.payload.alert, held.payload.takeover, preview = false, CcBannerHost.ACCESSIBILITY)) {
+      real = real.hostLost() // no window (the host is going away): stay held for the next bind
+    }
+    scheduleExpiry(now)
+  }
+
+  private fun scheduleExpiry(now: Long) {
+    main.removeCallbacks(realExpiry)
+    real.remainingMs(now)?.let { main.postDelayed(realExpiry, it) }
+  }
+
+  private fun expireReal() {
+    real = real.expire(OverlayHoldStore.now())
+    if (real.held == null) { persist(); if (showing?.preview == false) removeView() } else scheduleExpiry(OverlayHoldStore.now())
+  }
+
+  /** The user (or [hide]) dismissed the real alert: it is not brought back by a rebind. */
+  private fun dismissReal() {
+    main.removeCallbacks(realExpiry)
+    real = real.dismiss()
+    persist()
+    if (showing?.preview == false) removeView()
+  }
+
+  private fun restoreOnce(app: Context) {
+    this.app = app
+    if (restored) return
+    restored = true
+    if (real.held != null) return
+    val r = OverlayHoldStore.load(app, CcBannerHold.SLOT) ?: return
+    val entry = CcBannerHold.decode(r.payload) ?: return
+    Log.i(TAG, "real alert restored after a restart")
+    real = real.offer(r.id, entry, r.deadlineMs)
+    scheduleExpiry(OverlayHoldStore.now())
+  }
+
+  private fun persist() {
+    val ctx = app ?: return
+    OverlayHoldStore.save(ctx, CcBannerHold.SLOT, real.held?.let { OverlayHold.Held(it.id, CcBannerHold.encode(it.payload), it.deadlineMs) })
+  }
+
+  private fun draw(ctx: Context, wmgr: WindowManager, alert: CcAlert, takeover: Boolean, preview: Boolean,
+                   where: CcBannerHost, token: android.os.IBinder? = null): Boolean {
     val type = if (where == CcBannerHost.ACTIVITY) WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
         else WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
-    remove()
+    removeView()
     val root = if (takeover) takeoverView(ctx, alert, preview) else bannerView(ctx, alert, preview)
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT,
         if (takeover) WindowManager.LayoutParams.MATCH_PARENT else WindowManager.LayoutParams.WRAP_CONTENT,
         type, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
         .apply { gravity = Gravity.TOP; this.token = token }
-    runCatching { wmgr.addView(root, lp) }.onFailure { Log.w(TAG, "addView failed (preview=$preview)", it); return }
+    runCatching { wmgr.addView(root, lp) }.onFailure { Log.w(TAG, "addView failed (preview=$preview)", it); return false }
     view = root; viewWm = wmgr; viewHost = where; showing = CcBannerSlot.Showing(alert.severity, preview)
-    main.postDelayed(timeout, timeoutMs)
+    return true
   }
 
-  fun hide() = main.post { remove() }
+  /** Closes the real alert and any preview. */
+  fun hide() = main.post { dismissReal(); removeView() }
 
-  private fun remove() {
-    main.removeCallbacks(timeout)
+  /** A button on the drawn banner: a preview just closes, a real alert is dismissed for good. */
+  private fun close(preview: Boolean) = if (preview) removeView() else dismissReal()
+
+  private fun removeView() {
+    main.removeCallbacks(previewTimeout)
     view?.let { v -> runCatching { viewWm?.removeView(v) }.onFailure { Log.w(TAG, "removeView failed", it) } }
     view = null
     viewWm = null
@@ -163,9 +256,9 @@ internal object ControlCenterBanners {
     row.addView(glyph(ctx, alert, 88, if (alert.severity == CcSeverity.WARNING) WARN_ACCENT else Color.WHITE),
         LinearLayout.LayoutParams(px(ctx, 88), px(ctx, 88)).apply { rightMargin = px(ctx, 24) })
     row.addView(texts(ctx, alert, 30f, 22f, preview), LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-    if (!preview) row.addView(button(ctx, "View", false) { remove(); ControlCenterActivity.open(ctx) },
+    if (!preview) row.addView(button(ctx, "View", false) { close(preview); ControlCenterActivity.open(ctx) },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(ctx, 80)).apply { rightMargin = px(ctx, 14) })
-    row.addView(button(ctx, if (preview) CcBannerPreview.CLOSE_LABEL else "Dismiss", true) { remove() },
+    row.addView(button(ctx, if (preview) CcBannerPreview.CLOSE_LABEL else "Dismiss", true) { close(preview) },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(ctx, 80)))
     frame.addView(row, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT))
     return frame
@@ -183,9 +276,9 @@ internal object ControlCenterBanners {
     root.addView(TextView(ctx).apply { text = alert.body; setTextColor(DinnerCardOverlay.SECONDARY); textSize = 30f; gravity = Gravity.CENTER
       setPadding(0, px(ctx, 16), 0, px(ctx, 44)) })
     val actions = LinearLayout(ctx).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
-    if (!preview) actions.addView(button(ctx, "Open Control Center", false) { remove(); ControlCenterActivity.open(ctx) },
+    if (!preview) actions.addView(button(ctx, "Open Control Center", false) { close(preview); ControlCenterActivity.open(ctx) },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(ctx, 104)).apply { rightMargin = px(ctx, 24) })
-    actions.addView(button(ctx, if (preview) CcBannerPreview.CLOSE_LABEL else "I'm on it", true) { remove() },
+    actions.addView(button(ctx, if (preview) CcBannerPreview.CLOSE_LABEL else "I'm on it", true) { close(preview) },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(ctx, 104)))
     root.addView(actions)
     return root

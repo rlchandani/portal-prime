@@ -29,7 +29,8 @@ import android.widget.TextView
  * The doorbell card: the live door camera ([HaCameraFeed]) under "Someone's at the door" with
  * Dismiss and Open camera, drawn like [TimerDoneOverlay] (a `TYPE_ACCESSIBILITY_OVERLAY` hosted by
  * [BarWatchService]) so it shows over Home, any app or the photo-frame dream. A newer alert
- * replaces it; it closes itself after [DoorbellRing.SHOW_MS]. Main thread only.
+ * replaces it; it closes itself after [DoorbellRing.SHOW_MS]. An accessibility unbind or an app update
+ * doesn't close it early: it is held ([OverlayHold]) and comes back when the host binds. Main thread only.
  */
 internal object DoorbellCardOverlay {
   private const val TAG = "HearthpaneDoorbellCard"
@@ -48,29 +49,82 @@ internal object DoorbellCardOverlay {
   private const val DIVIDER = 0x22FFFFFF
 
   data class Card(val alertId: String, val title: String, val line: String, val status: String, val quiet: Boolean,
-                  val camera: String)
+                  val camera: String) {
+    /** The held card on disk ([OverlayHoldStore]): an app update must not drop someone at the door. */
+    companion object {
+      const val SLOT = "doorbell"
+      private const val MAX_TEXT = 200
+
+      fun encode(c: Card): org.json.JSONObject = org.json.JSONObject().put("alert", c.alertId).put("title", c.title)
+          .put("line", c.line).put("status", c.status).put("quiet", c.quiet).put("camera", c.camera)
+
+      fun decode(o: org.json.JSONObject?): Card? {
+        if (o == null) return null
+        val id = o.optString("alert").takeIf { it.isNotBlank() && it.length <= MAX_TEXT } ?: return null
+        val title = o.optString("title").take(MAX_TEXT).ifBlank { return null }
+        val camera = o.optString("camera").takeIf { it.length <= MAX_TEXT } ?: return null
+        return Card(id, title, o.optString("line").take(MAX_TEXT), o.optString("status").take(MAX_TEXT), o.optBoolean("quiet"), camera)
+      }
+    }
+  }
 
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null
+  private var app: Context? = null
   @Volatile private var view: View? = null
   private var feed: HaCameraFeed? = null
-  private val timeout = Runnable { remove() }
+  /** The card, kept through an accessibility unbind or an app update (see [OverlayHold]). */
+  private var hold = OverlayHold<Card>()
+  private var restored = false
+  private val timeout = Runnable { expire() }
 
   val showing: Boolean get() = view != null
 
+  /** The host bound: a card parked by an unbind (or restored after an update) comes back for the rest of its minute. */
   fun attach(service: AccessibilityService) {
-    main.post { host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager }
+    main.post {
+      host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+      restoreOnce(service.applicationContext)
+      hold = hold.hostReady(OverlayHoldStore.now())
+      if (hold.shown) { Log.i(TAG, "doorbell card back after a rebind"); draw() } else persist()
+    }
   }
 
-  fun detach() {
-    main.post { remove(); host = null; wm = null }
+  /** [service] unbound: the system takes the window; the card stays held until it binds again. */
+  fun detach(service: AccessibilityService) {
+    main.post {
+      if (host !== service) return@post // an older instance's unbind after the new one bound
+      removeView()
+      if (hold.held != null) Log.i(TAG, "accessibility host unbound; doorbell card held")
+      hold = hold.hostLost(); host = null; wm = null
+    }
   }
 
-  fun show(card: Card) {
-    val ctx = host ?: run { Log.w(TAG, "doorbell card before the accessibility host attached; not shown"); return }
+  /** Main thread. A newer card replaces the one held, showing or parked. */
+  fun show(context: Context, card: Card) {
+    restoreOnce(context)
+    val now = OverlayHoldStore.now()
+    hold = hold.offer(card.alertId, card, now + DoorbellRing.SHOW_MS)
+    persist()
+    if (hold.shown) draw() else { removeView(); schedule(now); Log.w(TAG, "doorbell card held until the accessibility host binds") }
+  }
+
+  /** Dismissed: it is not brought back by a rebind. */
+  fun hide() {
+    hold = hold.dismiss()
+    persist()
+    removeView()
+    main.removeCallbacks(timeout)
+  }
+
+  private fun draw() {
+    val card = hold.held?.payload ?: return
+    val ctx = host ?: return
     val wmgr = wm ?: return
-    remove()
+    val now = OverlayHoldStore.now()
+    if (hold.remainingMs(now) == null) { expire(); return }
+    removeView()
     val picture = ImageView(ctx).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
     val placeholder = TextView(ctx).apply {
       text = if (card.camera.isBlank()) "No camera chosen for the doorbell" else "Connecting to camera…"
@@ -81,7 +135,9 @@ internal object DoorbellCardOverlay {
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
         // FLAG_SECURE: the live door camera never shows in a screenshot or screen capture (Jarvis's included).
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_SECURE, PixelFormat.TRANSLUCENT)
-    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return }
+    schedule(now)
+    // No window (the host is going away): stay held for the next bind.
+    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); hold = hold.hostLost(); return }
     // Full-screen card: it would cover the YouTube player, so music pauses while it shows.
     YouTubeMusicEngine.setCovered(MusicCover.DOORBELL, true)
     if (card.camera.isNotBlank()) {
@@ -89,13 +145,36 @@ internal object DoorbellCardOverlay {
           onFrame = { bitmap -> picture.setImageBitmap(bitmap); placeholder.visibility = View.GONE },
           onUnavailable = { placeholder.text = "Camera unavailable on this Portal" }).also { it.start() }
     }
-    main.postDelayed(timeout, DoorbellRing.SHOW_MS)
   }
 
-  fun hide() = remove()
-
-  private fun remove() {
+  private fun schedule(now: Long) {
     main.removeCallbacks(timeout)
+    hold.remainingMs(now)?.let { main.postDelayed(timeout, it) }
+  }
+
+  private fun expire() {
+    hold = hold.expire(OverlayHoldStore.now())
+    if (hold.held == null) { persist(); removeView() } else schedule(OverlayHoldStore.now())
+  }
+
+  private fun restoreOnce(ctx: Context) {
+    app = ctx.applicationContext
+    if (restored) return
+    restored = true
+    if (hold.held != null) return
+    val r = OverlayHoldStore.load(ctx, Card.SLOT) ?: return
+    val card = Card.decode(r.payload) ?: return
+    Log.i(TAG, "doorbell card restored after a restart")
+    hold = hold.offer(r.id, card, r.deadlineMs)
+    schedule(OverlayHoldStore.now())
+  }
+
+  private fun persist() {
+    val ctx = app ?: return
+    OverlayHoldStore.save(ctx, Card.SLOT, hold.held?.let { OverlayHold.Held(it.id, Card.encode(it.payload), it.deadlineMs) })
+  }
+
+  private fun removeView() {
     feed?.stop(); feed = null
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
@@ -103,7 +182,7 @@ internal object DoorbellCardOverlay {
   }
 
   private fun openCamera(ctx: Context, camera: String, title: String) {
-    remove()
+    hide()
     runCatching { ctx.startActivity(haCameraIntent(ctx, camera, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
         .onFailure { Log.w(TAG, "could not open the camera view", it) }
   }
@@ -169,7 +248,7 @@ internal object DoorbellCardOverlay {
       addView(button(ctx, "Open camera", solid = false, px) { openCamera(ctx, card.camera, DoorbellEntities.prettyName(card.camera)) },
           LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(BUTTON_HEIGHT_DP)).apply { rightMargin = px(20) })
     }
-    addView(button(ctx, "Dismiss", solid = true, px) { remove() },
+    addView(button(ctx, "Dismiss", solid = true, px) { hide() },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(BUTTON_HEIGHT_DP)))
   }
 

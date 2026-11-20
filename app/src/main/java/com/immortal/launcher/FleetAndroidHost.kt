@@ -162,6 +162,7 @@ internal class FleetAndroidHost(private val context: Context) :
 
   override fun ccDebug(dryRun: Boolean?, testPlan: String?, testAlert: String?, haUnreachable: Boolean?, fake: CcFakeState?) =
       ControlCenter.debug(context, dryRun, testPlan, testAlert, haUnreachable, fake)
+  override fun ccShowTest(kind: String) = CcOverlayTest.show(context, kind)
 
   override fun testSourceAvailable() = ScreensaverTestSource.available()
   override fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin?) =

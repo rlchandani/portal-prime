@@ -175,3 +175,32 @@ internal fun CcEngine.debug(dry: Boolean?, plan: String?, unreachable: Boolean? 
   val rooms = testPlan?.floors?.sumOf { it.rooms.size } ?: 0
   return "dryRun=$dryRun testPlan=${testPlan != null} floors=${testPlan?.floors?.size ?: 0} rooms=$rooms haUnreachable=$haUnreachable"
 }
+
+/**
+ * Fleet `cc_debug` `showTest`: a silent test of a held critical overlay ([OverlayHold]) — a leak
+ * takeover or a camera-less doorbell card — so the accessibility-unbind and app-update paths can be
+ * checked on a Portal. Dry run only. Never a sound, a relay, the alert gate or the alert history;
+ * the doorbell card has no camera, so nothing private is drawn.
+ */
+internal object CcOverlayTest {
+  const val TAKEOVER = "takeover"
+  const val DOORBELL = "doorbell"
+  val KINDS = setOf(TAKEOVER, DOORBELL)
+
+  fun show(context: Context, kind: String): String {
+    val app = context.applicationContext
+    if (!CcDebugStore.dryRun(app)) return "showTest refused: turn dry run on first"
+    val stamp = System.currentTimeMillis()
+    when (kind) {
+      TAKEOVER -> ControlCenterBanners.offerTest(app, CcAlert("test:overlay:$stamp", CcSeverity.CRITICAL, CcKind.LEAK,
+          "binary_sensor.test", "Test alert", "Operator test · not a real leak", stamp, CcAlertAction.VIEW, "moisture"))
+      DOORBELL -> android.os.Handler(android.os.Looper.getMainLooper()).post {
+        DoorbellCardOverlay.show(app, DoorbellCardOverlay.Card("test:doorbell:$stamp", "Test doorbell",
+            "Operator test · not a real visitor", "Silent test", quiet = true, camera = ""))
+      }
+      else -> return "showTest refused: unknown kind"
+    }
+    Log.i("HearthpaneOverlayHold", "showTest $kind (silent)")
+    return "showTest=$kind shown (silent, dry run)"
+  }
+}

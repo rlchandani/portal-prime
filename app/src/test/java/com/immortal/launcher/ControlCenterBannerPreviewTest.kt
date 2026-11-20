@@ -104,7 +104,11 @@ class ControlCenterBannerPreviewTest {
     assertFalse("a preview in the Control Center window survives a rebind", CcBannerHost.removedOnDetach(CcBannerHost.ACTIVITY))
     assertFalse(CcBannerHost.removedOnDetach(CcBannerHost.NONE))
     val src = File("src/main/java/com/immortal/launcher/ControlCenterBanners.kt").readText()
-    assertTrue(src.substringAfter("fun detach()").substringBefore("\n").contains("CcBannerHost.removedOnDetach(viewHost)"))
+    val detach = src.substringAfter("fun detach(").substringBefore("fun offer(")
+    assertTrue(detach.contains("CcBannerHost.removedOnDetach(viewHost)"))
+    // A real alert is parked, not dropped: the next bind draws it again (OverlayHoldTest).
+    assertTrue(detach.contains("real.hostLost()"))
+    assertFalse(detach.contains("dismissReal()"))
   }
 
   @Test fun thePreviewPathTouchesNoAlertSideEffect() {

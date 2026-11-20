@@ -124,6 +124,16 @@ class FleetActionApiTest {
     assertEquals("dry=true", o.getString("result"))
   }
 
+  @Test fun ccDebugShowTestOnlyNamedKinds() {
+    assertEquals("400 bad_showTest", FleetReq.outcome(act("cc_debug", "showTest" to "smoke")))
+    assertEquals("400 bad_showTest", FleetReq.outcome(act("cc_debug", "showTest" to "")))
+    assertTrue(host.calls.isEmpty())
+    assertEquals("shown=takeover", FleetReq.json(act("cc_debug", "showTest" to "takeover")).getString("result"))
+    assertEquals(200, act("cc_debug", "showTest" to "doorbell").status)
+    // showTest answers on its own: no other switch runs with it.
+    assertEquals(listOf("ccShowTest:takeover", "ccShowTest:doorbell"), host.calls)
+  }
+
   @Test fun ccDebugFakeStateMustParse() {
     assertEquals("400 bad_fakeState", FleetReq.outcome(act("cc_debug", "fakeState" to "leak")))
     assertEquals("400 bad_fakeState", FleetReq.outcome(act("cc_debug", "fakeState" to JSONObject())))

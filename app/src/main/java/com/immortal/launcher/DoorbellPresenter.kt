@@ -34,7 +34,7 @@ internal object DoorbellPresenter {
     val volume = ((chime?.volume ?: 0) / PERCENT).coerceIn(MIN_VOLUME, 1f)
     main.post {
       ScreenControl.wake(app)
-      DoorbellCardOverlay.show(card)
+      DoorbellCardOverlay.show(app, card)
       if (decision.sound) runCatching { ChimePlayer.playPing(app, DOORBELL_RINGS, volume) }
           .onFailure { Log.w(TAG, "doorbell chime failed", it) }
     }
