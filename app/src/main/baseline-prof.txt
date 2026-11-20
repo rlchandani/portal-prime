@@ -86,6 +86,12 @@ HPLcom/immortal/launcher/HomeTodayWidgetKt;->**(**)**
 HPLcom/immortal/launcher/HomeTodayWidgetKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeWeatherWidgetKt;->**(**)**
 HPLcom/immortal/launcher/HomeWeatherWidgetKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeClockWidgetsKt;->**(**)**
+HPLcom/immortal/launcher/HomeClockWidgetsKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeFeedWidgetsKt;->**(**)**
+HPLcom/immortal/launcher/HomeFeedWidgetsKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeHaWidgetKt;->**(**)**
+HPLcom/immortal/launcher/HomeHaWidgetKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**
