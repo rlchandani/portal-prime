@@ -1,0 +1,362 @@
+## a lone Portal founds the household when a synced peer has nothing
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do local {"values":{"chime.volume":40,"welcome.showClock":false}}
+values chime.volume=40,welcome.showClock=false
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=40,welcome.showClock=false] peers=[] adoptedFrom=- cardDismissed=false
+do signal {"digest":"$empty","from":"hi","joining":false}
+log i HearthpaneSettingsSync: founded household settings with 2 changed values
+ledger SYNCED clock=2 records=[chime.volume=40@1:self,welcome.showClock=false@2:self] pending=- known=[chime.volume=40,welcome.showClock=false] peers=[hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"signalsReceived":1},"digest":"ecfd1ff539d8","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":2}
+do values {"keys":["chime.volume","welcome.showClock","immortal.maPassword","mqtt.password","fleet.name"]}
+valuesJson chime.volume=40,welcome.showClock=false,immortal.maPassword=null,mqtt.password=null,fleet.name=null
+
+## two joining Portals: the lower id founds, the higher waits
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[] peers=[] adoptedFrom=- cardDismissed=false
+do signal {"digest":"$empty","from":"lo","joining":true}
+ledger JOINING clock=0 records=[] pending=- known=[] peers=[lo/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"signalsReceived":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"JOINING","records":0}
+do signal {"digest":"$empty","from":"hi","joining":true}
+log i HearthpaneSettingsSync: founded household settings with 0 changed values
+ledger SYNCED clock=0 records=[] pending=- known=[] peers=[lo/Portal,hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"signalsReceived":2},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":0}
+do signal {"digest":"$mine","from":"hi","joining":false}
+status {"adoptFrom":null,"available":false,"counters":{"signalsReceived":3},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":0}
+
+## a new Portal fetches the household and adopts silently; sibling writes are not echoed
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[] peers=[] adoptedFrom=- cardDismissed=false
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+ledger JOINING clock=0 records=[] pending=- known=[] peers=[hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":1,"exchangesStarted":1,"httpBytesSent":48,"signalsReceived":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"JOINING","records":0}
+do peer {"from":"hi","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":55},{"by":"hi","key":"digitalclock.face","v":2,"value":"neon"}]}}
+main.postDelayed 400ms
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: joined household settings (auto-adopted, 2 written)
+peer -> {"phase":"synced","records":[{"value":55,"version":3,"deviceId":"99999999-9999-4999-8999-999999999999","key":"chime.volume","ts":1000},{"value":"neon","version":2,"deviceId":"99999999-9999-4999-8999-999999999999","key":"digitalclock.face","ts":1000}],"name":"Family"}
+ledger SYNCED clock=3 records=[chime.volume=55@3:hi,digitalclock.face=neon@2:hi] pending=- known=[chime.volume=55,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon] peers=[hi/Living+synced] adoptedFrom=Living cardDismissed=false
+values chime.volume=55,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":1,"exchangesServed":1,"exchangesStarted":1,"httpBytesSent":48,"joinsAuto":1,"signalsReceived":1},"digest":"172ba353039c","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesServed":1,"exchangesStarted":2,"httpBytesSent":315,"joinsAuto":1,"signalsReceived":2},"digest":"172ba353039c","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do route {"auth":"none","body":"{}"}
+route -> 503 unsigned {"error":"no_household_key","ok":false}
+
+## join choice with a conflict: keep this Portal's
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do local {"values":{"chime.volume":40}}
+values chime.volume=40
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=40] peers=[] adoptedFrom=- cardDismissed=false
+do peer {"from":"hi","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":55},{"by":"hi","key":"welcome.showClock","v":1,"value":false}]}}
+peer -> {"phase":"joining","records":[],"name":"Family"}
+ledger JOINING clock=0 records=[] pending=hi/Living[chime.volume=55@3:hi,welcome.showClock=false@1:hi] known=[chime.volume=40] peers=[hi/Living+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":"Living","available":false,"counters":{"exchangesServed":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do peer {"from":"lo","payload":{"joining":false,"name":"Mini","records":[{"by":"lo","key":"chime.volume","v":4,"value":60}]}}
+peer -> {"phase":"joining","records":[],"name":"Family"}
+ledger JOINING clock=0 records=[] pending=hi/Living[chime.volume=60@4:lo,welcome.showClock=false@1:hi] known=[chime.volume=40] peers=[lo/Mini+synced,hi/Living+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":"Living","available":false,"counters":{"exchangesServed":2},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Mini","seenAt":<now>,"syncedAt":<now>},{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do dismissAdoptCard
+ledger JOINING clock=0 records=[] pending=hi/Living[chime.volume=60@4:lo,welcome.showClock=false@1:hi] known=[chime.volume=40] peers=[lo/Mini+synced,hi/Living+synced] adoptedFrom=- cardDismissed=true
+do resolveJoin {"keepMine":true}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: joined household settings (kept, 1 written)
+ledger SYNCED clock=5 records=[chime.volume=40@5:self,welcome.showClock=false@1:hi] pending=- known=[chime.volume=40,welcome.showClock=false] peers=[lo/Mini+synced,hi/Living+synced] adoptedFrom=Living cardDismissed=false
+values chime.volume=40,welcome.showClock=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesServed":2,"joinsChosen":1},"digest":"9127f1e32681","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Mini","seenAt":<now>,"syncedAt":<now>},{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+do resolveJoin {"keepMine":false}
+
+## join choice with a conflict: adopt the household's
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do local {"values":{"chime.volume":40,"welcome.showGreeting":false}}
+values chime.volume=40,welcome.showGreeting=false
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=40,welcome.showGreeting=false] peers=[] adoptedFrom=- cardDismissed=false
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=40,welcome.showGreeting=false] peers=[hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":1,"exchangesStarted":1,"httpBytesSent":48,"signalsReceived":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"JOINING","records":0}
+do peer {"from":"hi","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":55}]}}
+peer -> {"phase":"joining","records":[],"name":"Family"}
+ledger JOINING clock=0 records=[] pending=hi/Living[chime.volume=55@3:hi] known=[chime.volume=40,welcome.showGreeting=false] peers=[hi/Living+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":"Living","available":false,"counters":{"exchangesFailed":1,"exchangesServed":1,"exchangesStarted":1,"httpBytesSent":48,"signalsReceived":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+status {"adoptFrom":"Living","available":false,"counters":{"exchangesFailed":2,"exchangesServed":1,"exchangesStarted":2,"httpBytesSent":96,"signalsReceived":2},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do resolveJoin {"keepMine":false}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: joined household settings (adopted, 1 written)
+ledger SYNCED clock=4 records=[chime.volume=55@3:hi,welcome.showGreeting=false@4:self] pending=- known=[chime.volume=55,welcome.showGreeting=false] peers=[hi/Living+synced] adoptedFrom=Living cardDismissed=false
+values chime.volume=55,welcome.showGreeting=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesServed":1,"exchangesStarted":2,"httpBytesSent":96,"joinsChosen":1,"signalsReceived":2},"digest":"6e245e984f0e","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+
+## synced: bus changes merge; stale, forged, malformed and out-of-scope ones are refused
+ledger SYNCED clock=5 records=[chime.volume=55@5:hi] pending=- known=[chime.volume=55] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=55
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"7be33177b54b","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do changed {"from":"hi","record":{"by":"hi","key":"digitalclock.face","v":6,"value":"neon"}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: digitalclock.face
+ledger SYNCED clock=6 records=[chime.volume=55@5:hi,digitalclock.face=neon@6:hi] pending=- known=[chime.volume=55,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=55,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":1,"recordsApplied":1,"recordsRefused":0},"digest":"168fc757d5cd","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+do changed {"from":"hi","record":{"by":"hi","key":"digitalclock.face","v":4,"value":"bold"}}
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":2,"recordsApplied":1,"recordsRefused":0},"digest":"168fc757d5cd","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"digitalclock.face","v":6,"value":"neon"}}
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":3,"recordsApplied":1,"recordsRefused":0},"digest":"168fc757d5cd","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"lo","record":{"by":"hi","key":"chime.volume","v":9,"value":20}}
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":4,"changedRefused":1,"recordsApplied":1,"recordsRefused":0},"digest":"168fc757d5cd","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":7,"value":500}}
+log i HearthpaneSettingsSync: kept this Portal's value for chime.volume (not valid here)
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume
+ledger SYNCED clock=7 records=[chime.volume=500@7:hi,digitalclock.face=neon@6:hi] pending=- known=[chime.volume=55,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":5,"changedRefused":1,"recordsApplied":2,"recordsRefused":0},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"nope.key","v":7,"value":"x"}}
+log w HearthpaneSettingsSync: refused 1 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":6,"changedRefused":1,"recordsApplied":2,"recordsRefused":1},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"fleet.name","v":7,"value":"Hacked"}}
+log w HearthpaneSettingsSync: refused 1 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":7,"changedRefused":1,"recordsApplied":2,"recordsRefused":2},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"immortal.maPassword","v":7,"value":"hunter2"}}
+log w HearthpaneSettingsSync: refused 1 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":8,"changedRefused":1,"recordsApplied":2,"recordsRefused":3},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"controlcenter.sharedRoom","v":7,"value":true}}
+log w HearthpaneSettingsSync: refused 1 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":9,"changedRefused":1,"recordsApplied":2,"recordsRefused":4},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","raw":{"key":1}}
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":10,"changedRefused":2,"recordsApplied":2,"recordsRefused":4},"digest":"11e0fde733ac","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":8,"value":35}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume
+ledger SYNCED clock=8 records=[chime.volume=35@8:hi,digitalclock.face=neon@6:hi] pending=- known=[chime.volume=35,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=35,digitalclock.color=cyan,digitalclock.face=neon,digitalclock.font=normal,digitalclock.glow=strong,digitalclock.style=neon
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":11,"changedRefused":2,"recordsApplied":3,"recordsRefused":4},"digest":"b5585ba0afe4","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+
+## synced: a local edit gets the next version
+ledger SYNCED clock=5 records=[chime.volume=55@5:hi] pending=- known=[chime.volume=55] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=55
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"7be33177b54b","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do local {"values":{"chime.volume":30}}
+main.postDelayed 400ms
+values chime.volume=30
+do local {"values":{"welcome.showClock":false}}
+main.postDelayed 400ms
+values chime.volume=30,welcome.showClock=false
+do fireMain
+main.postDelayed 60000ms
+log i HearthpaneSettingsSync: local change: chime.volume, welcome.showClock
+ledger SYNCED clock=7 records=[chime.volume=30@6:self,welcome.showClock=false@7:self] pending=- known=[chime.volume=30,welcome.showClock=false] peers=[] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"12f28acd7b63","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":2}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":6,"value":31}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume
+ledger SYNCED clock=7 records=[chime.volume=31@6:hi,welcome.showClock=false@7:self] pending=- known=[chime.volume=31,welcome.showClock=false] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=31,welcome.showClock=false
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":1,"recordsApplied":1,"recordsRefused":0},"digest":"af5568c4ee7d","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do local {"values":{"chime.volume":32}}
+main.postDelayed 400ms
+values chime.volume=32,welcome.showClock=false
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":7,"value":33}}
+log i HearthpaneSettingsSync: local change: chime.volume
+ledger SYNCED clock=8 records=[chime.volume=32@8:self,welcome.showClock=false@7:self] pending=- known=[chime.volume=32,welcome.showClock=false] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":2,"recordsApplied":1,"recordsRefused":0},"digest":"007ac851199b","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do fireMain
+main.postDelayed 60000ms
+
+## versions: counter first, then device id breaks a tie
+ledger SYNCED clock=1 records=[] pending=- known=[] peers=[] adoptedFrom=- cardDismissed=false
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":0}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":3,"value":50}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=50
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":1,"recordsApplied":1,"recordsRefused":0},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":1}
+do changed {"from":"lo","record":{"by":"lo","key":"chime.volume","v":3,"value":45}}
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[lo/Portal+synced,hi/Portal+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":2,"recordsApplied":1,"recordsRefused":0},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>},{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":1}
+do changed {"from":"lo","record":{"by":"lo","key":"chime.volume","v":4,"value":45}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 11111111-1111-4111-8111-111111111111: chime.volume
+ledger SYNCED clock=4 records=[chime.volume=45@4:lo] pending=- known=[chime.volume=45] peers=[lo/Portal+synced,hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=45
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":3,"recordsApplied":2,"recordsRefused":0},"digest":"dba7654dcd0a","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>},{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":1}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":1099511627777,"value":51}}
+log w HearthpaneSettingsSync: refused 1 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":4,"recordsApplied":2,"recordsRefused":1},"digest":"dba7654dcd0a","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>},{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":1}
+do fireMain
+main.postDelayed 60000ms
+
+## pause stops sending and receiving; resume picks up
+ledger SYNCED clock=2 records=[chime.volume=50@2:hi] pending=- known=[chime.volume=50] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=50
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"32e4124e5aa2","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do pause {"on":true}
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"32e4124e5aa2","keyFingerprint":null,"lastSyncAt":0,"paused":true,"peers":[],"phase":"SYNCED","records":1}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":3,"value":20}}
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+do peer {"from":"hi","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":20}]}}
+peer -> null
+do local {"values":{"chime.volume":10}}
+main.postDelayed 400ms
+values chime.volume=10
+do fireMain
+main.postDelayed 60000ms
+ledger SYNCED clock=3 records=[chime.volume=10@3:self] pending=- known=[chime.volume=10] peers=[] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"45c593d415eb","keyFingerprint":null,"lastSyncAt":0,"paused":true,"peers":[],"phase":"SYNCED","records":1}
+do pause {"on":false}
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"45c593d415eb","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do changed {"from":"hi","record":{"by":"hi","key":"chime.volume","v":9,"value":21}}
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume
+ledger SYNCED clock=9 records=[chime.volume=21@9:hi] pending=- known=[chime.volume=21] peers=[hi/Portal+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=21
+status {"adoptFrom":null,"available":false,"counters":{"changedReceived":1,"recordsApplied":1,"recordsRefused":0},"digest":"e27285b0665b","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":1}
+
+## synced catch-up: digests, exchanges, joiner rate limit and served exchanges
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=50
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do signal {"digest":"$mine","from":"hi","joining":false}
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"signalsReceived":1},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":1}
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":1,"exchangesStarted":1,"httpBytesSent":152,"signalsReceived":2},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":1}
+do signal {"digest":"$empty","from":"lo","joining":true}
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[lo/Portal,hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesStarted":2,"httpBytesSent":304,"signalsReceived":3},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":1}
+do signal {"digest":"$empty","from":"lo","joining":true}
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesStarted":2,"httpBytesSent":304,"signalsReceived":4},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":1}
+do signal {"digest":"0123456789ab","from":"hi","joining":false,"port":22}
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesStarted":2,"httpBytesSent":304,"signalsReceived":5},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":1}
+do peer {"from":"hi","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":4,"value":65},{"by":"hi","key":"immortal.maPassword","v":4,"value":"hunter2"},{"by":"hi","key":"calling.dropInsOn","v":4,"value":true},{"by":"hi","key":"welcome.showClock","v":2,"value":false}]}}
+log w HearthpaneSettingsSync: refused 2 malformed setting(s) from 99999999-9999-4999-8999-999999999999
+main.postDelayed 400ms
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: from 99999999-9999-4999-8999-999999999999: chime.volume, welcome.showClock
+peer -> {"phase":"synced","records":[{"value":65,"version":4,"deviceId":"99999999-9999-4999-8999-999999999999","key":"chime.volume","ts":1000},{"value":false,"version":2,"deviceId":"99999999-9999-4999-8999-999999999999","key":"welcome.showClock","ts":1000}],"name":"Family"}
+ledger SYNCED clock=4 records=[chime.volume=65@4:hi,welcome.showClock=false@2:hi] pending=- known=[chime.volume=65,welcome.showClock=false] peers=[lo/Portal,hi/Living+synced] adoptedFrom=- cardDismissed=false
+values chime.volume=65,welcome.showClock=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesServed":1,"exchangesStarted":2,"httpBytesSent":304,"recordsApplied":2,"recordsRefused":2,"signalsReceived":5},"digest":"8d67db191c36","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>},{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"SYNCED","records":2}
+do peer {"from":"lo","payload":{"joining":true,"name":"Mini","records":[{"by":"lo","key":"chime.volume","v":99,"value":1}]}}
+peer -> {"phase":"synced","records":[{"value":65,"version":4,"deviceId":"99999999-9999-4999-8999-999999999999","key":"chime.volume","ts":1000},{"value":false,"version":2,"deviceId":"99999999-9999-4999-8999-999999999999","key":"welcome.showClock","ts":1000}],"name":"Family"}
+ledger SYNCED clock=4 records=[chime.volume=65@4:hi,welcome.showClock=false@2:hi] pending=- known=[chime.volume=65,welcome.showClock=false] peers=[lo/Mini,hi/Living+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":2,"exchangesServed":2,"exchangesStarted":2,"httpBytesSent":304,"recordsApplied":2,"recordsRefused":2,"signalsReceived":5},"digest":"8d67db191c36","keyFingerprint":null,"lastSyncAt":<now>,"paused":false,"peers":[{"name":"Mini","seenAt":<now>,"syncedAt":0},{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"SYNCED","records":2}
+do peer {"from":"lo","raw":"{not json"}
+peer -> null
+do fireMain
+main.postDelayed 60000ms
+
+## rejoin forgets the ledger but keeps the settings
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=50
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"b0980a5b911d","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":1}
+do dismissAdoptCard
+ledger SYNCED clock=3 records=[chime.volume=50@3:hi] pending=- known=[chime.volume=50] peers=[] adoptedFrom=- cardDismissed=true
+do rejoin
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=50] peers=[] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do signal {"digest":"0123456789ab","from":"hi","joining":false}
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=50] peers=[hi/Portal] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":false,"counters":{"exchangesFailed":1,"exchangesStarted":1,"httpBytesSent":48,"signalsReceived":1},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[{"name":"Portal","seenAt":<now>,"syncedAt":0}],"phase":"JOINING","records":0}
+
+## after an update, household records this build can now apply are reconciled
+ledger SYNCED clock=4 records=[chime.volume=65@4:hi,digitalclock.face=hologram@3:hi] pending=- known=[] peers=[] adoptedFrom=- cardDismissed=false
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do install
+main.postDelayed 4000ms
+main.postDelayed 400ms
+log i HearthpaneSettingsSync: reconciled chime.volume
+ledger SYNCED clock=4 records=[chime.volume=65@4:hi,digitalclock.face=hologram@3:hi] pending=- known=[chime.volume=65] peers=[] adoptedFrom=- cardDismissed=false
+values chime.volume=65
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"5c261384b217","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"SYNCED","records":2}
+do install
+do fireMain
+main.postDelayed 60000ms
+
+## the signed peer route: method, size, signature, replay and pause
+ledger -
+values 
+status {"adoptFrom":null,"available":false,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":null,"lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do key
+do local {"values":{"chime.volume":40}}
+values chime.volume=40
+do install
+main.postDelayed 4000ms
+ledger JOINING clock=0 records=[] pending=- known=[chime.volume=40] peers=[] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":null,"available":true,"counters":{},"digest":"e3b0c44298fc","keyFingerprint":"e2d9de70","lastSyncAt":0,"paused":false,"peers":[],"phase":"JOINING","records":0}
+do route {"body":"{}","method":"GET"}
+route -> 405 unsigned {"error":"method_not_allowed","ok":false}
+do route {"body":"","contentLength":0}
+route -> 413 unsigned {"error":"body_too_large","ok":false}
+do route {"body":"{}","contentLength":300000}
+route -> 413 unsigned {"error":"body_too_large","ok":false}
+do route {"auth":"none","body":"{}"}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"auth":"otherKey","body":"{}"}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"auth":"otherBody","body":"{}"}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"auth":"stale","body":"{}"}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"from":"self","nonce":"selfcall","payload":{"joining":false,"name":"Me","records":[]}}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"nonce":"fixed-nonce-1","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":55}]}}
+route -> 200 sig=valid {"payload":"{\"phase\":\"joining\",\"records\":[],\"name\":\"Family\"}"}
+ledger JOINING clock=0 records=[] pending=hi/Living[chime.volume=55@3:hi] known=[chime.volume=40] peers=[hi/Living+synced] adoptedFrom=- cardDismissed=false
+status {"adoptFrom":"Living","available":true,"counters":{"exchangesServed":1},"digest":"e3b0c44298fc","keyFingerprint":"e2d9de70","lastSyncAt":<now>,"paused":false,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do route {"nonce":"fixed-nonce-1","payload":{"joining":false,"name":"Living","records":[{"by":"hi","key":"chime.volume","v":3,"value":55}]}}
+route -> 401 unsigned {"error":"unauthorized","ok":false}
+do route {"body":"{not json"}
+route -> 503 unsigned {"error":"unavailable","ok":false}
+do pause {"on":true}
+status {"adoptFrom":"Living","available":true,"counters":{"exchangesServed":1},"digest":"e3b0c44298fc","keyFingerprint":"e2d9de70","lastSyncAt":<now>,"paused":true,"peers":[{"name":"Living","seenAt":<now>,"syncedAt":<now>}],"phase":"JOINING","records":0}
+do route {"payload":{"joining":false,"name":"Living","records":[]}}
+route -> 503 unsigned {"error":"unavailable","ok":false}
+

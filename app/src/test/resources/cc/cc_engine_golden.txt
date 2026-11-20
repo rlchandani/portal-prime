@@ -1,0 +1,966 @@
+## auth flow, registry, plan from HA, subscribe_entities and batched diffs
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [30000]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+do state
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 99 -> t=+99
+advance 1 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off","lc":1700000001}}}}}
+advance 40 -> t=+140
+ha#0 {"id":7,"type":"event","event":{"c":{"sensor.kitchen_temp":{"+":{"s":"22.0"}}}}}
+ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"a":{"brightness":10}},"-":{"a":["friendly_name"]}}}}}
+advance 60 -> t=+200
+state LIVE '' live=+140 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=22.0,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"r":["camera.porch"]}}
+advance 100 -> t=+300
+state LIVE '' live=+200 retry=0 v=4 ents=10[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=22.0,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do files
+files plan=1f@-10000000 testPlan=- dryRunPref=false
+
+## no registry access and no plan anywhere
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":false,"id":1,"type":"result","error":{"code":"unauthorized","message":"Unauthorized"}}
+ha#0 {"success":false,"id":2,"type":"result","error":{"code":"unauthorized","message":"Unauthorized"}}
+ha#0 {"success":false,"id":3,"type":"result","error":{"code":"unauthorized","message":"Unauthorized"}}
+ha#0 {"success":false,"id":4,"type":"result","error":{"code":"unauthorized","message":"Unauthorized"}}
+log i HearthpaneControl: control center registry: 0 floors, 0 areas, 0 entities, 0 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":null},"success":true,"id":5,"type":"result"}
+send#0 {"id":6,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=0f/0r@0/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":6,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=0f/0r@0/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":6,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=- plan=0f/0r@0/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do files
+files plan=- testPlan=- dryRunPref=false
+
+## subscribe_entities refused falls back to get_states and state_changed
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":false,"id":7,"type":"result","error":{"code":"unknown_command","message":"Unknown command."}}
+send#0 {"id":8,"type":"get_states"}
+send#0 {"event_type":"state_changed","id":9,"type":"subscribe_events"}
+ha#0 {"result":[{"attributes":{"friendly_name":"Kitchen light"},"state":"on","entity_id":"light.kitchen","last_changed":"2023-11-14T22:00:00.000000+00:00"},{"attributes":{"friendly_name":"Front lock"},"state":"locked","entity_id":"lock.front","last_changed":"2023-11-14T22:00:00.000000+00:00"},{"attributes":{"friendly_name":"Garage light"},"state":"on","entity_id":"light.not_watched","last_changed":"2023-11-14T22:00:00.000000+00:00"}],"success":true,"id":8,"type":"result"}
+ha#0 {"success":true,"id":9,"type":"result"}
+state LIVE 'Waiting for the first update' live=+0 retry=0 v=2 ents=2[light.kitchen=on,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 100 -> t=+100
+ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":{"attributes":{"friendly_name":"Kitchen light"},"state":"off","entity_id":"light.kitchen","last_changed":"2023-11-14T22:13:21.000000+00:00"},"entity_id":"light.kitchen"}}}
+ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":{"attributes":{},"state":"off","entity_id":"light.not_watched","last_changed":"2023-11-14T22:13:21.000000+00:00"},"entity_id":"light.not_watched"}}}
+advance 100 -> t=+200
+state LIVE 'Waiting for the first update' live=+100 retry=0 v=3 ents=2[light.kitchen=off,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":null,"entity_id":"lock.front"}}}
+advance 100 -> t=+300
+state LIVE 'Waiting for the first update' live=+200 retry=0 v=4 ents=1[light.kitchen=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+
+## heartbeat, pong, stale socket and reconnect with a new generation
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [29900]
+advance 30000 -> t=+30100
+send#0 {"id":8,"type":"ping"}
+ha#0 {"id":8,"type":"pong"}
+advance 30000 -> t=+60100
+send#0 {"id":9,"type":"ping"}
+advance 30000 -> t=+90100
+log i HearthpaneControl: control center: no pong; reconnecting
+log i HearthpaneControl: control center socket stale
+cancel#0
+state STALE '' live=+0 retry=+91000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [900]
+ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off"}}}}}
+advance 1000 -> t=+91100
+open#1 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+0 retry=+91000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"ha_version":"2026.11.0","type":"auth_required"}
+send#1 {"access_token":"tok-123","type":"auth"}
+ha#1 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#1 {"id":1,"type":"config/floor_registry/list"}
+send#1 {"id":2,"type":"config/area_registry/list"}
+send#1 {"id":3,"type":"config/device_registry/list"}
+send#1 {"id":4,"type":"config/entity_registry/list"}
+send#1 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state STALE 'Loading rooms' live=+0 retry=+91000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#1 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#1 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#1 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#1 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#1 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state STALE 'Loading devices' live=+0 retry=+91000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#1 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+ha#1 {"success":true,"id":7,"type":"result"}
+state STALE 'Waiting for the first update' live=+0 retry=+91000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+91200
+state LIVE '' live=+91100 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [29900]
+
+## reconnect backoff while Home Assistant is unreachable or the Portal is offline
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#0
+log i HearthpaneControl: control center socket IOException
+cancel#0
+state UNREACHABLE '' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [1000]
+advance 1000 -> t=+1000
+open#1 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#1
+log i HearthpaneControl: control center socket IOException
+cancel#1
+state UNREACHABLE '' live=0 retry=+9000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 8000 -> t=+9000
+open#2 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+9000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+closed#2 1006
+log i HearthpaneControl: control center socket closed 1006
+cancel#2
+state UNREACHABLE '' live=0 retry=+25000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 16000 -> t=+25000
+open#3 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+25000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#3
+log i HearthpaneControl: control center socket IOException
+cancel#3
+state UNREACHABLE '' live=0 retry=+57000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 32000 -> t=+57000
+open#4 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+57000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#4
+log i HearthpaneControl: control center socket IOException
+cancel#4
+state UNREACHABLE '' live=0 retry=+117000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 60000 -> t=+117000
+open#5 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+117000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#5
+log i HearthpaneControl: control center socket IOException
+cancel#5
+state UNREACHABLE '' live=0 retry=+177000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 60000 -> t=+177000
+open#6 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+177000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+fail#6
+log i HearthpaneControl: control center socket IOException
+cancel#6
+state UNREACHABLE '' live=0 retry=+237000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do retryNow
+open#7 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+237000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do online {"on":false}
+fail#7
+log i HearthpaneControl: control center socket IOException
+cancel#7
+state UNREACHABLE '' live=0 retry=+178000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [1000]
+advance 8000 -> t=+185000
+state OFFLINE '' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do online {"on":true}
+advance 16000 -> t=+201000
+open#8 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#8 {"ha_version":"2026.11.0","type":"auth_required"}
+send#8 {"access_token":"tok-123","type":"auth"}
+ha#8 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#8 {"id":1,"type":"config/floor_registry/list"}
+send#8 {"id":2,"type":"config/area_registry/list"}
+send#8 {"id":3,"type":"config/device_registry/list"}
+send#8 {"id":4,"type":"config/entity_registry/list"}
+send#8 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#8 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#8 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#8 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#8 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#8 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#8 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#8 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#8 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#8 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=+186000 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#8 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+201100
+state LIVE '' live=+201000 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":false}
+send#8 {"id":8,"subscription":7,"type":"unsubscribe_events"}
+send#8 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":9,"type":"subscribe_entities"}
+do pending
+timers [29900]
+
+## disconnect mid-call fails the call, then a reconnect
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"power","entity":"light.kitchen","on":false}
+send -> true
+send#0 {"domain":"light","id":8,"service":"turn_off","service_data":{},"target":{"entity_id":"light.kitchen"},"type":"call_service"}
+state LIVE '' live=+0 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [5050, 29900]
+fail#0
+log i HearthpaneControl: control center socket IOException
+cancel#0
+result#0 ok=false err=null
+state STALE '' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"power","entity":"light.kitchen","on":true}
+send -> false
+state STALE '' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+do phone {"call":"power","entity":"light.kitchen","on":true}
+phone -> Reconnecting — values may be out of date
+ha#0 {"result":null,"success":true,"id":12,"type":"result"}
+advance 1000 -> t=+1100
+open#1 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+advance 4100 -> t=+5200
+ha#1 {"ha_version":"2026.11.0","type":"auth_required"}
+send#1 {"access_token":"tok-123","type":"auth"}
+ha#1 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#1 {"id":1,"type":"config/floor_registry/list"}
+send#1 {"id":2,"type":"config/area_registry/list"}
+send#1 {"id":3,"type":"config/device_registry/list"}
+send#1 {"id":4,"type":"config/entity_registry/list"}
+send#1 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state STALE 'Loading rooms' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#1 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#1 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#1 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#1 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#1 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state STALE 'Loading devices' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#1 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+ha#1 {"success":true,"id":7,"type":"result"}
+state STALE 'Waiting for the first update' live=+0 retry=+1100 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+5300
+state LIVE '' live=+5200 retry=0 v=5 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Reconnecting — values may be out of date'! debug=- alerts=[] scene=- - dismissed=[]
+
+## token refused at connect and after a session
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"type":"auth_invalid","message":"Invalid access token or password"}
+log w HearthpaneControl: control center token refused
+cancel#0
+state AUTH_FAILED '' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers [300000]
+do send {"call":"power","entity":"light.kitchen","on":true}
+send -> false
+state AUTH_FAILED '' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+advance 299999 -> t=+299999
+advance 1 -> t=+300000
+open#1 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"ha_version":"2026.11.0","type":"auth_required"}
+send#1 {"access_token":"tok-123","type":"auth"}
+ha#1 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#1 {"id":1,"type":"config/floor_registry/list"}
+send#1 {"id":2,"type":"config/area_registry/list"}
+send#1 {"id":3,"type":"config/device_registry/list"}
+send#1 {"id":4,"type":"config/entity_registry/list"}
+send#1 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#1 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#1 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#1 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#1 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#1 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#1 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=+300000 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#1 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+300100
+state LIVE '' live=+300000 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+closed#1 1000
+log i HearthpaneControl: control center socket closed 1000
+cancel#1
+state STALE '' live=+300000 retry=+301100 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+advance 1000 -> t=+301100
+open#2 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+300000 retry=+301100 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#2 {"type":"auth_required"}
+send#2 {"access_token":"tok-123","type":"auth"}
+ha#2 {"type":"auth_invalid","message":"Invalid access token or password"}
+log w HearthpaneControl: control center token refused
+cancel#2
+state AUTH_FAILED '' live=+300000 retry=+601100 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+do prefs {"prefs":{"immortal_ha":{"token":"tok-new"}}}
+do restart
+open#3 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+300000 retry=+601100 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='The Home Assistant token was refused'! debug=- alerts=[] scene=- - dismissed=[]
+ha#3 {"type":"auth_required"}
+send#3 {"access_token":"tok-new","type":"auth"}
+
+## oversized and malformed messages, and a plan too big for Home Assistant
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 <3000000 chars>
+advance 100 -> t=+200
+state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {not json
+ha#0 []
+ha#0 {"success":true,"id":999,"type":"result"}
+ha#0 {"id":999,"type":"event","event":{"a":{"light.ghost":{"s":"on"}}}}
+ha#0 {"type":"mystery"}
+advance 100 -> t=+300
+do savePlan {"bigRooms":1400}
+state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+do files
+files plan=1f@+300 testPlan=- dryRunPref=false
+ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off"}}}}}
+advance 100 -> t=+400
+state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+
+## plan load and save: newer local copy, HA ack and refusal, dry run, test plan
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"id":7,"key":"hearthpane_floorplan","type":"frontend/set_user_data","value":{"floors":[{"id":"ground","name":"Ground","openings":[],"rooms":[{"d":[{"e":"light.kitchen","x":0.5,"y":0.5}],"id":"kitchen","name":"Kitchen","out":false,"r":[0,0,8,5]}]}],"updatedAt":1699995000000,"v":1}}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":8,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":8,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":8,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1r@-5000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do savePlan {"plan":"$planEdited"}
+send#0 {"id":9,"key":"hearthpane_floorplan","type":"frontend/set_user_data","value":{"floors":[{"id":"ground","name":"Ground","openings":[],"rooms":[{"d":[{"e":"light.kitchen","x":0.4000000059604645,"y":0.4000000059604645}],"id":"kitchen","name":"Kitchen","out":false,"r":[0,0,8,5]},{"d":[],"id":"hall","name":"Hall","out":false,"r":[8,0,4,5]}]}],"updatedAt":1700000000100,"v":1}}
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+100/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":false,"id":9,"type":"result","error":{"code":"invalid_format","message":"bad"}}
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+100/THIS_PORTAL toast='Saved on this Portal only — Home Assistant didn't accept the plan'! debug=- alerts=[] scene=- - dismissed=[]
+do files
+files plan=1f@+100 testPlan=- dryRunPref=false
+do debug {"dryRun":true}
+debug -> dryRun=true testPlan=false floors=0 rooms=0 haUnreachable=false
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+100/THIS_PORTAL toast='Saved on this Portal only — Home Assistant didn't accept the plan'! debug=Dry run alerts=[] scene=- - dismissed=[]
+advance 10 -> t=+110
+do savePlan {"plan":"$planEdited"}
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=Dry run alerts=[] scene=- - dismissed=[]
+do debug {"dryRun":false,"testPlan":"load"}
+debug -> dryRun=false testPlan=true floors=1 rooms=2 haUnreachable=false
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=Test plan alerts=[] scene=- - dismissed=[]
+do files
+files plan=1f@+110 testPlan=1f@+110 dryRunPref=false
+do savePlan {"plan":"$planEdited"}
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+do restart
+close#0 1000
+open#1 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+ha#1 {"ha_version":"2026.11.0","type":"auth_required"}
+send#1 {"access_token":"tok-123","type":"auth"}
+ha#1 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#1 {"id":1,"type":"config/floor_registry/list"}
+send#1 {"id":2,"type":"config/area_registry/list"}
+send#1 {"id":3,"type":"config/device_registry/list"}
+send#1 {"id":4,"type":"config/entity_registry/list"}
+send#1 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state STALE 'Loading rooms' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+ha#1 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#1 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#1 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#1 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#1 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#1 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state STALE 'Loading devices' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+ha#1 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#1 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+ha#1 {"success":true,"id":7,"type":"result"}
+state STALE 'Waiting for the first update' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+ha#1 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+210
+state LIVE '' live=+110 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=Test plan alerts=[] scene=- - dismissed=[]
+do debug {"testPlan":"clear"}
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=false
+state LIVE '' live=+110 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@+110/THIS_PORTAL toast='Test plan saved on this Portal only' debug=- alerts=[] scene=- - dismissed=[]
+do files
+files plan=1f@+110 testPlan=- dryRunPref=false
+
+## plan lookup before the registry, and an unchanged visibility
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen"}],"success":true,"id":4,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 1 entities, 0 sensor classes
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak","light.kitchen","lock.front"],"id":6,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=1e/0c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":6,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=1e/0c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":6,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=1e/0c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+do visible {"on":false}
+do debug {"testPlan":"load"}
+send#0 {"id":7,"subscription":6,"type":"unsubscribe_events"}
+send#0 {"entity_ids":["light.kitchen"],"id":8,"type":"subscribe_entities"}
+debug -> dryRun=false testPlan=true floors=1 rooms=2 haUnreachable=false
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=1e/0c plan=1f/2r@+100/THIS_PORTAL toast=- debug=Test plan alerts=[] scene=- - dismissed=[]
+do debug {"testPlan":"clear"}
+send#0 {"id":9,"subscription":8,"type":"unsubscribe_events"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak","light.kitchen","lock.front"],"id":10,"type":"subscribe_entities"}
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=false
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=1e/0c plan=1f/2r@-10000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
+
+## service calls through the policy gate: confirmed, refused, undo, failures and scenes
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"unlock","entity":"lock.front"}
+log w HearthpaneControl: refused lock.unlock: needs confirm first
+send -> false
+do send {"call":"unlock","confirmed":true,"entity":"lock.front"}
+send -> true
+send#0 {"domain":"lock","id":8,"service":"unlock","service_data":{},"target":{"entity_id":"lock.front"},"type":"call_service"}
+state LIVE '' live=+0 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":8,"type":"result"}
+result#1 ok=true err=null
+state LIVE '' live=+0 retry=0 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"valveClose","entity":"valve.water_main"}
+log w HearthpaneControl: refused valve.close_valve: needs confirm first
+send -> false
+do send {"call":"valveClose","confirmed":true,"entity":"valve.water_main"}
+send -> true
+send#0 {"domain":"valve","id":9,"service":"close_valve","service_data":{},"target":{"entity_id":"valve.water_main"},"type":"call_service"}
+state LIVE '' live=+0 retry=0 v=5 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=closing] pending=[lock.front, valve.water_main] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":false,"id":9,"type":"result","error":{"code":"home_assistant_error","message":"Valve jammed"}}
+log i HearthpaneControl: control center call valve.close_valve refused
+result#3 ok=false err=Valve jammed
+state LIVE '' live=+0 retry=0 v=6 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Valve jammed'! debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"power","entity":"light.kitchen","on":false}
+send -> true
+send#0 {"domain":"light","id":10,"service":"turn_off","service_data":{},"target":{"entity_id":"light.kitchen"},"type":"call_service"}
+state LIVE '' live=+0 retry=0 v=7 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Valve jammed'! debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":10,"type":"result"}
+result#4 ok=true err=null
+state LIVE '' live=+0 retry=0 v=8 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Kitchen light off'+undo debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off"}}}}}
+do undo
+send#0 {"domain":"light","id":11,"service":"turn_on","service_data":{"brightness_pct":78},"target":{"entity_id":"light.kitchen"},"type":"call_service"}
+state LIVE '' live=+100 retry=0 v=9 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Kitchen light off'+undo debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":11,"type":"result"}
+state LIVE '' live=+100 retry=0 v=10 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Kitchen light off'+undo debug=- alerts=[] scene=- - dismissed=[]
+do undo
+do dismissToast
+state LIVE '' live=+100 retry=0 v=10 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"raw","domain":"light","entity":"light.unknown","service":"turn_on"}
+send -> true
+send#0 {"domain":"light","id":12,"service":"turn_on","service_data":{},"target":{"entity_id":"light.unknown"},"type":"call_service"}
+do send {"call":"raw","domain":"lock","entity":"lock.unknown","service":"unlock"}
+log w HearthpaneControl: refused lock.unlock: unknown lock entity
+send -> false
+do send {"call":"power","entity":"light.kitchen","on":true}
+send -> true
+send#0 {"domain":"light","id":13,"service":"turn_on","service_data":{},"target":{"entity_id":"light.kitchen"},"type":"call_service"}
+state LIVE '' live=+100 retry=0 v=11 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=unlocking,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen, lock.front] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+advance 5100 -> t=+5200
+state LIVE '' live=+100 retry=0 v=12 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Front lock didn't respond'! debug=- alerts=[] scene=- - dismissed=[]
+do alarm {"code":"1234","entity":"alarm_control_panel.home","mode":"AWAY"}
+send#0 {"domain":"alarm_control_panel","id":14,"service":"alarm_arm_away","service_data":{"code":"1234"},"target":{"entity_id":"alarm_control_panel.home"},"type":"call_service"}
+ha#0 {"success":false,"id":14,"type":"result","error":{"code":"invalid_code","message":"Invalid alarm code"}}
+log i HearthpaneControl: control center call alarm_control_panel.alarm_arm_away refused
+alarmResult#8 ok=false err=Invalid alarm code
+state LIVE '' live=+100 retry=0 v=13 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Invalid alarm code'! debug=- alerts=[] scene=- - dismissed=[]
+do runScene {"entity":"scene.movie"}
+runScene -> true
+send#0 {"domain":"scene","id":15,"service":"create","service_data":{"scene_id":"hearthpane_undo","snapshot_entities":["light.kitchen"]},"type":"call_service"}
+state LIVE '' live=+100 retry=0 v=13 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Invalid alarm code'! debug=- alerts=[] scene=Movie time/1r - dismissed=[]
+do runScene {"confirmed":true,"entity":"scene.movie"}
+runScene -> true
+send#0 {"domain":"scene","id":16,"service":"create","service_data":{"scene_id":"hearthpane_undo","snapshot_entities":["light.kitchen"]},"type":"call_service"}
+ha#0 {"success":true,"id":16,"type":"result"}
+send#0 {"domain":"scene","id":17,"service":"turn_on","service_data":{},"target":{"entity_id":"scene.movie"},"type":"call_service"}
+ha#0 {"success":true,"id":17,"type":"result"}
+do undo
+send#0 {"domain":"scene","id":18,"service":"turn_on","service_data":{},"target":{"entity_id":"scene.hearthpane_undo"},"type":"call_service"}
+do clearScene
+state LIVE '' live=+100 retry=0 v=13 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Invalid alarm code'! debug=- alerts=[] scene=- - dismissed=[]
+do prefs {"prefs":{"hearthpane_control_center":{"kids_locks":true,"portal_mode":"kids"}}}
+do reloadSettings
+do send {"call":"unlock","confirmed":true,"entity":"lock.front"}
+log w HearthpaneControl: refused lock.unlock: hidden on this Portal
+send -> false
+do send {"call":"power","entity":"light.kitchen","on":false}
+send -> true
+send#0 {"domain":"light","id":19,"service":"turn_off","service_data":{},"target":{"entity_id":"light.kitchen"},"type":"call_service"}
+state LIVE '' live=+100 retry=0 v=14 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[light.kitchen] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Couldn't do that: Invalid alarm code'! debug=- alerts=[] scene=- - dismissed=[]
+
+## dry run: calls logged not sent, fake states through the alert pipeline
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do debug {"dryRun":true}
+open#0 http://ha.test:8123/api/websocket
+debug -> dryRun=true testPlan=false floors=0 rooms=0 haUnreachable=false
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+do debug {"fake":{"deviceClass":"moisture","slug":"leak","state":"on"}}
+debug -> fakeState refused: not live (connecting)
+do visible {"on":true}
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=Dry run alerts=[] scene=- - dismissed=[]
+do send {"call":"power","entity":"light.kitchen","on":false}
+send -> true
+log i HearthpaneControl: dry-run light.turn_off data=[]
+result#0 ok=true err=null
+state LIVE '' live=+0 retry=0 v=3 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Kitchen light off (not sent)' debug=Dry run alerts=[] scene=- - dismissed=[]
+do send {"call":"coverOpen","confirmed":true,"entity":"lock.front"}
+send -> true
+log i HearthpaneControl: dry-run cover.open_cover data=[]
+result#1 ok=true err=null
+state LIVE '' live=+0 retry=0 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Front lock opening (not sent)' debug=Dry run alerts=[] scene=- - dismissed=[]
+do alarm {"code":"","entity":"alarm_control_panel.home","mode":"AWAY"}
+log i HearthpaneControl: dry-run alarm_control_panel.alarm_arm_away data=[]
+alarmResult#2 ok=true err=null
+state LIVE '' live=+0 retry=0 v=5 ents=11[alarm_control_panel.home=armed_away,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=Dry run alerts=[] scene=- - dismissed=[]
+do debug {"fake":{"deviceClass":"moisture","name":"Basement leak","slug":"leak","state":"on"}}
+log i HearthpaneBanner: dry-run relay cc_alert class=moisture (not sent)
+log i HearthpaneBanner: dry-run banner critical class=moisture quiet=false show=takeover sound=true
+debug -> fakeState binary_sensor.fake_leak=on class=moisture changedMinAgo=0 (dry run)
+state LIVE '' live=+0 retry=0 v=6 ents=12[alarm_control_panel.home=armed_away,binary_sensor.fake_leak=on,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=Dry run alerts=[binary_sensor.fake_leak:critical] scene=- - dismissed=[]
+advance 30000 -> t=+30100
+send#0 {"id":8,"type":"ping"}
+ha#0 {"id":8,"type":"pong"}
+do debug {"fake":{"changedMinAgo":30,"deviceClass":"garage","domain":"cover","slug":"garage","state":"open"}}
+log i HearthpaneBanner: dry-run open banner n=1 show=none sharedRoom=true appVisible=true
+debug -> fakeState cover.fake_garage=open class=garage changedMinAgo=30 (dry run)
+state LIVE '' live=+0 retry=0 v=7 ents=13[alarm_control_panel.home=armed_away,binary_sensor.fake_leak=on,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,cover.fake_garage=open,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=Dry run alerts=[binary_sensor.fake_leak:critical,cover.fake_garage:warning] scene=- - dismissed=[]
+advance 30000 -> t=+60100
+send#0 {"id":9,"type":"ping"}
+ha#0 {"id":9,"type":"pong"}
+do debug {"fake":{"deviceClass":"moisture","slug":"leak","state":"off"}}
+debug -> fakeState binary_sensor.fake_leak=off class=moisture changedMinAgo=0 (dry run)
+state LIVE '' live=+0 retry=0 v=8 ents=13[alarm_control_panel.home=armed_away,binary_sensor.fake_leak=off,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,cover.fake_garage=open,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=Dry run alerts=[cover.fake_garage:warning] scene=- - dismissed=[]
+advance 100 -> t=+60200
+do debug {"testAlert":"smoke"}
+log i HearthpaneBanner: dry-run banner critical class=smoke quiet=false show=takeover sound=true
+debug -> testAlert=smoke logged (dry run)
+do debug {"testAlert":"moisture"}
+log i HearthpaneBanner: dry-run banner critical class=moisture quiet=false show=takeover sound=true
+debug -> testAlert=moisture logged (dry run)
+do dismissAlert {"entity":"cover.fake_garage","until":600000}
+state LIVE '' live=+0 retry=0 v=8 ents=13[alarm_control_panel.home=armed_away,binary_sensor.fake_leak=off,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,cover.fake_garage=open,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=Dry run alerts=[] scene=- - dismissed=[cover.fake_garage@1699998230100]
+do debug {"dryRun":false}
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=false
+state LIVE '' live=+0 retry=0 v=8 ents=13[alarm_control_panel.home=armed_away,binary_sensor.fake_leak=off,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,cover.fake_garage=open,light.kitchen=off,lock.front=open,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast='Dry run: Armed · Away (not sent)' debug=- alerts=[] scene=- - dismissed=[cover.fake_garage@1699998230100]
+do debug {"fake":{"deviceClass":"moisture","slug":"leak","state":"on"}}
+debug -> fakeState refused: turn dry run on first
+do files
+files plan=1f@-10000000 testPlan=- dryRunPref=false
+
+## background banner subscription, alerts and retargeting with visibility
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do install
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"c":{"binary_sensor.kitchen_leak":{"+":{"s":"on","lc":1700000100}}}}}
+advance 100 -> t=+200
+log i HearthpaneBanner: control center critical alert shown
+state LIVE '' live=+100 retry=0 v=3 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=on] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[binary_sensor.kitchen_leak:critical] scene=- - dismissed=[]
+advance 30000 -> t=+30200
+send#0 {"id":8,"type":"ping"}
+do visible {"on":true}
+send#0 {"id":9,"subscription":7,"type":"unsubscribe_events"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":10,"type":"subscribe_entities"}
+ha#0 {"success":true,"id":10,"type":"result"}
+state LIVE 'Waiting for the first update' live=+100 retry=0 v=3 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=on] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[binary_sensor.kitchen_leak:critical] scene=- - dismissed=[]
+ha#0 {"id":10,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+30300
+state LIVE 'Waiting for the first update' live=+30200 retry=0 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":false}
+send#0 {"id":11,"subscription":10,"type":"unsubscribe_events"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":12,"type":"subscribe_entities"}
+advance 100 -> t=+30400
+do prefs {"prefs":{"hearthpane_control_center":{"banners_listen":false}}}
+do reloadSettings
+close#0 1000
+state LIVE 'Waiting for the first update' live=+30200 retry=0 v=5 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do pending
+timers []
+
+## camera streams, Tesla charge week and the phone's lease
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do stream {"entity":"camera.porch"}
+stream -> null
+do remoteWatch
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
+send#0 {"access_token":"tok-123","type":"auth"}
+ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#0 {"id":1,"type":"config/floor_registry/list"}
+send#0 {"id":2,"type":"config/area_registry/list"}
+send#0 {"id":3,"type":"config/device_registry/list"}
+send#0 {"id":4,"type":"config/entity_registry/list"}
+send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
+send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":7,"type":"subscribe_entities"}
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"success":true,"id":7,"type":"result"}
+state CONNECTING 'Waiting for the first update' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+ha#0 {"id":7,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
+advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+do stream {"entity":"camera.porch"}
+send#0 {"entity_id":"camera.porch","id":8,"type":"camera/stream"}
+ha#0 {"result":{"url":"/api/hls/abc123/master_playlist.m3u8"},"success":true,"id":8,"type":"result"}
+stream -> http://ha.test:8123/api/hls/abc123/master_playlist.m3u8
+do stream {"entity":"camera.porch"}
+send#0 {"entity_id":"camera.porch","id":9,"type":"camera/stream"}
+ha#0 {"success":false,"id":9,"type":"result","error":{"code":"start_stream_failed","message":"no stream"}}
+stream -> null
+do chargeWeek
+send#0 {"end_time":"2023-11-14T22:13:20Z","id":10,"period":"day","start_time":"2023-11-08T00:00:00Z","statistic_ids":["sensor.model_y_charge_energy_added"],"type":"recorder/statistics_during_period","types":["change"]}
+ha#0 {"result":{"sensor.model_y_charge_energy_added":[{"change":5.5,"start":1699574400000},{"change":7.25,"start":1699920000000},{"change":null,"start":1699660800000}]},"success":true,"id":10,"type":"result"}
+state LIVE '' live=+0 retry=0 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- charge dismissed=[]
+do stream {"entity":"camera.porch"}
+send#0 {"entity_id":"camera.porch","id":11,"type":"camera/stream"}
+do remoteWatch
+advance 30000 -> t=+30100
+send#0 {"id":12,"type":"ping"}
+do remoteWatch
+advance 45000 -> t=+75100
+log i HearthpaneControl: control center: no pong; reconnecting
+log i HearthpaneControl: control center socket stale
+cancel#0
+stream -> null
+open#1 http://ha.test:8123/api/websocket
+state STALE 'Connecting' live=+0 retry=+61000 v=2 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- charge dismissed=[]
+do pending
+timers [500]
+advance 1000 -> t=+76100
+close#1 1000
+do pending
+timers []
+
+## not configured, then set up; HA-unreachable switch
+state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do visible {"on":true}
+state NOT_CONFIGURED '' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+do send {"call":"power","entity":"light.kitchen","on":true}
+send -> false
+state NOT_CONFIGURED '' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=- alerts=[] scene=- - dismissed=[]
+do prefs {"prefs":{"immortal_ha":{"base_url":"not a url","token":"tok"}}}
+do restart
+do prefs {"prefs":{"immortal_ha":"$ha"}}
+do restart
+open#0 http://ha.test:8123/api/websocket
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=- alerts=[] scene=- - dismissed=[]
+do debug {"haUnreachable":true}
+close#0 1000
+open#1 http://ha.test:9/api/websocket
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=true
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=HA unreachable alerts=[] scene=- - dismissed=[]
+fail#1
+log i HearthpaneControl: control center socket IOException
+cancel#1
+state UNREACHABLE '' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=HA unreachable alerts=[] scene=- - dismissed=[]
+do debug {"haUnreachable":false}
+open#2 http://ha.test:8123/api/websocket
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=false
+state CONNECTING 'Connecting' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=- alerts=[] scene=- - dismissed=[]
+do debug {"haUnreachable":false}
+debug -> dryRun=false testPlan=false floors=0 rooms=0 haUnreachable=false
+ha#2 {"ha_version":"2026.11.0","type":"auth_required"}
+send#2 {"access_token":"tok-123","type":"auth"}
+ha#2 {"ha_version":"2026.11.0","type":"auth_ok"}
+send#2 {"id":1,"type":"config/floor_registry/list"}
+send#2 {"id":2,"type":"config/area_registry/list"}
+send#2 {"id":3,"type":"config/device_registry/list"}
+send#2 {"id":4,"type":"config/entity_registry/list"}
+send#2 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
+state CONNECTING 'Loading rooms' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast='Home Assistant isn't set up'! debug=- alerts=[] scene=- - dismissed=[]
+ha#2 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
+ha#2 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
+ha#2 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
+ha#2 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"hue"},{"entity_id":"binary_sensor.front_door","area_id":"hall","platform":"zha"},{"entity_id":"binary_sensor.kitchen_leak","area_id":"kitchen","platform":"zha"},{"entity_id":"lock.front","area_id":"hall","platform":"zwave"},{"entity_id":"valve.water_main","area_id":"hall","platform":"zwave"},{"entity_id":"camera.porch","area_id":"hall","platform":"generic"},{"entity_id":"scene.movie","platform":"homeassistant"},{"entity_id":"alarm_control_panel.home","platform":"manual"},{"original_device_class":"temperature","entity_id":"sensor.kitchen_temp","area_id":"kitchen","platform":"zha"},{"device_id":"dev_car","translation_key":"charge_state_battery_level","entity_id":"sensor.model_y_battery_level","platform":"tesla_fleet"},{"device_id":"dev_car","translation_key":"charge_state_charge_energy_added","entity_id":"sensor.model_y_charge_energy_added","platform":"tesla_fleet"}],"success":true,"id":4,"type":"result"}
+send#2 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
+ha#2 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
+log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
+state CONNECTING 'Loading devices' live=0 retry=+1000 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast='Home Assistant isn't set up'! debug=- alerts=[] scene=- - dismissed=[]
+

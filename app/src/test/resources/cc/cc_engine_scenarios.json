@@ -1,0 +1,441 @@
+{
+  "data": {
+    "ha": {"base_url": "http://ha.test:8123", "token": "tok-123"},
+    "floors": [{"floor_id": "ground", "name": "Ground", "level": 0}],
+    "areas": [
+      {"area_id": "kitchen", "name": "Kitchen", "floor_id": "ground"},
+      {"area_id": "hall", "name": "Hall", "floor_id": "ground"}
+    ],
+    "devices": [
+      {"id": "dev_lamp", "area_id": "kitchen", "name": "Lamp"},
+      {"id": "dev_car", "area_id": null, "name": "Model Y", "model": "Model Y"}
+    ],
+    "entities": [
+      {"entity_id": "light.kitchen", "device_id": "dev_lamp", "platform": "hue"},
+      {"entity_id": "binary_sensor.front_door", "area_id": "hall", "platform": "zha"},
+      {"entity_id": "binary_sensor.kitchen_leak", "area_id": "kitchen", "platform": "zha"},
+      {"entity_id": "lock.front", "area_id": "hall", "platform": "zwave"},
+      {"entity_id": "valve.water_main", "area_id": "hall", "platform": "zwave"},
+      {"entity_id": "camera.porch", "area_id": "hall", "platform": "generic"},
+      {"entity_id": "scene.movie", "platform": "homeassistant"},
+      {"entity_id": "alarm_control_panel.home", "platform": "manual"},
+      {"entity_id": "sensor.kitchen_temp", "area_id": "kitchen", "platform": "zha", "original_device_class": "temperature"},
+      {"entity_id": "sensor.model_y_battery_level", "device_id": "dev_car", "platform": "tesla_fleet", "translation_key": "charge_state_battery_level"},
+      {"entity_id": "sensor.model_y_charge_energy_added", "device_id": "dev_car", "platform": "tesla_fleet", "translation_key": "charge_state_charge_energy_added"}
+    ],
+    "classes": {
+      "binary_sensor.front_door": {"entity_id": "binary_sensor.front_door", "original_device_class": "door"},
+      "binary_sensor.kitchen_leak": {"entity_id": "binary_sensor.kitchen_leak", "original_device_class": "moisture"}
+    },
+    "initial": {"a": {
+      "light.kitchen": {"s": "on", "a": {"friendly_name": "Kitchen light", "brightness": 200}, "lc": 1699999000.0},
+      "binary_sensor.front_door": {"s": "off", "a": {"friendly_name": "Front door", "device_class": "door"}, "lc": 1699999000.0},
+      "binary_sensor.kitchen_leak": {"s": "off", "a": {"friendly_name": "Kitchen leak", "device_class": "moisture"}, "lc": 1699999000.0},
+      "lock.front": {"s": "locked", "a": {"friendly_name": "Front lock"}, "lc": 1699999000.0},
+      "valve.water_main": {"s": "open", "a": {"friendly_name": "Water main"}, "lc": 1699999000.0},
+      "camera.porch": {"s": "idle", "a": {"friendly_name": "Porch"}, "lc": 1699999000.0},
+      "scene.movie": {"s": "unknown", "a": {"friendly_name": "Movie time", "entity_id": ["light.kitchen"]}, "lc": 1699999000.0},
+      "alarm_control_panel.home": {"s": "disarmed", "a": {"friendly_name": "Alarm"}, "lc": 1699999000.0},
+      "sensor.kitchen_temp": {"s": "21.5", "a": {"friendly_name": "Kitchen temperature", "device_class": "temperature", "unit_of_measurement": "°C"}, "lc": 1699999000.0},
+      "sensor.model_y_battery_level": {"s": "80", "a": {"friendly_name": "Model Y battery", "unit_of_measurement": "%"}, "lc": 1699999000.0},
+      "sensor.model_y_charge_energy_added": {"s": "12.0", "a": {"friendly_name": "Model Y energy added", "unit_of_measurement": "kWh"}, "lc": 1699999000.0}
+    }},
+    "background": {"a": {
+      "binary_sensor.front_door": {"s": "off", "a": {"friendly_name": "Front door", "device_class": "door"}, "lc": 1699999000.0},
+      "binary_sensor.kitchen_leak": {"s": "off", "a": {"friendly_name": "Kitchen leak", "device_class": "moisture"}, "lc": 1699999000.0}
+    }},
+    "fullStates": [
+      {"entity_id": "light.kitchen", "state": "on", "attributes": {"friendly_name": "Kitchen light"}, "last_changed": "2023-11-14T22:00:00.000000+00:00"},
+      {"entity_id": "lock.front", "state": "locked", "attributes": {"friendly_name": "Front lock"}, "last_changed": "2023-11-14T22:00:00.000000+00:00"},
+      {"entity_id": "light.not_watched", "state": "on", "attributes": {"friendly_name": "Garage light"}, "last_changed": "2023-11-14T22:00:00.000000+00:00"}
+    ],
+    "planHa": {"v": 1, "updatedAt": 1699990000000, "floors": [{"id": "ground", "name": "Ground", "rooms": [
+      {"id": "kitchen", "name": "Kitchen", "r": [0, 0, 6, 5], "out": false, "d": [{"e": "light.kitchen", "x": 0.5, "y": 0.5}, {"e": "binary_sensor.kitchen_leak", "x": 0.2, "y": 0.8}]},
+      {"id": "hall", "name": "Hall", "r": [6, 0, 4, 5], "out": false, "d": [{"e": "lock.front", "x": 0.5, "y": 0.1}]}],
+      "openings": [{"e": "binary_sensor.front_door", "room": "hall", "side": "S", "at": 0.5, "span": 0.3}]}]},
+    "planLocalNewer": {"v": 1, "updatedAt": 1699995000000, "floors": [{"id": "ground", "name": "Ground", "rooms": [
+      {"id": "kitchen", "name": "Kitchen", "r": [0, 0, 8, 5], "out": false, "d": [{"e": "light.kitchen", "x": 0.5, "y": 0.5}]}], "openings": []}]},
+    "planEdited": {"v": 1, "updatedAt": 1, "floors": [{"id": "ground", "name": "Ground", "rooms": [
+      {"id": "kitchen", "name": "Kitchen", "r": [0, 0, 8, 5], "out": false, "d": [{"e": "light.kitchen", "x": 0.4, "y": 0.4}]},
+      {"id": "hall", "name": "Hall", "r": [8, 0, 4, 5], "out": false, "d": []}], "openings": []}]},
+    "macros": {
+      "handshake": [
+        {"ha": {"type": "auth_required", "ha_version": "2026.11.0"}},
+        {"ha": {"type": "auth_ok", "ha_version": "2026.11.0"}},
+        {"reply": "config/floor_registry/list", "result": "$floors"},
+        {"reply": "config/area_registry/list", "result": "$areas"},
+        {"reply": "config/device_registry/list", "result": "$devices"},
+        {"reply": "config/entity_registry/list", "result": "$entities"},
+        {"reply": "config/entity_registry/get_entries", "result": "$classes"}
+      ],
+      "planFromHa": [{"reply": "frontend/get_user_data", "result": {"value": "$planHa"}}],
+      "noPlanInHa": [{"reply": "frontend/get_user_data", "result": {"value": null}}],
+      "live": [
+        {"reply": "subscribe_entities"},
+        {"event": "subscribe_entities", "data": "$initial"},
+        {"advance": 100}
+      ],
+      "connectLive": [
+        {"do": "visible", "on": true},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"}
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "name": "auth flow, registry, plan from HA, subscribe_entities and batched diffs",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"ha": {"type": "auth_required", "ha_version": "2026.11.0"}},
+        {"ha": {"type": "auth_ok", "ha_version": "2026.11.0"}},
+        {"do": "pending"},
+        {"reply": "config/floor_registry/list", "result": "$floors"},
+        {"reply": "config/area_registry/list", "result": "$areas"},
+        {"reply": "config/device_registry/list", "result": "$devices"},
+        {"reply": "config/entity_registry/list", "result": "$entities"},
+        {"reply": "config/entity_registry/get_entries", "result": "$classes"},
+        {"macro": "planFromHa"},
+        {"reply": "subscribe_entities"},
+        {"event": "subscribe_entities", "data": "$initial"},
+        {"do": "state"},
+        {"advance": 99},
+        {"advance": 1},
+        {"event": "subscribe_entities", "data": {"c": {"light.kitchen": {"+": {"s": "off", "lc": 1700000001.0}}}}},
+        {"advance": 40},
+        {"event": "subscribe_entities", "data": {"c": {"sensor.kitchen_temp": {"+": {"s": "22.0"}}}}},
+        {"event": "subscribe_entities", "data": {"c": {"light.kitchen": {"+": {"a": {"brightness": 10}}, "-": {"a": ["friendly_name"]}}}}},
+        {"advance": 60},
+        {"event": "subscribe_entities", "data": {"r": ["camera.porch"]}},
+        {"advance": 100},
+        {"do": "files"}
+      ]
+    },
+    {
+      "name": "no registry access and no plan anywhere",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"ha": {"type": "auth_required"}},
+        {"ha": {"type": "auth_ok"}},
+        {"reply": "config/floor_registry/list", "success": false, "error": {"code": "unauthorized", "message": "Unauthorized"}},
+        {"reply": "config/area_registry/list", "success": false, "error": {"code": "unauthorized", "message": "Unauthorized"}},
+        {"reply": "config/device_registry/list", "success": false, "error": {"code": "unauthorized", "message": "Unauthorized"}},
+        {"reply": "config/entity_registry/list", "success": false, "error": {"code": "unauthorized", "message": "Unauthorized"}},
+        {"macro": "noPlanInHa"},
+        {"reply": "subscribe_entities"},
+        {"event": "subscribe_entities", "data": "$initial"},
+        {"advance": 100},
+        {"do": "files"}
+      ]
+    },
+    {
+      "name": "subscribe_entities refused falls back to get_states and state_changed",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"reply": "subscribe_entities", "success": false, "error": {"code": "unknown_command", "message": "Unknown command."}},
+        {"reply": "get_states", "result": "$fullStates"},
+        {"reply": "subscribe_events"},
+        {"advance": 100},
+        {"event": "subscribe_events", "data": {"event_type": "state_changed", "data": {"entity_id": "light.kitchen",
+          "new_state": {"entity_id": "light.kitchen", "state": "off", "attributes": {"friendly_name": "Kitchen light"}, "last_changed": "2023-11-14T22:13:21.000000+00:00"}}}},
+        {"event": "subscribe_events", "data": {"event_type": "state_changed", "data": {"entity_id": "light.not_watched",
+          "new_state": {"entity_id": "light.not_watched", "state": "off", "attributes": {}, "last_changed": "2023-11-14T22:13:21.000000+00:00"}}}},
+        {"advance": 100},
+        {"event": "subscribe_events", "data": {"event_type": "state_changed", "data": {"entity_id": "lock.front", "new_state": null}}},
+        {"advance": 100}
+      ]
+    },
+    {
+      "name": "heartbeat, pong, stale socket and reconnect with a new generation",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"macro": "connectLive"},
+        {"do": "pending"},
+        {"advance": 30000},
+        {"pong": true},
+        {"advance": 30000},
+        {"advance": 30000},
+        {"do": "pending"},
+        {"ha": {"type": "event", "id": 7, "event": {"c": {"light.kitchen": {"+": {"s": "off"}}}}}, "socket": 0},
+        {"advance": 1000},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"},
+        {"do": "pending"}
+      ]
+    },
+    {
+      "name": "reconnect backoff while Home Assistant is unreachable or the Portal is offline",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"fail": true},
+        {"do": "pending"},
+        {"advance": 1000},
+        {"fail": true},
+        {"advance": 8000},
+        {"closed": 1006},
+        {"advance": 16000},
+        {"fail": true},
+        {"advance": 32000},
+        {"fail": true},
+        {"advance": 60000},
+        {"fail": true},
+        {"advance": 60000},
+        {"fail": true},
+        {"do": "retryNow"},
+        {"do": "online", "on": false},
+        {"fail": true},
+        {"do": "pending"},
+        {"advance": 8000},
+        {"do": "online", "on": true},
+        {"advance": 16000},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"},
+        {"do": "visible", "on": false},
+        {"do": "pending"}
+      ]
+    },
+    {
+      "name": "disconnect mid-call fails the call, then a reconnect",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"macro": "connectLive"},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": false},
+        {"do": "pending"},
+        {"fail": true},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": true},
+        {"do": "phone", "call": "power", "entity": "light.kitchen", "on": true},
+        {"ha": {"type": "result", "id": 12, "success": true, "result": null}, "socket": 0},
+        {"advance": 1000},
+        {"advance": 4100},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"}
+      ]
+    },
+    {
+      "name": "token refused at connect and after a session",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"ha": {"type": "auth_required"}},
+        {"ha": {"type": "auth_invalid", "message": "Invalid access token or password"}},
+        {"do": "pending"},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": true},
+        {"advance": 299999},
+        {"advance": 1},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"},
+        {"closed": 1000},
+        {"advance": 1000},
+        {"ha": {"type": "auth_required"}},
+        {"ha": {"type": "auth_invalid", "message": "Invalid access token or password"}},
+        {"do": "prefs", "prefs": {"immortal_ha": {"token": "tok-new"}}},
+        {"do": "restart"},
+        {"ha": {"type": "auth_required"}}
+      ]
+    },
+    {
+      "name": "oversized and malformed messages, and a plan too big for Home Assistant",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"macro": "connectLive"},
+        {"event": "subscribe_entities", "data": {"a": {"sensor.big": {"s": "on", "a": {"friendly_name": "Big", "blob": "<PAD>"}, "lc": 1700000000.0}}}, "padTo": 3000000},
+        {"advance": 100},
+        {"ha": "{not json"},
+        {"ha": "[]"},
+        {"ha": {"type": "result", "id": 999, "success": true}},
+        {"ha": {"type": "event", "id": 999, "event": {"a": {"light.ghost": {"s": "on"}}}}},
+        {"ha": {"type": "mystery"}},
+        {"advance": 100},
+        {"do": "savePlan", "bigRooms": 1400},
+        {"do": "files"},
+        {"event": "subscribe_entities", "data": {"c": {"light.kitchen": {"+": {"s": "off"}}}}},
+        {"advance": 100}
+      ]
+    },
+    {
+      "name": "plan load and save: newer local copy, HA ack and refusal, dry run, test plan",
+      "prefs": {"immortal_ha": "$ha"},
+      "localPlan": "$planLocalNewer",
+      "steps": [
+        {"do": "visible", "on": true},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"reply": "frontend/set_user_data"},
+        {"macro": "live"},
+        {"do": "savePlan", "plan": "$planEdited"},
+        {"reply": "frontend/set_user_data", "success": false, "error": {"code": "invalid_format", "message": "bad"}},
+        {"do": "files"},
+        {"do": "debug", "dryRun": true},
+        {"advance": 10},
+        {"do": "savePlan", "plan": "$planEdited"},
+        {"do": "debug", "dryRun": false, "testPlan": "load"},
+        {"do": "files"},
+        {"do": "savePlan", "plan": "$planEdited"},
+        {"do": "restart"},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"},
+        {"do": "debug", "testPlan": "clear"},
+        {"do": "files"}
+      ]
+    },
+    {
+      "name": "plan lookup before the registry, and an unchanged visibility",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"do": "visible", "on": true},
+        {"ha": {"type": "auth_required"}},
+        {"ha": {"type": "auth_ok"}},
+        {"macro": "planFromHa"},
+        {"reply": "config/floor_registry/list", "result": "$floors"},
+        {"reply": "config/area_registry/list", "result": "$areas"},
+        {"reply": "config/device_registry/list", "result": "$devices"},
+        {"reply": "config/entity_registry/list", "result": [{"entity_id": "light.kitchen", "device_id": "dev_lamp"}]},
+        {"macro": "live"},
+        {"do": "visible", "on": true},
+        {"do": "visible", "on": false},
+        {"do": "debug", "testPlan": "load"},
+        {"do": "debug", "testPlan": "clear"}
+      ]
+    },
+    {
+      "name": "service calls through the policy gate: confirmed, refused, undo, failures and scenes",
+      "prefs": {"immortal_ha": "$ha"},
+      "steps": [
+        {"macro": "connectLive"},
+        {"do": "send", "call": "unlock", "entity": "lock.front"},
+        {"do": "send", "call": "unlock", "entity": "lock.front", "confirmed": true},
+        {"reply": "call_service"},
+        {"do": "send", "call": "valveClose", "entity": "valve.water_main"},
+        {"do": "send", "call": "valveClose", "entity": "valve.water_main", "confirmed": true},
+        {"reply": "call_service", "success": false, "error": {"code": "home_assistant_error", "message": "Valve jammed"}},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": false},
+        {"reply": "call_service"},
+        {"event": "subscribe_entities", "data": {"c": {"light.kitchen": {"+": {"s": "off"}}}}},
+        {"do": "undo"},
+        {"reply": "call_service"},
+        {"do": "undo"},
+        {"do": "dismissToast"},
+        {"do": "send", "call": "raw", "domain": "light", "service": "turn_on", "entity": "light.unknown"},
+        {"do": "send", "call": "raw", "domain": "lock", "service": "unlock", "entity": "lock.unknown"},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": true},
+        {"advance": 5100},
+        {"do": "alarm", "entity": "alarm_control_panel.home", "mode": "AWAY", "code": "1234"},
+        {"reply": "call_service", "success": false, "error": {"code": "invalid_code", "message": "Invalid alarm code"}},
+        {"do": "runScene", "entity": "scene.movie"},
+        {"do": "runScene", "entity": "scene.movie", "confirmed": true},
+        {"reply": "call_service"},
+        {"reply": "call_service"},
+        {"do": "undo"},
+        {"do": "clearScene"},
+        {"do": "prefs", "prefs": {"hearthpane_control_center": {"portal_mode": "kids", "kids_locks": true}}},
+        {"do": "reloadSettings"},
+        {"do": "send", "call": "unlock", "entity": "lock.front", "confirmed": true},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": false}
+      ]
+    },
+    {
+      "name": "dry run: calls logged not sent, fake states through the alert pipeline",
+      "prefs": {"immortal_ha": "$ha", "hearthpane_control_center": {"shared_room": true}},
+      "steps": [
+        {"do": "debug", "dryRun": true},
+        {"do": "debug", "fake": {"slug": "leak", "state": "on", "deviceClass": "moisture"}},
+        {"macro": "connectLive"},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": false},
+        {"do": "send", "call": "coverOpen", "entity": "lock.front", "confirmed": true},
+        {"do": "alarm", "entity": "alarm_control_panel.home", "mode": "AWAY", "code": ""},
+        {"do": "debug", "fake": {"slug": "leak", "state": "on", "deviceClass": "moisture", "name": "Basement leak"}},
+        {"advance": 30000},
+        {"pong": true},
+        {"do": "debug", "fake": {"domain": "cover", "slug": "garage", "state": "open", "deviceClass": "garage", "changedMinAgo": 30}},
+        {"advance": 30000},
+        {"pong": true},
+        {"do": "debug", "fake": {"slug": "leak", "state": "off", "deviceClass": "moisture"}},
+        {"advance": 100},
+        {"do": "debug", "testAlert": "smoke"},
+        {"do": "debug", "testAlert": "moisture"},
+        {"do": "dismissAlert", "entity": "cover.fake_garage", "until": 600000},
+        {"do": "debug", "dryRun": false},
+        {"do": "debug", "fake": {"slug": "leak", "state": "on", "deviceClass": "moisture"}},
+        {"do": "files"}
+      ]
+    },
+    {
+      "name": "background banner subscription, alerts and retargeting with visibility",
+      "prefs": {"immortal_ha": "$ha", "hearthpane_control_center": {"shared_room": true}},
+      "steps": [
+        {"do": "install"},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"reply": "subscribe_entities"},
+        {"event": "subscribe_entities", "data": "$background"},
+        {"advance": 100},
+        {"event": "subscribe_entities", "data": {"c": {"binary_sensor.kitchen_leak": {"+": {"s": "on", "lc": 1700000100.0}}}}},
+        {"advance": 100},
+        {"advance": 30000},
+        {"do": "visible", "on": true},
+        {"reply": "subscribe_entities"},
+        {"event": "subscribe_entities", "data": "$initial"},
+        {"advance": 100},
+        {"do": "visible", "on": false},
+        {"advance": 100},
+        {"do": "prefs", "prefs": {"hearthpane_control_center": {"banners_listen": false}}},
+        {"do": "reloadSettings"},
+        {"do": "pending"}
+      ]
+    },
+    {
+      "name": "camera streams, Tesla charge week and the phone's lease",
+      "prefs": {"immortal_ha": "$ha", "hearthpane_control_center": {"banners_listen": false}},
+      "steps": [
+        {"do": "stream", "entity": "camera.porch"},
+        {"do": "remoteWatch"},
+        {"macro": "handshake"},
+        {"macro": "planFromHa"},
+        {"macro": "live"},
+        {"do": "stream", "entity": "camera.porch"},
+        {"reply": "camera/stream", "result": {"url": "/api/hls/abc123/master_playlist.m3u8"}},
+        {"do": "stream", "entity": "camera.porch"},
+        {"reply": "camera/stream", "success": false, "error": {"code": "start_stream_failed", "message": "no stream"}},
+        {"do": "chargeWeek"},
+        {"reply": "recorder/statistics_during_period", "result": {"sensor.model_y_charge_energy_added": [
+          {"start": 1699574400000, "change": 5.5}, {"start": 1699920000000, "change": 7.25}, {"start": 1699660800000, "change": null}]}},
+        {"do": "stream", "entity": "camera.porch"},
+        {"do": "remoteWatch"},
+        {"advance": 30000},
+        {"do": "remoteWatch"},
+        {"advance": 45000},
+        {"do": "pending"},
+        {"advance": 1000},
+        {"do": "pending"}
+      ]
+    },
+    {
+      "name": "not configured, then set up; HA-unreachable switch",
+      "steps": [
+        {"do": "visible", "on": true},
+        {"do": "send", "call": "power", "entity": "light.kitchen", "on": true},
+        {"do": "prefs", "prefs": {"immortal_ha": {"base_url": "not a url", "token": "tok"}}},
+        {"do": "restart"},
+        {"do": "prefs", "prefs": {"immortal_ha": "$ha"}},
+        {"do": "restart"},
+        {"do": "debug", "haUnreachable": true},
+        {"fail": true},
+        {"do": "debug", "haUnreachable": false},
+        {"do": "debug", "haUnreachable": false},
+        {"macro": "handshake"}
+      ]
+    }
+  ]
+}
