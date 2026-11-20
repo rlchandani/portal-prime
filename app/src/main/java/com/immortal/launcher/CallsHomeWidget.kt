@@ -47,7 +47,7 @@ internal fun CallsHomeWidget(modifier: Modifier = Modifier) {
   LaunchedEffect(Unit) { Calling.refreshPresence(context) }
   val now = rememberCallClock(PRESENCE_TICK_MS)
   val missed = remember(history) { CallHistory.latestUnseenMissed(history) }
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
   val messages by CallMessageStore.messages.collectAsState()
   val message = remember(messages) { CallInbox.latestUnseen(messages) }
   ImmortalWidgetShell(title = "Calls", openPage = "calls", modifier = modifier, onOpen = { CallsActivity.open(context) },

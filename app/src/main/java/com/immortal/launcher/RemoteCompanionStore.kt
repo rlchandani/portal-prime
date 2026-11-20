@@ -66,7 +66,7 @@ internal object RemoteCompanionStore {
     val saved = read(c).optString("deviceId")
     val id = if (runCatching { UUID.fromString(saved).toString() == saved }.getOrDefault(false)) saved
     else UUID.randomUUID().toString().also { update(c, "deviceId", it) }
-    knownId.remember(path(c).path, id)
+    knownId.remember(owner(c), id)
     id
   }
   /**
@@ -76,10 +76,12 @@ internal object RemoteCompanionStore {
    * a backup restore that rewrites the file calls [forgetCachedId]. Null while the store is unreadable.
    */
   fun cachedId(c: Context): String? =
-      knownId.get(path(c).path) ?: runCatching { id(c) }.getOrNull()
+      knownId.get(owner(c)) ?: runCatching { id(c) }.getOrNull()
   /** The store file was replaced behind this object (backup import). */
   fun forgetCachedId() = knownId.clear()
-  private val knownId = PathMemo()
+  private val knownId = OwnerMemo()
+  // Keyed by the application context, not the file path: resolving noBackupFilesDir is itself a stat.
+  private fun owner(c: Context): Any = c.applicationContext ?: c
   fun scenes(c: Context): JSONArray = synchronized(mutationLock) { read(c).optJSONArray("scenes") ?: JSONArray() }
   fun history(c: Context): JSONArray = synchronized(mutationLock) { read(c).optJSONArray("operations") ?: JSONArray() }
   fun update(c: Context, key: String, value: Any) = synchronized(mutationLock) {
@@ -91,11 +93,11 @@ internal object RemoteCompanionStore {
   }
 }
 
-/** One remembered value per store path (tests use a fresh directory each; the app has one). */
-internal class PathMemo {
-  @Volatile private var entry: Pair<String, String>? = null
-  fun get(path: String): String? = entry?.takeIf { it.first == path }?.second
-  fun remember(path: String, value: String) { entry = path to value }
+/** One remembered value per owning context, compared by identity (the app has one; tests use many). */
+internal class OwnerMemo {
+  @Volatile private var entry: Pair<Any, String>? = null
+  fun get(owner: Any): String? = entry?.takeIf { it.first === owner }?.second
+  fun remember(owner: Any, value: String) { entry = owner to value }
   fun clear() { entry = null }
 }
 

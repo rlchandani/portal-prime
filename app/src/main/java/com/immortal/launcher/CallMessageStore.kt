@@ -18,6 +18,9 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Video messages received by this Portal, plus its own copies of the ones it sent: sealed files under
@@ -66,6 +69,10 @@ internal object CallMessageStore {
   }
 
   fun prune(context: Context) = synchronized(lock) { pruneLocked(context.applicationContext) }
+
+  /** For composables: the first load reads, prunes and sweeps on disk, so it runs on [io]. */
+  suspend fun ensureLoadedOffMain(context: Context, prune: Boolean = false, io: CoroutineDispatcher = Dispatchers.IO) =
+      withContext(io) { ensureLoaded(context); if (prune) prune(context) }
 
   /**
    * Streams one verified upload into the store. [copyBody] copies the HTTP body into the given

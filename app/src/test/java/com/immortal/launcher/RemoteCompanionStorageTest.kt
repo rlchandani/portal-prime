@@ -125,7 +125,7 @@ class RemoteCompanionStorageTest {
       assertEquals("{public:1}", file.readText())
     }
   }
-  @Test fun cachedIdOfAFreshStoreMatchesTheStrictIdAndIsPerStorePath() {
+  @Test fun cachedIdOfAFreshStoreMatchesTheStrictIdAndIsPerOwningContext() {
     var first = ""
     withStore(null) { c, file ->
       first = RemoteCompanionStore.cachedId(c)!!
