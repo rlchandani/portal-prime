@@ -72,7 +72,7 @@ internal object DinnerCall {
     hello(app, force = true)
   }
 
-  fun selfId(context: Context): String? = runCatching { RemoteCompanionStore.id(context) }.getOrNull()
+  fun selfId(context: Context): String? = RemoteCompanionStore.cachedId(context)
   fun selfName(context: Context): String = DinnerWire.cleanName(FleetConfig.name(context)) ?: "Portal"
   fun householdReady(context: Context): Boolean = HouseholdKey.get(context) != null
 

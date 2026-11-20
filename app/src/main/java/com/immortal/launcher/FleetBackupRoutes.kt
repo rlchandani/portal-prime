@@ -269,9 +269,13 @@ internal class FleetBackupRoutes(
       prefFiles++
     }
     var dataFiles = 0
-    plan.files.forEach { (path, bytes) ->
-      platform.write(dataFile(path), bytes)
-      dataFiles++
+    // Under the companion store's lock, so no reader can re-memoize its identity mid-replacement.
+    synchronized(RemoteCompanionStore.mutationLock) {
+      plan.files.forEach { (path, bytes) ->
+        platform.write(dataFile(path), bytes)
+        dataFiles++
+      }
+      RemoteCompanionStore.forgetCachedId()
     }
     val settings = if (plan.household.isEmpty()) 0 else platform.applyHousehold(context, plan.household).size
     return JSONObject().put("prefFiles", prefFiles).put("dataFiles", dataFiles).put("householdSettings", settings)
