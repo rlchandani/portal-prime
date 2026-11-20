@@ -1,6 +1,6 @@
 # Portal performance track — 2026-11-20 (perf-3)
 
-Family Portal+ (2221B01C7T01C0, Android 10, 2160×1440). Performance build + its `.dm`
+Family Portal+ (<family-serial>, Android 10, 2160×1440). Performance build + its `.dm`
 (`dexopt reason=install-dm` and the APK sha checked before every run). gfxinfo framestats
 (IntendedVsync → FrameCompleted, all launcher windows) plus SurfaceFlinger missed frames;
 perfetto (gfx/view/dalvik/am/wm/binder) for attribution. "Warm" excludes each run's first repeat.
