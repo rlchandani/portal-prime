@@ -29,19 +29,33 @@ internal object LanUrlPolicy {
   }
 
   /** Every address the host resolves to must be private (no mixed public/private answers). */
-  fun resolvesPrivate(host: String, resolve: (String) -> List<InetAddress>): Boolean =
-      runCatching { resolve(host) }.getOrNull()?.let { it.isNotEmpty() && it.all(::isPrivateLan) } == true
+  fun resolvesPrivate(host: String, resolve: (String) -> List<InetAddress>): Boolean = privateAnswer(host, resolve) != null
+
+  /** The host's one DNS answer when it is non-empty and wholly private, else null. */
+  private fun privateAnswer(host: String, resolve: (String) -> List<InetAddress>): List<InetAddress>? =
+      runCatching { resolve(host) }.getOrNull()?.takeIf { it.isNotEmpty() && it.all(::isPrivateLan) }
 
   /**
-   * `/remote/immich/albums` may contact [url] only when it is the Immich server already saved on
-   * this Portal (the owner set that up), or an http(s) URL whose host resolves to private LAN
-   * addresses only.
+   * Where `/remote/immich/albums` may connect for [url]. [Target.Saved] when it is the Immich
+   * server already saved on this Portal (the owner set that up; normal DNS). [Target.Pinned] when
+   * it is an http(s) URL whose host resolves to private LAN addresses only: the fetch must connect
+   * to exactly those addresses ([ImmichPinnedFetch]), so a DNS answer that changes after this check
+   * (rebinding) is never used. Null when refused. The host is resolved once, here.
    */
-  fun immichAlbumsAllowed(url: String, stored: String?, resolve: (String) -> List<InetAddress> = ::systemResolve): Boolean {
-    val endpoint = RemoteCompanionSources.endpoint(url, immich = true) ?: return false
-    if (!stored.isNullOrBlank() && endpoint == RemoteCompanionSources.endpoint(stored, immich = true)) return true
-    val host = runCatching { URI(endpoint).host }.getOrNull()?.trim('[', ']') ?: return false
-    return resolvesPrivate(host, resolve)
+  fun immichAlbumsTarget(url: String, stored: String?, resolve: (String) -> List<InetAddress> = ::systemResolve): Target? {
+    val endpoint = RemoteCompanionSources.endpoint(url, immich = true) ?: return null
+    if (!stored.isNullOrBlank() && endpoint == RemoteCompanionSources.endpoint(stored, immich = true)) return Target.Saved
+    val host = runCatching { URI(endpoint).host }.getOrNull()?.trim('[', ']') ?: return null
+    return privateAnswer(host, resolve)?.let { Target.Pinned(host, it) }
+  }
+
+  fun immichAlbumsAllowed(url: String, stored: String?, resolve: (String) -> List<InetAddress> = ::systemResolve): Boolean =
+      immichAlbumsTarget(url, stored, resolve) != null
+
+  sealed interface Target {
+    data object Saved : Target
+    /** Connect to [host] only at [addresses] (the checked answer); every other host is refused. */
+    data class Pinned(val host: String, val addresses: List<InetAddress>) : Target
   }
 
   private fun systemResolve(host: String): List<InetAddress> = InetAddress.getAllByName(host).toList()

@@ -12,7 +12,10 @@
 #                        Immich/SMB/WebDAV creds, multiroom user/pass, weather, …).
 #
 # The agent runs as com.immortal.launcher, so it can read its own /data/data
-# shared_prefs over /fs/read — no root or adb needed.
+# shared_prefs over /fs/read — no root or adb needed. Hearthpane 1.274 and later
+# refuse that read (the prefs hold the household key, tokens and sessions), so
+# against those agents the backup fails at the preferences step and keeps the
+# previous snapshot.
 #
 # Usage:
 #   ./fleet-backup.sh                 # back up every registered device
@@ -76,7 +79,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 capture() {
-  local serial="$1" n
+  local serial="$1" n err
   "$FLEETCTL" info --device "$serial" > "$stage/info.json" 2>/dev/null || return 1
   "$PYTHON3" "$here/fleet-backup-data.py" json info "$stage/info.json" || return 1
   "$FLEETCTL" apps --device "$serial" > "$stage/apps.json" 2>/dev/null || return 1
@@ -85,7 +88,12 @@ capture() {
   "$FLEETCTL" ls "$PREFS_DIR" --device "$serial" > "$stage/listing.json" 2>/dev/null || return 1
   "$PYTHON3" "$here/fleet-backup-data.py" names "$stage/listing.json" "$PREFS_DIR" > "$stage/preferences.txt" || return 1
   while IFS= read -r n; do
-    "$FLEETCTL" pull "$PREFS_DIR/$n" "$stage/shared_prefs/$n" --device "$serial" >/dev/null 2>&1 || return 1
+    if ! err="$("$FLEETCTL" pull "$PREFS_DIR/$n" "$stage/shared_prefs/$n" --device "$serial" 2>&1 >/dev/null)"; then
+      case "$err" in
+        *protected_path*) report "  error: this agent refuses preference reads (Hearthpane 1.274+ keeps keys and tokens off /fs/read)" >&2;;
+      esac
+      return 1
+    fi
     "$PYTHON3" "$here/fleet-backup-data.py" xml "$stage/shared_prefs/$n" || return 1
   done < "$stage/preferences.txt"
   "$PYTHON3" "$here/fleet-backup-data.py" manifest "$stage" "$serial" "$STAMP" "$APP_PACKAGE" || return 1

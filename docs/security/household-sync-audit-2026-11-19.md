@@ -103,14 +103,19 @@ Operator verification hooks (fleet token, which already has full control):
 `{"op":"age","days":N}` (debug clock for test sessions), `{"op":"pin"}` (issues a live code whose
 session is a test session) and `{"op":"revoke_id","id":"…"}`.
 
+### Closed in the last follow-up (sec-lows, on top of 1.273)
+
+| # | Finding | Status | Fix |
+|---|---|---|---|
+| 7 | **Low: the `/fs/read` blocklist didn't cover `shared_prefs`** | Fixed | `/fs/read` now refuses (`403 protected_path`) the app's whole private data directory: `shared_prefs` (household key, Home Assistant token, music tokens, phone sessions and pairing, fleet token), `databases`, `files`, `no_backup` (Who's there templates, companion store, sealed stores), `app_*` and `cache`, under `/data/data/<pkg>`, `/data/user/<n>/<pkg>`, `/data/user_de/<n>/<pkg>` and the Android 11+ `data_mirror` aliases. It also refuses the fleet manifest on external storage (`Android/data/<pkg>/files/fleet`, which carries the fleet token) and the `/proc/<pid>` side doors (`fd`, `fdinfo`, `map_files`, `mem`, `pagemap`, `root`, `cwd`, `exe`, `environ`, also under `task/<tid>`). The rule is checked on both the requested and the canonical path, so `..`, symlinks and `/proc/self/root/...` can't reach a store; a path that can't be resolved is refused. What the fleet tools read stays readable: `/sdcard` (`fleetctl cat`/`pull`, dev APKs), the installed APK under `/data/app` and `/proc/self/maps`/`cmdline` (`room-fleet.py`). Who's there's `no_backup/whos_there` also joins the stores `/fs/list` and `/fs/write` refuse. Listing and writing `shared_prefs` are unchanged, so `fleet-restore.sh --prefs` from an older snapshot still works. **Consequence:** `fleet-backup.sh` can no longer copy preferences from a 1.274+ agent; it now fails at that step with a clear message and keeps the previous snapshot (README updated). |
+| 8 | **Residual of 5: DNS rebinding on the Immich album check** | Fixed | `LanUrlPolicy.immichAlbumsTarget` resolves a phone-typed host once and returns the checked answer (`Target.Pinned`). `ImmichPinnedFetch` then connects to exactly those addresses through OkHttp with a pinned `Dns` (answers only that host, only with those addresses; any other name is `UnknownHostException`) and no proxy, so there is no second lookup. The URL keeps the host name, so the `Host` header, TLS SNI and certificate verification use the typed name. Redirects stay on the credential's origin and never downgrade (`PhotoSourceRedirects.redirectTarget`, at most 5), the reply is capped at 4 MiB, and the 20 s budget is also the OkHttp call timeout. The saved server (`Target.Saved`) keeps its normal path. |
+
+Tests: `FleetSecretPathsTest` (+8: every secret store under each data-dir alias, the fleet manifest, `/proc` side doors versus `maps`/`cmdline`/`status`, the fleet tools' paths, judging the resolved target, failed resolution, list/write left open) and `ImmichPinnedFetchTest` (10, against a loopback server under an unresolvable `.test` name: `Host` header and key, pinned DNS refuses other names, a URL for another host is refused before connecting, same-origin redirect stays pinned, cross-host redirect refused, oversized reply, error status, HTTPS ClientHello carries the typed name as SNI to the pinned address, a rebinding resolver is called once and its first answer is the one used, the saved server is not pinned). `:app:testDebugUnitTest`: 7,344 tests, 0 failures. `:app:assemblePerformance`: passes. `provisioning/test_fleet_backup.py`: 23 passed.
+
 ### Still open
 
-- **Low: the `/fs/read` blocklist doesn't cover `shared_prefs`.** Fleet token only; the fleet
-  token is already full control.
-- **Residual (finding 5):** the Immich check resolves the host and then connects, so a DNS answer
-  that changes between the two (rebinding) is not caught; and a private-LAN URL may name the
-  Portal's own LAN address. Both need a session and the request still carries only the key the
-  phone typed or the saved key for the saved server.
+- **Residual (finding 5):** a private-LAN Immich URL may name the Portal's own LAN address. It needs a
+  session, and the request still carries only the key the phone typed or the saved key for the saved server.
 - **Info: any household-key holder can claim any device id** (no per-device keys), point peer
   clients at any RFC 1918 host:port, wipe music history, or raise a forged leak alert. That is the
   household trust model; replies are still HMAC-verified and redirects are off.
