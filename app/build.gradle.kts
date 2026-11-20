@@ -37,6 +37,14 @@ fun localJavaString(key: String): String {
   return "\"" + raw.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 }
 
+// Scratch diagnostics only: StrictMode must never reach a shipped or measured variant.
+val strictModeRequested = providers.gradleProperty("portalStrictMode").orNull == "true"
+if (strictModeRequested && gradle.startParameter.taskNames.any { task ->
+      listOf("Release", "Performance", "Benchmark", "Dev").any { task.contains(it, ignoreCase = true) }
+    }) {
+  throw GradleException("-PportalStrictMode=true is for scratch debug builds only")
+}
+
 android {
   namespace = "com.immortal.launcher"
   compileSdk { version = release(36) { minorApiLevel = 1 } }
@@ -86,6 +94,9 @@ android {
     // Generated screensaver scenes for verification captures (never a household's photos).
     // Release and dev builds cannot enable it; see ScreensaverTestSource.
     buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "false")
+    // Main-thread StrictMode diagnostics (penaltyLog only). Off everywhere; only the debug build
+    // type reads -PportalStrictMode=true (see StrictModeDiagnostics and the guard below).
+    buildConfigField("boolean", "PORTAL_STRICT_MODE_DIAGNOSTICS", "false")
     // Calling perf probe: an in-process two-peer loopback call (camera → HW encode → LAN →
     // decode → render) behind a Calls app button. Off in every normal build; measurement only.
     buildConfigField("boolean", "PORTAL_CALL_LOOPBACK",
@@ -137,6 +148,7 @@ android {
       // build/reports/coverage/test/debug). Off for normal builds, so they stay uninstrumented.
       enableUnitTestCoverage = providers.gradleProperty("jacocoReport").orNull == "true"
       buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
+      buildConfigField("boolean", "PORTAL_STRICT_MODE_DIAGNOSTICS", strictModeRequested.toString())
     }
     // Family iteration uses the accepted native R8 rules with ordinary production
     // feature gates. Debug fixtures and benchmark-only UI observers stay excluded.
