@@ -1754,6 +1754,7 @@ private fun LauncherScreen(
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
+          ReminderAlertBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
           MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           WhosThereHiChip(Modifier.align(Alignment.TopCenter).padding(top = 4.dp))
           if (whoSheet) WhosThereNotYouSheet(onSettings = { context.openApprovedHomeSettings(SettingsPageIds.PEOPLE) },

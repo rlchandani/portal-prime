@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -129,7 +128,7 @@ private sealed interface PersonalCard {
 @Composable
 private fun Card(card: PersonalCard, ui: WhosThereUi, use24: Boolean, modifier: Modifier) = when (card) {
   is PersonalCard.Day -> DayCard(ui, card.p, use24, modifier)
-  is PersonalCard.Reminders -> RemindersCard(ui, card.p, modifier)
+  is PersonalCard.Reminders -> PersonalRemindersCard(ui, card.p, modifier)
   is PersonalCard.Chores -> WhosThereKidChoresCard(card.p, modifier)
   is PersonalCard.Routine -> WhosThereKidRoutineCard(card.p, modifier)
   is PersonalCard.FamilyDay -> FamilyDayCard(ui, card.people, use24, modifier)
@@ -156,7 +155,7 @@ private fun NotYouRow(ui: WhosThereUi, onNotYou: () -> Unit) {
 }
 
 @Composable
-private fun CardFrame(modifier: Modifier, title: String, owner: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+internal fun PersonalCardFrame(modifier: Modifier, title: String, owner: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
   ApprovedHomeSurface(modifier) {
     Column(Modifier.fillMaxSize().padding(horizontal = 28.dp, vertical = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       Row(Modifier.fillMaxWidth().heightIn(min = 36.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -222,7 +221,7 @@ internal fun loadWhosThereDay(context: Context, person: WhosTherePerson?, people
 @Composable
 private fun DayCard(ui: WhosThereUi, p: WhosTherePerson, use24: Boolean, modifier: Modifier) {
   val day = rememberPersonEvents(p, ui.people)
-  CardFrame(modifier, "${p.name}’s day", { OwnerChip(p) }) {
+  PersonalCardFrame(modifier, "${p.name}’s day", { OwnerChip(p) }) {
     EventList(day, use24, ui.hidePrivate, ownerOf = { if (it.owner == EventOwner.MINE) p else null },
         empty = if (day.source == null) "Add a calendar in Settings › Widgets › Calendar" else "Nothing else today")
     if (p.calendarUrl == null && day.source != null) {
@@ -235,7 +234,7 @@ private fun DayCard(ui: WhosThereUi, p: WhosTherePerson, use24: Boolean, modifie
 @Composable
 private fun FamilyDayCard(ui: WhosThereUi, people: List<WhosTherePerson>, use24: Boolean, modifier: Modifier) {
   val day = rememberPersonEvents(null, people)
-  CardFrame(modifier, if (people.size == 2) "Today for you both" else "Today for you all", { OwnerChip(null) }) {
+  PersonalCardFrame(modifier, if (people.size == 2) "Today for you both" else "Today for you all", { OwnerChip(null) }) {
     EventList(day, use24, hide = true, ownerOf = { e -> people.firstOrNull { e.owner == EventOwner.MINE && WhosThereContent.mentions(e.title, it.name) } },
         empty = if (day.source == null) "Add a calendar in Settings › Widgets › Calendar" else "Nothing else today")
   }
@@ -269,40 +268,8 @@ private fun EventList(day: DayData, use24: Boolean, hide: Boolean, ownerOf: (Per
 }
 
 @Composable
-private fun RemindersCard(ui: WhosThereUi, p: WhosTherePerson, modifier: Modifier) {
-  val context = LocalContext.current
-  androidx.compose.runtime.LaunchedEffect(Unit) { withContext(Dispatchers.IO) { HouseholdListStore.ensureLoaded(context) } }
-  val list by HouseholdListStore.state.collectAsState()
-  val items = androidx.compose.runtime.remember(list, p) { WhosThereContent.reminders(list.open().map { it.text.value }, p) }
-  CardFrame(modifier, "Reminders", { OwnerChip(null, "Just you", lock = true) }) {
-    if (items.isEmpty()) {
-      ApprovedHomeWidgetMessage("Add “${p.name}: …” to the household list and it shows here, just for ${p.name}")
-      return@CardFrame
-    }
-    val bar = ApprovedHomePalette.Chrome
-    items.forEach { text ->
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(26.dp).clip(RoundedCornerShape(8.dp)).approvedOutline(RoundedCornerShape(8.dp)))
-        Text(text, color = ApprovedHomePalette.Text, fontSize = 23.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(start = 14.dp).redacted(ui.hidePrivate, bar))
-      }
-    }
-    if (ui.hidePrivate) {
-      Spacer(Modifier.weight(1f))
-      Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(ApprovedHomePalette.Chrome).padding(horizontal = 16.dp, vertical = 8.dp),
-          verticalAlignment = Alignment.CenterVertically) {
-        WhosThereGlyph(WtGlyph.LOCK, ApprovedHomePalette.Secondary, 24.dp)
-        Text("${items.size} private — someone’s here", color = ApprovedHomePalette.Secondary, fontSize = 19.sp,
-            modifier = Modifier.padding(start = 10.dp).weight(1f), maxLines = 1)
-        if (ui.canReveal) ApprovedHomeTextButton("Show") { WhosThere.reveal() }
-      }
-    }
-  }
-}
-
-@Composable
 private fun ShowMineCard(people: List<WhosTherePerson>, modifier: Modifier) {
-  CardFrame(modifier, "Just you? Show your Home", {}) {
+  PersonalCardFrame(modifier, "Just you? Show your Home", {}) {
     Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       people.take(3).forEach { p ->
         val shape = RoundedCornerShape(24.dp)

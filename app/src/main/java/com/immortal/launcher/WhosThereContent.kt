@@ -14,8 +14,7 @@ package com.immortal.launcher
  * that name nobody. Events naming only someone else are left out. A title starting "Private",
  * or tagged #private, is a private event: its title hides when others are near.
  *
- * Reminders: there is no per-person reminders store yet, so v1 uses household-list items that
- * name the person the same way. They count as private ("Just you").
+ * Reminders live in their own store now ([ReminderStore], rules in [ReminderVisibility]).
  */
 internal enum class EventOwner { MINE, FAMILY }
 
@@ -88,10 +87,6 @@ internal object WhosThereContent {
       events.filter { it.endMillis > nowMs && it.startMillis < dayEndMs }
           .sortedWith(compareByDescending<PersonalEvent> { it.allDay }.thenBy { it.startMillis })
           .take(limit)
-
-  /** Household-list items that name the person, as their reminders (private by default). */
-  fun reminders(itemTexts: List<String>, person: WhosTherePerson, limit: Int = 5): List<String> =
-      itemTexts.filter { mentions(it, person.name) }.map { displayTitle(it, person.name) }.take(limit)
 
   /** The redacted text shown in place of a private title. */
   const val PRIVATE_LABEL = "Private"

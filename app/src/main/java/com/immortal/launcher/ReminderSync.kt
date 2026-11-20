@@ -1,0 +1,128 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+package com.immortal.launcher
+
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.SecureRandom
+import java.util.concurrent.Executors
+
+/**
+ * Keeps this Portal's reminders in step with the other Portals, exactly like chores: a change here
+ * broadcasts a signed `reminders_rev` signal (keyed digest + LAN address); a Portal whose replica
+ * differs POSTs its sealed replica to the sender's `/remote/reminderspeer` and merges the sealed,
+ * signed reply, so both sides end up with the union. A Portal that starts announces itself, which
+ * is the catch-up path after being off. Failed exchanges retry with backoff.
+ */
+internal object ReminderSync {
+  private const val TAG = "HearthpaneRemindersSync"
+  private const val MAX_RESPONSE = 2 * 1024 * 1024
+  private const val CONNECT_MS = 3_000
+  private const val READ_MS = 5_000
+  private val RETRY_MS = longArrayOf(5_000L, 30_000L, 120_000L)
+
+  private val net = Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-reminders-net").apply { isDaemon = true } }
+  private val main by lazy { Handler(Looper.getMainLooper()) }
+  private val random = SecureRandom()
+  @Volatile private var retryStep = 0
+  @Volatile private var pending: Runnable? = null
+
+  fun signal(context: Context) {
+    val app = context.applicationContext
+    net.execute {
+      val key = HouseholdKey.get(app) ?: return@execute
+      val host = HouseholdListSync.lanAddress() ?: return@execute
+      val digest = ReminderCodec.digest(ReminderStore.current(app), key)
+      HouseholdBus.send(app, ReminderPeerAuth.SIGNAL_TYPE,
+          HouseholdListPeerAuth.signalBody(HouseholdListPeerAuth.Signal(digest, host, FleetConfig.port(app))))
+    }
+  }
+
+  /** Bus handler for [ReminderPeerAuth.SIGNAL_TYPE] (listener thread; the bus already verified it). */
+  fun onSignal(context: Context, message: HouseholdMessage) {
+    val signal = HouseholdListPeerAuth.parseSignal(message.body) ?: return
+    val key = HouseholdKey.get(context) ?: return
+    if (signal.digest == ReminderCodec.digest(ReminderStore.current(context), key)) return
+    retryStep = 0
+    exchangeLater(context.applicationContext, signal)
+  }
+
+  private fun exchangeLater(context: Context, signal: HouseholdListPeerAuth.Signal) {
+    net.execute {
+      val ok = runCatching { exchange(context, signal) }
+          .onFailure { Log.i(TAG, "reminders exchange failed: ${it.javaClass.simpleName}") }
+          .getOrDefault(false)
+      if (ok) clearRetry() else scheduleRetry(context, signal)
+    }
+  }
+
+  private fun exchange(context: Context, signal: HouseholdListPeerAuth.Signal): Boolean {
+    val key = HouseholdKey.get(context) ?: return false
+    val self = RemoteCompanionStore.id(context)
+    val nonce = ByteArray(12).also(random::nextBytes).let(HouseholdKey::toHex)
+    val body = ReminderPeerAuth.sealedBody(key, nonce, ReminderSeal.REQUEST, HouseholdListSync.selfName(context),
+        ReminderStore.current(context))
+    val header = ReminderPeerAuth.requestHeader(key, self, nonce, System.currentTimeMillis(), body) ?: return false
+    val conn = URL("http", signal.host, signal.port, RemindersPeerRoute.PATH).openConnection() as HttpURLConnection
+    try {
+      conn.connectTimeout = CONNECT_MS
+      conn.readTimeout = READ_MS
+      conn.requestMethod = "POST"
+      conn.doOutput = true
+      conn.instanceFollowRedirects = false
+      conn.setRequestProperty("Content-Type", "application/json")
+      conn.setRequestProperty(ReminderPeerAuth.HEADER, header)
+      val bytes = body.toByteArray(Charsets.UTF_8)
+      conn.setFixedLengthStreamingMode(bytes.size)
+      conn.outputStream.use { it.write(bytes) }
+      if (conn.responseCode != 200) return false
+      val text = conn.inputStream.use { input -> readBounded(input, MAX_RESPONSE) } ?: return false
+      val envelope = JSONObject(text)
+      val payload = envelope.optString("payload")
+      if (!ReminderPeerAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return false
+      val theirs = ReminderPeerAuth.openBody(key, nonce, ReminderSeal.RESPONSE, payload) ?: return false
+      ReminderStore.update(context, ReminderStore.Source.PEER) { s -> ReminderMerge.merge(s, theirs) to Unit }
+      return true
+    } finally {
+      conn.disconnect()
+    }
+  }
+
+  /** At most [max] bytes as UTF-8, or null if there are more: a peer can't make us buffer an unbounded reply. */
+  internal fun readBounded(input: java.io.InputStream, max: Int): String? {
+    val out = java.io.ByteArrayOutputStream()
+    val buf = ByteArray(16 * 1024)
+    while (true) {
+      val n = input.read(buf)
+      if (n < 0) break
+      if (out.size() + n > max) return null
+      out.write(buf, 0, n)
+    }
+    return String(out.toByteArray(), Charsets.UTF_8)
+  }
+
+  private fun clearRetry() {
+    retryStep = 0
+    pending?.let(main::removeCallbacks)
+    pending = null
+  }
+
+  private fun scheduleRetry(context: Context, signal: HouseholdListPeerAuth.Signal) {
+    val step = retryStep
+    if (step >= RETRY_MS.size) return
+    retryStep = step + 1
+    val retry = Runnable { exchangeLater(context, signal) }
+    pending?.let(main::removeCallbacks)
+    pending = retry
+    main.postDelayed(retry, RETRY_MS[step])
+  }
+}

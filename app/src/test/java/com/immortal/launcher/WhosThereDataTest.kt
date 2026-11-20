@@ -152,11 +152,6 @@ class WhosThereDataTest {
     assertEquals(1, WhosThereContent.upcoming(e, 10, 100, limit = 1).size)
   }
 
-  @Test fun remindersAreListItemsNamingThePerson() {
-    val r = WhosThereContent.reminders(listOf("Maya: call Dr. Rao", "Milk (2)", "Renew passport @maya", "Arjun: bills"), maya)
-    assertEquals(listOf("call Dr. Rao", "Renew passport"), r)
-  }
-
   // ---- codec ----
 
   @Test fun householdRoundTripsAndDeleteWipesTemplates() {

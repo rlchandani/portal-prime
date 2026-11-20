@@ -35,7 +35,7 @@ internal object BriefingPersonalPolicy {
 
 /**
  * The personal part of [BriefingInputs]: whose briefing it is and what is theirs. [reminders] are
- * household-list items that name them ([WhosThereContent.reminders]); [events] are today's, theirs and
+ * their open reminders from the store ([ReminderVisibility.briefingTitles]); [events] are today's, theirs and
  * the family's ([loadWhosThereDay]).
  */
 internal data class BriefingPersonalInputs(

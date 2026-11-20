@@ -85,6 +85,8 @@ class ImmortalApp : Application() {
     // Who's there?: opt-in on-device recognition. Off until an adult enables it; only listens to
     // presence here, the camera is opened later and only from a resumed Home.
     WhosThere.install(this)
+    // Personal reminders: household replica synced like chores; due ones chime only for their person.
+    RemindersFeature.install(this)
     // "Hey Jarvis" on Hearthpane screens: Jarvis can't hear behind us on Android 10, so we listen for it — only
     // while one of our screens is resumed and nothing else needs the mic or camera. Idle until then.
     com.immortal.launcher.jarvis.wake.HearthpaneWake.install(this)

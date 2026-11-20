@@ -15,6 +15,7 @@ internal object ApprovedToolsCatalog {
     val all = listOf(
         ApprovedTool("alarm", "Alarm", "Wake up on your schedule.", "Everyday", "bell", 0xFFEEC184),
         ApprovedTool("timers", "Timers", "A few minutes, or a few hours.", "Everyday", "timer", 0xFFEEC184),
+        ApprovedTool("reminders", "Reminders", "For the household, or just for one of you.", "Everyday", "check", 0xFFEEC184),
         ApprovedTool("countdowns", "Countdowns", "Keep a date worth looking forward to.", "Everyday", "cal", 0xFFA9C9F5),
         ApprovedTool("converter", "Converter", "Measurements and currencies.", "Everyday", "calc", 0xFFA9C9F5),
         ApprovedTool("lamp", "Lamp", "A little light for your room.", "Everyday", "bulb", 0xFFEED6A6),
