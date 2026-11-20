@@ -120,6 +120,8 @@ HPLcom/immortal/launcher/HomeAppTilesKt;->**(**)**
 HPLcom/immortal/launcher/HomeAppTilesKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeFavoritesKt;->**(**)**
 HPLcom/immortal/launcher/HomeFavoritesKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeLauncherScreenKt;->**(**)**
+HPLcom/immortal/launcher/HomeLauncherScreenKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**
