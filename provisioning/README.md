@@ -73,6 +73,7 @@ installs → freeze OS updates → set launcher → set screensaver. Each step i
 | `APK_GLOB` | Which APK to install (drop yours in `apks/`) |
 | `ASSET_DIR` | Photos pushed to the frame (first becomes `frame.jpg`) |
 | `RESTORE_ALEXA`, `INSTALL_ALEXA_WAKE_WORD` | First-gen Alexa restore and the separate opt-in wake-word helper |
+| `DEBLOAT_PACKAGES`, `DEBLOAT_PROTECTED` | Opt-in Meta debloat list for `--debloat`, and the packages it must never disable (see `docs/guides/portal-debloat.md`) |
 
 To ship your own app instead of the sample, replace `apks/app-debug.apk`, drop photos in
 `assets/`, and update `PKG`/`HOME_ACTIVITY`/`DREAM_SERVICE` in `config.env`.
@@ -470,9 +471,11 @@ you occasionally need a raw adb shell or scrcpy mirroring, enable it on demand
 ./provision.sh            # provision
 ./provision.sh --status   # show current home / screensaver / install state / client
 ./provision.sh --restore  # undo
+./provision.sh --debloat  # opt-in: disable unused Meta background apps
+./provision.sh --undebloat  # turn them back on
 ```
 
-Windows: `powershell -ExecutionPolicy Bypass -File provision.ps1 [-Status|-Restore]`.
+Windows: `powershell -ExecutionPolicy Bypass -File provision.ps1 [-Status|-Restore|-Debloat|-Undebloat]`.
 
 ## What you should know
 
