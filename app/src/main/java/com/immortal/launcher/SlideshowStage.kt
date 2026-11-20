@@ -411,6 +411,8 @@ internal class SlideshowStage(
       val look = photo.look ?: return false
       val density = resources.displayMetrics.density
       val split = p.feature == Feature.SPLIT
+      // The card's 30-unit corner is a mock unit like the rest of Split glance ([HearthMockUnit]).
+      val corner = SPLIT_CORNER_DP * density * HearthMockUnit.boost(width, height, density)
       val box = (if (split) SplitGlancePanel.layout(width, height, density).first
           else SplitGlancePanel.Box(0, 0, width, height)).let { Rect(it.left, it.top, it.right, it.bottom) }
       val bw = photo.bitmap.width
@@ -422,7 +424,7 @@ internal class SlideshowStage(
       visibility = View.VISIBLE
       if (split) {
         background = null
-        val radius = SPLIT_CORNER_DP * density
+        val radius = corner
         addView(PhotoBackdropView(context).also {
           it.show(look.backdrop, floatArrayOf(box.left + radius, box.top + radius, box.right - radius,
               box.bottom - radius), 0f, 0f, SPLIT_BACKDROP)
@@ -438,7 +440,7 @@ internal class SlideshowStage(
           clipToOutline = true
           outlineProvider = object : android.view.ViewOutlineProvider() {
             override fun getOutline(v: View, outline: android.graphics.Outline) =
-                outline.setRoundRect(0, 0, v.width, v.height, SPLIT_CORNER_DP * density)
+                outline.setRoundRect(0, 0, v.width, v.height, corner)
           }
           elevation = 20f * density
           setBackgroundColor(Color.BLACK)

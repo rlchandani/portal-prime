@@ -86,12 +86,14 @@ internal class NightPhotoOverlay(context: Context) : View(context) {
     if (width <= 0 || height <= 0) return
     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), veil)
     if (shown.isEmpty()) return
-    val type = (minOf(width, height) / density / 1219f).coerceIn(.72f, 1f)
+    // Mock units ([HearthMockUnit]): the approved clock is 92 units = 122.7 dp on a Portal+.
+    val unit = HearthMockUnit.boost(width, height, density)
+    val type = (minOf(width, height) / density / 1219f).coerceIn(.72f, 1f) * unit
     time.textSize = 92f * density * type
     date.textSize = 22f * density * type
     val now = System.currentTimeMillis()
-    val dx = HearthOrbit.x(now, 10f * density, DRIFT_X_MS)
-    val dy = HearthOrbit.y(now, 6f * density, DRIFT_Y_MS)
+    val dx = HearthOrbit.x(now, 10f * density * unit, DRIFT_X_MS)
+    val dy = HearthOrbit.y(now, 6f * density * unit, DRIFT_Y_MS)
     val dateBaseline = height - 70f * density * type - date.descent() + dy
     canvas.drawText(dateText, width / 2f + dx, dateBaseline, date)
     canvas.drawText(shown, width / 2f + dx, dateBaseline + date.ascent() - 8f * density * type - time.descent(), time)
