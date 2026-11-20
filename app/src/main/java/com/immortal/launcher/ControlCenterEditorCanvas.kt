@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -43,10 +44,12 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 
 /**
@@ -109,6 +112,17 @@ internal fun CcEditorCanvas(st: CcEdState, floor: CcFloor, reg: CcRegistry, live
   val dots = remember(floor, active) { (active as? CcEdDrag.Device)?.let { CcPlanEdit.removeEntity(floor, it.entityId) } ?: floor }
   val text = rememberTextMeasurer()
   val labels = rememberEdLabels(floor, st.suggestions, st.step != CcEdStep.FOUND, c, text)
+  // Which room's "+N" cluster is open (one stable State: the gesture loop outlives recompositions); a new floor or step closes it.
+  val expanded = remember { mutableStateOf<String?>(null) }
+  LaunchedEffect(st.floorId, st.step) { expanded.value = null }
+  val layout = rememberDotLayout(st, dots, host.geom, labels, expanded.value)
+  val latestLayout by rememberUpdatedState(layout)
+  val clusterTap = remember(host) {
+    { gx: Float, gy: Float, tol: Float ->
+      if (latest.step !in CLUSTER_STEPS) false
+      else CcEdDots.tap(latestLayout, expanded.value, gx, gy, tol).let { (used, next) -> expanded.value = next; used }
+    }
+  }
   Box(modifier.clip(CcStyle.Sheet).background(c.planBg)
       .onGloballyPositioned { lc ->
         host.canvasOrigin = lc.positionInRoot()
@@ -117,28 +131,31 @@ internal fun CcEditorCanvas(st: CcEdState, floor: CcFloor, reg: CcRegistry, live
           host.geom = CcEdGeom(lc.size.width.toFloat(), lc.size.height.toFloat(), insets.first, insets.second, insets.third)
         }
       }
-      .pointerInput(host) { editorGestures(host, { latest }, { latestFloor }, tolPx, { x, y -> tap(x, y) }, { d -> drop(d) }) }
+      .pointerInput(host) {
+        editorGestures(host, { latest }, { latestFloor }, { latestLayout }, tolPx, clusterTap, { x, y -> tap(x, y) }, { d -> drop(d) })
+      }
       .semantics { contentDescription = "Floor plan canvas. Drag to draw or move rooms." }) {
     val geom = host.geom ?: return@Box
     val scene = remember(geom, st, still, reg, live, c, labels, density.density) { CcEdScene(geom, st, still, reg, live, c, labels, density.density) }
     Canvas(Modifier.fillMaxSize().graphicsLayer()) { drawEditorGrid(geom, c) }
     Canvas(Modifier.fillMaxSize().graphicsLayer()) { drawEditorStatic(scene) }
-    CcEditorDots(st, dots, geom, reg, live, motion, host)
+    CcEditorDots(st, dots, layout, geom, reg, live, motion, host)
     Canvas(Modifier.fillMaxSize().graphicsLayer()) { drawEditorDrag(scene, floor, host.current) }
   }
 }
 
 private suspend fun PointerInputScope.editorGestures(
-    host: CcEdDragHost, st: () -> CcEdState, floor: () -> CcFloor, tolPx: Float,
-    onTap: (Float, Float) -> Unit, onDrop: (CcEdDrag) -> Unit,
+    host: CcEdDragHost, st: () -> CcEdState, floor: () -> CcFloor, dots: () -> CcEdDotLayout, tolPx: Float,
+    onClusterTap: (Float, Float, Float) -> Boolean, onTap: (Float, Float) -> Unit, onDrop: (CcEdDrag) -> Unit,
 ) = awaitEachGesture {
   val down = awaitFirstDown()
   val geom = host.geom ?: return@awaitEachGesture
   val gx = geom.gx(down.position.x)
   val gy = geom.gy(down.position.y)
-  val start = CcEdGesture.begin(st(), floor(), gx, gy, geom.cells(tolPx))
+  val tol = geom.cells(tolPx)
+  val start = CcEdGesture.begin(st(), floor(), gx, gy, tol, dots())
   val slop = awaitTouchSlopOrCancellation(down.id) { ch, _ -> if (start != null) ch.consume() }
-  if (slop == null) { onTap(gx, gy); return@awaitEachGesture }
+  if (slop == null) { if (!onClusterTap(gx, gy, tol)) onTap(gx, gy); return@awaitEachGesture }
   if (start == null) return@awaitEachGesture
   host.begin(start, host.canvasOrigin + slop.position)
   drag(slop.id) { ch -> host.move(host.canvasOrigin + ch.position); ch.consume() }
@@ -146,14 +163,15 @@ private suspend fun PointerInputScope.editorGestures(
 }
 
 /**
- * Device dots (mock `.edDev`), flying in from the right after Auto-place. Positions are computed
- * in the layout lambda from the drag State, so dots ride along with a moved/resized room without
+ * Device dots (mock `.edDev`) where [CcEdDots] laid them out, flying in from the right after
+ * Auto-place, then any "+N" clusters, then an open cluster's ring on top. Positions are computed in
+ * the layout lambda from the drag State, so dots ride along with a moved/resized room without
  * recomposing.
  */
 @Composable
-private fun CcEditorDots(st: CcEdState, floor: CcFloor, geom: CcEdGeom, reg: CcRegistry, live: Map<String, CcEntity>, motion: Boolean,
-                         host: CcEdDragHost) {
-  if (st.step == CcEdStep.FOUND || (st.first && st.step == CcEdStep.ROOMS)) return
+private fun CcEditorDots(st: CcEdState, floor: CcFloor, layout: CcEdDotLayout, geom: CcEdGeom, reg: CcRegistry,
+                         live: Map<String, CcEntity>, motion: Boolean, host: CcEdDragHost) {
+  if (!dotsShown(st)) return
   val c = LocalCc.current
   val density = LocalDensity.current
   val flying = remember(st.flyIds) { st.flyIds.toList().sorted() }
@@ -163,20 +181,61 @@ private fun CcEditorDots(st: CcEdState, floor: CcFloor, geom: CcEdGeom, reg: CcR
   }
   val radius = with(density) { DOT_DP.dp.toPx() / 2f }
   val flyPx = with(density) { FLY_DISTANCE_DP.dp.toPx() }
-  floor.rooms.forEach { room ->
-    room.devices.forEach { d ->
+  val rooms = remember(floor) { floor.rooms.associateBy { it.id } }
+  val at = { room: CcRoom, fx: Float, fy: Float ->
+    Modifier.offset {
+      val r = CcEdGesture.liveRect(room.id, room.rect, host.current)
+      IntOffset((geom.px(r.x + fx * r.w) - radius).roundToInt(), (geom.py(r.y + fy * r.h) - radius).roundToInt())
+    }
+  }
+  val dot = @Composable { d: CcEdDot ->
+    rooms[d.roomId]?.let { room ->
       key(d.entityId) {
         val index = flying.indexOf(d.entityId)
-        CcEditorDot(CcEd.iconFor(d.entityId, reg, live[d.entityId]), c.text, c.surface, c.accent, Modifier
-            .offset {
-              val r = CcEdGesture.liveRect(room.id, room.rect, host.current)
-              IntOffset((geom.px(r.x + d.fx * r.w) - radius).roundToInt(), (geom.py(r.y + d.fy * r.h) - radius).roundToInt())
-            }
+        CcEditorDot(CcEd.iconFor(d.entityId, reg, live[d.entityId]), c.text, c.surface, c.accent, at(room, d.fx, d.fy)
             .graphicsLayer { translationX = if (index < 0) 0f else CcEdGeo.flyOffset(fly.value, index, flying.size) * flyPx })
       }
     }
   }
+  layout.dots.forEach { if (!it.ring) dot(it) }
+  layout.clusters.forEach { cl ->
+    rooms[cl.roomId]?.let { room -> key("cluster:${cl.roomId}") { CcEditorCluster(cl, room.name, c.bg, c.accent, at(room, cl.fx, cl.fy)) } }
+  }
+  layout.dots.forEach { if (it.ring) dot(it) }
 }
+
+/** "+N" (mock-styled dot, accent filled); open, it shows a close mark over its ring. */
+@Composable
+private fun CcEditorCluster(cl: CcEdCluster, roomName: String, ink: Color, fill: Color, modifier: Modifier) {
+  val what = if (cl.expanded) "Hide the ${cl.hidden.size} more devices in $roomName"
+      else "${cl.hidden.size} more devices in $roomName, tap to show them"
+  Box(modifier.size(DOT_DP.dp).clip(CircleShape).background(fill).semantics { contentDescription = what },
+      contentAlignment = Alignment.Center) {
+    if (cl.expanded) CcIcon("x", ink, 20.dp)
+    else Text(cl.label, color = ink, fontSize = CLUSTER_SP.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+  }
+}
+
+/** The dot layout for the floor as drawn, recomputed only when the floor, canvas size, labels or open cluster change. */
+@Composable
+private fun rememberDotLayout(st: CcEdState, floor: CcFloor, geom: CcEdGeom?, labels: Map<String, CcEdLabel>, expanded: String?): CcEdDotLayout {
+  val density = LocalDensity.current
+  val shown = dotsShown(st)
+  return remember(floor, geom, labels, expanded, shown, density.density) {
+    if (geom == null || !shown) CcEdDotLayout.EMPTY
+    else {
+      val spec = with(density) { CcEdDotSpec.of(geom.cell, DOT_DP.dp.toPx(), DOT_GAP_DP.dp.toPx()) }
+      val halves = labels.mapValues { (_, l) ->
+        val w = maxOf(l.title.size.width, l.sub?.size?.width ?: 0) / 2f
+        val h = (l.title.size.height + (l.sub?.size?.height ?: 0)) / 2f
+        geom.cells(w) to geom.cells(h)
+      }
+      CcEdDots.layout(floor, spec, expanded, halves)
+    }
+  }
+}
+
+private fun dotsShown(st: CcEdState): Boolean = !(st.step == CcEdStep.FOUND || (st.first && st.step == CcEdStep.ROOMS))
 
 @Composable
 private fun CcEditorDot(icon: String, ink: Color, fill: Color, edge: Color, modifier: Modifier) {
@@ -192,4 +251,9 @@ private const val CANVAS_SIDE = 20
 /** Finger tolerance for handles, dots and openings. */
 private const val HIT_DP = 34
 internal const val DOT_DP = 36
+/** Space between neighbouring dots (mock: 36 dp dots, 46 apart). */
+internal const val DOT_GAP_DP = 10
+private const val CLUSTER_SP = 15
+/** Steps where a "+N" cluster opens on tap (in Rooms a tap selects the room). */
+private val CLUSTER_STEPS = setOf(CcEdStep.DEVICES, CcEdStep.OPENINGS)
 private const val FLY_DISTANCE_DP = 900
