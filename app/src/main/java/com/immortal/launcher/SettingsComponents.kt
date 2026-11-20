@@ -252,6 +252,8 @@ internal fun ToggleRow(
     iconColor: Color = Color(0xFF636366),
     iconSymbol: String = "",
     enabled: Boolean = true,
+    /** A drawable glyph for the badge instead of [iconSymbol] text. */
+    iconRes: Int? = null,
     onChange: (Boolean) -> Unit,
 ) {
     Row(
@@ -264,8 +266,8 @@ internal fun ToggleRow(
             .padding(horizontal = 28.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (iconSymbol.isNotEmpty()) {
-            IconBadge(color = iconColor, symbol = iconSymbol)
+        if (iconSymbol.isNotEmpty() || iconRes != null) {
+            IconBadge(color = iconColor, symbol = iconSymbol, iconRes = iconRes)
             Spacer(Modifier.size(12.dp))
         }
         ApprovedSettingsLabel(title, LocalApprovedSettingsHelp.current,

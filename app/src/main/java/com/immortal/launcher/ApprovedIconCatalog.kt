@@ -88,6 +88,8 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "sun", "theme_day" -> R.drawable.approved_icon_theme_day
     "theme_night" -> R.drawable.approved_icon_theme_night
     "screensaver" -> R.drawable.portal_icon_screensaver
+    "people", "users" -> R.drawable.approved_icon_users
+    "face" -> R.drawable.approved_icon_face
     "more", "overflow" -> R.drawable.portal_icon_more
     "edit", "pencil", "customize" -> R.drawable.portal_icon_edit
     "check", "done" -> R.drawable.portal_icon_check
