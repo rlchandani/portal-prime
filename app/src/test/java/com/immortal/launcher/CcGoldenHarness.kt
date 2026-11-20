@@ -231,23 +231,10 @@ internal class CcGoldenHarness(private val dir: File, private val data: JSONObje
   }
 }
 
-/** Builds a [CcEngine] whose executor, clock and sockets are the harness's. */
+/** Builds a [CcEngine] on the real Android adapters, with the harness's executor, clock and sockets. */
 internal object CcGoldenEngine {
-  fun create(context: Context, sched: VirtualScheduler, open: (Request, WebSocketListener) -> WebSocket): CcEngine {
-    val e = CcEngine(context)
-    val real = e.exec
-    set(e, "exec", sched)
-    real.shutdownNow()
-    set(e, "client\$delegate", lazyOf(FakeOkHttp(open)))
-    e.clock = { sched.now }
-    return e
-  }
-
-  private fun set(target: Any, name: String, value: Any) {
-    val f = target.javaClass.getDeclaredField(name)
-    f.isAccessible = true
-    f.set(target, value)
-  }
+  fun create(context: Context, sched: VirtualScheduler, open: (Request, WebSocketListener) -> WebSocket): CcEngine =
+      CcEngine(CcAndroidHost(context), OkHttpCcSockets(FakeOkHttp(open)), ExecutorCcScheduler(sched), AndroidCcLog) { sched.now }
 
   private class FakeOkHttp(private val open: (Request, WebSocketListener) -> WebSocket) : OkHttpClient() {
     override fun newWebSocket(request: Request, listener: WebSocketListener): WebSocket = open(request, listener)

@@ -9,7 +9,6 @@ package com.immortal.launcher
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -27,37 +26,30 @@ internal object ControlCenter {
   private val main by lazy { Handler(Looper.getMainLooper()) }
 
   private fun engine(context: Context): CcEngine =
-      engine ?: synchronized(this) { engine ?: CcEngine(context.applicationContext).also { engine = it } }
+      engine ?: synchronized(this) {
+        engine ?: CcEngine(CcAndroidHost(context.applicationContext), OkHttpCcSockets(), ExecutorCcScheduler(), AndroidCcLog)
+            .also { engine = it }
+      }
 
   fun state(context: Context): StateFlow<CcUiState> = engine(context).flow
 
   /** App start: keep the background alert subscription if this Portal shows banners. */
-  fun install(context: Context) { val e = engine(context); e.post { e.ensure() } }
+  fun install(context: Context) = engine(context).install()
 
-  fun setVisible(context: Context, visible: Boolean) {
-    val e = engine(context)
-    e.post { e.visible = (e.visible + if (visible) 1 else -1).coerceAtLeast(0); e.ensure() }
-  }
+  fun setVisible(context: Context, visible: Boolean) = engine(context).setVisible(visible)
 
   /** HA address/token or Control Center settings changed. */
-  fun restart(context: Context) {
-    val e = engine(context)
-    e.post { e.ui = e.ui.copy(settings = ControlCenterConfig.load(e.app)); e.restart() }
-  }
+  fun restart(context: Context) = engine(context).restartWithSettings()
 
   /** Presence and recognitions changed ([RoomSignals]); republished only while someone looks. */
-  fun setSignals(context: Context, signals: CcRoomSignals) {
-    val e = engine(context)
-    e.post { if (e.ui.signals != signals) { e.ui = e.ui.copy(signals = signals); if (e.foreground) e.publish() } }
-  }
+  fun setSignals(context: Context, signals: CcRoomSignals) = engine(context).setSignals(signals)
 
   fun reloadSettings(context: Context) {
-    val e = engine(context)
-    e.post { e.ui = e.ui.copy(settings = ControlCenterConfig.load(e.app)); e.publish(); e.ensure() }
+    engine(context).reloadSettings()
     RoomSignals.refresh()
   }
 
-  fun retryNow(context: Context) { val e = engine(context); e.post { e.attempt = 0; e.restart() } }
+  fun retryNow(context: Context) = engine(context).retryNow()
 
   /**
    * Sends [call] now, or refuses (returns false) when HA isn't live or [CcPolicy.refusal] says no.
@@ -65,65 +57,31 @@ internal object ControlCenter {
    * modal or the PIN pad ([CcUi.confirmed], the alarm paths); sliders and dials send unconfirmed.
    */
   fun send(context: Context, call: CcCall, undoable: Boolean = true, onResult: ((Boolean, String?) -> Unit)? = null,
-           confirmed: Boolean = false): Boolean {
-    val e = engine(context)
-    val s = e.flow.value
-    if (refused(context, s, call, confirmed)) return false
-    val reason = s.connection.disabledReason
-    if (reason != null) { e.post { e.toast(reason, error = true) }; return false }
-    e.post { e.dispatch(call, undoable, onResult) }
-    return true
-  }
-
-  private fun refused(context: Context, s: CcUiState, call: CcCall, confirmed: Boolean): Boolean {
-    val why = ccSendRefusal(s, call, confirmed) { ControlCenterConfig.scenesSeen(context) } ?: return false
-    Log.w(TAG, "refused ${call.domain}.${call.service}: $why")
-    return true
-  }
+           confirmed: Boolean = false): Boolean = engine(context).send(call, undoable, onResult, confirmed)
 
   /**
    * A paired phone is looking ([CcRemoteRoute]): hold the live, on-screen subscription for
    * [CcRemoteWatch.LEASE_MS] more. Banners, plan models and the Home dot still follow this
    * Portal's own screen only. When the last lease lapses the socket drops back to background.
    */
-  fun remoteWatch(context: Context) {
-    val e = engine(context)
-    e.post {
-      e.remoteUntil = e.clock() + CcRemoteWatch.LEASE_MS
-      e.ensure()
-      if (e.remoteExpiry?.isDone != false) e.scheduleRemoteExpiry()
-    }
-  }
+  fun remoteWatch(context: Context) = engine(context).remoteWatch()
 
   /**
    * Sends a paired phone's call. [CcPhonePolicy] has already passed it (with the household's asks
    * and the phone's confirmation); kids mode is per Portal and doesn't apply. Null = sent and
    * [onResult] will run on the engine thread; else why not (HA isn't live).
    */
-  fun sendFromPhone(context: Context, call: CcCall, onResult: (Boolean, String?) -> Unit): String? {
-    val e = engine(context)
-    e.flow.value.connection.disabledReason?.let { return it }
-    Log.i(TAG, "phone call ${call.domain}.${call.service}")
-    e.post { e.dispatch(call, undoable = false, onResult = onResult) }
-    return null
-  }
+  fun sendFromPhone(context: Context, call: CcCall, onResult: (Boolean, String?) -> Unit): String? =
+      engine(context).sendFromPhone(call, onResult)
 
-  fun undo(context: Context) { val e = engine(context); e.post { e.undoLast() } }
+  fun undo(context: Context) = engine(context).undo()
 
-  fun dismissToast(context: Context, id: Long) { val e = engine(context); e.post { if (e.ui.toast?.id == id) { e.ui = e.ui.copy(toast = null); e.publish() } } }
+  fun dismissToast(context: Context, id: Long) = engine(context).dismissToast(id)
 
   /** Runs a scene/script in HA and walks the house on the plan while it happens. */
-  fun runScene(context: Context, scene: CcEntity, confirmed: Boolean = false): Boolean {
-    val e = engine(context)
-    if (refused(context, e.flow.value, CcCalls.run(scene), confirmed)) return false
-    val reason = e.flow.value.connection.disabledReason
-    if (reason != null) { e.post { e.toast(reason, error = true) }; return false }
-    e.post { e.startWalk(scene) }
-    ControlCenterConfig.markSceneSeen(context, scene.id)
-    return true
-  }
+  fun runScene(context: Context, scene: CcEntity, confirmed: Boolean = false): Boolean = engine(context).runScene(scene, confirmed)
 
-  fun clearSceneRun(context: Context) { val e = engine(context); e.post { e.ui = e.ui.copy(sceneRun = null); e.publish() } }
+  fun clearSceneRun(context: Context) = engine(context).clearSceneRun()
 
   /**
    * Arm/disarm; [onResult] on the main thread (false + HA's message for a wrong code). Called only
@@ -136,30 +94,18 @@ internal object ControlCenter {
 
   /** Fleet `cc_debug` (operator only): dry run, local test plan, HA-unreachable switch. Blocks briefly. */
   fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null, haUnreachable: Boolean? = null,
-            fakeState: CcFakeState? = null): String {
-    val e = engine(context)
-    return runCatching { e.exec.submit<String> { fakeState?.let { e.fakeState(it) } ?: testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan, haUnreachable) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
-        .getOrElse { "timeout" }
-  }
+            fakeState: CcFakeState? = null): String =
+      engine(context).debugCommand(dryRun, testPlan, testAlert, haUnreachable, fakeState, DEBUG_WAIT_MS)
 
-  fun savePlan(context: Context, plan: CcPlan) { val e = engine(context); e.post { e.savePlan(plan) } }
+  fun savePlan(context: Context, plan: CcPlan) = engine(context).queueSavePlan(plan)
 
-  fun dismissAlert(context: Context, alert: CcAlert, untilMs: Long) {
-    val e = engine(context)
-    e.post {
-      if (alert.kind == CcKind.APPLIANCE) e.live = e.live.dismissDone(alert.entityId)
-      e.ui = e.ui.copy(dismissed = e.ui.dismissed + (alert.id to untilMs)); e.publish()
-    }
-  }
+  fun dismissAlert(context: Context, alert: CcAlert, untilMs: Long) = engine(context).dismissAlert(alert, untilMs)
 
   /** A camera's HLS URL from HA (`camera/stream`), absolute, or null; [onUrl] runs on the engine thread. */
-  fun cameraStream(context: Context, entityId: String, onUrl: (String?) -> Unit) {
-    val e = engine(context)
-    e.post { e.requestStream(entityId) { rel -> onUrl(rel?.let { CcCameraLogic.streamUrl(HaConfig.baseUrl(e.app), it) }) } }
-  }
+  fun cameraStream(context: Context, entityId: String, onUrl: (String?) -> Unit) = engine(context).cameraStream(entityId, onUrl)
 
   /** Loads this week's home charging (daily recorder statistics) for the Tesla screen. Reads HA only, never the car. */
-  fun loadChargeWeek(context: Context) { val e = engine(context); e.post { e.requestChargeWeek() } }
+  fun loadChargeWeek(context: Context) = engine(context).loadChargeWeek()
 
   internal fun isoUtc(ms: Long): String =
       SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(ms)
@@ -171,128 +117,7 @@ internal object ControlCenter {
     return (0 until DAYS).map { d -> (c.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, d) }.timeInMillis }
   }
 
-  private const val DEBUG_WAIT_S = 5L
+  private const val DEBUG_WAIT_MS = 5_000L
   private const val DAYS = 7
   const val TAG = CcEngine.TAG
-}
-
-// --- actions, on the engine thread ----------------------------------------------------------
-
-internal fun CcEngine.toast(text: String, undo: Boolean = false, error: Boolean = false) {
-  ui = ui.copy(toast = CcToast(++toastSeq, text, undo, error)); publish()
-}
-
-internal fun CcEngine.dispatch(call: CcCall, undoable: Boolean, onResult: ((Boolean, String?) -> Unit)?) {
-  val ws = socket; val p = protocol
-  if (ws == null || p == null || !ui.connection.canControl) { toast(ui.connection.disabledReason ?: "Not connected", error = true); onResult?.invoke(false, null); return }
-  if (dryRun) { dryRunCall(call, onResult); return }
-  val key = "c${++callSeq}"
-  val before = call.entityId?.let { live.raw[it] }
-  calls[key] = CcCallInfo(call, before, undoable, onResult)
-  live = live.send(call, clock())
-  ws.send(p.call(call, key).text)
-  publish()
-  exec.schedule({ post { expirePending() } }, CcLive.ECHO_MS + EXPIRE_SLACK_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
-}
-
-private const val EXPIRE_SLACK_MS = 50L
-
-internal fun CcEngine.expirePending() {
-  val (next, silent) = live.expire(clock())
-  live = next
-  if (silent.isNotEmpty()) toast("${live.raw[silent.first()]?.name ?: "A device"} didn't respond", error = true) else publish()
-}
-
-internal fun CcEngine.callResult(r: CcProtocol.Out.Result) {
-  val info = calls.remove(r.req.key) ?: return
-  val id = info.call.entityId
-  if (r.ok) {
-    if (id != null) live = live.acknowledged(id)
-    val undo = if (info.undoable) info.before?.let { CcCalls.undo(it, info.call) } else null
-    lastUndo = undo
-    if (undo != null && info.call.label.isNotBlank()) toast(info.call.label, undo = true) else publish()
-  } else {
-    if (id != null) live = live.failed(id)
-    Log.i(CcEngine.TAG, "control center call ${info.call.domain}.${info.call.service} refused")
-    if (info.call.service != "create") toast("Couldn't do that: ${r.error ?: "Home Assistant refused"}", error = true)
-  }
-  info.onResult?.invoke(r.ok, r.error)
-}
-
-internal fun CcEngine.undoLast() {
-  val u = lastUndo ?: return
-  lastUndo = null
-  dispatch(u, undoable = false, onResult = null)
-}
-
-internal fun CcEngine.startWalk(scene: CcEntity) {
-  val members = scene.members
-  val rooms = CcSceneRun.rooms(ui.plan, members)
-  val open = ui.entities.values.filter { (CcKind.of(it) == CcKind.WINDOW || CcKind.of(it) == CcKind.DOOR) && it.isOpen }.map { it.name }
-  ui = ui.copy(sceneRun = CcSceneRun(scene.id, scene.name, rooms, clock(), CcSceneRun.duration(rooms.size), open, members.isNotEmpty()))
-  // Snapshot the members first (scene.create) so the whole scene can be undone; run once HA has it.
-  val run = CcCalls.run(scene)
-  val snap = CcCalls.snapshot(members)
-  if (snap == null) { dispatch(run, undoable = false, onResult = null); return }
-  dispatch(snap, undoable = false) { ok, _ ->
-    post {
-      dispatch(run, undoable = false) { ran, _ -> if (ran && ok) post { lastUndo = CcCalls.undoScene() } }
-    }
-  }
-}
-
-internal fun CcEngine.savePlan(plan: CcPlan) {
-  val stamped = plan.copy(updatedAt = clock())
-  if (testPlan != null) {
-    // Test plan: local only, never Home Assistant.
-    testPlan = stamped; CcDebugStore.saveTestPlan(app, stamped)
-    ui = ui.copy(plan = stamped, planSource = CcPlanSource.THIS_PORTAL)
-    toast("Test plan saved on this Portal only")
-    publish(); ensure(); return
-  }
-  CcPlanStore.save(app, stamped)
-  ui = ui.copy(plan = stamped, planSource = CcPlanSource.THIS_PORTAL)
-  if (!sendPlanToHa(stamped)) toast("Saved on this Portal. It will copy to Home Assistant when connected.")
-  publish()
-  ensure()
-}
-
-internal fun CcEngine.planSaved(ok: Boolean) {
-  if (ok) ui = ui.copy(planSource = CcPlanSource.HOME_ASSISTANT)
-  else toast("Saved on this Portal only — Home Assistant didn't accept the plan", error = true)
-  publish()
-}
-
-internal fun CcEngine.requestChargeWeek() {
-  val stat = ui.registry?.tesla?.weekStat ?: return
-  val ws = socket ?: return
-  val p = protocol ?: return
-  val now = clock()
-  val week = ControlCenter.weekBuckets(now, TimeZone.getDefault())
-  ws.send(p.statistics(CHARGE_WEEK, listOf(stat), ControlCenter.isoUtc(week.first()), ControlCenter.isoUtc(now), "day").text)
-}
-
-internal fun CcEngine.chargeStatsResult(r: CcProtocol.Out.Result) {
-  val ids = ui.registry?.tesla ?: return
-  val stat = ids.weekStat ?: return
-  if (!r.ok || r.req.key != CHARGE_WEEK) return
-  val starts = ControlCenter.weekBuckets(clock(), TimeZone.getDefault())
-  ui = ui.copy(chargeWeek = CcTeslaCharger.week(stat, CcTeslaCharger.stats(r.result), starts, CcTeslaCharger.price(ids, ui.entities)))
-  publish()
-}
-
-private const val CHARGE_WEEK = "charge_week"
-
-/** [CcPolicy.refusal] for [call] against the current state (pure; what [ControlCenter.send] checks). */
-internal fun ccSendRefusal(s: CcUiState, call: CcCall, confirmed: Boolean, scenesSeen: () -> Set<String>): String? =
-    CcPolicy.refusal(call.entityId?.let(s::entity), call, s.settings, confirmed, scenesSeen)
-
-/** The phone lease ran out unless renewed meanwhile; then back to whatever this Portal needs. */
-internal fun CcEngine.scheduleRemoteExpiry() {
-  val wait = (remoteUntil - clock()).coerceAtLeast(0L) + CcRemoteWatch.EXPIRY_SLACK_MS
-  remoteExpiry = exec.schedule({
-    post {
-      if (remoteUntil > clock()) scheduleRemoteExpiry() else { remoteExpiry = null; ensure() }
-    }
-  }, wait, java.util.concurrent.TimeUnit.MILLISECONDS)
 }

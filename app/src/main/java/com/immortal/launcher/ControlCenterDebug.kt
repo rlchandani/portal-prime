@@ -95,7 +95,7 @@ private val DRY_RUN_SETTLED = mapOf("opening" to "open", "closing" to "closed")
 
 /** Dry run: log, then behave as if HA had echoed the optimistic state at once. */
 internal fun CcEngine.dryRunCall(call: CcCall, onResult: ((Boolean, String?) -> Unit)?) {
-  Log.i(CcEngine.TAG, "dry-run ${call.domain}.${call.service} data=${call.data.keys.sorted()}")
+  log.i("dry-run ${call.domain}.${call.service} data=${call.data.keys.sorted()}")
   val id = call.entityId
   val raw = id?.let { live.raw[it] }
   val opt = dryRunOptimistic(call)
@@ -112,7 +112,7 @@ internal fun CcEngine.testAlert(deviceClass: String): String {
   val kind = if (deviceClass == "moisture") CcKind.LEAK else CcKind.SMOKE
   val alert = CcAlert("test:$deviceClass:${clock()}", CcSeverity.CRITICAL, kind, "binary_sensor.test", "Test alert", "", clock(),
       CcAlertAction.VIEW, deviceClass)
-  ControlCenterBanners.offer(app, alert, ui.settings, appVisible = visible > 0, dryRun = true)
+  host.offerBanner(alert, ui.settings, appVisible = visible > 0, dryRun = true)
   return "testAlert=$deviceClass logged (dry run)"
 }
 
@@ -157,15 +157,15 @@ internal data class CcFakeState(val entityId: String, val state: String, val dev
 
 /** Fleet `cc_debug`: switch dry run, load/clear the local-only test plan. Returns a short status. */
 internal fun CcEngine.debug(dry: Boolean?, plan: String?, unreachable: Boolean? = null): String {
-  dry?.let { dryRun = it; CcDebugStore.setDryRun(app, it) }
+  dry?.let { dryRun = it; host.setDryRun(it) }
   when (plan) {
     "load" -> ui.registry?.let { reg ->
       val p = CcTestPlan.build(reg, live.raw, clock())
-      CcDebugStore.saveTestPlan(app, p)
+      host.saveTestPlan(p)
       testPlan = p
       ui = ui.copy(plan = p, planSource = CcPlanSource.THIS_PORTAL)
     } ?: return "no registry yet (open the Control Center once, or wait for Home Assistant)"
-    "clear" -> { CcDebugStore.clearTestPlan(app); testPlan = null; ui = ui.copy(plan = CcPlanStore.load(app) ?: CcPlan.EMPTY) }
+    "clear" -> { host.clearTestPlan(); testPlan = null; ui = ui.copy(plan = host.loadPlan() ?: CcPlan.EMPTY) }
   }
   val reconnect = unreachable != null && unreachable != haUnreachable
   unreachable?.let { haUnreachable = it }
