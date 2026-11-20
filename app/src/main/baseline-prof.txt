@@ -78,6 +78,8 @@ HPLcom/immortal/launcher/settings/ControlCenterSettings;->**(**)**
 HPLcom/immortal/launcher/HomeActivity;->**(**)**
 HPLcom/immortal/launcher/HomeActivityKt;->**(**)**
 HPLcom/immortal/launcher/HomeActivityKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeAppInventoryKt;->**(**)**
+HPLcom/immortal/launcher/HomeAppInventoryKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**

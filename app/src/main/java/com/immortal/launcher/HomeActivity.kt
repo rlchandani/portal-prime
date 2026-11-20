@@ -22,7 +22,6 @@ import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Toast
@@ -30,16 +29,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInstaller
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
@@ -61,7 +56,6 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -73,7 +67,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,11 +78,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -109,7 +98,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -134,13 +122,11 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
@@ -157,16 +143,11 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.PathParser
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.zIndex
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -182,22 +163,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import kotlin.math.abs
 import kotlin.math.roundToInt
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.immortal.launcher.ui.components.GlassCard
 import com.immortal.launcher.ui.components.Glass
 import com.immortal.launcher.ui.components.OnResume
-import com.immortal.launcher.ui.components.WidgetPlaceholder
 import com.immortal.launcher.ui.components.launchSafely
 import com.immortal.launcher.ui.components.pollingState
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
-import com.immortal.launcher.ui.theme.ContentPrimary
 import com.immortal.launcher.ui.theme.ContentSecondary
 import com.immortal.launcher.ui.theme.PrimeBlue
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -208,31 +185,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import org.json.JSONObject
-
-internal data class AppEntry(
-    val label: String,
-    val component: ComponentName,
-    val icon: ImageBitmap,
-    val folder: String? = null,
-    val uninstallable: Boolean = false,
-)
-
-private data class WidgetProviderEntry(
-    val label: String,
-    val packageLabel: String,
-    val icon: ImageBitmap?,
-    val info: AppWidgetProviderInfo?,
-    val spanX: Int,
-    val spanY: Int,
-    val customKind: String? = null,
-)
 
 private data class PendingWidgetAdd(
     val appWidgetId: Int,
@@ -262,97 +218,9 @@ private data class PendingWidgetAdd(
   }
 }
 
-/** Home's immutable inventory snapshots retain their icons across Activity resumes/recreation.
- * The application receiver survives Home being stopped; no Activity is retained by this cache.
- */
-private object ApprovedHomeInventory {
-  val revision = MutableStateFlow(0L)
-  val apps = HomePresentationInventoryCache<AppEntry>()
-  val providers = HomePresentationInventoryCache<WidgetProviderEntry>()
-  private var registered = false
-
-  @Synchronized fun invalidate() {
-    apps.invalidate()
-    providers.invalidate()
-    revision.value++
-  }
-
-  @Synchronized fun register(context: Context) {
-    if (registered) return
-    val filter = android.content.IntentFilter().apply {
-      addAction(Intent.ACTION_PACKAGE_ADDED)
-      addAction(Intent.ACTION_PACKAGE_REMOVED)
-      addAction(Intent.ACTION_PACKAGE_CHANGED)
-      addAction(Intent.ACTION_PACKAGE_REPLACED)
-      addDataScheme("package")
-    }
-    val receiver = object : android.content.BroadcastReceiver() {
-      override fun onReceive(c: Context, intent: Intent) { invalidate() }
-    }
-    registered = runCatching {
-      context.applicationContext.registerReceiver(receiver, filter)
-      true
-    }.getOrDefault(false)
-  }
-}
-
-/** Package changes refresh every consumer of the shared app artwork inventory. */
-internal val approvedIconInventoryRevision: StateFlow<Long>
-  get() = ApprovedHomeInventory.revision
-
-/** A dashboard address changes the shortcut inventory, without another package scan on each frame. */
-internal fun invalidateApprovedDashboardInventory() = ApprovedHomeInventory.invalidate()
-
-/** Home warms this inventory before Apps is opened; exclude Home's injected shortcuts. */
-internal fun peekApprovedInstalledApps(context: Context): List<AppEntry>? =
-    ApprovedHomeInventory.apps.peek()?.let { approvedInstalledEntries(context, it) }
-
-internal fun approvedInstalledEntries(context: Context, inventory: List<AppEntry>): List<AppEntry> =
-    inventory.filter {
-      it.component.packageName != context.packageName && it.component != CALLS_COMPONENT
-    }
-
-/** Reuse the same already-rendered shortcut artwork as Home; never decode from composition. */
-internal fun peekApprovedIconInventory(): List<AppEntry>? = ApprovedHomeInventory.apps.peek()
-
-internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>): Map<String, ImageBitmap> {
-  if (inventory.isEmpty()) return emptyMap()
-  // Warm Apps prepares this map from composition; build targets once for the whole inventory.
-  val store = ComponentName(context, StoreActivity::class.java)
-  val music = ComponentName(context, WebAppActivity::class.java)
-  val dashboard = ComponentName(context, HomeDashboardActivity::class.java)
-  val control = ComponentName(context, ControlCenterActivity::class.java)
-  val settings = ComponentName(context, ImmortalSettingsActivity::class.java)
-  return inventory.mapNotNull { app ->
-    val key = when (app.component) {
-      store -> "store"
-      music -> "music"
-      dashboard -> "dashboard"
-      control -> ApprovedAppsBuiltins.CONTROL
-      settings -> "settings"
-      CALLS_COMPONENT -> "calls"
-      else -> null
-    }
-    key?.let { it to app.icon }
-  }.toMap()
-}
-
-/** Run on IO; cold Home and Apps requests share one package/icon scan. */
-internal fun loadApprovedIconInventory(context: Context): List<AppEntry> {
-  ApprovedHomeInventory.register(context)
-  return ApprovedHomeInventory.apps.load { loadApps(context.applicationContext) }
-}
-
-internal fun loadApprovedInstalledApps(context: Context): List<AppEntry> =
-    approvedInstalledEntries(context, loadApprovedIconInventory(context))
-
 private const val HOME_APP_WIDGET_HOST_ID = 0x4611
 private const val SAVED_LAUNCHER_TAB = "approved_saved_launcher_tab"
 internal const val APPROVED_HOME_MUSIC = "approved_home_music"
-
-// Sentinel component for the injected "Calls" grid tile — no real Activity backs it; onLaunch
-// recognizes this and bridges to the stock Portal calling surface via launchStockHome().
-private val CALLS_COMPONENT = ComponentName("com.immortal.launcher", "__immortal_calls_bridge__")
 
 /**
  * The custom Portal home launcher. Replaces the stock Aloha home (selected via
@@ -2300,12 +2168,6 @@ private fun gridColumnsFor(size: String): Int =
       ImmortalSettings.SIZE_LARGE -> 5
       else -> 6
     }
-
-private fun estimateWidgetSpan(minDp: Int, tileDp: Dp): Int {
-  if (minDp <= 0) return HomeWidgetStore.DEFAULT_SPAN_X
-  val tile = tileDp.value.coerceAtLeast(1f)
-  return HomeWidgetStore.normalizeSpan(((minDp + tile - 1f) / tile).toInt().coerceAtLeast(1))
-}
 
 private fun customWidgetLabel(kind: String): String =
     when (kind) {
@@ -5245,193 +5107,6 @@ private fun AppTile(
 
 // --- data ---------------------------------------------------------------------
 
-private fun loadApps(context: Context): List<AppEntry> {
-  val pm = context.packageManager
-  val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  val candidates = pm.queryIntentActivities(intent, 0).filter {
-    val pkg = it.activityInfo.packageName
-    pkg != context.packageName && !Curation.isHidden(pkg, "")
-  }
-  return prepareHomeAppIcons(
-          candidates,
-          packageName = { it.activityInfo.packageName },
-          rawLabel = { it.loadLabel(pm).toString() },
-          hiddenLabel = { it in Curation.hiddenLabels },
-          prepare = { ri, rawLabel ->
-            val ai = ri.activityInfo
-            val drawable = Curation.iconOverride(ai.packageName)
-                ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
-                ?: ri.loadIcon(pm)
-            val bmp: Bitmap = IconRenderer.renderAppIcon(context, drawable, 144)
-            val appInfo = ai.applicationInfo
-            val isUninstallable = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
-                                  (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-            AppEntry(
-                label = Curation.displayLabel(ai.packageName, rawLabel),
-                component = ComponentName(ai.packageName, ai.name),
-                icon = bmp.asImageBitmap(),
-                folder = Curation.folderFor(ai.packageName),
-                uninstallable = isUninstallable,
-            )
-          },
-      )
-      .sortedBy { it.label.lowercase(Locale.getDefault()) }
-      .let { apps ->
-        // Inject our own iOS-style settings as a grid tile. Our app is excluded from the
-        // normal query (pkg == this launcher), and ImmortalSettingsActivity is exported=false
-        // with no LAUNCHER filter, so it's launched via the special-case in onLaunch below.
-        val settingsIcon = Curation.iconOverride("com.android.settings")
-            ?.let { resId -> androidx.core.content.ContextCompat.getDrawable(context, resId) }
-            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-        // Inject the Immortal App Store too (StoreActivity — also our own, excluded from the query).
-        val storeIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_store_tile)
-            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-        // Inject a "Calls" tile that bridges to the stock Portal calling surface (the only trusted
-        // caller). It has no real Activity — launch is special-cased in onLaunch via CALLS_COMPONENT.
-        val callIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_call_tile)
-            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-        // Inject "Tools" (ToolsActivity — our own, exported=false, launched via the onLaunch
-        // special-case). It's the entry point to timers, notes, converter, cameras, countdown editor.
-        val toolsIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_tools_tile)
-            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-        // Inject "Music" (WebAppActivity → the YouTube Music PWA — there's no installable
-        // client without GMS, so the web app IS the client on a Portal).
-        val musicIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ic_music_tile)
-            ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-        var out = apps
-        if (HomeDashboardConfig.configured(context)) {
-          val dashboardIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
-              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-          if (dashboardIcon != null) out = out + AppEntry(
-              label = "Home dashboard",
-              component = ComponentName(context, HomeDashboardActivity::class.java),
-              icon = dashboardIcon,
-          )
-        }
-        // "Home Control" — the Control Center — once Home Assistant is connected (not on
-        // banners-only Portals, which keep alerts but no app).
-        if (HaConfig.isConfigured(context) && !ControlCenterConfig.load(context).bannersOnly) {
-          val controlIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
-              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
-          if (controlIcon != null) out = out + AppEntry(
-              label = "Home Control",
-              component = ComponentName(context.packageName, ControlCenterActivity::class.java.name),
-              icon = controlIcon,
-              uninstallable = false,
-          )
-        }
-        if (musicIcon != null) {
-          out = out + AppEntry(
-              label = "Music",
-              component = ComponentName(context.packageName, WebAppActivity::class.java.name),
-              icon = musicIcon,
-              uninstallable = false,
-          )
-        }
-        if (callIcon != null) {
-          out = out + AppEntry(
-              label = "Calls",
-              component = CALLS_COMPONENT,
-              icon = callIcon,
-              uninstallable = false,
-          )
-        }
-        if (toolsIcon != null) {
-          out = out + AppEntry(
-              label = "Tools",
-              component = ComponentName(context.packageName, ToolsActivity::class.java.name),
-              icon = toolsIcon,
-              uninstallable = false,
-          )
-        }
-        if (settingsIcon != null) {
-          out = out + AppEntry(
-              label = "Settings",
-              component = ComponentName(context.packageName, ImmortalSettingsActivity::class.java.name),
-              icon = settingsIcon,
-              uninstallable = false,
-          )
-        }
-        if (storeIcon != null) {
-          out = out + AppEntry(
-              label = "App Store",
-              component = ComponentName(context.packageName, StoreActivity::class.java.name),
-              icon = storeIcon,
-              uninstallable = false,
-          )
-        }
-        out
-      }
-}
-
-private fun loadWidgetProviders(context: Context, tileDp: Dp): List<WidgetProviderEntry> {
-  val pm = context.packageManager
-  val density = context.resources.displayMetrics.densityDpi
-  val custom =
-      listOf(
-          WidgetProviderEntry(
-              label = "Weather",
-              packageLabel = Brand.NAME,
-              icon = null,
-              info = null,
-              spanX = 2,
-              spanY = 2,
-              customKind = HomeWidgetStore.KIND_WEATHER,
-          ),
-          WidgetProviderEntry(
-              label = "World Clock",
-              packageLabel = Brand.NAME,
-              icon = null,
-              info = null,
-              spanX = 2,
-              spanY = 2,
-              customKind = HomeWidgetStore.KIND_WORLD_CLOCK,
-          ),
-          WidgetProviderEntry(
-              label = "Timers",
-              packageLabel = Brand.NAME,
-              icon = null,
-              info = null,
-              spanX = 2,
-              spanY = 2,
-              customKind = HomeWidgetStore.KIND_TIMERS,
-          ),
-      )
-  val android =
-      AppWidgetManager.getInstance(context)
-      .installedProviders
-      .mapNotNull { info ->
-        runCatching {
-              val packageLabel =
-                  pm.getApplicationLabel(pm.getApplicationInfo(info.provider.packageName, 0))
-                      .toString()
-              val icon =
-                  runCatching { info.loadIcon(context, density) }
-                      .getOrNull()
-                      ?: runCatching { pm.getApplicationIcon(info.provider.packageName) }.getOrNull()
-              val iconBitmap = icon?.toBitmap(96, 96)?.asImageBitmap()
-              WidgetProviderEntry(
-                  label = info.loadLabel(pm).toString().ifBlank { packageLabel },
-                  packageLabel = packageLabel,
-                  icon = iconBitmap,
-                  info = info,
-                  spanX =
-                      estimateWidgetSpan(appWidgetMinDp(context, info.minWidth), tileDp)
-                          .coerceAtLeast(HomeWidgetStore.DEFAULT_SPAN_X),
-                  spanY =
-                      estimateWidgetSpan(appWidgetMinDp(context, info.minHeight), tileDp)
-                          .coerceAtLeast(HomeWidgetStore.DEFAULT_SPAN_Y),
-              )
-            }
-            .getOrNull()
-      }
-      .sortedWith(
-          compareBy(
-              { it.packageLabel.lowercase(Locale.getDefault()) },
-              { it.label.lowercase(Locale.getDefault()) }))
-  return custom + android
-}
-
 private fun List<HomeWidgetStore.HomeWidget>.filterLiveWidgets(
     manager: AppWidgetManager,
     host: AppWidgetHost,
@@ -5465,17 +5140,6 @@ private fun updateWidgetSizeOptions(
           putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, height)
         })
   }
-}
-
-private fun appWidgetMinDp(context: Context, raw: Int): Int {
-  if (raw <= 0) return 0
-  // Android 9/10 on Portal reports AppWidgetProviderInfo sizes as raw complex
-  // dimension values (for example, 10241 == 40dp). Newer framework builds may
-  // already hand back dp integers, so only decode values that are clearly not
-  // plain dp sizes.
-  if (raw < 1000) return raw
-  val metrics = context.resources.displayMetrics
-  return (TypedValue.complexToDimensionPixelSize(raw, metrics) / metrics.density).roundToInt()
 }
 
 @Composable
