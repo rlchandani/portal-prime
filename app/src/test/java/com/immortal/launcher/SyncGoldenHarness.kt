@@ -84,11 +84,8 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
   /** The sync is a process-wide object: every scenario starts it from scratch. */
   private fun resetSync() {
     setStatic("installed", false)
-    setStatic("app", null)
-    setStatic("ledger", SyncLedger())
-    setStatic("paused", false)
-    staticField<HashMap<*, *>>("joinerPushedAt").clear()
-    staticField<MutableMap<*, *>>("counters").clear()
+    setStatic("core", null)
+    staticField<java.util.concurrent.atomic.AtomicBoolean>("pausedFlag").set(false)
     staticField<kotlinx.coroutines.flow.MutableStateFlow<SettingsSyncStatus>>("_status").value = SettingsSyncStatus()
   }
 
