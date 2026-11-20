@@ -32,7 +32,8 @@ class HomeMusicCoverTest {
     }
 
     @Test fun leavingAnInactiveHomeTakesThreeFramesAndOnlyTheLayerSwapIsSeen() {
-        assertEquals(listOf(MusicCloseStep.UNCOVER_HOME, MusicCloseStep.SETTLE, MusicCloseStep.SHOW_HOME, MusicCloseStep.REMOVE_MUSIC),
+        assertEquals(listOf(MusicCloseStep.UNCOVER_TABS, MusicCloseStep.SETTLE, MusicCloseStep.UNCOVER_HOME, MusicCloseStep.SETTLE,
+            MusicCloseStep.SHOW_HOME, MusicCloseStep.REMOVE_MUSIC),
             HomeMusicCover.closePlan(MusicPlayerLayout.FULL, covered = true))
     }
 

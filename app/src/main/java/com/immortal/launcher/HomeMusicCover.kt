@@ -33,16 +33,18 @@ internal object HomeMusicCover {
     /**
      * Leaving full-screen Music, one step per frame. Once Home has gone inactive beneath Music, bringing it
      * back (recomposing and measuring Home), showing it (recording it again) and tearing Music down were one
-     * 50–80 ms frame. Now Home first comes back beneath Music, which stays on screen and opaque, recording
-     * into its hidden layers; the next frame swaps the two layers' alpha (no recomposition, no recording),
-     * which is the frame the household sees; Music's composition is torn down, already invisible, in the
-     * third. Bringing Home back can run past the next vsync, so the swap waits one frame callback
-     * ([MusicCloseStep.SETTLE], which draws nothing) and starts on a fresh vsync instead of a late one.
-     * A Music that closes before Home went inactive just goes: Home is ready.
+     * 50–90 ms frame. Now Home comes back beneath Music, which stays on screen and opaque, in two frames
+     * (its tab pages, then its chrome: header, Now Playing card), recording into its hidden layers; the next
+     * frame swaps the two layers' alpha (no recomposition, no recording), which is the frame the household
+     * sees; Music's composition is torn down, already invisible, in the last. Bringing Home back can run
+     * past the next vsync, so each such step is followed by one frame callback ([MusicCloseStep.SETTLE],
+     * which draws nothing) and the next step starts on a fresh vsync instead of a late one. A Music that
+     * closes before Home went inactive just goes: Home is ready.
      */
     fun closePlan(layout: MusicPlayerLayout?, covered: Boolean): List<MusicCloseStep> =
-        if (layout == MusicPlayerLayout.FULL && covered)
-            listOf(MusicCloseStep.UNCOVER_HOME, MusicCloseStep.SETTLE, MusicCloseStep.SHOW_HOME, MusicCloseStep.REMOVE_MUSIC)
+        if (layout == MusicPlayerLayout.FULL && covered) listOf(
+            MusicCloseStep.UNCOVER_TABS, MusicCloseStep.SETTLE, MusicCloseStep.UNCOVER_HOME, MusicCloseStep.SETTLE,
+            MusicCloseStep.SHOW_HOME, MusicCloseStep.REMOVE_MUSIC)
         else listOf(MusicCloseStep.REMOVE_MUSIC)
 
     /**
@@ -63,7 +65,7 @@ internal object HomeMusicCover {
 }
 
 /** One frame's step of leaving full-screen Music ([HomeMusicCover.closePlan]). */
-internal enum class MusicCloseStep { UNCOVER_HOME, SETTLE, SHOW_HOME, REMOVE_MUSIC }
+internal enum class MusicCloseStep { UNCOVER_TABS, UNCOVER_HOME, SETTLE, SHOW_HOME, REMOVE_MUSIC }
 
 /**
  * Composes full-screen Music; the only composition that reads the live layout, so opening it recomposes only this.

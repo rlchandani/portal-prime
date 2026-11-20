@@ -1319,12 +1319,16 @@ private fun LauncherScreen(
   // full-screen Music recomposes nothing of Home (see HomeMusicCover).
   var musicLayout by musicLayoutState
   var musicCovered by remember { mutableStateOf(false) }
+  // Home's tab pages come back a frame before its chrome when Music closes (HomeMusicCover.closePlan).
+  var musicTabsCovered by remember { mutableStateOf(false) }
   LaunchedEffect(musicLayoutState) {
     snapshotFlow { musicLayoutState.value == MusicPlayerLayout.FULL }.collectLatest { full ->
-      if (full) { delay(HomeMusicCover.SETTLE_MS); musicCovered = true } else musicCovered = false
+      if (full) { delay(HomeMusicCover.SETTLE_MS); musicCovered = true; musicTabsCovered = true }
+      else { musicCovered = false; musicTabsCovered = false }
     }
   }
   val homeMusicLayout by remember { derivedStateOf { HomeMusicCover.homeLayout(musicLayoutState.value, musicCovered) } }
+  val homeTabsMusicLayout by remember { derivedStateOf { HomeMusicCover.homeLayout(musicLayoutState.value, musicTabsCovered) } }
   // Leaving full-screen Music runs over three frames (HomeMusicCover.closePlan). Read in layer blocks only.
   val homeShownOverMusic = remember { mutableStateOf(false) }
   var musicClosing by remember { mutableStateOf(false) }
@@ -1338,6 +1342,7 @@ private fun LauncherScreen(
           try {
             for (step in plan) withFrameNanos {
               when (step) {
+                MusicCloseStep.UNCOVER_TABS -> musicTabsCovered = false
                 MusicCloseStep.UNCOVER_HOME -> musicCovered = false
                 MusicCloseStep.SETTLE -> Unit
                 MusicCloseStep.SHOW_HOME -> homeShownOverMusic.value = true
@@ -1665,14 +1670,14 @@ private fun LauncherScreen(
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
         ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
-            bottom = if (homeMusicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
-            contentActive = homeMusicLayout == null || homeMusicLayout == MusicPlayerLayout.COMPACT,
+            bottom = if (homeTabsMusicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
+            contentActive = homeTabsMusicLayout == null || homeTabsMusicLayout == MusicPlayerLayout.COMPACT,
             prefetch = LauncherTabPrefetch.HOME_TABS) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
           // Who's there? may only open the camera while this Home page is really in front.
-          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && homeMusicLayout != MusicPlayerLayout.FULL && !editMode)
+          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && homeTabsMusicLayout != MusicPlayerLayout.FULL && !editMode)
           var whoSheet by remember { mutableStateOf(false) }
           val personal = whosThereHome.personal && !editMode
           val greetWelcome = remember(welcome, whosThereHome) {
