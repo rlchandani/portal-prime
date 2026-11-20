@@ -272,6 +272,9 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     fun halfBitmap(top: Boolean): android.graphics.Bitmap {
       val b = android.graphics.Bitmap.createBitmap(w, h / 2, android.graphics.Bitmap.Config.ARGB_8888)
       val c = Canvas(b)
+      // Opaque: the shadow pass above left the paint transparent, and a shader is drawn with the
+      // paint's alpha, so the card halves came out invisible (bare digits, no flip cards).
+      paint.color = android.graphics.Color.BLACK
       paint.shader = LinearGradient(0f, 0f, 0f, h / 2f, if (top) CARD_TOP_A else CARD_BOTTOM_A,
           if (top) CARD_TOP_B else CARD_BOTTOM_B, Shader.TileMode.CLAMP)
       // Round only the outer corners: draw the full card offset so the cut edge is square.
