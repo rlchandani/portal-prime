@@ -8,6 +8,7 @@ package com.immortal.launcher
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ToolsPaneRetentionTest {
@@ -40,5 +41,17 @@ class ToolsPaneRetentionTest {
             }
         }
         assertEquals(listOf("alarm", "converter", "countdowns", "lamp"), panes)
+    }
+
+    @Test fun localToolsAndRemindersKeepTheirWorkspaceUnderTheLibrary() {
+        listOf("alarm", "timers", "countdowns", "converter", "lamp", "reminders").forEach {
+            assertTrue(it, ToolsPaneRetention.keepsWorkspace(it))
+        }
+    }
+
+    @Test fun audioCameraAndNetworkToolsLeaveTheirWorkspaceOnBack() {
+        listOf("notes", "guests", "intercom", "stories", "iss", "aurora", "speed", "camera").forEach {
+            assertFalse(it, ToolsPaneRetention.keepsWorkspace(it))
+        }
     }
 }

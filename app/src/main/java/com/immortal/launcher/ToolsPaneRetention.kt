@@ -11,6 +11,9 @@ internal object ToolsPaneRetention {
     private val local = setOf("alarm", "timers", "countdowns", "converter", "lamp")
     private const val CAPACITY = 4
 
+    /** Local tools (and Reminders) whose open workspace may stay composed, hidden, under the library. */
+    fun keepsWorkspace(id: String): Boolean = id in local || id == "reminders"
+
     fun afterSelection(previous: List<String>, selected: String): List<String> {
         val retained = previous.filter { it in local && it != selected }.distinct()
         return if (selected in local) (retained + selected).takeLast(CAPACITY)

@@ -76,41 +76,94 @@ internal fun ApprovedToolsHost(
         LocalApprovedToolWorkspace provides true,
     ) {
         val layoutClass = currentLayoutClass()
+        // Opening a tool and coming Back used to dispose one tree and compose the other from scratch
+        // (two 100-150 ms frames each way on Family). The library now stays composed under an open tool,
+        // and a local tool's workspace stays composed under the library, so either switch only flips
+        // which layer draws and takes input. Camera, audio and network tools still leave on Back.
+        var keptWorkspace by remember { mutableStateOf<ApprovedTool?>(null) }
+        val workspace = tool ?: keptWorkspace?.takeIf { ToolsPaneRetention.keepsWorkspace(it.id) }
+        SideEffect { keptWorkspace = workspace }
         val content: @Composable BoxScope.() -> Unit = {
             Box(modifier.fillMaxSize()) {
-                if (tool == null) holder.SaveableStateProvider("library") {
-                    val edge = when {
-                        embedded -> LauncherEdge
-                        layoutClass.compactPortrait -> COMPACT_PORTRAIT_EDGE
-                        layoutClass.compactLandscape -> COMPACT_LANDSCAPE_EDGE
-                        else -> 96.dp
-                    }
-                    ToolsLibrary(grid, advanced, edge = edge) { selected = it.id }
-                }
-                else if (layoutClass.compact) {
-                    CompactToolWorkspace(tool, advanced, embedded, layoutClass.compactPortrait, holder) { selected = it.id }
-                }
-                else Row(Modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp, vertical = 36.dp)) {
-                    ToolsRail(tool, advanced) { selected = it.id }
-                    Column(Modifier.weight(1f).fillMaxHeight()) {
-                        Column(Modifier.fillMaxWidth().heightIn(min = 152.dp)
-                            .padding(horizontal = 40.dp, vertical = 28.dp)) {
-                            Text(tool.title, color = IosLabel, fontSize = 44.sp, lineHeight = 55.sp,
-                                fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
-                            Text(tool.description, color = IosSecondary, fontSize = 22.sp,
-                                lineHeight = 32.sp, modifier = Modifier.padding(top = 8.dp))
+                ToolsLayer(visible = tool == null) {
+                    holder.SaveableStateProvider("library") {
+                        val edge = when {
+                            embedded -> LauncherEdge
+                            layoutClass.compactPortrait -> COMPACT_PORTRAIT_EDGE
+                            layoutClass.compactLandscape -> COMPACT_LANDSCAPE_EDGE
+                            else -> 96.dp
                         }
-                        Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
-                        Box(Modifier.weight(1f).fillMaxWidth()
-                            .padding(start = 40.dp, end = 40.dp, top = 32.dp, bottom = 8.dp)) {
-                            ToolsWorkspacePanes(tool.id, holder)
-                        }
+                        ToolsLibrary(grid, advanced, edge = edge) { selected = it.id }
                     }
+                }
+                if (workspace != null) ToolsLayer(visible = tool != null) {
+                    ToolWorkspace(workspace, advanced, embedded, layoutClass, holder) { selected = it.id }
                 }
             }
         }
         if (embedded) Box(content = content)
         else ApprovedAppsShell("tools", onExit, content = content)
+    }
+}
+
+/** An open tool: the rail beside the tool's heading and pane (compact layouts in [CompactToolWorkspace]). */
+@Composable
+private fun ToolWorkspace(
+    tool: ApprovedTool, advanced: Boolean, embedded: Boolean, layoutClass: LayoutClass, holder: SaveableStateHolder,
+    onSelect: (ApprovedTool) -> Unit,
+) {
+    if (layoutClass.compact) {
+        CompactToolWorkspace(tool, advanced, embedded, layoutClass.compactPortrait, holder, onSelect)
+        return
+    }
+    Row(Modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp, vertical = 36.dp)) {
+        ToolsRail(tool, advanced, onSelect = onSelect)
+        Column(Modifier.weight(1f).fillMaxHeight()) {
+            Column(Modifier.fillMaxWidth().heightIn(min = 152.dp)
+                .padding(horizontal = 40.dp, vertical = 28.dp)) {
+                Text(tool.title, color = IosLabel, fontSize = 44.sp, lineHeight = 55.sp,
+                    fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
+                Text(tool.description, color = IosSecondary, fontSize = 22.sp,
+                    lineHeight = 32.sp, modifier = Modifier.padding(top = 8.dp))
+            }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
+            Box(Modifier.weight(1f).fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, top = 32.dp, bottom = 8.dp)) {
+                ToolsWorkspacePanes(tool.id, holder)
+            }
+        }
+    }
+}
+
+/**
+ * The library or an open tool, kept composed while the other one shows. Hidden, it draws nothing, takes no
+ * touch, focus or semantics, and its page lifecycle stays CREATED (no refreshes, Back callbacks off), as the
+ * launcher's retained tabs do.
+ */
+@Composable
+private fun ToolsLayer(visible: Boolean, content: @Composable () -> Unit) {
+    val active = visible && LocalApprovedLauncherPageActive.current
+    val input = remember { LauncherPageInputGate() }
+    val focus = LocalFocusManager.current
+    LaunchedEffect(visible) { if (!visible) focus.clearFocus(force = true) }
+    Box(Modifier.fillMaxSize()
+        .zIndex(if (visible) 1f else 0f)
+        .graphicsLayer { alpha = if (visible) 1f else 0f }
+        .focusProperties { canFocus = active }
+        .pointerInput(input) {
+            try {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.changes.any { it.pressed }) input.beginTouch()
+                        if (!input.acceptsAction()) event.changes.forEach { it.consume() }
+                        if (event.changes.none { it.pressed }) input.endTouch()
+                    }
+                }
+            } finally { input.endTouch() }
+        }
+        .then(if (visible) Modifier else Modifier.clearAndSetSemantics { })) {
+        ApprovedLauncherPageLifecycle(active, input, content)
     }
 }
 
