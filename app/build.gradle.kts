@@ -132,6 +132,10 @@ android {
     debug {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
+      // JVM unit-test coverage on demand (`-PjacocoReport=true`): instruments debug classes for
+      // testDebugUnitTest and enables createDebugUnitTestCoverageReport (HTML + XML under
+      // build/reports/coverage/test/debug). Off for normal builds, so they stay uninstrumented.
+      enableUnitTestCoverage = providers.gradleProperty("jacocoReport").orNull == "true"
       buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
     }
     // Family iteration uses the accepted native R8 rules with ordinary production
