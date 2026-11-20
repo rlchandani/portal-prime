@@ -44,6 +44,9 @@ class FleetRoutes(private val context: Context) {
   /** The phone-remote surface (`/remote/…`), which does its own pairing/session auth. */
   private val remote = RemoteRoutes(context)
 
+  /** Sealed settings backups (`/backup/…`): enrolment, export and import. */
+  private val backup = FleetBackupRoutes(context)
+
   /** Load (and later refresh) the catalog snapshot used by /info, /install, /update. */
   fun refreshCatalog() {
     StoreCatalog.loadCatalog(context) { catalog = it }
@@ -70,6 +73,7 @@ class FleetRoutes(private val context: Context) {
         // Protected stores can't be listed either (message ids and sizes are metadata too).
         if (FleetSecretPaths.isBlocked(java.io.File(path))) resp(403, err("protected_path")) else resp(200, FleetFs.list(path))
       }
+      in FleetBackupRoutes.PATHS -> backup.handle(req)
       "/fs/read" -> requireMethod("GET", req) { fsRead(req) }
       "/fs/write" -> requireMethod("POST", req) { fsWrite(req) }
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
@@ -176,7 +180,7 @@ class FleetRoutes(private val context: Context) {
             .put("devMode", DevMode.isEnabled(context))
             .put(
                 "capabilities",
-                JSONObject().put("files", true).put("diag", true).put("calendar", true).put("screensaver", true).put("dev", true).put("logcat", canReadLogs()).put("performance", true))
+                JSONObject().put("files", true).put("diag", true).put("calendar", true).put("screensaver", true).put("dev", true).put("logcat", canReadLogs()).put("performance", true).put("backup", true))
     // Installed catalog apps + a CHEAP (no-network) update hint from the catalog pin.
     // The authoritative F-Droid check is POST /update {"dryRun":true}, kept off the
     // hot dashboard-poll path so /info stays fast across a whole wall of devices.

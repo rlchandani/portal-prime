@@ -680,6 +680,18 @@
             android:foregroundServiceType="connectedDevice"
             android:exported="false" />
 
+        <!-- Confirms or clears the fleet backup key. Only the adb shell (USB) can send these:
+             DUMP is held by the shell and can't be requested by apps. -->
+        <receiver
+            android:name=".FleetBackupKeyAdbReceiver"
+            android:permission="android.permission.DUMP"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.immortal.launcher.action.CONFIRM_BACKUP_KEY" />
+                <action android:name="com.immortal.launcher.action.FORGET_BACKUP_KEY" />
+            </intent-filter>
+        </receiver>
+
         <!-- MQTT publisher: exposes this Portal to Home Assistant via MQTT Discovery.
              Off until the user configures a broker in Immortal settings. -->
         <service
