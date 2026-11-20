@@ -92,6 +92,12 @@ HPLcom/immortal/launcher/HomeFeedWidgetsKt;->**(**)**
 HPLcom/immortal/launcher/HomeFeedWidgetsKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHaWidgetKt;->**(**)**
 HPLcom/immortal/launcher/HomeHaWidgetKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeJarvisEntryKt;->**(**)**
+HPLcom/immortal/launcher/HomeJarvisEntryKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeHeaderStatusKt;->**(**)**
+HPLcom/immortal/launcher/HomeHeaderStatusKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeHeaderBarKt;->**(**)**
+HPLcom/immortal/launcher/HomeHeaderBarKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**
