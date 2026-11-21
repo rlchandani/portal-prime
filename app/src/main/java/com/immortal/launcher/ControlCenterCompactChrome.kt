@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -129,7 +127,8 @@ private fun CompactJarvis(enabled: Boolean, onJarvis: () -> Unit) {
 @Composable
 internal fun CcCompactNavBar(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
-  Row(Modifier.fillMaxWidth().height(CcCompactChrome.NavHeight).ccRegionLayer(c.rail).padding(horizontal = 14.dp, vertical = 10.dp),
+  // No bar-wide texture: each tab caches its own resting look (see [CcTab]).
+  Row(Modifier.fillMaxWidth().height(CcCompactChrome.NavHeight).background(c.rail).padding(horizontal = 14.dp, vertical = 10.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
     Box(Modifier.size(72.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onHome)
         .semantics { contentDescription = "Back to Hearthpane home" }, contentAlignment = Alignment.Center) {
@@ -150,24 +149,21 @@ internal fun CcCompactNavBar(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   }
 }
 
-/** One bottom-bar tab: a fixed tree; [selected] is read only by the card's layer, the colours and the semantics. */
+/** One bottom-bar tab ([CcTab]): a fixed tree; [selected] is read only by layer alphas and the semantics. */
 @Composable
 private fun RowScope.NavItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  val tint = remember(c, selected) { ColorProducer { if (selected.value) c.text else c.sec } }
-  Box(Modifier.weight(1f).fillMaxHeight().alpha(if (enabled) 1f else CC_DISABLED_ALPHA)) {
-    CcSelectionCard(NAV_ITEM, selected)
-    Box(Modifier.matchParentSize().clip(NAV_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
-        .ccSpeakTab(if (badge > 0) "$label, $badge" else label, selected)) {
-      Column(Modifier.align(Alignment.Center).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        CcIcon(icon, tint, 36.dp)
-        CcTabLabel(label, tint, 17.sp, overflow = TextOverflow.Ellipsis)
-      }
-      if (badge > 0) Box(Modifier.align(Alignment.TopCenter).offset(x = 22.dp, y = 6.dp).height(24.dp).widthIn(min = 24.dp)
-          .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
-        Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
-      }
+  CcTab(Modifier.weight(1f).fillMaxHeight(), NAV_ITEM, selected, if (badge > 0) "$label, $badge" else label, enabled, onClick,
+      overlay = {
+        if (badge > 0) Box(Modifier.align(Alignment.TopCenter).offset(x = 22.dp, y = 6.dp).height(24.dp).widthIn(min = 24.dp)
+            .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+          Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+        }
+      }) { color ->
+    Column(Modifier.align(Alignment.Center).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)) {
+      CcIcon(icon, rememberCcTint(color), 36.dp)
+      CcTabText(label, color, 17.sp, overflow = TextOverflow.Ellipsis)
     }
   }
 }

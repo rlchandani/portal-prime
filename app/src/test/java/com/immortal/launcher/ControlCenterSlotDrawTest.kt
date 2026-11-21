@@ -57,4 +57,17 @@ class ControlCenterSlotDrawTest {
     assertEquals(false, ccSlotSemantics(active = false, exposed = true))
     assertEquals(false, ccSlotSemantics(active = false, exposed = false))
   }
+
+  /** A parked screen holds no region textures (they'd re-render while hidden); a shown one caches once ready. */
+  @Test fun regionsAreCachedOnlyWhileShownAndReady() {
+    assertEquals(true, ccSlotCachesRegions(active = true, cacheReady = true))
+    assertEquals(false, ccSlotCachesRegions(active = true, cacheReady = false))
+    assertEquals(false, ccSlotCachesRegions(active = false, cacheReady = true))
+    assertEquals(false, ccSlotCachesRegions(active = false, cacheReady = false))
+  }
+
+  @Test fun aCachedRegionIsAnOffscreenTextureAndAnUncachedOneDrawsStraight() {
+    assertEquals(androidx.compose.ui.graphics.CompositingStrategy.Offscreen, ccRegionStrategy(cache = true))
+    assertEquals(androidx.compose.ui.graphics.CompositingStrategy.Auto, ccRegionStrategy(cache = false))
+  }
 }

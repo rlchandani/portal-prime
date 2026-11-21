@@ -38,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -73,7 +72,9 @@ internal fun rememberCcTabSelected(ui: CcUi, screen: CcScreen): State<Boolean> =
 internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
   val alerts = r.alerts
-  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().ccRegionLayer(c.rail).padding(top = 22.dp, bottom = 20.dp),
+  // No rail-wide texture: each tab caches its own resting look (see [CcTab]), so the selection
+  // highlight lives outside every cached layer and a switch re-renders none of the rail.
+  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().background(c.rail).padding(top = 22.dp, bottom = 20.dp),
       horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Box(Modifier.size(72.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onHome)
         .semantics { contentDescription = "Back to Hearthpane home" }, contentAlignment = Alignment.Center) {
@@ -96,23 +97,20 @@ internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   }
 }
 
-/** One rail tab: a fixed tree; [selected] is read only by the card's layer, the colours and the semantics. */
+/** One rail tab ([CcTab]): a fixed tree; [selected] is read only by layer alphas and the semantics. */
 @Composable
 private fun RailItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  val tint = remember(c, selected) { ColorProducer { if (selected.value) c.text else c.sec } }
-  Box(Modifier.size(104.dp, 96.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA)) {
-    CcSelectionCard(RAIL_ITEM, selected)
-    Box(Modifier.matchParentSize().clip(RAIL_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
-        .ccSpeakTab(if (badge > 0) "$label, $badge" else label, selected)) {
-      Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        CcIcon(icon, tint, 38.dp)
-        CcTabLabel(label, tint, 17.sp)
-      }
-      if (badge > 0) Box(Modifier.align(Alignment.TopEnd).offset(x = (-22).dp, y = 12.dp).height(24.dp).widthIn(min = 24.dp)
-          .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
-        Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-      }
+  CcTab(Modifier.size(104.dp, 96.dp), RAIL_ITEM, selected, if (badge > 0) "$label, $badge" else label, enabled, onClick,
+      overlay = {
+        if (badge > 0) Box(Modifier.align(Alignment.TopEnd).offset(x = (-22).dp, y = 12.dp).height(24.dp).widthIn(min = 24.dp)
+            .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+          Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        }
+      }) { color ->
+    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+      CcIcon(icon, rememberCcTint(color), 38.dp)
+      CcTabText(label, color, 17.sp)
     }
   }
 }
