@@ -205,3 +205,82 @@ self-updater, then dev mode was turned off. Family ends on official 1.289.
 - `CallMessageActivity.onCreate` keeps its synchronous `ensureLoaded`, because it needs the
   index to open a message; it is a no-op once loaded.
 - `CallMessageStore`'s 6-hourly prune still runs on the main looper (rare).
+
+## Round 2 — the remaining one-off sites (2026-11-20, branch `mainthread-2`)
+
+Family Portal+, base = local main at 1.302 (296). Same method: scratch debug builds with
+`-PportalStrictMode=true`, plus an uncommitted timing patch (`System.nanoTime` around the exact
+calls below, logged per call) applied identically to base and branch. Tour per build: install
+(cold start, 45 s), screensaver start on the operator test source (fleet action), Home, a second
+frame start (`am start` of the frame Activity), Home, Music open, Back, Calls open, Home. Base was
+toured twice, the final branch once. Times are debug-build wall times on the main thread, so
+CPU-bound parts read high; I/O and Keystore IPC are real. No screenshots were taken. The device
+ended on official 1.302 (installed APK sha256 matches the release), Home on top, dev mode off,
+test source off, music volume restored.
+
+### What the violations actually were
+
+- **Screensaver start (9–10 per start).** All are path `access()` stats on the new Activity's
+  `ContextImpl`: `getDataDir` + `ensurePrivateDirExists` for the first `getSharedPreferences` of
+  `ScreensaverConfig`, `WelcomeConfig`, `ImmortalSettings`, `ScreensaverTestSource` and
+  `TimerStore` (two each), and `getCacheDir` in `PhotoFrameController.<init>` (two). None waited
+  on a prefs load except `TimerStore` (`immortal_timer` was not warmed). StrictMode's 250–340 ms is
+  the whole `onCreate`.
+- **First Music open.** `YtAndroid.library` builds the YouTube library on the main thread inside
+  `remember`: `noBackupFilesDir` stat, account-file read, Keystore key lookup and AES-GCM decrypt.
+- **First Calls open.** `CallAutoAnswerStore.repository` does the same for the Grandma-mode
+  rules (on Family the file is absent, so no decrypt; a Portal with Grandma mode set pays the
+  Keystore cost here and in the first incoming-call decision, `Calling.decide`).
+- **Cold-start prefs.** Before Home's first frame there are **no** prefs load waits left
+  (`StartupPrefsWarmup` covers them); only path stats remain. All 14 real load waits
+  (`SharedPreferencesImpl.get*` under `awaitLoadedLocked`) come after the first frame, in
+  deferred startup steps and the accessibility service: `QuickBarConfig`, `OverlayHoldStore`,
+  `HouseholdListStore.migrateTodosOnce`, `DinnerCall`, `DinnerConfig`, `HouseholdKey`,
+  `CallingStore` (41 ms message), `CallingConfig`, `SharedTimers`, `CcDebugStore`,
+  `ReminderAlerts`, `OtaUpdater`, `DevMode`, `MqttConfig` (84 ms message).
+
+### Fixes
+
+| Change | Where |
+|---|---|
+| `processPrefs(context, name)`: SharedPreferences through the application context, whose path cache the startup warm-up already filled. Same file, same process-wide object | `ProcessContext.kt`; used by `ScreensaverConfig`, `WelcomeConfig`, `ImmortalSettings`, `TimerStore`, `ScreensaverTestSource` |
+| `ProcessCacheDir`: the cache dir resolved once per process (`getCacheDir` stats on every call). Its user, `EngineScaledCache`, `mkdirs` before each write | `ProcessContext.kt`, `PhotoFrameController` |
+| `FirstOpenWarmup`: a last deferred startup step starts one background thread that calls the owners' own synchronized, load-once getters: cache dir, `CallAutoAnswerStore.repository`, `YtAndroid.library`, `TimerStore.load`. A main-thread caller arriving mid-load waits on the same monitor for the same load, so there is no second copy and no use before load; a failed task is left to first use, logged by exception type only | `FirstOpenWarmup.kt`, `ImmortalApp.deferredSteps` |
+
+### After (debug builds, same tour)
+
+| Site | Base n per pass | Branch n | Base main-thread time | Branch |
+|---|---:|---:|---:|---:|
+| Screensaver start, first (`ScreensaverConfig`, `WelcomeConfig`, `ImmortalSettings`, `ScreensaverTestSource`, `TimerStore` prefs, `getCacheDir`) | 9 | 0 | `ScreensaverConfig.load` 2.4 / 0.7 ms | 0.4 ms |
+| Screensaver start, again | 8 | 0 | 0.7 ms | 0.4 ms |
+| `FaceFocusStore.<init>` `getFilesDir` (not changed) | 1 | 1 | µs | µs |
+| First Music open (`YtAndroid.create`, `YtKeystoreSecureStore.load`) | 2 | 0 | 14.8 / 18.9 ms | 0.007–0.011 ms |
+| First Calls open (`CallAutoAnswerStore`, `YtKeystoreSecureStore.load`, `ImmortalSettings` ×2) | 4 | 0 | 2.5 ms (no rules file) | 0.05 ms |
+| Calls open, `HouseholdKey.get` stat (not changed) | 1 | 1–2 | µs | µs |
+| **Tour total excluding cold start** | **21 / 26** | **4** | | |
+| Cold start (install step) | 78 / 78 | 77 | | |
+
+What did not move, honestly: the frame Activity's whole `onCreate` (288–325 ms first start,
+101–109 ms after) and its `Displayed` time (557–658 ms first, 240–262 ms after) are within
+run-to-run noise on both builds. The removed stats were microseconds each. The real first-start
+cost is `PhotoFrameController.<init>` at ~100 ms on the first start and ~1–2 ms after, which is
+class loading and initialisation, not I/O. The Music win (15–19 ms of Keystore and file work per
+process) and the Calls/incoming-call win (Keystore decrypt on Grandma-mode Portals) are real
+main-thread time removed.
+
+### Not done, by the brief's condition
+
+- **More prefs warming.** It cannot help Home's first frame: no load waits remain before it. The
+  14 post-first-frame waits above are the candidate (warm their files at the start of deferred
+  startup), but they cost single-digit ms each within deferred steps and would add parallel I/O to
+  the first seconds after start. Left for a measured follow-up on a performance build.
+- **`PhotoFrameController` first-construction cost (~100 ms debug).** Class load/init, not I/O;
+  out of scope here. Measure on a performance build before considering class preloading.
+- `FaceFocusStore` `getFilesDir` and the Calls `HouseholdKey` stat: microseconds, unchanged.
+
+JVM tests: `FirstOpenWarmupTest` (9): tasks run in order and a failure never stops the rest, the
+failure callback gets the name and error, empty list, the warmed set, `processPrefs` reads through
+the application context and never the Activity's, falls back when there is no application context,
+and the memo resolves once, does not remember a failed resolve, and serves across threads.
+
+Gate: full unit tests (8711, 0 failures, 1 skipped) and `:app:assemblePerformance` pass.
