@@ -187,6 +187,8 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   override fun onStart() {
     super.onStart()
     hostStarted = true
+    // Counted like the dream window: its photos and textures are dropped 4 s after it goes.
+    CcGpuTrim.instance.started()
     updateHostVisibility()
   }
 
@@ -198,6 +200,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   override fun onStop() {
     hostStarted = false
     updateHostVisibility()
+    CcGpuTrim.instance.stopped()
     super.onStop()
   }
 

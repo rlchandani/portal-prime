@@ -27,6 +27,8 @@ class PhotoDreamService : DreamService() {
   private lateinit var frame: PhotoFrameController
   private var pinnedOrigin = false
   private var frameStopped = false
+  /** This dream window is counted in [CcGpuTrim] (balanced across attach and detach). */
+  private var gpuCounted = false
   private var lostPanelShown = false
   private var nightBrightness: NightWindowBrightness? = null
 
@@ -49,6 +51,8 @@ class PhotoDreamService : DreamService() {
     pinnedOrigin = PinnedAppScreensaver.hasPin()
     ImmortalDreamNavigation.attached(this)
     PinnedAppScreensaver.nativeDreamAttached()
+    // Counted like a Control Center window: its photos and textures are dropped 4 s after it goes.
+    if (!gpuCounted) { gpuCounted = true; CcGpuTrim.instance.started() }
     // DreamService installs Android's separate Dream window animation. It can keep a
     // departing photo surface over the already-resumed Home. Reveal the retained task
     // directly; slideshow motion remains owned by PhotoFrameController.
@@ -138,6 +142,7 @@ class PhotoDreamService : DreamService() {
     window?.let { FramePerformanceCapture.untrack(it) }
     stopFrameOnce()
     super.onDetachedFromWindow()
+    if (gpuCounted) { gpuCounted = false; CcGpuTrim.instance.stopped() }
   }
 
   private fun showLostSession() {
