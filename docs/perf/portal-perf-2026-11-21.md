@@ -559,3 +559,69 @@ plus the LazyColumn), semantics 10–12.5 ms (`checkForSemanticsChanges` → `ge
   draw of the newly shown screen; the second long frame waits on the first's RenderThread. Next: avoid
   re-rendering the region layers on a switch (selection highlight outside the rail layer), and measure what part of
   the window flush is the shown screen versus the whole-window replay.
+
+## Control Center screen switch: render thread, 1.311 vs `cc-render`
+
+**Device:** Family Portal+. Plain `adb install -r -d`, no force-stop. STREAM_MUSIC 0 during each stint, restored to 3.
+No screenshots, no `debug.hwui` props set. Ended on official 1.311 (on-device sha256 `0c357fcd…bbca9`, matching
+`hearthpane-latest.json`), Home on top and default, dev mode off.
+
+**Builds:** official 1.311; branch `cc-render` `assemblePerformance` (`aed8a854…`).
+
+**Method:** as before (Map → Alerts via the read-only "door is open" row, warm-up + 4 measured taps per round,
+`framestats` of the Control Center window), now also the return (BACK, Alerts → Map) after each tap. 4 rounds each
+(off, off, [branch], off, off, branch ×4). RenderThread breakdown from `atrace gfx view` (HWUI's `drawLayer [name] w x h`,
+`flush layers`, `flush commands` slices), 2–3 traced taps per build. The house changed between rounds (an alert
+cleared, someone came home), so the last official round is the closest comparison for the branch rounds.
+
+**Where the switch frame's render thread went on 1.311 (traced):** three cached textures re-rendered before the
+window: the rail (149 × 1440, the strip between the two tabs whose selection changed), the header (2011 × 122, the
+title) and the **parked** Map's side column (608 × 1281, the tapped row's ripple still animating on a screen that is
+transparent and off-screen; it re-rendered again on later frames). `drawLayer` 0.7–1.9 ms each, `flush layers`
+5–6 ms, then `flush commands` (the window) 2–4.3 ms. The renderer re-renders every damaged texture in the tree,
+transparent or not.
+
+**Changes (`cc-render`):**
+1. `ControlCenterSelection.kt:91` `CcTab` (used by `ControlCenterChrome.kt:102` `RailItem` and
+   `ControlCenterCompactChrome.kt:154` `NavItem`): the rail / bottom bar is no longer one texture. Each tab caches its
+   resting look (rail colour, secondary tint) as its own small texture; the selected card and the selected look
+   (primary tint) sit above it and are shown by layer alpha only; badge + ripple stay in the tappable, speaking box
+   on top. A switch flips four layer alphas and re-renders no texture; a rail tap's ripple no longer re-renders the
+   rail texture either. Labels in the looks are drawn (`CcTabText`, `BasicText`'s layout/clip/paint via
+   `TextMeasurer`) so each tab is still exactly one accessibility node.
+2. `ControlCenterRegionLayer.kt:40` + `ControlCenterScreenSlots.kt:73,98,194` `ccSlotCachesRegions`: region textures on
+   a kept-alive screen (the Map's side column) are cached only while the screen is shown. Parking drops the texture
+   in the switch frame itself (read while drawing), so a hidden screen is never re-rendered; on a return the column
+   draws straight onto the window and its texture is rebuilt 4 frames later on a quiet frame. Same pixels either way
+   (the region paints its own opaque background).
+- Tried, not kept: splitting the header into a title texture and a pills texture. It saved ~0.5 ms of `drawLayer`
+  but adds a grouping node to the uiautomator tree (Compose exposes the extra container), so a11y would not be
+  identical.
+
+| Map → Alerts | official 1.311 (16 taps) | `cc-render` (16 taps) |
+|---|---|---|
+| Frames over 32 ms per tap | 2 ×14, 1 ×1, 0 ×1 (28) | 1 ×10, 2 ×1, 0 ×5 (12) |
+| Worst frame, median ms | 45 | 34 |
+| Worst frame range ms | 26–56 | 27–56 |
+| Sum of frames over 32 ms, median ms | 83 | 34 |
+| Frames over 16 ms, total | 79 | 53 |
+
+| Alerts → Map (BACK) | official 1.311 (16) | of it, last round (4) | `cc-render` (16) |
+|---|---|---|---|
+| Frames over 32 ms | 20 | 7 | 29 |
+| Worst frame, median ms | 42 | 45 | 42 |
+
+- Traced switch frame on `cc-render`: the only texture re-rendered is the header (title, 0.8–1.1 ms `drawLayer`,
+  1.9–2.4 ms `flush layers`, was 5–6 ms); no rail, no side column on any frame after the tap. Render thread of the
+  switch frame 11–21 ms (1.311: 17–24 ms traced). The switch frame's main thread is now the larger half (25–30 ms
+  traced: composition 13–17 ms, record 7–12 ms).
+- The return is not improved: on the branch it is 2 frames over 32 ms per tap like the last official round in the
+  same house state (the house change between rounds moved the official return numbers too). The side column drawing
+  straight for 4 frames after a return did not show up as a new long frame in the traces.
+- Graphics memory after leaving: 46–47 MB on the branch (official 47–78 MB; the parked side column texture is gone).
+- Accessibility (full uiautomator dump, Map and Alerts): same nodes, order, bounds, flags and selected state as
+  1.311; differences are only the house data (an alert cleared → "Alerts, 3", one fewer attention row, a person
+  home, clock).
+- **Target (no switch frame over 32 ms) still not met:** 5 of 16 taps have none (1.311: 1 of 16); most taps have one
+  frame of 32–40 ms. What remains on that frame is main thread (Alerts composition and draw recording) plus the
+  window's GPU command submission (`flush commands` 3–8 ms) and swap; the return switch is unchanged.
