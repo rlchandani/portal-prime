@@ -29,7 +29,8 @@ object CalendarHelper {
       }.build()
 
       val events = mutableListOf<CalendarEvent>()
-      context.contentResolver.query(
+      // Unstable per-call client: an update of the calendar provider's app must not kill Home.
+      UnstableProvider.call(context.contentResolver, CalendarContract.AUTHORITY) { client -> client.query(
           uri,
           arrayOf(
               CalendarContract.Instances.EVENT_ID,
@@ -65,7 +66,7 @@ object CalendarHelper {
           )
           if (events.size >= 10) break
         }
-      }
+      } }
       events
     }.getOrDefault(emptyList())
   }

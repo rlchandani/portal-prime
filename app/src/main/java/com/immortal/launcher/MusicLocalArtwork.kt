@@ -58,8 +58,9 @@ internal object MusicLocalArtwork {
     if (maxEdge <= 0 || routeFor(uri) != MusicArtworkRoute.LOCAL) return null
     return try {
       admission.run {
-        val raw = readLocal(uri) {
-          resolver.openInputStream(Uri.parse(it).normalizeScheme())
+        // content:// covers come from other apps; read them through an unstable client (UnstableProvider).
+        val raw = UnstableProvider.withStream(resolver, Uri.parse(uri).normalizeScheme()) { open ->
+          readLocal(uri) { open() }
         } ?: return@run null
         if (Thread.currentThread().isInterrupted) return@run null
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
