@@ -366,6 +366,17 @@
     const cellW = (W - 6 * vmin - (n - 1) * 2 * vmin) / n, cellH = H - 6 * vmin;
     return aspects.map(a => window.SS.containEdge(a, cellW, cellH));
   };
+  // Cinema letterbox (mode-impls cinema layoutImage; styles.css .ss-scope 11% / 11%): a photo
+  // up to 2.2:1 is contained, unmoving, in the 78 %-high scope. Wider photos are cropped,
+  // drift and may follow a face, so they keep their former copy (null).
+  window.SS.CINEMA_SCOPE = .78;
+  window.SS.CINEMA_WIDE = 2.2;
+  window.SS.cinemaDrawnEdge = function (a, W, H) {
+    const r = ratioOf(a);
+    if (r > window.SS.CINEMA_WIDE) return null;
+    const scopeH = H * window.SS.CINEMA_SCOPE, w = Math.min(W, scopeH * r);
+    return Math.max(w, w / r);
+  };
   // Gallery wall on a compact screen (mock AB.galleryWall): the tile count follows the area.
   // Upright 7 tiles in rows of ~0.2 H above the clock; turned 6 tiles in rows of >= 0.42 H.
   // The Portal+ ("L") keeps its measured layout (null).

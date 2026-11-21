@@ -121,3 +121,25 @@ test('Polaroid print box and the Diptych cells', () => {
   const [land] = SS.diptychDrawnEdges([1.5], W, H);
   near(land, Math.min(W - 6 * vmin, (H - 6 * vmin) * 1.5));
 });
+
+test('Cinema: a contained photo at its drawn size in the 78 % scope; wide photos keep their copy', () => {
+  const scopeH = H * .78;
+  near(SS.cinemaDrawnEdge(4 / 3, W, H), scopeH * 4 / 3);
+  assert.equal(deliver(HOST, SS.largeEdge(2400, SS.cinemaDrawnEdge(4 / 3, W, H), DPR)), 1500);
+  near(SS.cinemaDrawnEdge(3 / 4, W, H), scopeH, 1e-6);
+  assert.equal(deliver(HOST, SS.largeEdge(2400, SS.cinemaDrawnEdge(3 / 4, W, H), DPR)), 1200);
+  near(SS.cinemaDrawnEdge(2.2, W, H), W, 1e-6, 'a 2.2:1 photo is the screen width');
+  assert.equal(SS.cinemaDrawnEdge(2.21, W, H), null, 'wide photos are cropped and drift');
+  assert.equal(SS.cinemaDrawnEdge(3, W, H), null);
+  assert.equal(SS.largeEdge(2400, SS.cinemaDrawnEdge(3, W, H) ?? undefined, DPR), 2400);
+});
+
+test('Cinema: the copy covers the laid-out image box for every contained shape (property)', () => {
+  // Mirrors mode-impls cinema layoutImage for a non-wide photo.
+  for (let r = .3; r <= 2.2; r += .01) {
+    const scopeH = H * .78, w = Math.min(W, scopeH * r), h = w / r;
+    const copy = deliver(HOST, SS.largeEdge(2400, SS.cinemaDrawnEdge(r, W, H), DPR));
+    assert.ok(copy >= Math.ceil(Math.max(w, h) * DPR) - 1e-9, `${r}: ${copy}`);
+    assert.ok(copy <= 2400);
+  }
+});

@@ -88,7 +88,7 @@ internal class FilmstripEngine(
       discard = ::discardScene,
       admit = { prepared ->
         if (closed || prepared.revision != preparationRevision) discardScene(prepared)
-        else try { admit(prepared) } catch (_: RuntimeException) { onFailure() }
+        else warmThenAdmit(prepared)
       })
   private val tick = Runnable { if (!closed && !userPaused) move(+1) }
   private val transformCurve = PathInterpolator(.22f, 1f, .36f, 1f)
@@ -215,6 +215,19 @@ internal class FilmstripEngine(
     }
   }
 
+  /** Uploads the deck's pixels a photo at a time (FilmstripTextureWarmup), then admits it. */
+  private fun warmThenAdmit(prepared: Scene) {
+    val steps = prepared.images.map {
+      if (prepared.backdropOnly) listOf(it.backdrop) else listOf(it.photo, it.backdrop)
+    }
+    FilmstripTextureWarmup(steps,
+        prepare = Bitmap::prepareToDraw,
+        isCurrent = { !closed && prepared.revision == preparationRevision },
+        post = { step, delay, discard -> ui.postOwnedDelayed(step, delay, discard) },
+        onReady = { try { admit(prepared) } catch (_: RuntimeException) { onFailure() } },
+        onAbandon = { discardScene(prepared) }).start()
+  }
+
   private fun admit(prepared: Scene) {
     val span = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.NATIVE_FILMSTRIP_ADMISSION)
     try {
@@ -246,7 +259,7 @@ internal class FilmstripEngine(
           scaleType = ImageView.ScaleType.FIT_XY
           setImageBitmap(pixels.photo)
         }
-        val dimmer = View(context).apply { setBackgroundColor(Color.BLACK); alpha = .45f }
+        val dimmer = FlatDimmer(context).apply { setBackgroundColor(Color.BLACK); alpha = .45f }
         val container = FrameLayout(context).apply {
           outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
@@ -453,6 +466,15 @@ internal class FilmstripEngine(
     // Never recycle a bitmap previously handed to a View; RenderThread may still own its display list.
 
   }
+}
+
+/**
+ * A card's black dimmer. One opaque fill at the view's alpha draws the same pixels as that fill
+ * drawn into its own offscreen layer and composited at the alpha, so it skips the layer (one per
+ * card, each a full card-sized render target, built in the deck's admission frame).
+ */
+internal class FlatDimmer(context: Context) : View(context) {
+  override fun hasOverlappingRendering(): Boolean = false
 }
 
 /** Legacy vignette stays above the photo stage, below the controller's native clock/overlays. */

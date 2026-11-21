@@ -1734,9 +1734,9 @@
     function layoutImage(layer, u) {
       const p = layer.photo; if (!p) return;
       const image = layer.img, viewportW = ctx.root.clientWidth || ctx.W,
-        viewportH = ctx.root.clientHeight || ctx.H, scopeH = viewportH * .78;
+        viewportH = ctx.root.clientHeight || ctx.H, scopeH = viewportH * SS.CINEMA_SCOPE;
     const raw = aspect(p), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
-    const wide = ratio > 2.2, W = wide ? viewportW : Math.min(viewportW, scopeH * ratio), H = wide ? scopeH : W / ratio;
+    const wide = ratio > SS.CINEMA_WIDE, W = wide ? viewportW : Math.min(viewportW, scopeH * ratio), H = wide ? scopeH : W / ratio;
     image.style.width = W + "px"; image.style.height = H + "px";
     image.style.left = ((viewportW - W) / 2) + "px"; image.style.top = ((scopeH - H) / 2) + "px";
     image.style.right = "auto"; image.style.bottom = "auto";
@@ -1783,7 +1783,10 @@
     if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
       const c = SS.counts(deck), p = SS.take(deck, ctx.cursor, [c.pano ? "pano" : "landscape"])[0];
-      const u = await t.publish(() => ctx.url(p, 2400));
+      // Portal+: a contained photo is asked for at its drawn size (SS.cinemaDrawnEdge).
+      const u = await t.publish(() => ctx.url(p, 2400, !compactClass(ctx) && knownShape(p) ?
+        SS.cinemaDrawnEdge(aspect(p), ctx.root.clientWidth || ctx.W, ctx.root.clientHeight || ctx.H) ?? undefined :
+        undefined));
       if (u === false || !await t.load(u) || disposed) return false;
       return t.publish(() => {
         if (disposed || !dissolve.active()) return false;
