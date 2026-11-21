@@ -73,7 +73,8 @@ class ApkInstallActivity : ComponentActivity() {
 
     // Copy the APK somewhere we control (the daemon needs a real file path, and
     // we parse it for the app's name/icon).
-    val apk = IncomingApkSnapshot.copy(cacheDir) { contentResolver.openInputStream(src) }
+    // The sharing app's provider is read through an unstable client, so its update can't kill Home.
+    val apk = UnstableProvider.withStream(contentResolver, src) { open -> IncomingApkSnapshot.copy(cacheDir, open) }
     if (apk == null) {
       finish()
       return

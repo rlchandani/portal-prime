@@ -7,7 +7,6 @@
 package com.immortal.launcher
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
@@ -17,14 +16,15 @@ import org.json.JSONObject
 
 /** Only finite IPC configuration. No audio probe or credential fields cross this boundary. */
 internal object RemoteCompanionJarvis {
-  private val uri by lazy { Uri.parse("content://com.portal.assistant.control") }
+  /** Reached only through a per-call unstable client: an in-place Jarvis update must not take Home down with it. */
+  private const val AUTHORITY = "com.portal.assistant.control"
   private val gate = Semaphore(1)
   private val ipc = Executors.newSingleThreadExecutor { task -> Thread(task, "remote-jarvis-ipc").apply { isDaemon = true } }
   private fun call(c: Context, method: String, extras: Bundle? = null): Bundle? {
     if (!gate.tryAcquire()) return null
     val result = try {
       ipc.submit<Bundle?> {
-        try { runCatching { c.contentResolver.call(uri, method, null, extras) }.getOrNull() }
+        try { UnstableProvider.call(c.contentResolver, AUTHORITY) { it.call(method, null, extras) } }
         finally { gate.release() }
       }
     } catch (e: Exception) { gate.release(); return null }
@@ -40,7 +40,7 @@ internal object RemoteCompanionJarvis {
     if (!gate.tryAcquire()) return
     try {
       ipc.execute {
-        try { runCatching { c.applicationContext.contentResolver.call(uri, "warm", null, null) } }
+        try { UnstableProvider.call(c.applicationContext.contentResolver, AUTHORITY) { it.call("warm", null, null) } }
         finally { gate.release() }
       }
     } catch (e: Exception) { gate.release() }
