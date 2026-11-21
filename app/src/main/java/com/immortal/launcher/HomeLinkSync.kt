@@ -21,6 +21,10 @@ import java.util.concurrent.Executors
  * POSTs its sealed vault to the sender's `/remote/homelinkpeer` and merges the sealed, signed
  * reply. Startup announces, which is the catch-up path after being off. A removal is a tombstone
  * in the vault, so "Remove Lakeview" reaches every Portal and wipes its key there too.
+ *
+ * Measurement builds only ([HomeLinkGate.VAULT_SYNC]): elsewhere nothing here starts, signals or
+ * answers, because the vault carries the identity's private key and a phone holding the household
+ * key could pose as a Portal to fetch it.
  */
 internal object HomeLinkSync {
   private const val TAG = "HearthpaneHomeLinkSync"
@@ -36,6 +40,7 @@ internal object HomeLinkSync {
 
   /** Wires the bus signal, then (off the main thread: it reads the Keystore) the store's change listener. */
   fun install(context: Context) {
+    if (!HomeLinkGate.VAULT_SYNC) return
     val app = context.applicationContext
     HouseholdBus.register(HomeLinkSyncWire.SIGNAL_TYPE) { ctx, m -> onSignal(ctx, m) }
     net.execute {
@@ -45,6 +50,7 @@ internal object HomeLinkSync {
   }
 
   fun handle(context: Context, req: FleetHttpServer.Request): FleetHttpServer.Response {
+    if (!HomeLinkGate.VAULT_SYNC) return RemoteFeatureRoutes.json(404, RemoteFeatureRoutes.error("not_found"))
     val repo = HomeLinkRepository.get(context)
     return HomeLinkSyncRoute(
         key = { HouseholdKey.get(context) }, selfId = { selfId(context) }, clock = System::currentTimeMillis, replay = replay,
@@ -54,6 +60,7 @@ internal object HomeLinkSync {
   }
 
   fun signal(context: Context) {
+    if (!HomeLinkGate.VAULT_SYNC) return
     val app = context.applicationContext
     net.execute {
       val key = HouseholdKey.get(app) ?: return@execute
