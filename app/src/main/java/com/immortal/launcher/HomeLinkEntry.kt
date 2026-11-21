@@ -62,7 +62,7 @@ internal object HomeLinkCopy {
   const val CANCEL = "Cancel"
   const val JOIN_TITLE = "Join a household"
   const val JOIN_H2 = "Type the code from their Portal"
-  const val JOIN_HOW = "Codes are 9 letters and numbers. Ask the person who sent it to read it out."
+  const val JOIN_HOW = "Codes are 10 letters and numbers. Ask the person who sent it to read it out."
   const val JOIN = "Join"
   const val VERIFY_LEDE = "Both screens show the same four pictures if the connection is really between your two homes. Compare them on a phone call or in person."
   const val MATCH = "They match"
@@ -90,6 +90,8 @@ internal object HomeLinkCopy {
         "The pictures didn’t match, so something may be in between your Portals. Nothing was shared and no keys were saved. Try again with a new code.")
     HomeLinkFailure.TAMPERED -> Failure("We stopped the pairing",
         "Something didn’t check out between your Portals. Nothing was shared and no keys were saved. Try again with a new code.")
+    HomeLinkFailure.TOO_MANY_TRIES -> Failure("This code stopped working",
+        "It was typed wrong three times, so we switched it off to keep guessers out. Nothing was shared. Make a new code and read it out again.")
     HomeLinkFailure.EXPIRED -> Failure("This code ran out",
         "Codes work for 10 minutes and only once. Nothing was shared. Make a new code and read it out again.")
   }

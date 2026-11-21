@@ -53,12 +53,15 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlinx.coroutines.delay
+import java.security.SecureRandom
 
 /**
  * The Calls app (absorbs Home's old Calls tile): rooms in this home with presence, Recent (missed
  * and history), Call everyone, Settings, and a way into Portal's own Messenger/WhatsApp calling.
  */
 class CallsActivity : ComponentActivity() {
+  private val homeLinks by lazy { HomeLinkFeature(SecureRandom()) }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val start = when (intent.getStringExtra(EXTRA_TAB)) {
@@ -70,7 +73,7 @@ class CallsActivity : ComponentActivity() {
       PortalPrimeTheme(darkTheme = false) {
         // Grandma mode replaces the whole app with big faces (set up on this Portal only).
         val rules by CallAutoAnswerStore.flow(this).collectAsState()
-        if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, onBack = ::finish)
+        if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, homeLinks, onBack = ::finish)
       }
     }
     // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
@@ -118,7 +121,7 @@ internal fun callsSurface(): CallSurface {
 }
 
 @Composable
-private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
+private fun CallsApp(start: CallsTab, homeLinks: HomeLinkFeature, onBack: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   var tab by rememberSaveable { mutableStateOf(start) }
@@ -155,7 +158,7 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
     if (everyone) Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { everyone = false }) }
     if (loopback && BuildConfig.PORTAL_CALL_LOOPBACK) CallLoopbackScreen(onClose = { loopback = false })
     if (testMessage && BuildConfig.PORTAL_CALL_LOOPBACK) CallMessageTestSheet(onDismiss = { testMessage = false })
-    if (linkTest && BuildConfig.PORTAL_CALL_LOOPBACK) HomeLinkLoopbackScreen(onClose = { linkTest = false })
+    if (linkTest && BuildConfig.PORTAL_CALL_LOOPBACK) HomeLinkLoopbackScreen(homeLinks, onClose = { linkTest = false })
   }
 }
 

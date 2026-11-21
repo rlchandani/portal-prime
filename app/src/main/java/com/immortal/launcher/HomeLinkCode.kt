@@ -9,24 +9,36 @@ package com.immortal.launcher
 import java.security.SecureRandom
 
 /**
- * The one-time code that introduces two homes (mock `inviteScr`: `MPL-7Q4-K2P`, 10 minutes, works
- * once). Nine symbols from Crockford's 32-symbol alphabet: 45 bits, read out over a phone call.
+ * The one-time code that introduces two homes (mock `inviteScr`: `MPT-7Q4-K2PA`, 10 minutes,
+ * works once). Ten symbols from Crockford's 32-symbol alphabet, read out over a phone call, split
+ * the way magic-wormhole splits its codes:
  *
- * The code only introduces: the relay is given [mailboxId] (a hash, never the code) and messages
- * carry a MAC under [macKey] so strangers' messages are ignored. A relay that brute-forces the
- * code from the mailbox id still cannot sit in the middle unnoticed: the safety pictures
- * ([HomeLinkSafety]) carry the security, behind a commit-then-reveal exchange ([HomeLinkInviter]).
+ * - [nameplate] (first 3 symbols, 15 bits) is **public**: it only says which relay mailbox to
+ *   meet in ([mailboxId]). It is not a secret and carries no information about the rest.
+ * - [secret] (last 7 symbols, 35 bits) never reaches the relay in any form it can test offline:
+ *   it only feeds the PAKE ([HomeLinkPake]), so each guess at it costs one live join attempt, and
+ *   an invite allows at most [HomeLinkInviter.MAX_TRIES] of those.
+ *
+ * After the PAKE, the safety pictures ([HomeLinkSafety]) are a second, independent check.
  */
 @JvmInline
 internal value class HomeLinkCode private constructor(val value: String) {
-  /** `MP7-Q4K-2PA`. */
-  val display: String get() = value.chunked(GROUP).joinToString("-")
+  /** Locates the mailbox. Public. */
+  val nameplate: String get() = value.take(NAMEPLATE)
+
+  /** Feeds the PAKE only. Never log, never send. */
+  val secret: String get() = value.drop(NAMEPLATE)
+
+  /** `MPT-7Q4-K2PA`: nameplate, then the secret in two groups. */
+  val display: String get() = listOf(nameplate, secret.take(GROUP), secret.drop(GROUP)).joinToString("-")
 
   companion object {
     const val ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-    const val LENGTH = 9
+    const val LENGTH = 10
+    const val NAMEPLATE = 3
+    const val SECRET_BITS = (LENGTH - NAMEPLATE) * 5
     private const val GROUP = 3
-    private val SALT = HomeLinkHash.utf8("hearthpane-homelink-code-v1")
+    private val SALT = HomeLinkHash.utf8("hearthpane-homelink-nameplate-v2")
     private const val MAILBOX_HEX = 32
 
     fun generate(random: SecureRandom): HomeLinkCode =
@@ -40,14 +52,13 @@ internal value class HomeLinkCode private constructor(val value: String) {
       return HomeLinkCode(cleaned)
     }
 
-    private fun root(code: HomeLinkCode): ByteArray = HomeLinkHash.hmac(SALT, HomeLinkHash.utf8(code.value))
-
-    /** Where both homes meet on the relay. Hex, 128 bits, derived one-way from the code. */
+    /**
+     * Where both homes meet on the relay: a function of the public [nameplate] only, so it says
+     * nothing about [secret] (the S1 review found the old hash-of-the-whole-code id let anyone
+     * who saw it brute-force the 45-bit code offline).
+     */
     fun mailboxId(code: HomeLinkCode): String =
-        HomeLinkHash.hex(HomeLinkHash.hmac(root(code), HomeLinkHash.utf8("mailbox"))).take(MAILBOX_HEX)
-
-    /** Authenticates pairing messages as coming from someone who has the code. */
-    fun macKey(code: HomeLinkCode): ByteArray = HomeLinkHash.hmac(root(code), HomeLinkHash.utf8("mac"))
+        HomeLinkHash.hex(HomeLinkHash.hmac(SALT, HomeLinkHash.utf8(code.nameplate))).take(MAILBOX_HEX)
   }
 }
 

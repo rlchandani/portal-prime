@@ -10,33 +10,54 @@ import org.json.JSONException
 import org.json.JSONObject
 
 /**
- * The three pairing messages that cross the relay when two homes link ([HomeLinkInviter]).
- * Everything here is public to the relay except the joiner's key and name, which stay hidden
- * behind [Commit.commitment] until the inviter has revealed its own.
+ * The four pairing messages that cross the relay when two homes link ([HomeLinkInviter]), in a
+ * fixed order: [Hello] (seq 0) → [Commit] (1) → [Reveal] (2) → [Open] (3). Each carries its type
+ * and [seq]; the session MAC covers both, so a relay can't relabel, reorder or reflect one, and a
+ * side rejects anything out of sequence.
+ *
+ * What the relay sees: the mailbox id (from the public nameplate), two PAKE shares (random curve
+ * points), MACs under the PAKE session key, the inviter's key and name, and — only after the
+ * inviter has revealed — the joiner's. Nothing it can test a guess at the code's secret against.
  */
 internal sealed interface HomeLinkMessage {
   val mailbox: String
+  val seq: Int
   val mac: String
 
-  /** Joiner → inviter: a hash of (key, nonce, name), nothing readable. */
-  data class Commit(override val mailbox: String, val commitment: String, override val mac: String = "") : HomeLinkMessage
+  /** Inviter → mailbox, when the invite is made: its PAKE share. Unauthenticated by design; the PAKE key covers it. */
+  data class Hello(override val mailbox: String, val share: String, override val seq: Int = SEQ) : HomeLinkMessage {
+    override val mac: String get() = ""
+    companion object { const val SEQ = 0 }
+  }
+
+  /** Joiner → inviter: its PAKE share and a hash of (key, nonce, name), nothing readable. */
+  data class Commit(override val mailbox: String, val share: String, val commitment: String, override val mac: String = "",
+                    override val seq: Int = SEQ) : HomeLinkMessage {
+    companion object { const val SEQ = 1 }
+  }
 
   /** Inviter → joiner: its key and name, signed. */
   data class Reveal(override val mailbox: String, val key: String, val name: String, val sig: String,
-                    override val mac: String = "") : HomeLinkMessage
+                    override val mac: String = "", override val seq: Int = SEQ) : HomeLinkMessage {
+    companion object { const val SEQ = 2 }
+  }
 
   /** Joiner → inviter: what it committed to, signed over the inviter's key. */
   data class Open(override val mailbox: String, val key: String, val nonce: String, val name: String, val sig: String,
-                  override val mac: String = "") : HomeLinkMessage
+                  override val mac: String = "", override val seq: Int = SEQ) : HomeLinkMessage {
+    companion object { const val SEQ = 3 }
+  }
 }
 
 /** Strict JSON codec: versioned, bounded, every field required (anything off parses to null). */
 internal object HomeLinkWire {
-  const val VERSION = 1
+  const val VERSION = 2
   const val MAX_NAME = 40
   const val MAX_FIELD = 200
   const val MAX_BYTES = 4_096
+  private const val MAX_SEQ = 15
   private val MAILBOX = Regex("^[0-9a-f]{32}$")
+  private const val HELLO = "hello"
   private const val COMMIT = "commit"
   private const val REVEAL = "reveal"
   private const val OPEN = "open"
@@ -46,11 +67,12 @@ internal object HomeLinkWire {
       name.isNotBlank() && name.length <= MAX_NAME && name.none { Character.isISOControl(it) }
 
   fun encode(m: HomeLinkMessage): String {
-    val o = JSONObject().put("v", VERSION).put("b", m.mailbox).put("m", m.mac)
+    val o = JSONObject().put("v", VERSION).put("q", m.seq).put("b", m.mailbox)
     when (m) {
-      is HomeLinkMessage.Commit -> o.put("t", COMMIT).put("c", m.commitment)
-      is HomeLinkMessage.Reveal -> o.put("t", REVEAL).put("k", m.key).put("n", m.name).put("s", m.sig)
-      is HomeLinkMessage.Open -> o.put("t", OPEN).put("k", m.key).put("r", m.nonce).put("n", m.name).put("s", m.sig)
+      is HomeLinkMessage.Hello -> o.put("t", HELLO).put("y", m.share)
+      is HomeLinkMessage.Commit -> o.put("t", COMMIT).put("y", m.share).put("c", m.commitment).put("m", m.mac)
+      is HomeLinkMessage.Reveal -> o.put("t", REVEAL).put("k", m.key).put("n", m.name).put("s", m.sig).put("m", m.mac)
+      is HomeLinkMessage.Open -> o.put("t", OPEN).put("k", m.key).put("r", m.nonce).put("n", m.name).put("s", m.sig).put("m", m.mac)
     }
     return o.toString()
   }
@@ -58,27 +80,30 @@ internal object HomeLinkWire {
   fun parse(text: String): HomeLinkMessage? {
     if (text.length > MAX_BYTES) return null
     val o = try { JSONObject(text) } catch (e: JSONException) { return null }
-    if (o.optInt("v", -1) != VERSION) return null
+    if (o.opt("v") != VERSION) return null
+    val seq = (o.opt("q") as? Int)?.takeIf { it in 0..MAX_SEQ } ?: return null
     val mailbox = o.optString("b").takeIf { MAILBOX.matches(it) } ?: return null
-    val mac = field(o, "m") ?: return null
     return when (o.optString("t")) {
-      COMMIT -> HomeLinkMessage.Commit(mailbox, field(o, "c") ?: return null, mac)
+      HELLO -> HomeLinkMessage.Hello(mailbox, field(o, "y") ?: return null, seq)
+      COMMIT -> HomeLinkMessage.Commit(mailbox, field(o, "y") ?: return null, field(o, "c") ?: return null,
+          field(o, "m") ?: return null, seq)
       REVEAL -> HomeLinkMessage.Reveal(mailbox, field(o, "k") ?: return null, name(o) ?: return null,
-          field(o, "s") ?: return null, mac)
+          field(o, "s") ?: return null, field(o, "m") ?: return null, seq)
       OPEN -> HomeLinkMessage.Open(mailbox, field(o, "k") ?: return null, field(o, "r") ?: return null,
-          name(o) ?: return null, field(o, "s") ?: return null, mac)
+          name(o) ?: return null, field(o, "s") ?: return null, field(o, "m") ?: return null, seq)
       else -> null
     }
   }
 
-  /** The exact text the code MAC covers: every field but the MAC, length-prefixed, type first. */
+  /** The exact text the session MAC covers: version, type, seq, then every field but the MAC, length-prefixed. */
   fun signable(m: HomeLinkMessage): String {
     val parts = when (m) {
-      is HomeLinkMessage.Commit -> listOf(COMMIT, m.mailbox, m.commitment)
+      is HomeLinkMessage.Hello -> listOf(HELLO, m.mailbox, m.share)
+      is HomeLinkMessage.Commit -> listOf(COMMIT, m.mailbox, m.share, m.commitment)
       is HomeLinkMessage.Reveal -> listOf(REVEAL, m.mailbox, m.key, m.name, m.sig)
       is HomeLinkMessage.Open -> listOf(OPEN, m.mailbox, m.key, m.nonce, m.name, m.sig)
     }
-    return (listOf("v$VERSION") + parts).joinToString("") { "${it.length}:$it" }
+    return (listOf("v$VERSION", "q${m.seq}") + parts).joinToString("") { "${it.length}:$it" }
   }
 
   private fun field(o: JSONObject, key: String): String? =

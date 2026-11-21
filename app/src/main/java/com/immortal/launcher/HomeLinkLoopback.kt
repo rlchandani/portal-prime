@@ -39,17 +39,17 @@ internal object HomeLinkLoopback {
 
   fun exchange(invite: HomeLinkInvite, typed: HomeLinkCode, inviter: HomeLinkSelf, joiner: HomeLinkSelf, random: SecureRandom,
                now: Long): Result {
-    var i = HomeLinkInviter.start(invite)
-    val j1 = HomeLinkJoiner.start(typed, joiner, random)
-    var j = j1.state
-    var toInviter: HomeLinkMessage? = j1.outgoing
-    while (toInviter != null) {
-      val iStep = HomeLinkInviter.receive(i, inviter, relay(toInviter) ?: break, now)
-      i = iStep.state
-      val toJoiner = iStep.outgoing?.let(::relay) ?: break
-      val jStep = HomeLinkJoiner.receive(j, joiner, toJoiner)
+    val hello = HomeLinkInviter.start(invite, random)
+    var i = hello.state
+    var j = HomeLinkJoiner.start(typed, random)
+    var toJoiner: HomeLinkMessage? = hello.outgoing
+    while (toJoiner != null) {
+      val jStep = HomeLinkJoiner.receive(j, joiner, relay(toJoiner) ?: break, random)
       j = jStep.state
-      toInviter = jStep.outgoing
+      val toInviter = jStep.outgoing?.let(::relay) ?: break
+      val iStep = HomeLinkInviter.receive(i, inviter, toInviter, now)
+      i = iStep.state
+      toJoiner = iStep.outgoing
     }
     return Result(i, j)
   }
@@ -61,11 +61,11 @@ private enum class LinkTestStage { INVITE, JOIN, VERIFY, CONNECTED, FAILED }
 
 /** The "Link homes test" overlay: Invite → Join (as the other home) → Verify → Connected or stopped. */
 @Composable
-internal fun HomeLinkLoopbackScreen(onClose: () -> Unit) {
+internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Unit) {
   val p = LocalApprovedPalette.current
-  val random = remember { SecureRandom() }
-  var invite by remember { mutableStateOf(HomeLinkInvite(HomeLinkCode.generate(random), System.currentTimeMillis())) }
-  var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+  val random = feature.random
+  var invite by remember { mutableStateOf(HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())) }
+  var now by remember { mutableLongStateOf(feature.clock()) }
   var stage by remember { mutableStateOf(LinkTestStage.INVITE) }
   var entry by remember { mutableStateOf(HomeLinkCodeEntry()) }
   var result by remember { mutableStateOf<HomeLinkLoopback.Result?>(null) }
@@ -74,7 +74,7 @@ internal fun HomeLinkLoopbackScreen(onClose: () -> Unit) {
   var qr by remember { mutableStateOf<Bitmap?>(null) }
   var noAnswer by remember { mutableStateOf(false) }
   LaunchedEffect(invite) { qr = withContext(Dispatchers.Default) { lanSetupQr(HomeLinkCopy.qrText(invite.code), QR_PX) } }
-  LaunchedEffect(Unit) { while (true) { now = System.currentTimeMillis(); delay(TICK_MS) } }
+  LaunchedEffect(Unit) { while (true) { now = feature.clock(); delay(TICK_MS) } }
   LaunchedEffect(now, stage) {
     if (stage == LinkTestStage.INVITE && invite.isExpired(now)) { failure = HomeLinkFailure.EXPIRED; stage = LinkTestStage.FAILED }
   }
@@ -82,7 +82,7 @@ internal fun HomeLinkLoopbackScreen(onClose: () -> Unit) {
     val code = typed ?: return@LaunchedEffect
     val r = withContext(Dispatchers.Default) {
       HomeLinkLoopback.exchange(invite, code, HomeLinkSelf(HomeLinkIdentity.generate(random), "Maple House"),
-          HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview"), random, System.currentTimeMillis())
+          HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview"), random, feature.clock())
     }
     typed = null
     result = r
@@ -94,7 +94,7 @@ internal fun HomeLinkLoopbackScreen(onClose: () -> Unit) {
     }
   }
   fun restart() {
-    invite = HomeLinkInvite(HomeLinkCode.generate(random), System.currentTimeMillis())
+    invite = HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())
     entry = HomeLinkCodeEntry(); result = null; noAnswer = false; stage = LinkTestStage.INVITE
   }
   Box(Modifier.fillMaxSize().background(p.background)) {

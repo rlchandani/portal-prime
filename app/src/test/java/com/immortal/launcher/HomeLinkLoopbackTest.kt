@@ -15,7 +15,7 @@ class HomeLinkLoopbackTest {
   private val random = SecureRandom()
   private val maple = HomeLinkSelf(HomeLinkIdentity.generate(random), "Maple House")
   private val lake = HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview")
-  private val invite = HomeLinkInvite(HomeLinkCode.parse("MP7Q4K2PA")!!, createdAt = 0L)
+  private val invite = HomeLinkInvite(HomeLinkCode.parse("MPT7Q4K2PA")!!, createdAt = 0L)
 
   @Test fun theRightCodeLeavesBothSidesComparingTheSamePictures() {
     val r = HomeLinkLoopback.exchange(invite, invite.code, maple, lake, random, now = 1_000L)
@@ -27,8 +27,10 @@ class HomeLinkLoopbackTest {
   }
 
   @Test fun aWrongCodeGetsNoAnswerAndTheInviteStaysOpen() {
-    val r = HomeLinkLoopback.exchange(invite, HomeLinkCode.parse("MP7Q4K2PB")!!, maple, lake, random, now = 1_000L)
-    assertEquals(HomeLinkInviterState.Waiting(invite), r.inviter)
+    val r = HomeLinkLoopback.exchange(invite, HomeLinkCode.parse("MPT7Q4K2PB")!!, maple, lake, random, now = 1_000L)
+    val waiting = r.inviter as HomeLinkInviterState.Waiting
+    assertEquals(invite, waiting.invite)
+    assertEquals(1, waiting.failedTries)
     assertTrue(r.joiner is HomeLinkJoinerState.Committing)
   }
 

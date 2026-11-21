@@ -14,10 +14,10 @@ import java.security.SecureRandom
 class HomeLinkCodeTest {
   private val random = SecureRandom()
 
-  @Test fun newCodeIsNineSymbolsFromTheAlphabet() {
+  @Test fun newCodeIsTenSymbolsFromTheAlphabet() {
     repeat(200) {
       val code = HomeLinkCode.generate(random)
-      assertEquals(9, code.value.length)
+      assertEquals(10, code.value.length)
       assertTrue(code.value.all { it in HomeLinkCode.ALPHABET })
     }
   }
@@ -28,44 +28,55 @@ class HomeLinkCodeTest {
     for (c in "ILOU") assertFalse("$c is easy to mishear", c in HomeLinkCode.ALPHABET)
   }
 
-  @Test fun showsInThreeGroups() {
-    assertEquals("MP7-Q4K-2PA", HomeLinkCode.parse("MP7Q4K2PA")!!.display)
+  @Test fun splitsIntoAPublicNameplateAndA35BitSecret() {
+    val code = HomeLinkCode.parse("MPT7Q4K2PA")!!
+    assertEquals("MPT", code.nameplate)
+    assertEquals("7Q4K2PA", code.secret)
+    assertEquals(35, HomeLinkCode.SECRET_BITS)
+  }
+
+  @Test fun showsNameplateThenTheSecretInTwoGroups() {
+    assertEquals("MPT-7Q4-K2PA", HomeLinkCode.parse("MPT7Q4K2PA")!!.display)
   }
 
   @Test fun typedCodesAreForgiving() {
-    val want = HomeLinkCode.parse("MP7Q4K2PA")!!
-    assertEquals(want, HomeLinkCode.parse("mp7-q4k-2pa"))
-    assertEquals(want, HomeLinkCode.parse(" MP7 Q4K 2PA "))
+    val want = HomeLinkCode.parse("MPT7Q4K2PA")!!
+    assertEquals(want, HomeLinkCode.parse("mpt-7q4-k2pa"))
+    assertEquals(want, HomeLinkCode.parse(" MPT 7Q4 K2PA "))
     // O reads as zero, I and L as one (Crockford).
-    assertEquals(HomeLinkCode.parse("A00111BCD"), HomeLinkCode.parse("aOoIiLBCD"))
+    assertEquals(HomeLinkCode.parse("A00111BCDE"), HomeLinkCode.parse("aOoIiLBCDE"))
   }
 
   @Test fun rejectsWrongLengthAndUnknownSymbols() {
     assertNull(HomeLinkCode.parse(""))
-    assertNull(HomeLinkCode.parse("MP7Q4K2P"))
-    assertNull(HomeLinkCode.parse("MP7Q4K2PAA"))
-    assertNull(HomeLinkCode.parse("MP7Q4K2PU"))
-    assertNull(HomeLinkCode.parse("MP7Q4K2P!"))
+    assertNull(HomeLinkCode.parse("MPT7Q4K2P"))
+    assertNull(HomeLinkCode.parse("MPT7Q4K2PAA"))
+    assertNull(HomeLinkCode.parse("MPT7Q4K2PU"))
+    assertNull(HomeLinkCode.parse("MPT7Q4K2P!"))
   }
 
-  @Test fun mailboxIsStableHexAndNeverTheCode() {
-    val code = HomeLinkCode.parse("MP7Q4K2PA")!!
+  @Test fun mailboxIsStableHexFromTheNameplateOnly() {
+    val code = HomeLinkCode.parse("MPT7Q4K2PA")!!
     val box = HomeLinkCode.mailboxId(code)
-    assertEquals(box, HomeLinkCode.mailboxId(HomeLinkCode.parse("mp7-q4k-2pa")!!))
+    assertEquals(box, HomeLinkCode.mailboxId(HomeLinkCode.parse("mpt-7q4-k2pa")!!))
     assertTrue(box.matches(Regex("[0-9a-f]{32}")))
-    assertFalse(box.contains(code.value.lowercase()))
-    assertNotEquals(box, HomeLinkCode.mailboxId(HomeLinkCode.parse("MP7Q4K2PB")!!))
+    assertNotEquals(box, HomeLinkCode.mailboxId(HomeLinkCode.parse("MPM7Q4K2PA")!!))
   }
 
-  @Test fun macKeyDiffersFromMailboxAndPerCode() {
-    val a = HomeLinkCode.parse("MP7Q4K2PA")!!
-    val b = HomeLinkCode.parse("MP7Q4K2PB")!!
-    assertEquals(32, HomeLinkCode.macKey(a).size)
-    assertFalse(HomeLinkCode.macKey(a).contentEquals(HomeLinkCode.macKey(b)))
+  /**
+   * The S1 review's finding: the mailbox id was a hash of the whole code, so whoever saw it could
+   * brute-force the code offline. Now every secret gives the same id, so it is no oracle at all.
+   */
+  @Test fun theMailboxIdSaysNothingAboutTheSecret() {
+    val box = HomeLinkCode.mailboxId(HomeLinkCode.parse("MPT7Q4K2PA")!!)
+    repeat(200) {
+      val other = HomeLinkCode.parse("MPT" + HomeLinkCode.generate(random).secret)!!
+      assertEquals(box, HomeLinkCode.mailboxId(other))
+    }
   }
 
   @Test fun inviteLastsTenMinutes() {
-    val invite = HomeLinkInvite(HomeLinkCode.parse("MP7Q4K2PA")!!, createdAt = 1_000L)
+    val invite = HomeLinkInvite(HomeLinkCode.parse("MPT7Q4K2PA")!!, createdAt = 1_000L)
     assertEquals(1_000L + 10 * 60_000L, invite.expiresAt)
     assertFalse(invite.isExpired(invite.expiresAt - 1))
     assertTrue(invite.isExpired(invite.expiresAt))
@@ -75,7 +86,7 @@ class HomeLinkCodeTest {
   }
 
   @Test fun countdownReadsLikeTheMock() {
-    val invite = HomeLinkInvite(HomeLinkCode.parse("MP7Q4K2PA")!!, createdAt = 0L)
+    val invite = HomeLinkInvite(HomeLinkCode.parse("MPT7Q4K2PA")!!, createdAt = 0L)
     assertEquals("9:42", invite.countdown(18_000L))
     assertEquals("0:05", invite.countdown(invite.expiresAt - 5_000))
     assertEquals("0:00", invite.countdown(invite.expiresAt + 1))

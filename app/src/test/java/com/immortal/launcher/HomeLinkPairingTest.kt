@@ -11,30 +11,38 @@ import org.junit.Test
 import java.security.SecureRandom
 
 /**
- * Linking two homes over an untrusted mailbox: commit → reveal → open → compare pictures.
+ * Linking two homes over an untrusted mailbox: hello → commit → reveal → open → compare pictures.
  * The "relay" here is the test itself, so it can drop, replay, forge and swap messages.
  */
 class HomeLinkPairingTest {
   private val random = SecureRandom()
   private val maple = HomeLinkSelf(HomeLinkIdentity.generate(random), "Maple House")
   private val lake = HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview")
-  private val code = HomeLinkCode.parse("MP7Q4K2PA")!!
+  private val code = HomeLinkCode.parse("MPT7Q4K2PA")!!
+  private val wrong = HomeLinkCode.parse("MPT7Q4K2PB")!!
   private val invite = HomeLinkInvite(code, createdAt = 0L)
+  private val mailbox = HomeLinkCode.mailboxId(code)
   private val now = 60_000L
 
-  private fun commit(self: HomeLinkSelf = lake, c: HomeLinkCode = code) = HomeLinkJoiner.start(c, self, random)
+  private fun hello() = HomeLinkInviter.start(invite, random)
 
-  /** Runs the three messages and returns both sides comparing. */
-  private fun toComparing(): Pair<HomeLinkInviterState, HomeLinkJoinerState> {
-    val j1 = commit()
-    val i1 = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, j1.outgoing!!, now)
-    val j2 = HomeLinkJoiner.receive(j1.state, lake, i1.outgoing!!)
-    val i2 = HomeLinkInviter.receive(i1.state, maple, j2.outgoing!!, now)
-    return i2.state to j2.state
+  private fun commit(h: HomeLinkStep<HomeLinkInviterState>, self: HomeLinkSelf = lake, c: HomeLinkCode = code) =
+      HomeLinkJoiner.receive(HomeLinkJoiner.start(c, random), self, h.outgoing!!, random)
+
+  private fun toInviter(state: HomeLinkInviterState, m: HomeLinkMessage, at: Long = now) = HomeLinkInviter.receive(state, maple, m, at)
+
+  /** Runs the four messages; returns both sides comparing and everything the relay saw. */
+  private fun run(): Triple<HomeLinkInviterState, HomeLinkJoinerState, List<HomeLinkMessage>> {
+    val h = hello()
+    val j1 = commit(h)
+    val i1 = toInviter(h.state, j1.outgoing!!)
+    val j2 = HomeLinkJoiner.receive(j1.state, lake, i1.outgoing!!, random)
+    val i2 = toInviter(i1.state, j2.outgoing!!)
+    return Triple(i2.state, j2.state, listOf(h.outgoing!!, j1.outgoing!!, i1.outgoing!!, j2.outgoing!!))
   }
 
   @Test fun happyPathBothScreensShowTheSamePictures() {
-    val (i, j) = toComparing()
+    val (i, j) = run()
     i as HomeLinkInviterState.Comparing
     j as HomeLinkJoinerState.Comparing
     assertEquals(i.safety, j.safety)
@@ -44,8 +52,15 @@ class HomeLinkPairingTest {
     assertEquals(maple.identity.publicKey, j.peer.publicKey)
   }
 
+  @Test fun messagesGoInOrderWithTheirSequenceNumbers() {
+    val seen = run().third
+    assertEquals(listOf(0, 1, 2, 3), seen.map { it.seq })
+    assertTrue(seen[0] is HomeLinkMessage.Hello && seen[1] is HomeLinkMessage.Commit &&
+        seen[2] is HomeLinkMessage.Reveal && seen[3] is HomeLinkMessage.Open)
+  }
+
   @Test fun theyMatchLinksBothHomesWithPinnedKeys() {
-    val (i, j) = toComparing()
+    val (i, j) = run()
     val linkedI = HomeLinkInviter.confirm(i, matched = true)
     val linkedJ = HomeLinkJoiner.confirm(j, matched = true)
     assertEquals(lake.identity.publicKey, (linkedI as HomeLinkInviterState.Linked).peer.publicKey)
@@ -53,116 +68,246 @@ class HomeLinkPairingTest {
   }
 
   @Test fun theyDontMatchStopsAndKeepsNothing() {
-    val (i, j) = toComparing()
+    val (i, j) = run()
     assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.MISMATCH), HomeLinkInviter.confirm(i, matched = false))
     assertEquals(HomeLinkJoinerState.Failed(HomeLinkFailure.MISMATCH), HomeLinkJoiner.confirm(j, matched = false))
   }
 
   @Test fun confirmOutsideComparingChangesNothing() {
-    val waiting = HomeLinkInviter.start(invite)
+    val waiting = hello().state
     assertSame(waiting, HomeLinkInviter.confirm(waiting, matched = true))
-    val committing = commit().state
-    assertSame(committing, HomeLinkJoiner.confirm(committing, matched = true))
+    val awaiting = HomeLinkJoiner.start(code, random)
+    assertSame(awaiting, HomeLinkJoiner.confirm(awaiting, matched = true))
   }
 
   @Test fun commitSaysNothingAboutTheJoiner() {
-    val wire = HomeLinkWire.encode(commit().outgoing!!)
+    val wire = HomeLinkWire.encode(commit(hello()).outgoing!!)
     assertFalse(wire.contains("Lakeview"))
     assertFalse(wire.contains(lake.identity.publicKey))
   }
 
-  @Test fun aWrongCodeIsIgnoredAndTheInviteStaysOpen() {
-    val stranger = commit(c = HomeLinkCode.parse("MP7Q4K2PB")!!).outgoing!!
-    val waiting = HomeLinkInviter.start(invite)
-    val step = HomeLinkInviter.receive(waiting, maple, stranger, now)
-    assertSame(waiting, step.state)
-    assertNull(step.outgoing)
+  // ---- Offline guessing: nothing the relay sees can be tested against a guess. ----
+
+  @Test fun theSecretNeverCrossesTheRelay() {
+    for (m in run().third) {
+      val wire = HomeLinkWire.encode(m)
+      assertFalse(wire.contains(code.secret))
+      assertFalse(wire.contains(code.value))
+    }
+  }
+
+  /**
+   * Two pairings with the same code: apart from the mailbox (public nameplate), the identity keys
+   * and names, every value on the wire differs. A deterministic function of the secret (like the
+   * old hash-of-the-code mailbox or code-keyed MACs) would repeat and could be brute-forced.
+   */
+  @Test fun nothingDeterministicFromTheSecretCrossesTheRelay() {
+    fun values(ms: List<HomeLinkMessage>): Set<String> = ms.flatMap { m ->
+      val o = org.json.JSONObject(HomeLinkWire.encode(m))
+      o.keys().asSequence().filter { it !in setOf("v", "q", "t", "b", "k", "n") }.map { o.get(it).toString() }.toList()
+    }.toSet()
+    assertEquals(emptySet<String>(), values(run().third) intersect values(run().third))
+  }
+
+  /** Even the right code is no help with a recording: the commit MAC can't be checked without a PAKE scalar. */
+  @Test fun aRecordedTranscriptCantConfirmEvenTheRightCode() {
+    val seen = run().third
+    val hello = seen[0] as HomeLinkMessage.Hello
+    val commit = seen[1] as HomeLinkMessage.Commit
+    val eve = HomeLinkPake.start(code.secret, mailbox, random)
+    for (theirs in listOf(hello.share, commit.share)) {
+      val k = HomeLinkPake.finish(eve, theirs)!!
+      val guess = HomeLinkSession.derive(mailbox, hello.share, commit.share, k)
+      assertFalse(HomeLinkPairingProof.fromPeer(guess, mailbox, commit))
+    }
+  }
+
+  // ---- Online guessing: each try is one join attempt, three per invite. ----
+
+  @Test fun aWrongCodeIsIgnoredAndCountsAsATry() {
+    val h = hello()
+    val step = toInviter(h.state, commit(h, c = wrong).outgoing!!)
     assertEquals(HomeLinkIgnored.WRONG_CODE, step.ignored)
+    assertNull(step.outgoing)
+    assertEquals(1, (step.state as HomeLinkInviterState.Waiting).failedTries)
+  }
+
+  @Test fun threeWrongTriesBurnTheInviteAndTheRightCodeNoLongerWorks() {
+    val h = hello()
+    var state = h.state
+    repeat(HomeLinkInviter.MAX_TRIES) { state = toInviter(state, commit(h, c = wrong).outgoing!!).state }
+    assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.TOO_MANY_TRIES), state)
+    val late = toInviter(state, commit(h).outgoing!!)
+    assertNull(late.outgoing)
+    assertEquals(HomeLinkIgnored.UNEXPECTED, late.ignored)
+  }
+
+  @Test fun twoWrongTriesThenTheRightCodeStillLinks() {
+    val h = hello()
+    var state = h.state
+    repeat(HomeLinkInviter.MAX_TRIES - 1) { state = toInviter(state, commit(h, c = wrong).outgoing!!).state }
+    val ok = toInviter(state, commit(h).outgoing!!)
+    assertTrue(ok.state is HomeLinkInviterState.AwaitingOpen)
+    assertTrue(ok.outgoing is HomeLinkMessage.Reveal)
+  }
+
+  @Test fun aGarbageShareCountsAsATry() {
+    val h = hello()
+    val good = commit(h).outgoing as HomeLinkMessage.Commit
+    val step = toInviter(h.state, good.copy(share = HomeLinkHash.b64(ByteArray(32) { 0xFF.toByte() })))
+    assertEquals(1, (step.state as HomeLinkInviterState.Waiting).failedTries)
+  }
+
+  @Test fun anotherMailboxIsIgnoredWithoutCountingATry() {
+    val h = hello()
+    val other = HomeLinkCode.parse("XYZ7Q4K2PA")!!
+    val stray = (commit(h).outgoing as HomeLinkMessage.Commit).copy(mailbox = HomeLinkCode.mailboxId(other))
+    val step = toInviter(h.state, stray)
+    assertEquals(HomeLinkIgnored.WRONG_CODE, step.ignored)
+    assertSame(h.state, step.state)
   }
 
   @Test fun theCodeWorksOnce() {
-    val first = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, commit().outgoing!!, now)
-    val second = HomeLinkInviter.receive(first.state, maple, commit(HomeLinkSelf(HomeLinkIdentity.generate(random), "Eve")).outgoing!!, now)
+    val h = hello()
+    val first = toInviter(h.state, commit(h).outgoing!!)
+    val second = toInviter(first.state, commit(h, HomeLinkSelf(HomeLinkIdentity.generate(random), "Eve")).outgoing!!)
     assertSame(first.state, second.state)
     assertNull(second.outgoing)
     assertEquals(HomeLinkIgnored.ALREADY_USED, second.ignored)
   }
 
   @Test fun anExpiredInviteFails() {
-    val step = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, commit().outgoing!!, invite.expiresAt)
+    val h = hello()
+    val step = toInviter(h.state, commit(h).outgoing!!, at = invite.expiresAt)
     assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.EXPIRED), step.state)
     assertNull(step.outgoing)
   }
 
+  // ---- Sequence numbers: covered by the MAC, out-of-sequence rejected. ----
+
+  @Test fun theMacCoversTheSequenceNumber() {
+    val h = hello()
+    val j1 = commit(h)
+    val session = (j1.state as HomeLinkJoinerState.Committing).session
+    val c = j1.outgoing as HomeLinkMessage.Commit
+    assertTrue(HomeLinkPairingProof.fromPeer(session, mailbox, c))
+    assertFalse(HomeLinkPairingProof.fromPeer(session, mailbox, c.copy(seq = 3)))
+  }
+
+  @Test fun outOfSequenceMessagesAreRejectedAndDontCountAsTries() {
+    val h = hello()
+    val j1 = commit(h)
+    val session = (j1.state as HomeLinkJoinerState.Committing).session
+    val c = j1.outgoing as HomeLinkMessage.Commit
+    // Relabelled in transit, and re-MAC'd by someone holding the session: both refused.
+    for (m in listOf(c.copy(seq = 2), HomeLinkPairingProof.withMac(session, c.copy(seq = 2)))) {
+      val step = toInviter(h.state, m)
+      assertEquals(HomeLinkIgnored.OUT_OF_SEQUENCE, step.ignored)
+      assertSame(h.state, step.state)
+    }
+    val badHello = (h.outgoing as HomeLinkMessage.Hello).copy(seq = 1)
+    assertEquals(HomeLinkIgnored.OUT_OF_SEQUENCE, HomeLinkJoiner.receive(HomeLinkJoiner.start(code, random), lake, badHello, random).ignored)
+    val i1 = toInviter(h.state, c)
+    val reveal = i1.outgoing as HomeLinkMessage.Reveal
+    val relabelled = HomeLinkPairingProof.withMac(session, reveal.copy(seq = 3))
+    assertEquals(HomeLinkIgnored.OUT_OF_SEQUENCE, HomeLinkJoiner.receive(j1.state, lake, relabelled, random).ignored)
+  }
+
+  // ---- Tampering. ----
+
   @Test fun anOpenThatBreaksItsCommitmentFails() {
-    val j1 = commit()
-    val i1 = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, j1.outgoing!!, now)
-    // A different joiner (same code) answers the reveal: its key was never committed.
+    val h = hello()
+    val j1 = commit(h)
+    val i1 = toInviter(h.state, j1.outgoing!!)
+    val session = (j1.state as HomeLinkJoinerState.Committing).session
+    // Someone holding the session answers with a key that was never committed.
     val impostor = HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview")
-    val other = commit(impostor)
-    val open = HomeLinkJoiner.receive(other.state, impostor, i1.outgoing!!).outgoing!!
-    val i2 = HomeLinkInviter.receive(i1.state, maple, open, now)
-    assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.TAMPERED), i2.state)
+    val nonce = (j1.state as HomeLinkJoinerState.Committing).nonce
+    val sig = impostor.identity.sign(HomeLinkPairingProof.openText(session, mailbox, maple.identity.publicKey, nonce, impostor.name))
+    val open = HomeLinkPairingProof.withMac(session, HomeLinkMessage.Open(mailbox, impostor.identity.publicKey, nonce, impostor.name, sig))
+    assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.TAMPERED), toInviter(i1.state, open).state)
+  }
+
+  @Test fun aRevealFromAnotherSessionIsIgnored() {
+    val h = hello()
+    val j1 = commit(h)
+    val i1 = toInviter(h.state, j1.outgoing!!)
+    val other = commit(h)
+    val step = HomeLinkJoiner.receive(other.state, lake, i1.outgoing!!, random)
+    assertEquals(HomeLinkIgnored.WRONG_CODE, step.ignored)
   }
 
   @Test fun aForgedRevealSignatureFails() {
-    val j1 = commit()
-    val reveal = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, j1.outgoing!!, now).outgoing as HomeLinkMessage.Reveal
-    val forged = HomeLinkPairingProof.withMac(code, reveal.copy(name = "Evil House"))
-    val j2 = HomeLinkJoiner.receive(j1.state, lake, forged)
+    val h = hello()
+    val j1 = commit(h)
+    val session = (j1.state as HomeLinkJoinerState.Committing).session
+    val reveal = toInviter(h.state, j1.outgoing!!).outgoing as HomeLinkMessage.Reveal
+    val forged = HomeLinkPairingProof.withMac(session, reveal.copy(name = "Evil House"))
+    val j2 = HomeLinkJoiner.receive(j1.state, lake, forged, random)
     assertEquals(HomeLinkJoinerState.Failed(HomeLinkFailure.TAMPERED), j2.state)
     assertNull(j2.outgoing)
   }
 
-  @Test fun aRevealWithoutTheCodeIsIgnored() {
-    val j1 = commit()
-    val reveal = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, j1.outgoing!!, now).outgoing as HomeLinkMessage.Reveal
-    val step = HomeLinkJoiner.receive(j1.state, lake, reveal.copy(mac = "AAAA"))
+  @Test fun aRevealWithoutTheSessionKeyIsIgnored() {
+    val h = hello()
+    val j1 = commit(h)
+    val reveal = toInviter(h.state, j1.outgoing!!).outgoing as HomeLinkMessage.Reveal
+    val step = HomeLinkJoiner.receive(j1.state, lake, reveal.copy(mac = "AAAA"), random)
     assertSame(j1.state, step.state)
     assertEquals(HomeLinkIgnored.WRONG_CODE, step.ignored)
   }
 
-  @Test fun outOfOrderMessagesAreIgnored() {
-    val j1 = commit()
-    val waiting = HomeLinkInviter.start(invite)
-    val i1 = HomeLinkInviter.receive(waiting, maple, j1.outgoing!!, now)
-    // The joiner's own commit echoed back, and a replayed commit to the inviter.
-    assertEquals(HomeLinkIgnored.UNEXPECTED, HomeLinkJoiner.receive(j1.state, lake, j1.outgoing!!).ignored)
-    val (i, _) = toComparing()
-    assertEquals(HomeLinkIgnored.ALREADY_USED, HomeLinkInviter.receive(i, maple, j1.outgoing!!, now).ignored)
-    assertEquals(HomeLinkIgnored.UNEXPECTED, HomeLinkInviter.receive(waiting, maple, i1.outgoing!!, now).ignored)
+  @Test fun aHelloWithABadShareOrMailboxIsIgnored() {
+    val start = HomeLinkJoiner.start(code, random)
+    val h = hello().outgoing as HomeLinkMessage.Hello
+    assertEquals(HomeLinkIgnored.UNEXPECTED, HomeLinkJoiner.receive(start, lake, h.copy(share = "AAAA"), random).ignored)
+    val elsewhere = h.copy(mailbox = HomeLinkCode.mailboxId(HomeLinkCode.parse("XYZ7Q4K2PA")!!))
+    assertEquals(HomeLinkIgnored.WRONG_CODE, HomeLinkJoiner.receive(start, lake, elsewhere, random).ignored)
   }
 
+  @Test fun outOfOrderMessagesAreIgnored() {
+    val h = hello()
+    val j1 = commit(h)
+    val i1 = toInviter(h.state, j1.outgoing!!)
+    // The joiner's own commit echoed back, a replayed commit to the inviter, a reveal sent to an inviter.
+    assertEquals(HomeLinkIgnored.UNEXPECTED, HomeLinkJoiner.receive(j1.state, lake, j1.outgoing!!, random).ignored)
+    val (i, _) = run()
+    assertEquals(HomeLinkIgnored.ALREADY_USED, toInviter(i, j1.outgoing!!).ignored)
+    assertEquals(HomeLinkIgnored.UNEXPECTED, toInviter(h.state, i1.outgoing!!).ignored)
+  }
+
+  /** Worst case, Mallory knows the code and runs both halves: the pictures still differ. */
   @Test fun aRelayInTheMiddleShowsDifferentPictures() {
-    // Mallory runs both halves: she joins Maple's invite as "Lakeview" and invites Lakeview herself.
     val mallory = HomeLinkSelf(HomeLinkIdentity.generate(random), "Lakeview")
     val malloryAsMaple = HomeLinkSelf(HomeLinkIdentity.generate(random), "Maple House")
-    val m1 = commit(mallory)
-    val i1 = HomeLinkInviter.receive(HomeLinkInviter.start(invite), maple, m1.outgoing!!, now)
-    val m2 = HomeLinkJoiner.receive(m1.state, mallory, i1.outgoing!!)
-    val atMaple = HomeLinkInviter.receive(i1.state, maple, m2.outgoing!!, now).state as HomeLinkInviterState.Comparing
+    val h = hello()
+    val m1 = commit(h, mallory)
+    val i1 = toInviter(h.state, m1.outgoing!!)
+    val m2 = HomeLinkJoiner.receive(m1.state, mallory, i1.outgoing!!, random)
+    val atMaple = toInviter(i1.state, m2.outgoing!!).state as HomeLinkInviterState.Comparing
 
-    val j1 = commit()
-    val mi1 = HomeLinkInviter.receive(HomeLinkInviter.start(invite), malloryAsMaple, j1.outgoing!!, now)
-    val atLake = HomeLinkJoiner.receive(j1.state, lake, mi1.outgoing!!).state as HomeLinkJoinerState.Comparing
+    val mh = HomeLinkInviter.start(invite, random)
+    val j1 = commit(mh)
+    val mi1 = HomeLinkInviter.receive(mh.state, malloryAsMaple, j1.outgoing!!, now)
+    val atLake = HomeLinkJoiner.receive(j1.state, lake, mi1.outgoing!!, random).state as HomeLinkJoinerState.Comparing
     assertNotEquals(atMaple.safety, atLake.safety)
   }
 
   @Test fun failedStatesIgnoreEverything() {
     val failed = HomeLinkInviterState.Failed(HomeLinkFailure.EXPIRED)
-    assertEquals(HomeLinkIgnored.UNEXPECTED, HomeLinkInviter.receive(failed, maple, commit().outgoing!!, now).ignored)
+    assertEquals(HomeLinkIgnored.UNEXPECTED, toInviter(failed, commit(hello()).outgoing!!).ignored)
   }
 
   @Test fun tickExpiresOnlyAnOpenInvite() {
-    val waiting = HomeLinkInviter.start(invite)
+    val waiting = hello().state
     assertSame(waiting, HomeLinkInviter.tick(waiting, invite.expiresAt - 1))
     assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.EXPIRED), HomeLinkInviter.tick(waiting, invite.expiresAt))
-    val (comparing, _) = toComparing()
+    val (comparing, _) = run()
     assertSame(comparing, HomeLinkInviter.tick(comparing, invite.expiresAt + 1))
   }
 
   @Test fun bothSidesDeriveTheSameLinkKeyFromThePinnedKeys() {
-    val (i, j) = toComparing()
+    val (i, j) = run()
     val atMaple = maple.identity.linkKey((i as HomeLinkInviterState.Comparing).peer.publicKey, maple.identity.publicKey)
     val atLake = lake.identity.linkKey((j as HomeLinkJoinerState.Comparing).peer.publicKey, maple.identity.publicKey)
     assertArrayEquals(atMaple, atLake)

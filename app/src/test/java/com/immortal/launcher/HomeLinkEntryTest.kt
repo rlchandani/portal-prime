@@ -16,7 +16,7 @@ class HomeLinkEntryTest {
   @Test fun startsEmptyWithTheCursorOnTheFirstSlot() {
     val e = HomeLinkCodeEntry()
     assertEquals(0, e.cursor)
-    assertEquals(List(9) { null }, e.slots)
+    assertEquals(List(10) { null }, e.slots)
     assertFalse(e.complete)
     assertNull(e.code)
   }
@@ -32,10 +32,10 @@ class HomeLinkEntryTest {
   }
 
   @Test fun fullCodeStopsTakingSymbolsAndParses() {
-    val e = typed("MP7Q4K2PAZZ")
+    val e = typed("MPT7Q4K2PAZZ")
     assertTrue(e.complete)
     assertEquals(-1, e.cursor)
-    assertEquals(HomeLinkCode.parse("MP7Q4K2PA"), e.code)
+    assertEquals(HomeLinkCode.parse("MPT7Q4K2PA"), e.code)
   }
 
   @Test fun backspaceRemovesTheLastAndIsSafeWhenEmpty() {
@@ -60,8 +60,8 @@ class HomeLinkEntryTest {
   }
 
   @Test fun qrCarriesTheCodeForToolkit() {
-    val code = HomeLinkCode.parse("MP7Q4K2PA")!!
-    assertEquals("hearthpane:link:MP7Q4K2PA", HomeLinkCopy.qrText(code))
+    val code = HomeLinkCode.parse("MPT7Q4K2PA")!!
+    assertEquals("hearthpane:link:MPT7Q4K2PA", HomeLinkCopy.qrText(code))
   }
 
   @Test fun failureWordsSayNothingWasKept() {
@@ -76,6 +76,6 @@ class HomeLinkEntryTest {
 
   @Test fun verifyTitleNamesTheOtherHome() {
     assertEquals("Check it’s really Lakeview", HomeLinkCopy.verifyTitle("Lakeview"))
-    assertEquals("Expires in 9:42", HomeLinkCopy.expires(HomeLinkInvite(HomeLinkCode.parse("MP7Q4K2PA")!!, 0L), 18_000L))
+    assertEquals("Expires in 9:42", HomeLinkCopy.expires(HomeLinkInvite(HomeLinkCode.parse("MPT7Q4K2PA")!!, 0L), 18_000L))
   }
 }

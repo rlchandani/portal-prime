@@ -10,10 +10,10 @@ import java.security.SecureRandom
 
 /** The inviting home's side (mock `inviteScr` → `verifyScr` → `permsScr`). Immutable states. */
 internal sealed interface HomeLinkInviterState {
-  /** Showing the code and QR. */
-  data class Waiting(val invite: HomeLinkInvite) : HomeLinkInviterState
+  /** Showing the code and QR; our [pake] share is in the mailbox. [failedTries] joins had the wrong code. */
+  data class Waiting(val invite: HomeLinkInvite, val pake: HomeLinkPakeHalf, val failedTries: Int = 0) : HomeLinkInviterState
   /** Someone with the code committed; our key went back; waiting for theirs. */
-  data class AwaitingOpen(val invite: HomeLinkInvite, val commitment: String) : HomeLinkInviterState
+  data class AwaitingOpen(val invite: HomeLinkInvite, val session: HomeLinkSession, val commitment: String) : HomeLinkInviterState
   /** Both screens show [safety]; people compare. */
   data class Comparing(val peer: HomeLinkPeer, val safety: HomeLinkSafetyNumber) : HomeLinkInviterState
   data class Linked(val peer: HomeLinkPeer) : HomeLinkInviterState
@@ -22,21 +22,34 @@ internal sealed interface HomeLinkInviterState {
 
 /** The joining home's side (mock `joinScr` → `verifyScr`). Immutable states. */
 internal sealed interface HomeLinkJoinerState {
-  /** Typed the code and posted a commitment; waiting for the inviter's key. */
-  data class Committing(val code: HomeLinkCode, val nonce: String) : HomeLinkJoinerState
+  /** Typed the code; waiting to read the inviter's PAKE share from the mailbox. */
+  data class AwaitingHello(val code: HomeLinkCode, val pake: HomeLinkPakeHalf) : HomeLinkJoinerState
+  /** Posted our share and a commitment; waiting for the inviter's key. */
+  data class Committing(val code: HomeLinkCode, val session: HomeLinkSession, val nonce: String) : HomeLinkJoinerState
   data class Comparing(val peer: HomeLinkPeer, val safety: HomeLinkSafetyNumber) : HomeLinkJoinerState
   data class Linked(val peer: HomeLinkPeer) : HomeLinkJoinerState
   data class Failed(val reason: HomeLinkFailure) : HomeLinkJoinerState
 }
 
 /**
- * Linking two homes, inviter side. Commit-then-reveal (as in ZRTP): the joiner's key is fixed by
- * its commitment before it sees ours, and ours is fixed before we see theirs, so a relay in the
- * middle can't pick keys that make both screens show the same pictures. The first valid commit
+ * Linking two homes, inviter side: hello → commit → reveal → open, then the pictures.
+ *
+ * The code's secret part runs a PAKE ([HomeLinkPake]), so a wrong guess shows only as a commit
+ * whose MAC fails; after [MAX_TRIES] of those the invite is burned. Commit-then-reveal (as in
+ * ZRTP) then fixes both identity keys before either side sees the other's, so even someone who
+ * learnt the code gets one guess at the safety pictures, not a search. The first valid commit
  * uses up the code. Pure: the caller posts [HomeLinkStep.outgoing] and keeps [HomeLinkStep.state].
  */
 internal object HomeLinkInviter {
-  fun start(invite: HomeLinkInvite): HomeLinkInviterState = HomeLinkInviterState.Waiting(invite)
+  /** Wrong-code joins one invite survives. Security-critical: with 35 secret bits, 3 tries ≈ 1 in 11 billion. */
+  const val MAX_TRIES = 3
+
+  /** A new invite and the hello to post to its mailbox. */
+  fun start(invite: HomeLinkInvite, random: SecureRandom): HomeLinkStep<HomeLinkInviterState> {
+    val mailbox = HomeLinkCode.mailboxId(invite.code)
+    val pake = HomeLinkPake.start(invite.code.secret, mailbox, random)
+    return HomeLinkStep(HomeLinkInviterState.Waiting(invite, pake), HomeLinkMessage.Hello(mailbox, pake.share))
+  }
 
   /** Expires a still-open invite when its 10 minutes are up (the screen's countdown calls this). */
   fun tick(state: HomeLinkInviterState, now: Long): HomeLinkInviterState =
@@ -49,9 +62,12 @@ internal object HomeLinkInviter {
       return HomeLinkStep(state, ignored = if (used) HomeLinkIgnored.ALREADY_USED else HomeLinkIgnored.UNEXPECTED)
     }
     if (invite.isExpired(now)) return HomeLinkStep(HomeLinkInviterState.Failed(HomeLinkFailure.EXPIRED))
+    if (m.mailbox != HomeLinkCode.mailboxId(invite.code)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     return when {
-      state is HomeLinkInviterState.Waiting && m is HomeLinkMessage.Commit -> onCommit(state, self, m)
-      state is HomeLinkInviterState.AwaitingOpen && m is HomeLinkMessage.Open -> onOpen(state, self, m)
+      state is HomeLinkInviterState.Waiting && m is HomeLinkMessage.Commit ->
+          if (m.seq != HomeLinkMessage.Commit.SEQ) outOfSequence(state) else onCommit(state, self, m)
+      state is HomeLinkInviterState.AwaitingOpen && m is HomeLinkMessage.Open ->
+          if (m.seq != HomeLinkMessage.Open.SEQ) outOfSequence(state) else onOpen(state, self, m)
       state is HomeLinkInviterState.AwaitingOpen && m is HomeLinkMessage.Commit -> HomeLinkStep(state, ignored = HomeLinkIgnored.ALREADY_USED)
       else -> HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
     }
@@ -71,44 +87,70 @@ internal object HomeLinkInviter {
   }
 
   private fun onCommit(state: HomeLinkInviterState.Waiting, self: HomeLinkSelf, m: HomeLinkMessage.Commit): HomeLinkStep<HomeLinkInviterState> {
-    val code = state.invite.code
-    if (!HomeLinkPairingProof.fromCode(code, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
-    val sig = self.identity.sign(HomeLinkPairingProof.revealText(m.mailbox, self.name))
-    val reveal = HomeLinkPairingProof.withMac(code, HomeLinkMessage.Reveal(m.mailbox, self.identity.publicKey, self.name, sig))
-    return HomeLinkStep(HomeLinkInviterState.AwaitingOpen(state.invite, m.commitment), reveal)
+    val shared = HomeLinkPake.finish(state.pake, m.share)
+    val session = shared?.let { HomeLinkSession.derive(m.mailbox, state.pake.share, m.share, it) }
+    if (session == null || !HomeLinkPairingProof.fromPeer(session, m.mailbox, m)) return wrongTry(state)
+    val sig = self.identity.sign(HomeLinkPairingProof.revealText(session, m.mailbox, self.name))
+    val reveal = HomeLinkPairingProof.withMac(session, HomeLinkMessage.Reveal(m.mailbox, self.identity.publicKey, self.name, sig))
+    return HomeLinkStep(HomeLinkInviterState.AwaitingOpen(state.invite, session, m.commitment), reveal)
+  }
+
+  /** A join with the wrong code (or garbage): counts against the invite, which burns at [MAX_TRIES]. */
+  private fun wrongTry(state: HomeLinkInviterState.Waiting): HomeLinkStep<HomeLinkInviterState> {
+    val tries = state.failedTries + 1
+    return if (tries >= MAX_TRIES) HomeLinkStep(HomeLinkInviterState.Failed(HomeLinkFailure.TOO_MANY_TRIES))
+    else HomeLinkStep(state.copy(failedTries = tries), ignored = HomeLinkIgnored.WRONG_CODE)
   }
 
   private fun onOpen(state: HomeLinkInviterState.AwaitingOpen, self: HomeLinkSelf, m: HomeLinkMessage.Open): HomeLinkStep<HomeLinkInviterState> {
-    if (!HomeLinkPairingProof.fromCode(state.invite.code, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
+    if (!HomeLinkPairingProof.fromPeer(state.session, m.mailbox, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     val tampered = HomeLinkStep<HomeLinkInviterState>(HomeLinkInviterState.Failed(HomeLinkFailure.TAMPERED))
     val committed = HomeLinkPairingProof.commitment(m.key, m.nonce, m.name)
     if (committed == null || !HomeLinkHash.same(HomeLinkHash.utf8(committed), HomeLinkHash.utf8(state.commitment))) return tampered
-    val text = HomeLinkPairingProof.openText(m.mailbox, self.identity.publicKey, m.nonce, m.name)
+    val text = HomeLinkPairingProof.openText(state.session, m.mailbox, self.identity.publicKey, m.nonce, m.name)
     if (m.key == self.identity.publicKey || !HomeLinkIdentity.verify(m.key, text, m.sig)) return tampered
     val safety = HomeLinkSafety.derive(self.identity.publicKey, m.key, m.nonce) ?: return tampered
     return HomeLinkStep(HomeLinkInviterState.Comparing(HomeLinkPeer(m.name, m.key), safety))
   }
 }
 
+internal fun <S> outOfSequence(state: S): HomeLinkStep<S> = HomeLinkStep(state, ignored = HomeLinkIgnored.OUT_OF_SEQUENCE)
+
 /** Linking two homes, joiner side (the home that typed the code). Pure, like [HomeLinkInviter]. */
 internal object HomeLinkJoiner {
-  fun start(code: HomeLinkCode, self: HomeLinkSelf, random: SecureRandom): HomeLinkStep<HomeLinkJoinerState> {
-    val nonce = HomeLinkHash.b64(ByteArray(HomeLinkPairingProof.NONCE_BYTES).also { random.nextBytes(it) })
-    val commitment = requireNotNull(HomeLinkPairingProof.commitment(self.identity.publicKey, nonce, self.name)) { "fresh nonce" }
-    val commit = HomeLinkPairingProof.withMac(code, HomeLinkMessage.Commit(HomeLinkCode.mailboxId(code), commitment))
-    return HomeLinkStep(HomeLinkJoinerState.Committing(code, nonce), commit)
+  fun start(code: HomeLinkCode, random: SecureRandom): HomeLinkJoinerState =
+      HomeLinkJoinerState.AwaitingHello(code, HomeLinkPake.start(code.secret, HomeLinkCode.mailboxId(code), random))
+
+  fun receive(state: HomeLinkJoinerState, self: HomeLinkSelf, m: HomeLinkMessage, random: SecureRandom): HomeLinkStep<HomeLinkJoinerState> = when {
+    state is HomeLinkJoinerState.AwaitingHello && m is HomeLinkMessage.Hello ->
+        if (m.seq != HomeLinkMessage.Hello.SEQ) outOfSequence(state) else onHello(state, self, m, random)
+    state is HomeLinkJoinerState.Committing && m is HomeLinkMessage.Reveal ->
+        if (m.seq != HomeLinkMessage.Reveal.SEQ) outOfSequence(state) else onReveal(state, self, m)
+    else -> HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
   }
 
-  fun receive(state: HomeLinkJoinerState, self: HomeLinkSelf, m: HomeLinkMessage): HomeLinkStep<HomeLinkJoinerState> {
-    if (state !is HomeLinkJoinerState.Committing || m !is HomeLinkMessage.Reveal) return HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
-    if (!HomeLinkPairingProof.fromCode(state.code, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
+  private fun onHello(state: HomeLinkJoinerState.AwaitingHello, self: HomeLinkSelf, m: HomeLinkMessage.Hello,
+                      random: SecureRandom): HomeLinkStep<HomeLinkJoinerState> {
+    val mailbox = HomeLinkCode.mailboxId(state.code)
+    if (m.mailbox != mailbox) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
+    val shared = HomeLinkPake.finish(state.pake, m.share) ?: return HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
+    val session = HomeLinkSession.derive(mailbox, m.share, state.pake.share, shared)
+    val nonce = HomeLinkHash.b64(ByteArray(HomeLinkPairingProof.NONCE_BYTES).also { random.nextBytes(it) })
+    val commitment = requireNotNull(HomeLinkPairingProof.commitment(self.identity.publicKey, nonce, self.name)) { "fresh nonce" }
+    val commit = HomeLinkPairingProof.withMac(session, HomeLinkMessage.Commit(mailbox, state.pake.share, commitment))
+    return HomeLinkStep(HomeLinkJoinerState.Committing(state.code, session, nonce), commit)
+  }
+
+  private fun onReveal(state: HomeLinkJoinerState.Committing, self: HomeLinkSelf, m: HomeLinkMessage.Reveal): HomeLinkStep<HomeLinkJoinerState> {
+    val mailbox = HomeLinkCode.mailboxId(state.code)
+    if (!HomeLinkPairingProof.fromPeer(state.session, mailbox, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     val tampered = HomeLinkStep<HomeLinkJoinerState>(HomeLinkJoinerState.Failed(HomeLinkFailure.TAMPERED))
     if (m.key == self.identity.publicKey) return tampered
-    if (!HomeLinkIdentity.verify(m.key, HomeLinkPairingProof.revealText(m.mailbox, m.name), m.sig)) return tampered
+    if (!HomeLinkIdentity.verify(m.key, HomeLinkPairingProof.revealText(state.session, mailbox, m.name), m.sig)) return tampered
     val safety = HomeLinkSafety.derive(m.key, self.identity.publicKey, state.nonce) ?: return tampered
-    val sig = self.identity.sign(HomeLinkPairingProof.openText(m.mailbox, m.key, state.nonce, self.name))
-    val open = HomeLinkPairingProof.withMac(state.code,
-        HomeLinkMessage.Open(m.mailbox, self.identity.publicKey, state.nonce, self.name, sig))
+    val sig = self.identity.sign(HomeLinkPairingProof.openText(state.session, mailbox, m.key, state.nonce, self.name))
+    val open = HomeLinkPairingProof.withMac(state.session,
+        HomeLinkMessage.Open(mailbox, self.identity.publicKey, state.nonce, self.name, sig))
     return HomeLinkStep(HomeLinkJoinerState.Comparing(HomeLinkPeer(m.name, m.key), safety), open)
   }
 
