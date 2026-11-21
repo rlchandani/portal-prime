@@ -42,9 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /** What the rail shows; equal slices skip the rail entirely on HA updates. */
 @Immutable
@@ -241,10 +238,10 @@ internal fun isNight(now: Long): Boolean {
 /** "Tuesday evening · 7:42 pm" (title line under Home). */
 internal fun ccSubtitle(now: Long, extra: String? = null): String {
   val cal = java.util.Calendar.getInstance().apply { timeInMillis = now }
-  val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(now))
+  val day = CcDateFormats.format("EEEE", now)
   val part = when (cal.get(java.util.Calendar.HOUR_OF_DAY)) { in 5..11 -> "morning"; in 12..16 -> "afternoon"; in 17..21 -> "evening"; else -> "night" }
-  val time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(now)).lowercase()
+  val time = ccTime(now)
   return listOfNotNull("$day $part · $time", extra).joinToString(" · ")
 }
 
-internal fun ccTime(ms: Long): String = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(ms)).lowercase()
+internal fun ccTime(ms: Long): String = CcDateFormats.format("h:mm a", ms).lowercase()
