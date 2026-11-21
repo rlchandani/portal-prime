@@ -53,14 +53,13 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlinx.coroutines.delay
-import java.security.SecureRandom
 
 /**
  * The Calls app (absorbs Home's old Calls tile): rooms in this home with presence, Recent (missed
  * and history), Call everyone, Settings, and a way into Portal's own Messenger/WhatsApp calling.
  */
 class CallsActivity : ComponentActivity() {
-  private val homeLinks by lazy { HomeLinkFeature(SecureRandom()) }
+  private val homeLinks by lazy { HomeLinkFeature(HomeLinkFeature.sharedRandom) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

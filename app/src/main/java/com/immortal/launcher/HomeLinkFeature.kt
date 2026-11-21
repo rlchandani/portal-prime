@@ -13,4 +13,9 @@ import java.security.SecureRandom
  * one [SecureRandom] (never created inside composition, where `remember` would make a new one on
  * every re-entry and hide it from tests) and a clock.
  */
-internal class HomeLinkFeature(val random: SecureRandom, val clock: () -> Long = System::currentTimeMillis)
+internal class HomeLinkFeature(val random: SecureRandom, val clock: () -> Long = System::currentTimeMillis) {
+  companion object {
+    /** The one generator for the feature's process-wide parts (store, sync); screens get it via [HomeLinkFeature]. */
+    val sharedRandom: SecureRandom by lazy { SecureRandom() }
+  }
+}

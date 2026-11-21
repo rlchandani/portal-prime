@@ -68,11 +68,16 @@ internal data class HomeLinkBook(val links: List<HomeLink> = emptyList()) {
 internal object HomeLinkBookCodec {
   private const val VERSION = 1
 
-  fun encode(book: HomeLinkBook): String = JSONObject().put("v", VERSION).put("links", JSONArray().apply {
-    for (l in book.links) put(JSONObject().put("id", l.id).put("n", l.name).put("k", l.publicKey).put("at", l.verifiedAt)
-        .put("call", l.permissions.canCall).put("avail", l.permissions.seesAvailability)
-        .put("rooms", JSONArray(l.permissions.ringRooms.sorted())))
-  }).toString()
+  fun encode(book: HomeLinkBook): String =
+      JSONObject().put("v", VERSION).put("links", JSONArray().apply { for (l in book.links) put(linkJson(l)) }).toString()
+
+  /** One link as stored (also inside [HomeLinkVaultCodec]). */
+  fun linkJson(l: HomeLink): JSONObject = JSONObject().put("id", l.id).put("n", l.name).put("k", l.publicKey).put("at", l.verifiedAt)
+      .put("call", l.permissions.canCall).put("avail", l.permissions.seesAvailability)
+      .put("rooms", JSONArray(l.permissions.ringRooms.sorted()))
+
+  /** One stored link, validated like wire data, or null. */
+  fun parseLink(o: JSONObject): HomeLink? = try { entry(o) } catch (e: JSONException) { null }
 
   /** Null for anything corrupt, so the caller can tell "no homes" from "unreadable". */
   fun parse(text: String): HomeLinkBook? = try {
