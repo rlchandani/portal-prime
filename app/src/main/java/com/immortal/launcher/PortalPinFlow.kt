@@ -96,7 +96,7 @@ internal object PortalPinCopy {
   const val REMOVE = "Remove"
   const val SHOW_TITLE = "Pair with another Portal"
   const val SHOW_H2 = "Type this code on the other Portal"
-  const val SHOW_HOW = "On the other Portal: Calls › Link homes test › Portals › Type a code."
+  const val SHOW_HOW = "On the other Portal: Calls › Link homes test › This home › Pair Portals › Type a code."
   const val WAITING = "Waiting for the other Portal…"
   const val ONCE = "Works once"
   const val SAME_ROOM = "Both Portals in one room"
