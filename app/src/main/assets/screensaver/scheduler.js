@@ -211,7 +211,7 @@
       incoming = scene;
       const ctx = {
         root: layer, deck, cursor, W: innerWidth, H: innerHeight, cls, nativeToken: scene.nativeToken,
-        url: (photo, edge) => window.photoUrl(photo, edge),
+        url: photoSizer(cls),
         photoMs: intervalMs, microMs: intervalMs, motionMs: intervalMs + MOTION_OVERLAP_MS,
         photoMotion: opts.photoMotion !== false,
         ambientMs: Math.min(9000, Math.max(3500, Math.round(intervalMs / 4))),
@@ -239,6 +239,14 @@
         arm("beat", () => advance("auto"), Math.min(intervalMs, 5000));
       }
       return true;
+    }
+    // Compact screens (the Mini) decode at most what is drawn: the display's long edge in device
+    // pixels, or the size a mode says it draws (a pan or a cover crop runs past the screen). The
+    // Portal+ ("L") keeps the shipped requests exactly.
+    function photoSizer(cls) {
+      if (cls === "L" || typeof SS.compactEdge !== "function") return (photo, edge) => window.photoUrl(photo, edge);
+      const W = innerWidth, H = innerHeight, dpr = Number(window.devicePixelRatio);
+      return (photo, edge, drawn) => window.photoUrl(photo, SS.compactEdge(edge, drawn, W, H, dpr));
     }
     // The window turned: re-lay the visible beat for the new screen once the dim has landed.
     // The native Filmstrip lays itself out again in place, so it is left alone.

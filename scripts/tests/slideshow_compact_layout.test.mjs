@@ -113,15 +113,16 @@ for (const mode of ['kenBurns', 'push']) {
     } finally { r.cleanup(); }
   });
 
-  test(`${mode}: an upright landscape is whole over its own small blurred copy`, async () => {
+  test(`${mode}: an upright landscape fills the height and pans its whole width`, async () => {
     const r = createSceneFixture({ mode, W: 800, H: 1280, cls: 'CP', photos: landscapes() });
     try {
       assert.equal(await r.cleanup.ready, true);
       const hero = heroes(r).at(-1);
-      assert.equal(hero.style.backgroundSize, 'contain');
-      assert.equal(hero.style.left, '32px'); assert.equal(hero.style.width, '736px');
-      assert.equal(fills(r).length, 1);
-      assert.ok(r.resolutions.some(n => n.edge === 320), 'backdrop uses the 320 px copy');
+      assert.equal(hero.style.backgroundSize, '100% 100%');
+      assert.equal(hero.style.width, '1920px'); assert.equal(hero.style.height, '1280px');
+      assert.match(hero.style.animation, /^compactPanX /);
+      assert.equal(fills(r).length, 0, 'no blurred backdrop behind a full-bleed pan');
+      assert.ok(!r.resolutions.some(n => n.edge === 320));
     } finally { r.cleanup(); }
   });
 
