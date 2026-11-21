@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
  * phase 2). Pure geometry in pixels: [SlideshowStage] turns a [Plan] into views.
  *
  * [LayoutClass.LARGE] never gets a plan ([plan] returns null), so the Portal+ keeps every shipped
- * style exactly. Compact rules:
+ * style exactly. Compact rules (with the photo-fit setting at "fill", [ScreensaverConfig.FIT_FILL]):
  *  - Smart frame: upright, two landscapes stack (cards keep 83 % of a 3:2); a photo whose crop keeps
  *    80 % fills the screen; a panorama sweeps at full height; anything else is whole over its own
  *    blurred backdrop, raised clear of the clock. Turned, the same single rule.
@@ -23,6 +23,10 @@ import kotlin.math.roundToInt
  *    backdrop in both orientations.
  *  - Gallery print / spread: upright, a fixed print zone above the clock (spread is a column of
  *    two landscape prints). Turned, unchanged (null: the shipped measured placement).
+ *
+ * With fit at "fit" ([ScreensaverConfig.FIT_FIT]) nothing is cropped: a Smart frame or Pair single
+ * takes the Whole photo rule (on black, or over its backdrop past [WHOLE_MISMATCH]; never filled or
+ * swept), and stacked or paired cards hold each photo whole and still in its slot.
  */
 internal object CompactStagePlan {
   enum class Style { SMART, PAIR, WHOLE, PRINT, SPREAD }
@@ -99,19 +103,22 @@ internal object CompactStagePlan {
       regions: List<SlideshowGeometry.Region> = emptyList(),
       /** Overlays measured on screen (the upright calendar card); whole cards and prints clear them. */
       occupied: List<ScreensaverLayout.Box> = emptyList(),
+      /** The photo-fit setting: true is "fill" (the 80 % rule), false is "fit" (every photo whole). */
+      fill: Boolean = true,
   ): Plan? {
     if (style == null || !cls.compact || photos.isEmpty() || width <= 0 || height <= 0 || density <= 0f) return null
     if (photos.any { it.first <= 0 || it.second <= 0 }) return null
     if (cls.compactLandscape && (style == Style.PRINT || style == Style.SPREAD)) return null
     val pair = photos.size >= 2 && pairs(style, cls, photos[0], photos[1])
     val clear = { zone: ScreensaverLayout.Box -> clearTop(zone, occupied, height, density) }
+    val alone = { if (fill) single(photos[0], cls, width, height, density, motion, parity, regions, clear)
+        else whole(photos[0], cls, width, height, density, clear) }
     val plan = when (style) {
-      Style.SMART -> if (pair) stack(photos, width, height, density, motion, 24, 16, 18f)
-          else single(photos[0], cls, width, height, density, motion, parity, regions, clear)
+      Style.SMART -> if (pair) stack(photos, width, height, density, motion, fill, 24, 16, 18f) else alone()
       Style.PAIR -> when {
-        pair && cls.compactPortrait -> stack(photos, width, height, density, motion, 0, 12, 0f)
-        pair -> sideBySide(photos, width, height, density, motion)
-        else -> single(photos[0], cls, width, height, density, motion, parity, regions, clear)
+        pair && cls.compactPortrait -> stack(photos, width, height, density, motion, fill, 0, 12, 0f)
+        pair -> sideBySide(photos, width, height, density, motion, fill)
+        else -> alone()
       }
       Style.WHOLE -> whole(photos[0], cls, width, height, density, clear)
       Style.PRINT -> print(listOf(photos[0]), width, height, density, clear)
@@ -157,15 +164,19 @@ internal object CompactStagePlan {
     return Plan(Ground.BACKDROP, listOf(Tile(0, card, m, cornerDp = 6f, elevationDp = CARD_ELEVATION_DP)))
   }
 
-  /** Two landscapes stacked upright, drifting in opposite directions (mock stackPair). */
+  /**
+   * Two landscapes stacked upright, drifting in opposite directions (mock stackPair). Under fit
+   * ([fill] false) each card shrinks to its photo, whole and still, centred in its slot.
+   */
   private fun stack(
-      photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float, motion: Boolean,
+      photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float, motion: Boolean, fill: Boolean,
       marginDp: Int, gapDp: Int, cornerDp: Float,
   ): Plan {
     val (top, bottom) = ScreensaverLayout.stackPair(w, h, density, marginDp, gapDp)
-    fun tile(i: Int, box: ScreensaverLayout.Box, s0: Float, s1: Float, x0: Float, x1: Float): Tile {
+    fun tile(i: Int, slot: ScreensaverLayout.Box, s0: Float, s1: Float, x0: Float, x1: Float): Tile {
       val (pw, ph) = photos[i]
-      val m = if (motion) drift(pw, ph, box.width, box.height, s0, s1, x0, x1, 0f, 0f)
+      val box = if (fill) slot else contain(pw, ph, slot)
+      val m = if (motion && fill) drift(pw, ph, box.width, box.height, s0, s1, x0, x1, 0f, 0f)
           else drift(pw, ph, box.width, box.height, 1f, 1f, 0f, 0f, 0f, 0f)
       return Tile(i, box, m, cornerDp = cornerDp, elevationDp = if (marginDp > 0) CARD_ELEVATION_DP else 0f)
     }
@@ -173,18 +184,24 @@ internal object CompactStagePlan {
         tile(1, bottom, 1.05f, 1.02f, .01f, -.01f)), PAIR_BACKDROP)
   }
 
-  /** Two portraits side by side turned, cover-cropped in rounded tiles over the backdrop. */
-  private fun sideBySide(photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float, motion: Boolean): Plan {
+  /**
+   * Two portraits side by side turned, cover-cropped in rounded tiles over the backdrop. Under fit
+   * ([fill] false) each tile shrinks to its photo, whole and still, centred in its slot.
+   */
+  private fun sideBySide(
+      photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float, motion: Boolean, fill: Boolean,
+  ): Plan {
     fun px(dp: Int) = (dp * density).roundToInt()
     val m = px(32)
     val gutter = px(20)
     val tw = ((w - 2 * m - gutter) / 2).coerceAtLeast(1)
     val tiles = (0..1).map { i ->
       val left = m + i * (tw + gutter)
-      val box = ScreensaverLayout.Box(left, m, left + tw, maxOf(m + 1, h - m))
+      val slot = ScreensaverLayout.Box(left, m, left + tw, maxOf(m + 1, h - m))
       val (pw, ph) = photos[i]
+      val box = if (fill) slot else contain(pw, ph, slot)
       val dy = if (i == 1) .01f else -.01f
-      val path = if (motion) drift(pw, ph, box.width, box.height, 1.02f, 1.05f, 0f, 0f, dy, -dy)
+      val path = if (motion && fill) drift(pw, ph, box.width, box.height, 1.02f, 1.05f, 0f, 0f, dy, -dy)
           else drift(pw, ph, box.width, box.height, 1f, 1f, 0f, 0f, 0f, 0f)
       Tile(i, box, path, cornerDp = 14f, elevationDp = CARD_ELEVATION_DP)
     }
