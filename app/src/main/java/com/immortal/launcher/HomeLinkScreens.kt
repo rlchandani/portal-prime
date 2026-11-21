@@ -41,6 +41,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -56,49 +58,69 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
 @Composable
 internal fun HomeLinkHeader(title: String, sub: String? = null, onBack: (() -> Unit)? = null) {
   val p = LocalApprovedPalette.current
-  Row(Modifier.fillMaxWidth().height(130.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+  val compact = currentLayoutClass().compact
+  Row(Modifier.fillMaxWidth().height(if (compact) 110.dp else 130.dp).padding(horizontal = homeLinkDims().pad),
+      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     onBack?.let { CallRoundButton("back", "Back", it, surface = callsSurface()) }
     Column(Modifier.semantics { heading() }) {
-      Text(title, color = p.text, fontSize = 40.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-      sub?.let { Text(it, color = p.secondary, fontSize = 22.sp, maxLines = 1) }
+      Text(title, color = p.text, fontSize = if (compact) 32.sp else 40.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+          overflow = TextOverflow.Ellipsis)
+      sub?.let { Text(it, color = p.secondary, fontSize = if (compact) 19.sp else 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     }
   }
 }
 
-/** Mock `inviteScr`: the QR on the left; the code, its limits and the why on the right. */
-@OptIn(ExperimentalLayoutApi::class)
+/** Mock `inviteScr`: the QR on the left; the code, its limits and the why on the right. On a Mini, stacked. */
 @Composable
 internal fun HomeLinkInviteScreen(invite: HomeLinkInvite, now: Long, qr: Bitmap?, onNewCode: () -> Unit, onCancel: () -> Unit) {
   val p = LocalApprovedPalette.current
+  val compact = currentLayoutClass().compact
   Column(Modifier.fillMaxSize().background(p.background)) {
     HomeLinkHeader(HomeLinkCopy.INVITE_TITLE, HomeLinkCopy.INVITE_SUB, onBack = onCancel)
-    Row(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 24.dp), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(60.dp)) {
-      Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        HomeLinkQr(qr, HomeLinkCopy.qrText(invite.code))
+    if (compact) {
+      Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 32.dp, vertical = 16.dp),
+          horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        HomeLinkQr(qr, HomeLinkCopy.qrText(invite.code), COMPACT_QR)
         HomeLinkLockedNote(HomeLinkCopy.INVITE_SCAN)
+        InviteCodeDetails(invite, now, onNewCode, onCancel)
       }
-      Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(32.dp)) {
-        Text(HomeLinkCopy.INVITE_H2, color = p.text, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-        Text(HomeLinkCopy.INVITE_HOW, color = p.secondary, fontSize = 24.sp)
-        HomeLinkSlots(invite.code.value.toList(), cursor = -1, spoken = "Code ${invite.code.value.toList().joinToString(" ")}")
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          CallChip(HomeLinkCopy.expires(invite, now), "clock", plainFill = p.surface2, plainInk = p.secondary)
-          CallChip(HomeLinkCopy.INVITE_ONCE, "key", plainFill = p.surface2, plainInk = p.secondary)
-          CallChip(HomeLinkCopy.INVITE_READ, "phone", plainFill = p.surface2, plainInk = p.secondary)
+    } else {
+      Row(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 24.dp), verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(60.dp)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+          HomeLinkQr(qr, HomeLinkCopy.qrText(invite.code), PORTAL_QR)
+          HomeLinkLockedNote(HomeLinkCopy.INVITE_SCAN)
         }
-        HomeLinkNoteCard(HomeLinkCopy.INVITE_NOTE)
-        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-          CallPill(HomeLinkCopy.NEW_CODE, onNewCode, icon = "redo", surface = callsSurface())
-          CallPill(HomeLinkCopy.CANCEL, onCancel, surface = callsSurface())
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(32.dp)) {
+          InviteCodeDetails(invite, now, onNewCode, onCancel)
         }
       }
     }
   }
 }
 
-/** Mock `verifyScr`: four pictures, twelve digits, and the two answers. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun InviteCodeDetails(invite: HomeLinkInvite, now: Long, onNewCode: () -> Unit, onCancel: () -> Unit) {
+  val p = LocalApprovedPalette.current
+  val d = homeLinkDims()
+  Text(HomeLinkCopy.INVITE_H2, color = p.text, fontSize = d.title, fontWeight = FontWeight.Bold)
+  Text(HomeLinkCopy.INVITE_HOW, color = p.secondary, fontSize = d.sub)
+  HomeLinkSlots(invite.code.value.toList(), cursor = -1, spoken = "Code ${invite.code.value.toList().joinToString(" ")}")
+  FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    CallChip(HomeLinkCopy.expires(invite, now), "clock", plainFill = p.surface2, plainInk = p.secondary)
+    CallChip(HomeLinkCopy.INVITE_ONCE, "key", plainFill = p.surface2, plainInk = p.secondary)
+    CallChip(HomeLinkCopy.INVITE_READ, "phone", plainFill = p.surface2, plainInk = p.secondary)
+  }
+  HomeLinkNoteCard(HomeLinkCopy.INVITE_NOTE)
+  Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+    CallPill(HomeLinkCopy.NEW_CODE, onNewCode, icon = "redo", surface = callsSurface())
+    CallPill(HomeLinkCopy.CANCEL, onCancel, surface = callsSurface())
+  }
+}
+
+/** Mock `verifyScr`: four pictures (2 × 2 on a Mini), twelve digits, and the two answers. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun HomeLinkVerifyScreen(theirName: String, safety: HomeLinkSafetyNumber, onMatch: () -> Unit, onMismatch: () -> Unit) {
   val p = LocalApprovedPalette.current
@@ -109,9 +131,10 @@ internal fun HomeLinkVerifyScreen(theirName: String, safety: HomeLinkSafetyNumbe
       Text(HomeLinkCopy.VERIFY_LEDE, color = p.secondary, fontSize = 30.sp, textAlign = TextAlign.Center,
           lineHeight = 42.sp, modifier = Modifier.widthIn(max = 1500.dp))
       HomeLinkSafetyGrid(safety)
-      Text(safety.displayDigits, color = p.text, fontSize = 44.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
+      Text(safety.displayDigits, color = p.text, fontSize = if (currentLayoutClass().compact) 36.sp else 44.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
           letterSpacing = 5.sp)
-      Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+      FlowRow(horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+          verticalArrangement = Arrangement.spacedBy(20.dp)) {
         CallPill(HomeLinkCopy.NO_MATCH, onMismatch, icon = "x", size = CallButtonSize.LG, surface = callsSurface())
         CallPill(HomeLinkCopy.MATCH, onMatch, icon = "check", style = CallButtonStyle.OK, size = CallButtonSize.LG, surface = callsSurface())
       }
@@ -125,14 +148,18 @@ internal fun HomeLinkSafetyGrid(safety: HomeLinkSafetyNumber) {
   val p = LocalApprovedPalette.current
   BoxWithConstraints(Modifier.widthIn(max = 1400.dp).fillMaxWidth().clearAndSetSemantics { contentDescription = safety.spoken }) {
     val compact = maxWidth < COMPACT_GRID
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-      safety.pictures.forEach { pic ->
+    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+     safety.pictures.chunked(HomeLinkLayout.safetyColumns(compact)).forEach { row ->
+     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+      row.forEach { pic ->
         Column(Modifier.weight(1f).background(p.surface, RoundedCornerShape(30.dp)).border(1.5.dp, p.divider, RoundedCornerShape(30.dp))
             .padding(vertical = if (compact) 18.dp else 28.dp, horizontal = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
           Text(pic.emoji, fontSize = if (compact) 56.sp else 80.sp, lineHeight = if (compact) 62.sp else 88.sp)
           Text(pic.word, color = p.text, fontSize = 26.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
       }
+     }
+     }
     }
   }
 }
@@ -184,27 +211,28 @@ internal fun HomeLinkConnectedScreen(theirName: String, onDone: () -> Unit) {
   }
 }
 
-/** `.slots`: one tile per symbol, a dash between groups of three; [cursor] gets the accent ring. */
+/** `.slots`: one tile per symbol, a dash between nameplate and secret groups (`MPT–7Q4–K2PA`); [cursor] gets the accent ring. */
 @Composable
 internal fun HomeLinkSlots(symbols: List<Char?>, cursor: Int, spoken: String) {
   val p = LocalApprovedPalette.current
   val shape = RoundedCornerShape(20.dp)
-  Row(Modifier.clearAndSetSemantics { contentDescription = spoken }, horizontalArrangement = Arrangement.spacedBy(12.dp),
+  val slot = HomeLinkLayout.slot(currentLayoutClass().compact)
+  Row(Modifier.clearAndSetSemantics { contentDescription = spoken }, horizontalArrangement = Arrangement.spacedBy(slot.gap),
       verticalAlignment = Alignment.CenterVertically) {
     symbols.forEachIndexed { i, c ->
-      if (i > 0 && i % SLOT_GROUP == 0) Text("–", color = p.secondary, fontSize = 50.sp, modifier = Modifier.padding(horizontal = 4.dp))
-      Box(Modifier.size(70.dp, 100.dp).background(p.surface, shape)
+      if (i in HomeLinkLayout.GROUP_STARTS) Text("–", color = p.secondary, fontSize = slot.text, modifier = Modifier.padding(horizontal = 2.dp))
+      Box(Modifier.size(slot.width, slot.height).background(p.surface, shape)
           .border(if (i == cursor) 4.dp else 2.dp, if (i == cursor) p.accent else p.outline, shape), contentAlignment = Alignment.Center) {
-        Text(c?.toString() ?: "", color = p.text, fontSize = 50.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+        Text(c?.toString() ?: "", color = p.text, fontSize = slot.text, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
       }
     }
   }
 }
 
-/** `.qr`: 460 dp on white so phones scan it in a dark room too. */
+/** `.qr`: 460 dp on white (360 dp on a Mini) so phones scan it in a dark room too. */
 @Composable
-private fun HomeLinkQr(qr: Bitmap?, text: String) {
-  Box(Modifier.size(460.dp).background(Color.White, RoundedCornerShape(30.dp)).padding(24.dp)
+private fun HomeLinkQr(qr: Bitmap?, text: String, size: Dp) {
+  Box(Modifier.size(size).background(Color.White, RoundedCornerShape(30.dp)).padding(24.dp)
       .clearAndSetSemantics { contentDescription = "QR code for Portal Toolkit" }, contentAlignment = Alignment.Center) {
     if (qr != null) Image(qr.asImageBitmap(), contentDescription = null, filterQuality = FilterQuality.None, modifier = Modifier.fillMaxSize())
     else Text(text, color = Color(0xFF182C39), fontSize = 20.sp, textAlign = TextAlign.Center)
@@ -233,5 +261,6 @@ internal fun HomeLinkNoteCard(text: String) {
   }
 }
 
-private const val SLOT_GROUP = 3
+private val PORTAL_QR = 460.dp
+private val COMPACT_QR = 360.dp
 private val COMPACT_GRID = 900.dp
