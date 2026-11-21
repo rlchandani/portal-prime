@@ -6,36 +6,46 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorProducer
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ObserverModifierNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.invalidateSemantics
 import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -44,6 +54,13 @@ import kotlin.math.roundToInt
 
 /*
  * Rail / bottom-bar tabs whose selection is read at draw (and semantics) time, not in composition.
+ *
+ * Round 2 (render thread): a tab is drawn as two stacked looks, the resting one (rail colour,
+ * secondary tint) cached as its own small texture and the selected one (card, primary tint) shown
+ * by layer alpha. Nothing a switch changes is inside a cached texture any more, so a switch
+ * re-renders no layer at all: it flips four layer alphas. Before, the whole rail was one cached
+ * texture and a switch re-rendered the strip between the two changed tabs (Home to Alerts: four
+ * tabs) every time, plus every frame of a rail tap's ripple.
  *
  * Switching screens used to recompose the whole rail: each item got a new `on` flag, so its
  * modifier chain gained or lost the `ccCard` nodes (a structural change: new render node, clip,
@@ -60,7 +77,69 @@ internal val CcNeverSelected: State<Boolean> = object : State<Boolean> { overrid
 /** The selected tab's `.card` behind the tab, always composed; [selected] only toggles its layer's alpha. */
 @Composable
 internal fun BoxScope.CcSelectionCard(shape: Shape, selected: State<Boolean>) {
-  Box(Modifier.matchParentSize().graphicsLayer { alpha = if (selected.value) 1f else 0f }.ccCard(shape))
+  Box(Modifier.matchParentSize().graphicsLayer { alpha = ccLookAlpha(selected.value) }.ccCard(shape))
+}
+
+/**
+ * One rail / bottom-bar tab, drawn bottom to top: the resting look ([content] in [CcColors.sec]
+ * over the rail colour, its own cached texture), the selected card, the selected look ([content]
+ * in [CcColors.text]; both looks are only visible through layer alpha), then [overlay] (the badge)
+ * and the press ripple in the tappable, speaking box. The looks hold no semantics (labels are
+ * drawn, see [CcTabText]), so the tab is still one node saying [description].
+ */
+@Composable
+internal fun CcTab(modifier: Modifier, shape: Shape, selected: State<Boolean>, description: String, enabled: Boolean,
+                   onClick: () -> Unit, overlay: @Composable BoxScope.() -> Unit = {}, content: @Composable BoxScope.(Color) -> Unit) {
+  val c = LocalCc.current
+  Box(modifier.ccDisabledLayer(enabled)) {
+    Box(Modifier.matchParentSize().ccRegionLayer(c.rail).clip(shape)) { content(c.sec) }
+    CcSelectionCard(shape, selected)
+    Box(Modifier.matchParentSize().graphicsLayer { alpha = ccLookAlpha(selected.value); this.shape = shape; clip = true }) { content(c.text) }
+    Box(Modifier.matchParentSize().clip(shape).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
+        .ccSpeakTab(description, selected), content = overlay)
+  }
+}
+
+/** Layer alpha of the selected look (and card): shown only while selected. */
+internal fun ccLookAlpha(selected: Boolean): Float = if (selected) 1f else 0f
+
+/**
+ * A disabled tab ([CC_DISABLED_ALPHA], as `Modifier.alpha`: a clipped layer) kept as a texture,
+ * so its alpha group is rendered once instead of a save-layer every frame. An enabled tab adds nothing.
+ */
+private fun Modifier.ccDisabledLayer(enabled: Boolean): Modifier =
+    if (enabled) this else graphicsLayer(alpha = CC_DISABLED_ALPHA, clip = true, compositingStrategy = CompositingStrategy.Offscreen)
+
+/**
+ * A one-line tab label (Material `Text` metrics) laid out and painted exactly as `BasicText`
+ * (same style, constraints, clip and paint), but drawn: it adds no semantics node, so a tab can
+ * draw its label twice (resting and selected look) and still be one node.
+ */
+@Composable
+internal fun CcTabText(text: String, color: Color, fontSize: TextUnit, overflow: TextOverflow = TextOverflow.Clip) {
+  val style = LocalTextStyle.current.merge(TextStyle(fontSize = fontSize))
+  val measurer = rememberTextMeasurer(cacheSize = 1)
+  val laid = remember { CcLaidText() }
+  Layout(Modifier.drawBehind { laid.result?.let { ccPaintTabText(it, color, overflow) } }) { _, constraints ->
+    val result = measurer.measure(text, style, overflow, softWrap = true, maxLines = 1, constraints = constraints)
+    laid.result = result
+    layout(result.size.width, result.size.height) {}
+  }
+}
+
+/** The last layout of a [CcTabText] (written by its measure, read by its draw). */
+private class CcLaidText { var result: TextLayoutResult? = null }
+
+/** `BasicText`'s paint: clipped only when the text overflows its box, no shadow / decoration, filled. */
+private fun DrawScope.ccPaintTabText(result: TextLayoutResult, color: Color, overflow: TextOverflow) {
+  val canvas = drawContext.canvas
+  val clip = result.hasVisualOverflow && overflow != TextOverflow.Visible
+  if (clip) { canvas.save(); canvas.clipRect(0f, 0f, result.size.width.toFloat(), result.size.height.toFloat()) }
+  try {
+    result.multiParagraph.paint(canvas, color, Shadow.None, TextDecoration.None, Fill)
+  } finally {
+    if (clip) canvas.restore()
+  }
 }
 
 /** [CcIcon] whose tint is read while drawing, so a tint change redraws it without recomposing. */
@@ -76,12 +155,9 @@ internal fun CcIcon(name: String, tint: ColorProducer, size: Dp, modifier: Modif
   })
 }
 
-/** A one-line label (Material `Text` metrics) whose colour is read while drawing. */
+/** A fixed tint for [CcIcon]'s drawn-tint form (a look of a [CcTab] never changes colour). */
 @Composable
-internal fun CcTabLabel(text: String, color: ColorProducer, fontSize: TextUnit, overflow: TextOverflow = TextOverflow.Clip) {
-  val style = LocalTextStyle.current.merge(TextStyle(fontSize = fontSize))
-  BasicText(text, style = style, overflow = overflow, maxLines = 1, color = color)
-}
+internal fun rememberCcTint(color: Color): ColorProducer = remember(color) { ColorProducer { color } }
 
 /** Reuses one tint filter per colour (a tab only ever has two). */
 private class CcTintFilters {

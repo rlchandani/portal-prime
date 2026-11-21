@@ -68,14 +68,20 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         var lingering by remember { mutableStateOf(false) }
         // True a few frames into a visit (see [ccSlotSemantics]); a slot composed already shown starts exposed.
         var exposed by remember { mutableStateOf(active) }
+        // True a few frames after the semantics join (see [ccSlotCachesRegions]); a slot composed already shown starts cached.
+        var cacheReady by remember { mutableStateOf(active) }
+        val cache = remember { derivedStateOf { ccSlotCachesRegions(active, cacheReady) } }
         LaunchedEffect(active) {
           settled = false
           if (active) {
             lingering = true
             repeat(EXPOSE_FRAMES) { withFrameNanos { } }
             exposed = true
+            repeat(CACHE_FRAMES) { withFrameNanos { } }
+            cacheReady = true
           } else {
             exposed = false
+            cacheReady = false
             repeat(SETTLE_FRAMES) { withFrameNanos { } }
             settled = true
             repeat(LINGER_FRAMES) { withFrameNanos { } }
@@ -88,7 +94,8 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
             .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
             .then(if (ccSlotSemantics(active, exposed)) Modifier else Modifier.clearAndSetSemantics {})
         Box(Modifier.fillMaxSize().then(layer)) {
-          CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value)) {
+          CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value),
+              LocalCcRegionCache provides cache) {
             draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
           }
         }
@@ -176,6 +183,18 @@ internal fun ccSlotLive(active: Boolean, lingering: Boolean): Boolean = active |
  * still well inside the 100 ms that Compose batches accessibility events by.
  */
 internal fun ccSlotSemantics(active: Boolean, exposed: Boolean): Boolean = active && exposed
+
+/**
+ * Whether a slot's region layers ([ccRegionLayer] with [LocalCcRegionCache]) are cached textures:
+ * only while shown, and only once [CACHE_FRAMES] frames have passed after the semantics joined.
+ * Parking drops them in the switch frame itself ([active] is read while drawing), so nothing on
+ * the hidden screen is re-rendered; on a return the region draws straight onto the window for a
+ * few frames and its texture is built on a quiet frame instead of the switch frame.
+ */
+internal fun ccSlotCachesRegions(active: Boolean, cacheReady: Boolean): Boolean = active && cacheReady
+
+/** Frames after the semantics join before a shown screen caches its regions (see [ccSlotCachesRegions]). */
+private const val CACHE_FRAMES = 2
 
 /** Frames a shown screen waits before joining the semantics tree (see [ccSlotSemantics]). */
 private const val EXPOSE_FRAMES = 2

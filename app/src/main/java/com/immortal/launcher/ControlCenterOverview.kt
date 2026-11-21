@@ -65,7 +65,7 @@ internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
       }
     }
     if (loading) CcSideSkeleton(Modifier.width(CcStyle.SideWidth).fillMaxHeight())
-    else CcSideColumn(s, ui, Modifier.width(CcStyle.SideWidth).fillMaxHeight().ccRegionLayer(c.bg))
+    else CcSideColumn(s, ui, Modifier.width(CcStyle.SideWidth).fillMaxHeight().ccRegionLayer(c.bg, LocalCcRegionCache.current))
   }
 }
 
@@ -86,7 +86,7 @@ private fun CcOverviewPortrait(s: CcUiState, ui: CcUi, loading: Boolean) {
       }
     }
     if (loading) CcSideSkeleton(Modifier.weight(1f).fillMaxWidth().clipToBounds())
-    else CcSideColumn(s, ui, Modifier.weight(1f).fillMaxWidth().ccRegionLayer(c.bg))
+    else CcSideColumn(s, ui, Modifier.weight(1f).fillMaxWidth().ccRegionLayer(c.bg, LocalCcRegionCache.current))
   }
 }
 
