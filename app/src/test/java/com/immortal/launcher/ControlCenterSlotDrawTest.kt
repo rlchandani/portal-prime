@@ -24,12 +24,21 @@ class ControlCenterSlotDrawTest {
   }
 
   @Test fun aSettledParkedScreenLeavesTheTree() {
-    for (screen in CC_KEEP_ALIVE - CcScreen.MAP) {
+    for (screen in CC_KEEP_ALIVE - CC_KEEP_RECORDED) {
       assertEquals(CcSlotDraw.DETACHED, ccSlotDraw(screen, active = false, settled = true))
     }
   }
 
   @Test fun theMapIsNeverDetached() {
     assertEquals(CcSlotDraw.RECORDING, ccSlotDraw(CcScreen.MAP, active = false, settled = true))
+  }
+
+  /** Android 10 deletes a detached node's display lists, so showing Alerts again re-recorded all of it (~20 ms). */
+  @Test fun alertsStaysRecordedWhileParked() {
+    assertEquals(CcSlotDraw.RECORDING, ccSlotDraw(CcScreen.ALERTS, active = false, settled = true))
+  }
+
+  @Test fun onlyTheMapAndAlertsStayRecorded() {
+    assertEquals(setOf(CcScreen.MAP, CcScreen.ALERTS), CC_KEEP_RECORDED)
   }
 }
