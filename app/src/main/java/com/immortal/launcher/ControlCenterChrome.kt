@@ -27,6 +27,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -35,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -43,20 +47,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** What the rail shows; equal slices skip the rail entirely on HA updates. */
+/** What the rail shows; equal slices skip the rail entirely on HA updates and on screen switches (see [CcRail]). */
 @Immutable
-internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean,
+internal data class CcRailSlice(val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean,
                                   val car: String = CcTeslaIds.DEFAULT_LABEL,
                                   /** Home Assistant is down ([CcPhase.blocksHome]): only Home and Settings stay open. */
                                   val blocked: Boolean = false) {
   companion object {
-    fun of(s: CcUiState, screen: CcScreen) = CcRailSlice(screen, s.alerts().size, s.settings.kids,
+    fun of(s: CcUiState) = CcRailSlice(s.alerts().size, s.settings.kids,
         CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings), CcPolicy.screenHidden(CcScreen.SECURITY, s.settings),
         s.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL, s.connection.phase.blocksHome)
   }
 }
 
-/** Left rail (`.rail`): back to Hearthpane Home, the six sections, Edit plan + Settings at the foot. */
+/** True while [screen] is showing; a derived state, so a switch notifies only the two tabs that change. */
+@Composable
+internal fun rememberCcTabSelected(ui: CcUi, screen: CcScreen): State<Boolean> = remember(ui, screen) { derivedStateOf { ui.screen == screen } }
+
+/**
+ * Left rail (`.rail`): back to Hearthpane Home, the six sections, Edit plan + Settings at the foot.
+ * The current screen is read only by each tab's selection state (at draw / semantics time), so a
+ * screen switch recomposes none of the rail.
+ */
 @Composable
 internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
@@ -69,49 +81,57 @@ internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
     }
     Spacer(Modifier.height(10.dp))
     val open = !r.blocked
-    RailItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
-    if (!r.hideCameras) RailItem("cam", "Cameras", r.screen == CcScreen.CAMERAS, enabled = open) { ui.go(CcScreen.CAMERAS) }
-    RailItem("car", r.car, r.screen == CcScreen.TESLA, enabled = open) { ui.go(CcScreen.TESLA) }
-    RailItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
-    if (!r.hideSecurity) RailItem("shield", "Security", r.screen == CcScreen.SECURITY, enabled = open) { ui.go(CcScreen.SECURITY) }
+    RailItem("map", "Home", rememberCcTabSelected(ui, CcScreen.MAP)) { ui.go(CcScreen.MAP) }
+    if (!r.hideCameras) RailItem("cam", "Cameras", rememberCcTabSelected(ui, CcScreen.CAMERAS), enabled = open) { ui.go(CcScreen.CAMERAS) }
+    RailItem("car", r.car, rememberCcTabSelected(ui, CcScreen.TESLA), enabled = open) { ui.go(CcScreen.TESLA) }
+    RailItem("bell", "Alerts", rememberCcTabSelected(ui, CcScreen.ALERTS), badge = alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
+    if (!r.hideSecurity) RailItem("shield", "Security", rememberCcTabSelected(ui, CcScreen.SECURITY), enabled = open) { ui.go(CcScreen.SECURITY) }
     Spacer(Modifier.weight(1f))
     if (r.kids) {
-      RailItem("lock", "Leave kids", false) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
+      RailItem("lock", "Leave kids", CcNeverSelected) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
     } else {
-      RailItem("edit", "Edit plan", r.screen == CcScreen.EDIT, enabled = open) { ui.go(CcScreen.EDIT) }
-      RailItem("gear", "Settings", r.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
+      RailItem("edit", "Edit plan", rememberCcTabSelected(ui, CcScreen.EDIT), enabled = open) { ui.go(CcScreen.EDIT) }
+      RailItem("gear", "Settings", rememberCcTabSelected(ui, CcScreen.SETTINGS)) { ui.go(CcScreen.SETTINGS) }
     }
   }
 }
 
+/** One rail tab: a fixed tree; [selected] is read only by the card's layer, the colours and the semantics. */
 @Composable
-private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
+private fun RailItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  Box(Modifier.size(104.dp, 96.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA)
-      .then(if (on) Modifier.ccCard(RoundedCornerShape(24.dp)) else Modifier)
-      .clip(RoundedCornerShape(24.dp)).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
-      .ccSpeak(if (badge > 0) "$label, $badge" else label, selected = on)) {
-    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-      CcIcon(icon, if (on) c.text else c.sec, 38.dp)
-      Text(label, color = if (on) c.text else c.sec, fontSize = 17.sp, maxLines = 1)
-    }
-    if (badge > 0) Box(Modifier.align(Alignment.TopEnd).offset(x = (-22).dp, y = 12.dp).height(24.dp).widthIn(min = 24.dp)
-        .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
-      Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+  val tint = remember(c, selected) { ColorProducer { if (selected.value) c.text else c.sec } }
+  Box(Modifier.size(104.dp, 96.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA)) {
+    CcSelectionCard(RAIL_ITEM, selected)
+    Box(Modifier.matchParentSize().clip(RAIL_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
+        .ccSpeakTab(if (badge > 0) "$label, $badge" else label, selected)) {
+      Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        CcIcon(icon, tint, 38.dp)
+        CcTabLabel(label, tint, 17.sp)
+      }
+      if (badge > 0) Box(Modifier.align(Alignment.TopEnd).offset(x = (-22).dp, y = 12.dp).height(24.dp).widthIn(min = 24.dp)
+          .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+        Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+      }
     }
   }
 }
 
-/** What the header shows (people, alarm, weather, connection, debug pill) — skips when equal. */
+private val RAIL_ITEM = RoundedCornerShape(24.dp)
+
+/**
+ * What the header's pills show (people, alarm, weather, connection, debug pill) — skips when equal.
+ * The title and subtitle are not in it: they follow the screen, and only [CcHeaderTitle] reads it.
+ */
 @Immutable
 internal data class CcHeaderSlice(
-    val title: String, val subtitle: String, val people: List<CcEntity>, val alarm: CcEntity?,
+    val people: List<CcEntity>, val alarm: CcEntity?,
     val weatherTemp: Long?, val weatherText: String?, val night: Boolean, val phase: CcPhase, val debug: String?,
 ) {
   companion object {
-    fun of(s: CcUiState, title: String, subtitle: String): CcHeaderSlice {
+    fun of(s: CcUiState): CcHeaderSlice {
       val w = s.weather
-      return CcHeaderSlice(title, subtitle, s.people, s.alarm,
+      return CcHeaderSlice(s.people, s.alarm,
           w?.attrs?.get("temperature")?.toString()?.toDoubleOrNull()?.let { Math.round(it) },
           w?.state?.replace('-', ' ')?.replace('_', ' ')?.takeIf { it.isNotBlank() }, isNight(s.now), s.connection.phase, s.debug)
     }
@@ -120,16 +140,13 @@ internal data class CcHeaderSlice(
 
 /** Header (`.hdr`): ember glyph + serif title, then who's home, alarm, weather, live state, Ask Jarvis. */
 @Composable
-internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
+internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
   Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).ccRegionLayer(c.bg).padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
-      Column(Modifier.ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
-        Text(h.title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
-        Text(h.subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      }
+      CcHeaderTitle(heading, ui)
     }
     val home = h.people.filter { it.state == "home" }
     if (h.people.isNotEmpty()) CcPill(CcSpeech.people(home.map { it.name }, h.people.size), onClick = { ui.go(CcScreen.SECURITY) }) {
@@ -160,6 +177,17 @@ internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
       Box(Modifier.size(40.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFFF7EA), Color(0xFFFFD3A1), CcStyle.Ember))))
       Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
     }
+  }
+}
+
+/** The serif title and subtitle: the only part of the header a screen (or floor) switch recomposes. */
+@Composable
+private fun CcHeaderTitle(inputs: CcHeadingInputs, ui: CcUi) {
+  val c = LocalCc.current
+  val h = rememberCcHeading(inputs, ui)
+  Column(Modifier.ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
+    Text(h.title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
+    Text(h.subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 

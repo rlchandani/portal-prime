@@ -39,7 +39,7 @@ class ControlCenterUnreachableTest {
   }
 
   @Test fun theRailSliceCarriesIt() {
-    assertTrue(CcRailSlice(CcScreen.MAP, 0, kids = false, hideCameras = false, hideSecurity = false, blocked = true).blocked)
-    assertFalse(CcRailSlice(CcScreen.MAP, 0, kids = false, hideCameras = false, hideSecurity = false).blocked)
+    assertTrue(CcRailSlice(0, kids = false, hideCameras = false, hideSecurity = false, blocked = true).blocked)
+    assertFalse(CcRailSlice(0, kids = false, hideCameras = false, hideSecurity = false).blocked)
   }
 }

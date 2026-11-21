@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -54,24 +57,32 @@ internal object CcCompactChrome {
 
 /** Portrait header: glyph + serif title / subtitle + Ask Jarvis; below it who's home, alarm, weather, live. */
 @Composable
-internal fun CcCompactHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
+internal fun CcCompactHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
   Column(Modifier.fillMaxWidth().height(CcCompactChrome.HeaderHeight).ccRegionLayer(c.bg)
       .padding(start = 30.dp, end = 30.dp, top = 16.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
     Row(Modifier.fillMaxWidth().height(84.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
-      Column(Modifier.weight(1f).ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
-        Text(h.title, color = c.text, fontSize = 42.sp, fontFamily = CcStyle.Serif, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            lineHeight = 46.sp)
-        Text(h.subtitle, color = c.sec, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      }
+      CompactTitle(heading, ui)
       CompactJarvis(enabled = !h.phase.blocksHome, onJarvis)
     }
     Row(Modifier.fillMaxWidth().height(64.dp).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       HeaderPills(h, ui)
     }
+  }
+}
+
+/** Title + subtitle: the only part of the header a screen (or floor) switch recomposes. */
+@Composable
+private fun RowScope.CompactTitle(inputs: CcHeadingInputs, ui: CcUi) {
+  val c = LocalCc.current
+  val h = rememberCcHeading(inputs, ui)
+  Column(Modifier.weight(1f).ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
+    Text(h.title, color = c.text, fontSize = 42.sp, fontFamily = CcStyle.Serif, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        lineHeight = 46.sp)
+    Text(h.subtitle, color = c.sec, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 
@@ -125,35 +136,38 @@ internal fun CcCompactNavBar(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
       CcIcon("home", c.text, 34.dp)
     }
     val open = !r.blocked
-    NavItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
-    if (!r.hideCameras) NavItem("cam", "Cameras", r.screen == CcScreen.CAMERAS, enabled = open) { ui.go(CcScreen.CAMERAS) }
-    NavItem("car", r.car, r.screen == CcScreen.TESLA, enabled = open) { ui.go(CcScreen.TESLA) }
-    NavItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = r.alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
-    if (!r.hideSecurity) NavItem("shield", "Security", r.screen == CcScreen.SECURITY, enabled = open) { ui.go(CcScreen.SECURITY) }
+    NavItem("map", "Home", rememberCcTabSelected(ui, CcScreen.MAP)) { ui.go(CcScreen.MAP) }
+    if (!r.hideCameras) NavItem("cam", "Cameras", rememberCcTabSelected(ui, CcScreen.CAMERAS), enabled = open) { ui.go(CcScreen.CAMERAS) }
+    NavItem("car", r.car, rememberCcTabSelected(ui, CcScreen.TESLA), enabled = open) { ui.go(CcScreen.TESLA) }
+    NavItem("bell", "Alerts", rememberCcTabSelected(ui, CcScreen.ALERTS), badge = r.alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
+    if (!r.hideSecurity) NavItem("shield", "Security", rememberCcTabSelected(ui, CcScreen.SECURITY), enabled = open) { ui.go(CcScreen.SECURITY) }
     if (r.kids) {
-      NavItem("lock", "Leave kids", false) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
+      NavItem("lock", "Leave kids", CcNeverSelected) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
     } else {
-      NavItem("edit", "Edit plan", r.screen == CcScreen.EDIT, enabled = open) { ui.go(CcScreen.EDIT) }
-      NavItem("gear", "Settings", r.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
+      NavItem("edit", "Edit plan", rememberCcTabSelected(ui, CcScreen.EDIT), enabled = open) { ui.go(CcScreen.EDIT) }
+      NavItem("gear", "Settings", rememberCcTabSelected(ui, CcScreen.SETTINGS)) { ui.go(CcScreen.SETTINGS) }
     }
   }
 }
 
+/** One bottom-bar tab: a fixed tree; [selected] is read only by the card's layer, the colours and the semantics. */
 @Composable
-private fun RowScope.NavItem(icon: String, label: String, on: Boolean, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
+private fun RowScope.NavItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  Box(Modifier.weight(1f).fillMaxHeight().alpha(if (enabled) 1f else CC_DISABLED_ALPHA)
-      .then(if (on) Modifier.ccCard(NAV_ITEM) else Modifier)
-      .clip(NAV_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
-      .ccSpeak(if (badge > 0) "$label, $badge" else label, selected = on)) {
-    Column(Modifier.align(Alignment.Center).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp)) {
-      CcIcon(icon, if (on) c.text else c.sec, 36.dp)
-      Text(label, color = if (on) c.text else c.sec, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-    if (badge > 0) Box(Modifier.align(Alignment.TopCenter).offset(x = 22.dp, y = 6.dp).height(24.dp).widthIn(min = 24.dp)
-        .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
-      Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+  val tint = remember(c, selected) { ColorProducer { if (selected.value) c.text else c.sec } }
+  Box(Modifier.weight(1f).fillMaxHeight().alpha(if (enabled) 1f else CC_DISABLED_ALPHA)) {
+    CcSelectionCard(NAV_ITEM, selected)
+    Box(Modifier.matchParentSize().clip(NAV_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
+        .ccSpeakTab(if (badge > 0) "$label, $badge" else label, selected)) {
+      Column(Modifier.align(Alignment.Center).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        CcIcon(icon, tint, 36.dp)
+        CcTabLabel(label, tint, 17.sp, overflow = TextOverflow.Ellipsis)
+      }
+      if (badge > 0) Box(Modifier.align(Alignment.TopCenter).offset(x = 22.dp, y = 6.dp).height(24.dp).widthIn(min = 24.dp)
+          .clip(RoundedCornerShape(12.dp)).background(c.red).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+        Text("$badge", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+      }
     }
   }
 }

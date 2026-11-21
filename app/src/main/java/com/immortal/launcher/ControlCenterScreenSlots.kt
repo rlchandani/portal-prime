@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -59,21 +60,31 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
   val slot: (CcScreen) -> @Composable () -> Unit = { screen ->
     slotContent.getOrPut(screen) {
       {
-        val active = screen == shownScreen.value
+        // Derived: a switch recomposes only the two slots whose screen comes or goes, not every parked one.
+        val active by remember { derivedStateOf { screen == shownScreen.value } }
         // True once a parked screen has had a frame to record its draw lists (see [ccSlotDraw]).
         var settled by remember { mutableStateOf(false) }
+        // True from a visit until a few frames after leaving (see [ccSlotLive]).
+        var lingering by remember { mutableStateOf(false) }
         LaunchedEffect(active) {
           settled = false
-          if (!active) { withFrameNanos { }; withFrameNanos { }; settled = true }
+          if (active) lingering = true
+          else {
+            repeat(SETTLE_FRAMES) { withFrameNanos { } }
+            settled = true
+            repeat(LINGER_FRAMES) { withFrameNanos { } }
+            lingering = false
+          }
         }
         val mode = ccSlotDraw(screen, active, settled)
+        val live = ccSlotLive(active, lingering)
         // A parked screen is off-screen: it stays out of the semantics tree, which Compose diffs
         // after every change while the Portal's accessibility services are on (always).
         val layer = Modifier.graphicsLayer { alpha = if (mode == CcSlotDraw.RECORDING) 0f else 1f }
             .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
             .then(if (active) Modifier else Modifier.clearAndSetSemantics {})
         Box(Modifier.fillMaxSize().then(layer)) {
-          CompositionLocalProvider(LocalCcScreenActive provides active, LocalCcMotion provides (active && motionOn.value)) {
+          CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value)) {
             draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
           }
         }
@@ -141,6 +152,21 @@ internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): Cc
   screen in CC_KEEP_RECORDED || !settled -> CcSlotDraw.RECORDING
   else -> CcSlotDraw.DETACHED
 }
+
+/**
+ * Whether a slot's content behaves as on screen ([LocalCcScreenActive], [LocalCcMotion]): at once
+ * when it is shown, but only [SETTLE_FRAMES] + [LINGER_FRAMES] frames after it is parked. Leaving a
+ * screen stops its cameras and animations (effects cancelled, streams released, the tile
+ * recomposed), and doing that in the switch frame made it longer; a parked screen is already
+ * transparent and out of the semantics tree, so the stop is invisible a few frames later too.
+ * A screen that was never shown (prewarmed) is never live.
+ */
+internal fun ccSlotLive(active: Boolean, lingering: Boolean): Boolean = active || lingering
+
+/** Frames a parked screen keeps drawing (transparent) to record its draw lists. */
+private const val SETTLE_FRAMES = 2
+/** Further frames before a parked screen stops its cameras and animations (off the settle frame too). */
+private const val LINGER_FRAMES = 2
 
 /** Parked screens that stay in the render tree (transparent) so their draw lists survive; see [ccSlotDraw]. */
 internal val CC_KEEP_RECORDED = setOf(CcScreen.MAP, CcScreen.ALERTS)
