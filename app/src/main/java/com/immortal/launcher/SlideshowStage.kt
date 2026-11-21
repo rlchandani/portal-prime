@@ -252,6 +252,7 @@ internal class SlideshowStage(
   }
 
   fun stop() {
+    rotationReveal?.cancel(); rotationReveal = null; alpha = 1f
     revision++
     pending = null
     shown = null
@@ -275,7 +276,26 @@ internal class SlideshowStage(
       present(next); own("pending", null)
       layers.forEach { it.measureAfterRebind(w, h) }
     }
-    else layers.forEach { it.resize(w, h, paused || !hostActive) }
+    else {
+      layers.forEach { it.resize(w, h, paused || !hostActive) }
+      if (ScreensaverLayout.rotated(oldw, oldh, w, h) && shown != null) revealAfterRotation()
+    }
+  }
+
+  private var rotationReveal: android.view.ViewPropertyAnimator? = null
+
+  /**
+   * Rotation mid-show (mock): the same photo is re-laid for the new screen under a 20 % dim (set
+   * at once, under the system's own rotation animation), held [ScreensaverLayout.ROTATION_DIM_MS],
+   * then revealed over [ScreensaverLayout.ROTATION_REVEAL_MS]. No re-decode; the bitmaps are kept.
+   */
+  private fun revealAfterRotation() {
+    rotationReveal?.cancel()
+    if (!animationsAllowed()) { alpha = 1f; return }
+    alpha = ScreensaverLayout.ROTATION_DIM
+    rotationReveal = animate().alpha(1f).setStartDelay(ScreensaverLayout.ROTATION_DIM_MS)
+        .setDuration(ScreensaverLayout.ROTATION_REVEAL_MS).setInterpolator(HearthEasing.SOFT)
+        .withLayer().withEndAction { rotationReveal = null }
   }
 
   private fun own(name: String, presentation: Presentation?) {
@@ -418,18 +438,33 @@ internal class SlideshowStage(
       val split = p.feature.split
       // The night veil as a colour matrix on the draw (free in the shader; no full-screen layer).
       val nightLevel = if (p.feature == Feature.SPLIT_NIGHT) 1f else 0f
-      // The card's 30-unit corner is a mock unit like the rest of Split glance ([HearthMockUnit]).
-      val corner = SPLIT_CORNER_DP * density * HearthMockUnit.boost(width, height, density)
-      val box = (if (split) SplitGlancePanel.layout(width, height, density).first
+      val cls = ScreensaverLayout.of(context)
+      // The card's 30-unit corner is a mock unit like the rest of Split glance ([HearthMockUnit]);
+      // compact windows use the Mini mock's 28 dp corner.
+      val corner = if (cls.compact) ScreensaverLayout.splitType(cls).cornerDp * density
+          else SPLIT_CORNER_DP * density * HearthMockUnit.boost(width, height, density)
+      val box = (if (split) SplitGlancePanel.layout(width, height, density, cls).first
           else SplitGlancePanel.Box(0, 0, width, height)).let { Rect(it.left, it.top, it.right, it.bottom) }
       val bw = photo.bitmap.width
       val bh = photo.bitmap.height
-      val plan = PremiumFraming.plan(bw, bh, box.width(), box.height(), photo.regions, p.keepPeople,
+      // Night photo keeps the day's whole-photo rule: a badly mismatched photo (a portrait on the
+      // Portal+, a landscape on the upright Mini) is shown whole over its own warm backdrop instead
+      // of losing more than half of itself to the cover crop. Matching photos still cover.
+      val nightWhole = !split && ScreensaverLayout.nightWhole(bw, bh, width, height)
+      val parity = (featureParity++ and 1) == 1
+      val plan = if (nightWhole) PremiumFraming.Frame(ScreensaverLayout.wholeMotion(bw, bh,
+          ScreensaverLayout.nightZone(cls, width, height, density), p.motion), true)
+      else PremiumFraming.plan(bw, bh, box.width(), box.height(), photo.regions, p.keepPeople,
           fill = true, motion = p.motion, focus = look.analysis.focus,
-          target = PremiumFraming.Target(.5f, .45f), reverse = (featureParity++ and 1) == 1,
+          target = PremiumFraming.Target(.5f, .45f), reverse = parity,
           mismatchLimit = Double.MAX_VALUE)
       visibility = View.VISIBLE
-      if (split) {
+      if (nightWhole) {
+        background = null
+        addView(PhotoBackdropView(context).also {
+          it.show(look.backdrop, ScreensaverLayout.rectOf(plan.motion.start, bw, bh), 0f, 1f, NIGHT_BACKDROP)
+        }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+      } else if (split) {
         background = null
         val radius = corner
         addView(PhotoBackdropView(context).also {
@@ -688,6 +723,8 @@ internal class SlideshowStage(
     private const val SPLIT_CORNER_DP = 30f
     /** Split glance backdrop is dimmer than the ambient fill (mock .38). */
     private const val SPLIT_BACKDROP = .38f
+    /** A whole Night photo's backdrop (mock .5 under the warm night grade). */
+    private const val NIGHT_BACKDROP = .5f
     private var featureParity = 0
     /** CSS sine ease-in-out, the mock's night dissolve and drift. */
     private val SINE = android.animation.TimeInterpolator { t -> (-(Math.cos(Math.PI * t) - 1) / 2).toFloat() }

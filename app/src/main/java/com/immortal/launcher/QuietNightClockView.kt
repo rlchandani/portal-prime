@@ -137,8 +137,11 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
     val clockHeight = clockPaint.descent() - clockPaint.ascent()
     val dateHeight = datePaint.descent() - datePaint.ascent()
     val gap = height * 0.043f
-    val top = (height - clockHeight - dateHeight - gap) / 2f
-    canvas.drawText(time, width / 2f, top - clockPaint.ascent(), clockPaint)
-    canvas.drawText(date, width / 2f, top + clockHeight + gap - datePaint.ascent(), datePaint)
+    // A slow +/-12 x 9 dp orbit so the all-night text never sits on the same pixels (burn-in).
+    // Evaluated only on the draws this view already makes (minute ticks and the reveal ramp).
+    val (dx, dy) = ScreensaverLayout.quietDrift(System.currentTimeMillis(), resources.displayMetrics.density)
+    val top = (height - clockHeight - dateHeight - gap) / 2f + dy
+    canvas.drawText(time, width / 2f + dx, top - clockPaint.ascent(), clockPaint)
+    canvas.drawText(date, width / 2f + dx, top + clockHeight + gap - datePaint.ascent(), datePaint)
   }
 }
