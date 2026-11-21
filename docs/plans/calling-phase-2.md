@@ -111,8 +111,8 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 
 | # | Slice | Needs | Status |
 |---|---|---|---|
-| S1 | **Household pairing core**: identity key, invite code, commit/reveal protocol, SAS (4 pictures + 12 digits), link + permissions model and codec, in-memory mailbox for tests | nothing | **started this run** |
-| S2 | Households UI: Households & devices list, Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch, Permissions, Connected — behind a hidden flag until S4 | nothing (flag off) | next |
+| S1 | **Household pairing core**: identity key, invite code, commit/reveal protocol, SAS (4 pictures + 12 digits), link + permissions model and codec | nothing | **built** (`HomeLink*.kt`, 61 tests) |
+| S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired, Connected — **built**, reachable only from the measurement-build "Link homes test" (both homes on one Portal, `HomeLinkLoopback`). Still to do: Households & devices list, Permissions screen, compact (Mini) layouts | nothing (flag off) | **partly built** |
 | S3 | Link store on device (encrypted at rest with `CallMessageKeys`), identity key shared to household Portals over the existing household channel, remove-household wipes keys everywhere | nothing | after S2 |
 | S4 | Relay mailbox client + Worker/DO + TURN credentials | **D1 relay choice, D2 account** | blocked |
 | S5 | Cross-home 1:1 call: STUN/TURN candidates, trickle, identity-signed offer/answer, honest route chip ("Direct" / "Relay") | S4 | blocked |
