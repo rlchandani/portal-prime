@@ -134,6 +134,13 @@ class ScreensaverTestSourceTest {
     assertEquals(null, ScreensaverTestSource.Pin.of("kenBurns", 601))
   }
 
+  @Test fun pinMayHoldACatalogFace() {
+    assertEquals(ScreensaverTestSource.Pin("smartFrame", 30, "flip"), ScreensaverTestSource.Pin.of("smartFrame", 30, "flip"))
+    assertEquals(ScreensaverTestSource.Pin("smartFrame", 30, "bold"), ScreensaverTestSource.Pin.of("smartFrame", 30, "bold"))
+    assertEquals(null, ScreensaverTestSource.Pin.of("smartFrame", 30, "notAFace"))
+    assertEquals(null, ScreensaverTestSource.Pin.of("smartFrame", 30)?.face)
+  }
+
   @Test fun pinnedReplacesOnlyModeAndInterval() {
     val household = ScreensaverConfig.Settings(mode = "shuffle", intervalSec = 45, photoMotion = false)
     val pinned = ScreensaverTestSource.pinned(household, ScreensaverTestSource.Pin("polaroid", 10))

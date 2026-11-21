@@ -40,6 +40,10 @@ internal class SlideshowStage(
       val occupied: List<Rect>, val galleryPrint: Boolean, val gallerySpread: Boolean,
       val editing: Boolean = false, val automatic: Boolean = true,
       val feature: Feature = Feature.NONE, val keepPeople: Boolean = false,
+      /** The native style, for the compact (Portal Mini) layouts; LARGE ignores it. */
+      val style: CompactStagePlan.Style? = null,
+      /** Alternates compact drift/sweep directions per scene; fixed for the scene's lifetime. */
+      val parity: Boolean = false,
   ) {
     val galleryStyle: Boolean get() = galleryPrint || gallerySpread
     /** A new-mode scene: one unedited photo without a saved crop. */
@@ -73,6 +77,13 @@ internal class SlideshowStage(
   private val paused get() = dissolvePause.paused
   private val hostActive get() = dissolvePause.hostActive
   var onPresented: (() -> Unit)? = null
+  /**
+   * A rotation left a two-photo scene that no longer pairs on the new screen (a stacked pair
+   * turned, a portrait pair upright): the first photo stays, and the companion (its source key)
+   * is handed back so navigation shows it next instead of skipping it.
+   */
+  var onCompanionDropped: ((anchor: String, companion: String) -> Unit)? = null
+  private var compactParity = false
   val currentPhoto: SlideshowPhoto? get() = shown?.photos?.firstOrNull()
   val photoCount: Int get() = shown?.photos?.size ?: 0
 
@@ -90,6 +101,7 @@ internal class SlideshowStage(
       occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
       gallerySpread: Boolean = false, automatic: Boolean = true,
       feature: Feature = Feature.NONE, keepPeople: Boolean = false,
+      style: CompactStagePlan.Style? = null,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
     // Retain one extra obstacle as an overflow sentinel; gallery styles then take their
@@ -99,7 +111,8 @@ internal class SlideshowStage(
     val presentation = Presentation(photos.take(if (galleryPrint) 1 else 2),
         fill && !gallery, motion && !gallery, dwell, measured, galleryPrint,
         gallerySpread && !galleryPrint, automatic = automatic,
-        feature = if (gallery) Feature.NONE else feature, keepPeople = keepPeople)
+        feature = if (gallery) Feature.NONE else feature, keepPeople = keepPeople,
+        style = style, parity = style != null && compactParity.also { compactParity = !it })
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -277,12 +290,28 @@ internal class SlideshowStage(
       layers.forEach { it.measureAfterRebind(w, h) }
     }
     else {
+      val rotated = ScreensaverLayout.rotated(oldw, oldh, w, h)
+      if (rotated) dropUnpairedCompanion()
       layers.forEach { it.resize(w, h, paused || !hostActive) }
-      if (ScreensaverLayout.rotated(oldw, oldh, w, h) && shown != null) revealAfterRotation()
+      if (rotated && shown != null) revealAfterRotation()
     }
   }
 
   private var rotationReveal: android.view.ViewPropertyAnimator? = null
+
+  /** Re-pair on rotation: a pair that no longer fits the new class keeps only its first photo. */
+  private fun dropUnpairedCompanion() {
+    val old = shown ?: return
+    if (old.photos.size != 2 || old.editing || editOriginal != null) return
+    val (a, b) = old.photos
+    val cls = ScreensaverLayout.of(context)
+    if (CompactStagePlan.pairs(old.style, cls, a.bitmap.width to a.bitmap.height,
+            b.bitmap.width to b.bitmap.height)) return
+    val single = old.copy(photos = listOf(a))
+    shown = single
+    layers[current].retain(single)
+    onCompanionDropped?.invoke(a.sourceKey, b.sourceKey)
+  }
 
   /**
    * Rotation mid-show (mock): the same photo is re-laid for the new screen under a 20 % dim (set
@@ -318,6 +347,8 @@ internal class SlideshowStage(
     private var displayed: Presentation? = null
     private val matte = NativePhotoMatte(MATTE, resources.displayMetrics.density)
     private val printMatte = NativePhotoMatte(PRINT_MATTE, resources.displayMetrics.density)
+    /** This layer holds a compact (Portal Mini) scene: measured gallery reservations don't move it. */
+    private var compactLaid = false
     /** Easing of a new-mode settle; null for classic linear motion. */
     private var featureEasing: android.animation.TimeInterpolator? = null
     /** A Night photo scene is one full-bleed cover photo and nothing else (see [displayFeature]). */
@@ -338,6 +369,7 @@ internal class SlideshowStage(
         SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
       })
       if (p.featureScene && displayFeature(p, p.photos[0], width, height)) return
+      if (!p.editing && p.photos.all { it.adjustment == null } && displayCompact(p, width, height)) return
       background = if (p.galleryStyle) printMatte else matte
       visibility = View.VISIBLE
       val gallery = galleryPlans(p, width, height)
@@ -519,6 +551,99 @@ internal class SlideshowStage(
       return true
     }
 
+    /** Keep [p] as this layer's scene (re-pairing dropped a companion); the next display uses it. */
+    fun retain(p: Presentation) {
+      if (displayed == null) return
+      displayed = p
+      budget.setOwner(owner, p.photos.map {
+        SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
+      })
+    }
+
+    /**
+     * A compact window's native style ([CompactStagePlan]): stacked or paired cards, full-bleed
+     * drift, panorama sweep or whole over the backdrop. False on LARGE (or a style unchanged on this
+     * class), so the shipped presentation below runs exactly as before.
+     */
+    private fun displayCompact(p: Presentation, width: Int, height: Int): Boolean {
+      val cls = ScreensaverLayout.of(context)
+      if (!cls.compact || p.style == null) return false
+      val density = resources.displayMetrics.density
+      val first = p.photos[0]
+      val plan = CompactStagePlan.plan(p.style, cls, p.photos.map { it.bitmap.width to it.bitmap.height },
+          width, height, density, p.motion, p.parity, backdrop = first.look != null,
+          regions = if (p.keepPeople) first.regions else emptyList(),
+          occupied = p.occupied.map { ScreensaverLayout.Box(it.left, it.top, it.right, it.bottom) }) ?: return false
+      compactLaid = true
+      visibility = View.VISIBLE
+      background = when (plan.ground) {
+        CompactStagePlan.Ground.BLACK -> android.graphics.drawable.ColorDrawable(Color.BLACK)
+        CompactStagePlan.Ground.MATTE -> matte
+        CompactStagePlan.Ground.PRINT -> printMatte
+        CompactStagePlan.Ground.BACKDROP -> null
+      }
+      val look = first.look
+      if (plan.ground == CompactStagePlan.Ground.BACKDROP && look != null) {
+        // One card: cut its hole (inset by the corner) so a dissolve never blends the backdrop
+        // through the photo. Two cards: no hole; the backdrop is a single cheap opaque draw.
+        val hole = plan.tiles.singleOrNull()?.let { t ->
+          val inset = t.cornerDp * density
+          floatArrayOf(t.box.left + inset, t.box.top + inset, t.box.right - inset, t.box.bottom - inset)
+        } ?: floatArrayOf(0f, 0f, 0f, 0f)
+        addView(PhotoBackdropView(context).also { it.show(look.backdrop, hole, 0f, 0f, plan.backdropBrightness) },
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+      }
+      // A single full-screen cover (fill or sweep) is opaque: draw its alpha directly.
+      val full = plan.tiles.singleOrNull()?.box?.let { it.left == 0 && it.top == 0 && it.width == width && it.height == height }
+      if (plan.ground == CompactStagePlan.Ground.BLACK && full == true && plan.tiles[0].motion.start.let {
+            it.x <= 0f && it.y <= 0f }) { background = null; singleOpaquePhoto = true }
+      plan.tiles.forEachIndexed { index, tile ->
+        val photo = p.photos[tile.photo]
+        val radius = tile.cornerDp * density
+        val holder = FrameLayout(context).apply {
+          clipChildren = true
+          if (radius > 0f || tile.elevationDp > 0f) {
+            clipToOutline = radius > 0f
+            outlineProvider = object : android.view.ViewOutlineProvider() {
+              override fun getOutline(v: View, outline: android.graphics.Outline) =
+                  outline.setRoundRect(0, 0, v.width, v.height, radius)
+            }
+            elevation = tile.elevationDp * density
+            if (tile.elevationDp > 0f) setBackgroundColor(Color.BLACK)
+          }
+        }
+        addView(holder, LayoutParams(tile.box.width, tile.box.height).apply {
+          leftMargin = tile.box.left; topMargin = tile.box.top
+        })
+        val image = NativePhotoView(context).apply {
+          scaleType = ImageView.ScaleType.FIT_XY
+          setImageBitmap(photo.bitmap)
+          pivotX = 0f; pivotY = 0f
+          showBorder = tile.border
+        }
+        holder.addView(image, LayoutParams(photo.bitmap.width, photo.bitmap.height))
+        val start = tile.motion.start
+        image.scaleX = start.scale; image.scaleY = start.scale
+        image.translationX = start.x; image.translationY = start.y
+        paths[index] = tile.motion
+        if (tile.motion.start != tile.motion.end && animationsAllowed()) {
+          val end = tile.motion.end
+          movePhotos.add(index)
+          moves.add(AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(image, View.SCALE_X, start.scale, end.scale),
+                ObjectAnimator.ofFloat(image, View.SCALE_Y, start.scale, end.scale),
+                ObjectAnimator.ofFloat(image, View.TRANSLATION_X, start.x, end.x),
+                ObjectAnimator.ofFloat(image, View.TRANSLATION_Y, start.y, end.y))
+            duration = p.dwell + DISSOLVE_MS
+            interpolator = LinearInterpolator()
+            start()
+          })
+        }
+      }
+      return true
+    }
+
     /** Reuses only bitmap dimensions and views; no composite images or extra pixel owners. */
     private fun galleryPlans(
         p: Presentation, width: Int, height: Int,
@@ -547,6 +672,7 @@ internal class SlideshowStage(
 
     fun refreshGalleryOverlays(occupied: List<Rect>, width: Int, height: Int) {
       val old = displayed ?: return
+      if (compactLaid) { displayed = old.copy(occupied = occupied); return }
       if (!old.galleryStyle || old.occupied == occupied || old.editing) return
       if (old.photos.any { it.bitmap.isRecycled }) return
       displayed = old.copy(occupied = occupied)
@@ -686,6 +812,7 @@ internal class SlideshowStage(
       displayed = null
       featureEasing = null
       singleOpaquePhoto = false
+      compactLaid = false
       moves.forEach { it.cancel() }
       moves.clear()
       movePhotos.clear()

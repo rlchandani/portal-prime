@@ -52,6 +52,8 @@ internal fun ScreensaverModeContent() {
     val domain = SettingsDomains.screensaver
     val spec = domain.specs.first { it.key == "mode" } as EnumSpec<ScreensaverConfig.Settings>
     var mode by remember { mutableStateOf(spec.get(domain.load(context))) }
+    // The Portal Mini (either orientation): Cinema is a turned style; upright Panorama stands in.
+    val compact = currentLayoutClass().compact
     val advanced = rememberApprovedAdvanced()
     var advancedConsent by remember { mutableStateOf(false) }
     DisposableEffect(owner) {
@@ -67,7 +69,7 @@ internal fun ScreensaverModeContent() {
     Card {
         PickerRow(spec.title, mode,
             SettingsPresentation.visibleEnumOptions(domain.id, spec.key, spec.options, mode, advanced)
-                .map { (value, label) -> PickerOption(value, label) }) { selected ->
+                .map { (value, label) -> PickerOption(value, label, ScreensaverConfig.modeHint(value, compact)) }) { selected ->
             domain.apply(context, JSONObject().put(spec.key, selected))
             mode = spec.get(domain.load(context))
         }

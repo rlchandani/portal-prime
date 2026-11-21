@@ -128,15 +128,18 @@ internal class QuietNightClockView(context: Context, tone: String) : View(contex
     canvas.drawColor(Color.argb((255 * reveal).toInt(), 0, 0, 0))
     clockPaint.alpha = (255 * reveal).toInt()
     datePaint.alpha = (180 * reveal).toInt()
-    clockPaint.textSize = height * 0.28f
+    // The Mini (compact) gets its own type (mock QuietC); LARGE keeps the shipped arithmetic.
+    val compact = ScreensaverFaceLayout.quietType(
+        ScreensaverLayout.of(context), width.toFloat(), height.toFloat(), resources.displayMetrics.density)
+    clockPaint.textSize = compact?.clock ?: (height * 0.28f)
     val measured = clockPaint.measureText(time).coerceAtLeast(1f)
     clockPaint.textSize *= minOf(1f, width * 0.82f / measured)
-    datePaint.textSize = minOf(height * 0.041f, width * 0.038f)
+    datePaint.textSize = compact?.date ?: minOf(height * 0.041f, width * 0.038f)
     val dateWidth = datePaint.measureText(date).coerceAtLeast(1f)
     datePaint.textSize *= minOf(1f, width * 0.84f / dateWidth)
     val clockHeight = clockPaint.descent() - clockPaint.ascent()
     val dateHeight = datePaint.descent() - datePaint.ascent()
-    val gap = height * 0.043f
+    val gap = compact?.gap ?: (height * 0.043f)
     // A slow +/-12 x 9 dp orbit so the all-night text never sits on the same pixels (burn-in).
     // Evaluated only on the draws this view already makes (minute ticks and the reveal ramp).
     val (dx, dy) = ScreensaverLayout.quietDrift(System.currentTimeMillis(), resources.displayMetrics.density)
