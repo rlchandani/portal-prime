@@ -107,7 +107,7 @@ private fun VoiceChoiceRow(
       verticalAlignment = Alignment.CenterVertically) {
     Row(Modifier.weight(1f).defaultMinSize(minHeight = 68.dp)
         .background(if (isSelected) IosFocusTint else Color.Transparent, shape)
-        .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, onClick = onClick)
+        .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, onClick = onClick, role = null)
         .semantics(mergeDescendants = true) { selected = isSelected; role = Role.RadioButton }
         .padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
       Column(Modifier.weight(1f)) {

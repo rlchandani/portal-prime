@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.BorderStroke
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -167,7 +168,7 @@ internal fun ApprovedSettingsDialog(
     content: @Composable () -> Unit,
 ) {
     if (!LocalApprovedLauncherPageActive.current) return
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
         Surface(
             color = IosCard,
             shape = RoundedCornerShape(28.dp),
@@ -197,7 +198,7 @@ internal fun ApprovedSettingsDialog(
                 content()
             }
         }
-    }
+    }}
 }
 
 @Composable

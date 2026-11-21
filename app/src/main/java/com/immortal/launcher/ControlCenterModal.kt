@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -75,7 +76,7 @@ private fun ModalFrame(ui: CcUi, open: Boolean, pop: CcPresence, fade: CcPresenc
   val lift = with(LocalDensity.current) { MODAL_LIFT.toPx() }
   Box(Modifier.fillMaxSize()) {
     Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
-        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.modal(null) }
+        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, role = Role.Button) { ui.modal(null) }
             .semantics { contentDescription = "Dismiss" } else Modifier))
     // Compact: never wider than the window (kept off its edges); the designed width when it fits.
     val width = if (currentLayoutClass().compact)
@@ -89,7 +90,7 @@ private fun ModalFrame(ui: CcUi, open: Boolean, pop: CcPresence, fade: CcPresenc
         }
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Modal, ambientColor = Color.Black, spotColor = Color.Black)
         .clip(CcStyle.Modal).background(c.bg)
-        .clickable(remember { MutableInteractionSource() }, indication = null) {}
+        .blockScrimTaps()
         .verticalScroll(rememberScrollState())
         .padding(start = 46.dp, end = 46.dp, top = 44.dp, bottom = 40.dp), content = content)
   }

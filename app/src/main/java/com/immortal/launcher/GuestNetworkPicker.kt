@@ -143,7 +143,7 @@ private fun GuestNetworkRow(network: GuestNetworks.Nearby, selected: Boolean, on
   val detail = listOfNotNull("Connected now".takeIf { network.connected }, network.security.label).joinToString(" · ")
   Row(Modifier.fillMaxWidth().heightIn(min = 84.dp).clip(shape)
       .background(if (selected) ApprovedHomePalette.Selected else ApprovedHomePalette.Card).approvedOutline(shape)
-      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, onClick = onClick)
+      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, onClick = onClick, role = null)
       .semantics(mergeDescendants = true) {
         role = Role.RadioButton; this.selected = selected
         contentDescription = "${network.ssid}, $detail, ${GuestNetworks.bars(network.level)} of 4 bars"

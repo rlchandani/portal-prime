@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -105,5 +106,8 @@ internal fun CcTheme(dark: Boolean, content: @Composable () -> Unit) {
   // LARGE keeps the width-only rule; compact (the Mini) also reads the height (see CcCompactScale).
   val scale = CcCompactScale.of(currentLayoutClass(), config.screenWidthDp)
   val scaled = if (scale != 1f) Density(density.density * scale, density.fontScale) else density
-  CompositionLocalProvider(LocalCc provides if (dark) CcDark else CcLight, LocalDensity provides scaled, content = content)
+  CompositionLocalProvider(LocalCc provides if (dark) CcDark else CcLight, LocalDensity provides scaled) {
+    // Re-derived inside the compact scale so the hit-area floor stays 64 real dp.
+    ProvideHearthpaneTouchTargets(content)
+  }
 }

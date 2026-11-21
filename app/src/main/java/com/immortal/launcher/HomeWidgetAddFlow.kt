@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.Canvas
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -266,7 +267,7 @@ internal fun HomeWidgetPickerSheet(
 ) {
   var showMore by rememberSaveable(slot) { mutableStateOf(false) }
   Dialog(onDismissRequest = onDismiss,
-      properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+      properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) { ProvideHearthpaneTouchTargets {
     val view = LocalView.current
     DisposableEffect(view) {
       (view.parent as? DialogWindowProvider)?.window?.let { window ->
@@ -308,7 +309,7 @@ internal fun HomeWidgetPickerSheet(
         }
       }
     }
-  }
+  }}
 }
 
 @Composable

@@ -7,6 +7,9 @@
 package com.immortal.launcher
 
 import android.content.Context
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectableGroup
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -145,14 +148,15 @@ private fun ApprovedAppsRoundAction(glyph: String, label: String, size: androidx
 internal fun ApprovedAppsDock(selected: String, onExit: () -> Unit, modifier: Modifier = Modifier) {
   val context = LocalContext.current
   Surface(modifier = modifier, color = IosCard, shape = RoundedCornerShape(26.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider)) {
-    Row(Modifier.height(92.dp).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
+    Row(Modifier.height(92.dp).padding(8.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically) {
       listOf(Triple("home", "Home", "home"), Triple("apps", "Apps", "gridapps"), Triple("tools", "Tools", "tools")).forEach { (id, label, glyph) ->
         val active = id == selected
         Row(Modifier.widthIn(min = 176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
             .background(if (active) LocalApprovedPalette.current.selected else Color.Transparent)
+            .semantics { this.selected = active }
             .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f,
-                ringColor = LocalApprovedPalette.current.accent) {
+                ringColor = LocalApprovedPalette.current.accent, role = Role.Tab) {
               ApprovedLauncherTab.fromId(id)?.let { tab ->
                 if (context.openApprovedHomeTab(tab)) onExit()
               }

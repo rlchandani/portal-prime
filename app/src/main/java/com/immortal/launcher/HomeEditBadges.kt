@@ -103,7 +103,7 @@ internal fun RemoveBadge(size: Dp, modifier: Modifier = Modifier, onClick: () ->
   Surface(
       color = Color(0xFFE53935),
       shape = CircleShape,
-      modifier = modifier.size(size).tvFocusable(CircleShape) { onClick() },
+      modifier = modifier.size(size).semantics { contentDescription = "Remove" }.tvFocusable(CircleShape) { onClick() },
   ) {
     Canvas(Modifier.fillMaxSize()) {
       val cx = this.size.width / 2f

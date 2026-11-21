@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -189,7 +190,7 @@ private fun WifiQrTile(state: WifiWidgetState.Ready, modifier: Modifier, onClick
 /** Full-screen enlarged QR: tap or Back closes it, the screen stays awake, and it closes after 2 min. */
 @Composable
 private fun WifiQrFullScreen(state: WifiWidgetState.Ready, onClose: () -> Unit) {
-  Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+  Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     KeepInteractiveScreenAwake()
     LaunchedEffect(Unit) { delay(WifiQrOverlay.AUTO_CLOSE_MS); onClose() }
     Column(Modifier.fillMaxSize().background(ApprovedHomePalette.Background)
@@ -201,5 +202,5 @@ private fun WifiQrFullScreen(state: WifiWidgetState.Ready, onClose: () -> Unit) 
           fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
       Text("$SCAN_HINT · Tap anywhere to close", color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 32.sp)
     }
-  }
+  }}
 }

@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Intent
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -190,9 +191,9 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   if (showDinner) {
     androidx.compose.ui.window.Dialog(onDismissRequest = { showDinner = false },
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false)) {
+            decorFitsSystemWindows = false)) { ProvideHearthpaneTouchTargets {
       Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { showDinner = false }) }
-    }
+    }}
   }
   ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier, scrollContent = false) {
     if (tiles.isEmpty()) {

@@ -281,7 +281,7 @@ internal fun CallHeadline(title: String, sub: String?, titleSize: TextUnit = 72.
 @Composable
 internal fun Modifier.callClick(label: String, enabled: Boolean, onClick: () -> Unit): Modifier =
     semantics { role = Role.Button; contentDescription = label }
-        .clickable(remember { MutableInteractionSource() }, ripple(), enabled = enabled, onClick = onClick)
+        .clickable(remember { MutableInteractionSource() }, ripple(), enabled = enabled, role = Role.Button, onClick = onClick)
 
 internal fun Modifier.callPanel(fill: Color, shape: Shape = RoundedCornerShape(32.dp), edge: Color? = null): Modifier =
     background(fill, shape).let { if (edge != null) it.border(OUTLINE, edge, shape) else it }

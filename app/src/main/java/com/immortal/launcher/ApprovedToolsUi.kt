@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.BorderStroke
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -167,7 +168,7 @@ internal fun ToolsSheet(
     val p = LocalApprovedPalette.current
     val cfg = LocalConfiguration.current
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(
-        usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
+        usePlatformDefaultWidth = false, dismissOnClickOutside = false)) { ProvideHearthpaneTouchTargets {
         Surface(color = p.surface, shape = RoundedCornerShape(28.dp),
             border = BorderStroke(1.dp, p.divider),
             modifier = Modifier.padding(24.dp).imePadding().widthIn(max = 880.dp)
@@ -197,7 +198,7 @@ internal fun ToolsSheet(
                 }
             }
         }
-    }
+    }}
 }
 
 /** Compact sheet actions: right-aligned, wrapping to another line instead of squeezing a label. */

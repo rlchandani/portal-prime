@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import androidx.activity.compose.BackHandler
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -205,7 +206,7 @@ private fun ToolValueRow(label: String, value: String, onClick: () -> Unit) {
 @Composable
 private fun ToolDialog(title: String, onDismiss: () -> Unit, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
   if (!LocalApprovedLauncherPageActive.current) return
-  androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+  androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     KeepInteractiveScreenAwake()
     val compact = currentLayoutClass().compact
     val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp).heightIn(max = 980.dp)
@@ -215,7 +216,7 @@ private fun ToolDialog(title: String, onDismiss: () -> Unit, content: @Composabl
         content()
       }
     }
-  }
+  }}
 }
 
 /**

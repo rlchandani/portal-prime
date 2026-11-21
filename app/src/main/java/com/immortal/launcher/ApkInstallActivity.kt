@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Intent
+import androidx.compose.ui.semantics.Role
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
@@ -203,14 +204,13 @@ private fun InstallPrompt(
     onCancel: () -> Unit,
     onInstall: ((String) -> Unit) -> Unit,
 ) {
-  val noRipple = remember { MutableInteractionSource() }
   var status by remember { mutableStateOf<String?>(null) }
   Box(
       contentAlignment = Alignment.Center,
       modifier =
           Modifier.fillMaxSize()
               .background(Color(0xCC000000))
-              .clickable(interactionSource = noRipple, indication = null) { onCancel() },
+              .dismissScrim("Cancel") { onCancel() },
   ) {
     Surface(
         color = Color(0xFF1C1C1E),
@@ -218,7 +218,7 @@ private fun InstallPrompt(
         modifier =
             Modifier.padding(24.dp)
                 .width(420.dp)
-                .clickable(interactionSource = noRipple, indication = null) {},
+                .blockScrimTaps(),
     ) {
       Column(
           horizontalAlignment = Alignment.CenterHorizontally,
@@ -251,7 +251,7 @@ private fun InstallPrompt(
               else "Cancel",
               color = Color(0xFF8AB4F8),
               fontSize = 18.sp,
-              modifier = Modifier.clickable { onCancel() }.padding(12.dp),
+              modifier = Modifier.clickable(role = Role.Button) { onCancel() }.padding(12.dp),
           )
           if (status == null) {
             Spacer(Modifier.size(8.dp))
@@ -260,7 +260,7 @@ private fun InstallPrompt(
                 color = Color(0xFF8AB4F8),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable { onInstall { s -> status = s } }.padding(12.dp),
+                modifier = Modifier.clickable(role = Role.Button) { onInstall { s -> status = s } }.padding(12.dp),
             )
           }
         }

@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.Image
+import androidx.compose.ui.semantics.Role
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,7 +50,7 @@ internal fun RoutinesHomeWidget(modifier: Modifier = Modifier) {
   val runs = remember(revision, now) { RoutineEngine.repo.runs() }
   var sheet by remember { mutableStateOf(false) }
   val onOpen = { if (RoutineSchedule.active(runs) != null) RoutineEngine.reopen() else sheet = true }
-  Column(modifier.padding(30.dp).clickable { onOpen() }) {
+  Column(modifier.padding(30.dp).clickable(role = Role.Button) { onOpen() }) {
     ApprovedHomeWidgetHeading("Routines", "tools", HomeRefinements.HeaderAction.OPEN) { onOpen() }
     Spacer(Modifier.height(22.dp))
     val list = doc.routines.sortedBy { it.start }
@@ -81,7 +83,7 @@ private fun WidgetRow(r: Routine, status: RoutineSchedule.Status) {
 @Composable
 internal fun RoutinesSheet(doc: RoutineDoc, runs: Map<String, RoutineRun>, now: Long, onClose: () -> Unit) {
   val busy = RoutineSchedule.active(runs) != null
-  Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+  Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     Column(Modifier.widthIn(max = 1400.dp).fillMaxWidth(0.8f).clip(RoundedCornerShape(40.dp))
         .background(RoutineColors.Sheet).border(1.dp, RoutineColors.Border, RoundedCornerShape(40.dp)).padding(48.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
@@ -112,14 +114,14 @@ internal fun RoutinesSheet(doc: RoutineDoc, runs: Map<String, RoutineRun>, now: 
         }
       }
     }
-  }
+  }}
 }
 
 @Composable
 private fun SheetButton(label: String, solid: Boolean, enabled: Boolean, onClick: () -> Unit) {
   Box(Modifier.heightIn(min = 72.dp).clip(RoundedCornerShape(36.dp))
       .background(if (solid) RoutineColors.Text.copy(alpha = if (enabled) 1f else 0.3f) else RoutineColors.Raised)
-      .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 32.dp), contentAlignment = Alignment.Center) {
+      .clickable(role = Role.Button, enabled = enabled, onClick = onClick).padding(horizontal = 32.dp), contentAlignment = Alignment.Center) {
     Text(label, color = if (solid) RoutineColors.Bg else RoutineColors.Text, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
   }
 }
@@ -142,7 +144,7 @@ internal fun RoutineHomeToast(modifier: Modifier = Modifier) {
     }, color = RoutineColors.Text, fontSize = 28.sp)
     t.undoRid?.let { rid ->
       Text("Undo", color = RoutineColors.Green, fontSize = 28.sp, fontWeight = FontWeight.SemiBold,
-          modifier = Modifier.clickable { RoutineEngine.undoClose(rid) }.padding(8.dp))
+          modifier = Modifier.clickable(role = Role.Button) { RoutineEngine.undoClose(rid) }.padding(8.dp))
     }
   }
 }

@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.Manifest
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -43,7 +44,7 @@ class CallMessageActivity : ComponentActivity() {
     if (msgId != null) {
       val m = CallMessageStore.messages.value.firstOrNull { it.id == msgId } ?: return finish()
       CallMessageStore.markSeen(this, m.id)
-      setContent { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessagePlayScreen(m, onClose = ::finish) } }
+      setContent { ProvideHearthpaneTouchTargets { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessagePlayScreen(m, onClose = ::finish) } } }
       return
     }
     val peer = intent.getStringExtra(EXTRA_PEER)?.let(CallMessages::recipient)
@@ -56,7 +57,7 @@ class CallMessageActivity : ComponentActivity() {
     val callId = intent.getStringExtra(EXTRA_CALL)?.takeIf(CallWire::isCallId)
     val c = CallMessageComposer(this, peer, test, onFinish = ::finish, callId = callId)
     composer = c
-    setContent { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessageComposeScreen(c, auto) } }
+    setContent { ProvideHearthpaneTouchTargets { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessageComposeScreen(c, auto) } } }
   }
 
   override fun onStart() {

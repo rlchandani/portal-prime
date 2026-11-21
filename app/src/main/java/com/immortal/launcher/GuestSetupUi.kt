@@ -43,7 +43,7 @@ internal fun GuestChoiceChip(label: String, selected: Boolean, icon: String? = n
   val shape = RoundedCornerShape(32.dp)
   Row(Modifier.heightIn(min = GuestTouch).clip(shape)
       .background(if (selected) ApprovedHomePalette.Text else Color.Transparent).approvedOutline(shape)
-      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, onClick = onClick)
+      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, onClick = onClick, role = null)
       .semantics { role = Role.Checkbox; this.selected = selected; contentDescription = label }
       .padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -82,7 +82,7 @@ internal fun GuestHint(text: String, warning: Boolean = false, modifier: Modifie
 internal fun GuestToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
   val shape = RoundedCornerShape(20.dp)
   Row(Modifier.fillMaxWidth().heightIn(min = GuestTouch).clip(shape)
-      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent) { onChange(!checked) }
+      .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent, role = null) { onChange(!checked) }
       .semantics(mergeDescendants = true) { role = Role.Switch; selected = checked }.padding(vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically) {
     Text(label, color = ApprovedHomePalette.Text, fontSize = 24.sp, lineHeight = 32.sp, modifier = Modifier.weight(1f))

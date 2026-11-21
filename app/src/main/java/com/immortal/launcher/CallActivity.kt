@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.Manifest
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.content.BroadcastReceiver
 import android.content.ComponentCallbacks2
 import android.content.Context
@@ -52,8 +53,10 @@ class CallActivity : ComponentActivity() {
         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
     applyToolsDisplayBars(this)
     setContent {
-      CallApp(motion = motion.value, lowMemory = lowMemory.intValue, onClose = ::finish,
-          onNeedPermissions = ::requestCallPermissions)
+      ProvideHearthpaneTouchTargets {
+        CallApp(motion = motion.value, lowMemory = lowMemory.intValue, onClose = ::finish,
+            onNeedPermissions = ::requestCallPermissions)
+      }
     }
     window.setBackgroundDrawable(null)
   }

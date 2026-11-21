@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +41,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 internal fun CcTileGrid(ui: CcUi, slice: CcRoomSlice) {
   val rows = slice.contents.tiles.chunked(2)
-  Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+  Column(Modifier.semantics { collectionInfo = CollectionInfo(rows.size, 2) }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
     rows.forEach { row ->
       key(row.first().id) {
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {

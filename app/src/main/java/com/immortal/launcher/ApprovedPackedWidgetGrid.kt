@@ -7,6 +7,12 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.MutatePriority
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
+import androidx.compose.ui.semantics.CollectionInfo
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -186,7 +192,9 @@ internal fun ApprovedPackedWidgetGrid(
         }
       }
       Layout(
-          modifier = Modifier.fillMaxWidth().height(height),
+          // A grid to accessibility services: rows of half-height slots across the drawn columns.
+          modifier = Modifier.fillMaxWidth().height(height)
+              .semantics { collectionInfo = CollectionInfo(rowCount, if (folded) 2 else 4) },
           content = {
             widgets.forEachIndexed { index, widget ->
               key(widget.key) {
@@ -248,7 +256,11 @@ internal fun ApprovedPackedWidgetGrid(
                     .onGloballyPositioned { cardCoordinates = it }.then(widgetDrag({ cardCoordinates }, false))
                 val grip = if (!editing) Modifier else Modifier
                     .onGloballyPositioned { gripCoordinates = it }.then(widgetDrag({ gripCoordinates }, true))
+                val drawn = shown[index]
                 val cardContent = @Composable { content(widget, Modifier.fillMaxSize().zIndex(if (dragging) 1f else 0f)
+                    .semantics {
+                      collectionItemInfo = CollectionItemInfo(drawn.row, drawn.rows, drawn.column, drawn.columns)
+                    }
                     .graphicsLayer {
                       translationX = preview?.takeIf { it.key == widget.key }?.translationX ?: 0f
                       translationY = preview?.takeIf { it.key == widget.key }?.translationY ?: 0f
@@ -256,7 +268,7 @@ internal fun ApprovedPackedWidgetGrid(
                     },
                     cellSpan, drag, grip) }
                 if (cardDensity == null || widget.isAppWidget) cardContent()
-                else CompositionLocalProvider(LocalDensity provides cardDensity) { cardContent() }
+                else CompositionLocalProvider(LocalDensity provides cardDensity) { ProvideHearthpaneTouchTargets(cardContent) }
               }
             }
           },

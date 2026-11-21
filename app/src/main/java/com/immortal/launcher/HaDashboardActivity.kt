@@ -8,6 +8,8 @@
 package com.immortal.launcher
 
 import android.os.Bundle
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateColorAsState
@@ -323,7 +325,7 @@ private fun RoomChip(name: String, litCount: Int, selected: Boolean, onClick: ()
         modifier = Modifier.heightIn(min = 56.dp)
             .clip(RoundedCornerShape(14.dp))
             .background(if (selected) Color.White.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.06f))
-            .clickable { onClick() }
+            .clickable(role = Role.Button) { onClick() }
             .padding(horizontal = 18.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -437,7 +439,7 @@ private fun RoomRow(name: String, litCount: Int, selected: Boolean, onClick: () 
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(if (selected) Color.White.copy(alpha = 0.11f) else Color.Transparent)
-            .clickable { onClick() }
+            .clickable(role = Role.Button) { onClick() }
             .padding(horizontal = 14.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -467,7 +469,7 @@ private fun SceneChip(label: String, modifier: Modifier = Modifier, onClick: () 
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .border(0.5.dp, SceneRim, RoundedCornerShape(12.dp))
-            .clickable {
+            .clickable(role = Role.Button) {
                 scope.launch { flashing = true; delay(500); flashing = false }
                 onClick()
             }
@@ -611,7 +613,7 @@ private fun ToggleTile(
             .clip(RoundedCornerShape(Glass.Radius))
             .background(bg)
             .border(0.5.dp, if (on) Color.Transparent else Glass.Border, RoundedCornerShape(Glass.Radius))
-            .clickable { onToggle(d.entityId, on) }
+            .toggleable(value = on, role = Role.Switch) { onToggle(d.entityId, on) }
             .padding(horizontal = 17.dp, vertical = 17.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -649,7 +651,7 @@ private fun DimmerTile(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(
-            modifier = Modifier.weight(1f).fillMaxHeight().clickable { onToggle(d.entityId, on) },
+            modifier = Modifier.weight(1f).fillMaxHeight().toggleable(value = on, role = Role.Switch) { onToggle(d.entityId, on) },
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(if (on) AmberText.copy(0.12f) else Glass.SubTint))
@@ -787,7 +789,7 @@ private fun TempButton(label: String, onClick: () -> Unit) {
         modifier = Modifier.size(44.dp).clip(CircleShape)
             .border(0.5.dp, Glass.Border, CircleShape)
             .background(Glass.Chrome)
-            .clickable { onClick() }
+            .clickable(role = Role.Button) { onClick() }
     ) {
         Text(label, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Light)
     }
@@ -850,7 +852,7 @@ private fun EqBars(modifier: Modifier = Modifier) {
 @Composable
 private fun MediaButton(label: String, onClick: () -> Unit) {
     Text(label, color = Color.White.copy(alpha = 0.85f), fontSize = 18.sp,
-        modifier = Modifier.clickable { onClick() }.padding(2.dp))
+        modifier = Modifier.clickable(role = Role.Button) { onClick() }.padding(2.dp))
 }
 
 @Composable
