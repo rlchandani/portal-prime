@@ -313,6 +313,56 @@ class HomeLinkPairingTest {
     assertArrayEquals(atMaple, atLake)
   }
 
+  /**
+   * Verify has no skip: once both sides are comparing, no message (a replay of any of the four,
+   * or the joiner's open again) and no amount of waiting links anyone. Only a person's answer does.
+   */
+  @Test fun comparingEndsOnlyWithAPersonsAnswer() {
+    val h = hello()
+    val j1 = commit(h)
+    val i1 = toInviter(h.state, j1.outgoing!!)
+    val j2 = HomeLinkJoiner.receive(j1.state, lake, i1.outgoing!!, random)
+    val i2 = toInviter(i1.state, j2.outgoing!!)
+    val i = i2.state as HomeLinkInviterState.Comparing
+    val j = j2.state as HomeLinkJoinerState.Comparing
+    for (m in listOf(h.outgoing!!, j1.outgoing!!, i1.outgoing!!, j2.outgoing!!)) {
+      for (at in listOf(now, invite.expiresAt, Long.MAX_VALUE)) {
+        assertEquals(i, toInviter(i, m, at).state)
+        assertNull(toInviter(i, m, at).outgoing)
+      }
+      assertEquals(j, HomeLinkJoiner.receive(j, lake, m, random).state)
+      assertNull(HomeLinkJoiner.receive(j, lake, m, random).outgoing)
+    }
+    assertEquals(i, HomeLinkInviter.tick(i, Long.MAX_VALUE))
+    assertEquals(HomeLinkInviterState.Linked(i.peer), HomeLinkInviter.confirm(i, matched = true))
+    assertEquals(HomeLinkJoinerState.Linked(j.peer), HomeLinkJoiner.confirm(j, matched = true))
+  }
+
+  /** The screens agree: Verify has no timer, no auto-answer, and the test flow links only from "They match". */
+  @Test fun theVerifyScreenHasNoSkipOrAutoConfirm() {
+    val dir = listOf(java.io.File("src/main/java/com/immortal/launcher"), java.io.File("app/src/main/java/com/immortal/launcher"))
+        .first { it.isDirectory }
+    val screens = java.io.File(dir, "HomeLinkScreens.kt").readText()
+    val start = screens.indexOf("internal fun HomeLinkVerifyScreen(")
+    val verify = screens.substring(start, screens.indexOf("\n}\n", start))
+    for (banned in listOf("LaunchedEffect", "delay(", "onMatch()", "onMatch.invoke", "SideEffect", "DisposableEffect", "Timer"))
+      assertFalse("Verify uses $banned", verify.contains(banned))
+    assertEquals("onMatch is only the parameter and the They match button", 2, Regex("onMatch").findAll(verify).count())
+    assertTrue(verify.contains("CallPill(HomeLinkCopy.MATCH, onMatch"))
+    val sources = dir.listFiles { f -> f.name.startsWith("HomeLink") && f.name.endsWith(".kt") }!!.associate { it.name to it.readText() }
+    for ((name, text) in sources) {
+      if (name == "HomeLinkRoles.kt") continue
+      assertFalse("$name makes a Linked state", text.contains("InviterState.Linked(") || text.contains("JoinerState.Linked("))
+      assertFalse("$name confirms a match itself", Regex("""confirm\([^)]*true""").containsMatchIn(text))
+    }
+    val flow = sources.getValue("HomeLinkTestFlow.kt")
+    assertEquals(1, Regex("""stage = HomeLinkTestStage\.PERMS""").findAll(flow).count())
+    val onMatch = flow.substring(flow.indexOf("onMatch = {"), flow.indexOf("onMismatch ="))
+    assertTrue(onMatch.contains("stage = HomeLinkTestStage.PERMS"))
+    assertTrue(onMatch.contains(".link(peer"))
+    assertEquals(1, Regex("""\.link\(peer""").findAll(flow).count())
+  }
+
   @Test fun homeNamesMustBeShowable() {
     assertThrows(IllegalArgumentException::class.java) { HomeLinkSelf(maple.identity, "") }
     assertThrows(IllegalArgumentException::class.java) { HomeLinkSelf(maple.identity, "x".repeat(HomeLinkWire.MAX_NAME + 1)) }

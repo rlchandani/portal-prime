@@ -62,9 +62,15 @@ anyone who saw the mailbox id could brute-force the code offline (≈ 2^45 SHA-2
 GPU-hour) and race the real joiner. v2 removes every code-derived deterministic value from the
 wire.
 
-**PAKE**: both sides map (secret, mailbox) to a curve point `G` (hash-to-curve by
-try-and-increment over a fixed 64 candidates, so timing doesn't depend on the secret); each sends
-`x(y·G)` for a random scalar `y`; both compute `x(y_i·y_j·G)`. A share is a uniformly random point
+**PAKE**: both sides map (secret, mailbox) to a curve point `G` with **RFC 9380 hash_to_curve,
+suite P256_XMD:SHA-256_SSWU_RO_** (`HomeLinkHashToCurve`: expand_message_xmd, simplified SWU with
+Z = −10, square roots by exponent since p ≡ 3 mod 4, CMOV by arithmetic rather than branches; DST
+`hearthpane-homelink-cpace-v2-P256_XMD:SHA-256_SSWU_RO_`; the RFC's Appendix J.1.1 and K.1 vectors
+match exactly in `HomeLinkHashToCurveTest`). It replaced the S1 try-and-increment map after the
+crypto review. Each side sends `x(y·G)` for a random scalar `y`; both compute `x(y_i·y_j·G)`.
+Received shares are validated before use: exactly 32 bytes in canonical Base64 (so our own share
+can't come back re-spelt), x < p, a finite point on the curve (x-only shares can't encode infinity;
+cofactor 1, so no subgroup check). A share is a uniformly random point
 whatever the secret, and testing a guess against a recorded transcript needs one side's scalar
 (Diffie–Hellman hardness). Secret-scalar multiplications use the platform ECDH, not BigInteger.
 The session key gives one MAC key per direction and a public session id `sid` that the identity
@@ -88,7 +94,13 @@ wrong direction key):
 **Attempt limits (security-critical)**: the inviter burns the invite after **3** commits that fail
 the MAC (`HomeLinkInviter.MAX_TRIES`, state `failedTries`, failure `TOO_MANY_TRIES`); the first
 valid commit uses it up; anything after 10 minutes is refused. The joiner makes one attempt per
-typed code.
+typed code. The count and the invite are **memory only** (`HomeLinkInviterSession`): nothing
+persists an invite, its PAKE scalar or its tries, so forcing the inviter to restart doesn't reset
+the count, it ends the invite (a restarted inviter can't even accept a commit made against the old
+hello), and the next invite has a new random secret. Each invite stays bounded at 3 guesses; an
+attacker who keeps forcing new invites gets 3 independent 1-in-2^35 guesses per invite the family
+creates, the same as without restarts. Parallel joins go through one lock against the latest
+state, so they can't share a try between them (`HomeLinkInviterSessionTest`).
 
 ### Threat model for linking
 
@@ -98,7 +110,8 @@ typed code.
 | Active relay / third party knowing the nameplate | post commits as a joiner, or a fake hello to the joiner | online guessing: one guess per join attempt | inviter: ≤ 3 tries per invite → 3 / 2^35 ≈ 1 in 11 billion; joiner: 1 guess per typed code |
 | Someone who learnt the whole code (overheard the phone call) | complete a PAKE as either side, or sit in the middle | MITM | the SAS: commit-then-reveal fixes keys before either side sees the other's → one 1-in-2^64 guess at pictures+digits; people must compare (the UI never skips Verify) |
 | Relay DoS | drop messages, burn an invite with 3 garbage commits | denial of service | accepted: make a new code |
-| Local timing observer | PAKE map timing | partition attack on the secret | fixed 64-candidate map; secret scalars via platform ECDH |
+| Local timing observer | PAKE map timing | partition attack on the secret | RFC 9380 SSWU map, straight-line (same field operations for every input, no secret branches of our own); secret scalars via platform ECDH. Residual: `BigInteger` arithmetic and the final affine addition (`modInverse`) aren't constant-time, so timing can leak a little about the secret-derived point. Only the device holding the secret computes it, once per PAKE start, so this needs fine-grained local timing of that Portal or phone while it pairs |
+| A paired phone (holds the household key) posing as a Portal | `/remote/homelinkpeer` from a spoofed Portal id at that Portal's announced address | fetch the sealed vault = the household identity's private key | **route and vault sync are off outside measurement builds** (`HomeLinkGate.VAULT_SYNC` = `PORTAL_CALL_LOOPBACK`; `HomeLinkGateTest`): not registered in release/performance/benchmark builds until Portal-only key material exists (Risks) |
 
 A memory-hard KDF on the mailbox id was considered and not needed: with the nameplate public and
 the secret only inside the PAKE, there is no offline target left to harden.
@@ -154,7 +167,7 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 |---|---|---|---|
 | S1 | **Household pairing core**: identity key, invite code (public nameplate + PAKE secret, 3 tries), commit/reveal protocol with typed+sequenced MAC'd messages, SAS (4 pictures + 12 digits), link + permissions model and codec | nothing | **built**, protocol v2 after security review (`HomeLink*.kt`, `HomeLinkPake.kt`) |
 | S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired/Too many tries, Connected, **Households & devices** (`HomeLinkHouseholdsScreen`), **Permissions** (`HomeLinkPermissionsScreen`), **Mini 800×1280 layouts** for all of them (`HomeLinkDims`/`HomeLinkLayout`, ≥ 64 dp). Reachable only from the measurement-build "Link homes test" (`HomeLinkTestFlow`) until S4 | nothing (flag off) | **built** |
-| S3 | Vault (`HomeLinkVault`: identity + revisioned entries, key-less tombstones) sealed at rest (`HomeLinkRepository`: own Keystore alias, `no_backup/hearthpane_homelinks`; not `CallMessageKeys`, whose delete-all forgets its alias), shared with this home's Portals (`HomeLinkSync`, `/remote/homelinkpeer`, sealed per requester/nonce/direction; phones refused), Remove wipes the home's key on every Portal | nothing | **built** |
+| S3 | Vault (`HomeLinkVault`: identity + revisioned entries, key-less tombstones) sealed at rest (`HomeLinkRepository`: own Keystore alias, `no_backup/hearthpane_homelinks`; not `CallMessageKeys`, whose delete-all forgets its alias), shared with this home's Portals (`HomeLinkSync`, `/remote/homelinkpeer`, sealed per requester/nonce/direction; phones refused), Remove wipes the home's key on every Portal. **Sync is measurement-build only** (`HomeLinkGate`) until Portal-only key material exists (Risks) | nothing | **built** (sync gated) |
 | S4 | Relay mailbox client + Worker/DO + TURN credentials. **Security-critical relay rules**: a nameplate is claimed by one inviter `hello` (a nameplate in use is refused; the inviter makes a new code); the mailbox accepts **at most 3 joiner commits per nameplate**, then closes; mailboxes and their messages are deleted at 10 minutes or on the first completed `open`; one message ≤ 4 KB; per-IP rate limit on nameplate claims and commits. The Portal's own 3-try limit stands even if the relay is hostile — the relay limit protects against third parties who see the nameplate. | **D1 relay choice, D2 account** | blocked |
 | S5 | Cross-home 1:1 call: STUN/TURN candidates, trickle, identity-signed offer/answer, honest route chip ("Direct" / "Relay") | S4 | blocked |
 | S6 | Cross-home video messages (R2 blob, delete on delivery, 7-day expiry) | S4, **D3 storage** | blocked |
@@ -188,7 +201,18 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 - The household key is the trust root inside a home and paired phones hold it too. The vault
   route refuses phone ids and addresses a Portal didn't announce, but a phone holding the key could
   in principle impersonate a Portal on the LAN and receive the sealed identity. Closing that needs
-  Portal-only key material (a Portal↔Portal pairing), not yet designed.
+  Portal-only key material (a Portal↔Portal pairing), not yet designed. **Until then the route
+  and the vault sync are measurement-build only** (`HomeLinkGate`): ordinary builds don't
+  register `/remote/homelinkpeer`, so S3's cross-Portal sharing waits on this.
+  Sketch of the Portal-only option: each Portal gets a **Keystore-backed, non-exportable P-256
+  device key** at first boot; Portals in a home pin each other's device keys through a
+  Portal-only ceremony (on-screen code or an SAS between two Portals in the room, never via a
+  phone), kept as a signed "Portal roster" that a phone can read but not extend. The vault is then
+  sealed per recipient with ECDH to that Portal's pinned device key (HPKE-style, the request
+  signed by the requester's device key), so the household key alone no longer opens it. Removing
+  a Portal drops it from the roster and rotates the household identity. Alternative with less
+  machinery: never sync the private key at all and give each Portal its own identity, pinned by
+  the other home as a set; that costs a re-link when a Portal joins.
 - If two Portals each make an identity before they first sync, the older one wins and the other
   Portal's links (pinned to the newer key by the other home) stop verifying. The identity is only
   made at first link and syncs at once, so this needs two first-links within seconds.
