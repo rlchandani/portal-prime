@@ -155,7 +155,7 @@ internal object CcAlertRules {
   }
 
   private fun dayLabel(ms: Long, zone: TimeZone): String =
-      java.text.SimpleDateFormat("EEE d MMM", java.util.Locale.getDefault()).apply { timeZone = zone }.format(java.util.Date(ms))
+      CcDateFormats.format("EEE d MMM", ms, zone)
 
   fun list(filter: CcAlertFilter, active: List<CcAlert>, resolved: List<CcResolvedAlert>): List<Pair<CcAlert, Boolean>> {
     val activeIds = active.map { it.id }.toSet()

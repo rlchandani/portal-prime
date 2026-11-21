@@ -132,7 +132,8 @@ private fun AlertCard(item: CcAlertItem, onOp: (CcAlertItem) -> Unit) {
   }
   Row(Modifier.fillMaxWidth().alpha(if (item.active) 1f else RESOLVED_ALPHA).ccCard(RoundedCornerShape(30.dp)).padding(horizontal = 24.dp, vertical = 22.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-    Box(Modifier.size(76.dp).clip(RoundedCornerShape(22.dp)).background(bg), contentAlignment = Alignment.Center) {
+    // A filled shape, not a clip: no extra render node per card, the same pixels.
+    Box(Modifier.size(76.dp).background(bg, ICON_TILE_SHAPE), contentAlignment = Alignment.Center) {
       CcIcon(item.icon, fg, 40.dp)
     }
     Column(Modifier.weight(1f)) {
@@ -148,6 +149,7 @@ private fun AlertCard(item: CcAlertItem, onOp: (CcAlertItem) -> Unit) {
 }
 
 private const val RESOLVED_ALPHA = 0.6f
+private val ICON_TILE_SHAPE = RoundedCornerShape(22.dp)
 
 /** `.btn.sm.pri` (or `.danger` for critical): 64 tall here for the touch floor. */
 @Composable

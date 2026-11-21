@@ -110,7 +110,7 @@ internal fun CcToggle(on: Boolean, onChange: (Boolean) -> Unit, enabled: Boolean
   Box(Modifier.size(88.dp, 50.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(CcStyle.Pill)
       .background(if (on) c.green else c.surface2).clickable(enabled = enabled, role = Role.Switch) { onChange(!on) }
       .semantics { contentDescription = "$label ${if (on) "on" else "off"}" }) {
-    Box(Modifier.padding(5.dp).offset(x = (38 * x).dp).size(40.dp).clip(CircleShape).background(Color.White))
+    Box(Modifier.padding(5.dp).offset(x = (38 * x).dp).size(40.dp).background(Color.White, CircleShape))
   }
 }
 
@@ -136,7 +136,8 @@ internal fun CcTag(text: String, tone: CcTone = CcTone.NEUTRAL) {
     CcTone.RED -> c.redBg to c.red
   }
   Text(text, color = fg, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1,
-      modifier = Modifier.clip(CcStyle.Pill).background(bg).padding(horizontal = 14.dp, vertical = 6.dp))
+      // A filled pill, not a clip (nothing inside overflows): one render node fewer per tag.
+      modifier = Modifier.background(bg, CcStyle.Pill).padding(horizontal = 14.dp, vertical = 6.dp))
 }
 
 internal enum class CcTone { NEUTRAL, GREEN, AMBER, RED }

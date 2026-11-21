@@ -403,3 +403,59 @@ owner trade-off:
 - **What the trace shows** (one atrace, 26–36 s, gfx/view/dalvik/sched, on B): the change's long frames are `DrawFrame` → `WebViewFunctor::drawGl` on the RenderThread (100, 334 and 107 ms). The main thread's `doFrame` → `draw` waits on it (100 / 322 / 81 ms). During the 334 ms frame, `Chrome_InProcGpuThread` ran 294 ms, which is WebView's own raster and texture upload of the incoming photo. In the 1 s around the change, the renderer's image threads (`CrRendererMain` 221 ms, `ThreadPoolForeground` 199 ms) and `kswapd0` (205 ms, memory reclaim) were busy too. There was no launcher GC or bitmap work in these frames.
 - **Memory after leaving** is at the Home level on every build, C included, because the engine's WebView is destroyed when the dream ends. Two runs (A r2, B r3) showed a 413/214 MB running peak with a slower return; D r3 showed the same.
 - **Recommendation: keep 1.306.** The deferral is harmless and still applies to the native stages. The GPU trim made no measurable difference to the change. The change cost belongs to the WebView engine: Chromium uploads the next photo at its first draw, even though `preloadDecoded` decodes it beforehand. A fix there (draw the next photo once, off the transition, or smaller derivatives than the 2400 px edge for this panel) needs its own trace and A/B. No code change was kept on this branch.
+
+---
+
+## Control Center Alerts screen cost, 1.308 vs `cc-alerts`
+
+**Device:** Family Portal+. Plain `adb install -r -d` of each build (no `.dm`), no force-stop. Lock held 10:45–10:56,
+11:19–11:27 and 11:28–11:40 PST. STREAM_MUSIC 0 during each stint, restored to 3. No screenshots.
+
+**Builds:** official 1.308 (sha256 `bd7f9faa…4588`, matching `hearthpane-latest.json`); branch `cc-alerts`
+`assemblePerformance` v1 (Alerts stays recorded + fewer clip layers, `199186ca…`) and v2 (v1 + reused date
+formatters, `0e999a37…`). `assembleBenchmark` builds (profileable, R8 mapping applied offline) for simpleperf.
+
+**Method:** as the `cc-switch` A/B: open Control Center (fleet `open_control_center`, Map), one warm-up tap of the
+read-only "door is open" row (Map → Alerts) + Back, then 4 measured taps (`gfxinfo reset` → tap → 3 s →
+`framestats` of the Control Center window → Back). Official: 4 rounds (one at the start, two mid, one at the end,
+interleaved with the branch); v1: 2 rounds; v2: 3 rounds. simpleperf 4 kHz call graphs, 1.4 s around 3 taps per build.
+
+**Where the switch frame went on 1.308 (simpleperf, main thread, worst frame of 3 taps, ~60 ms main):**
+- **Draw recording, 18–26 ms** — almost all of it the Alerts slot re-recording every card (text paint, icons,
+  backgrounds, the LazyColumn items). Cause: a settled parked screen is `DETACHED` (not drawn), and Android 10's
+  renderer deletes the display lists of a render node that leaves the tree (`RenderNode::destroyHardwareResources`;
+  Compose then sees `hasDisplayList() == false`). So "their draw lists stay recorded" was not true for Alerts.
+- Composition 18 ms: mostly the chrome (rail items, header pills, subtitle) and the map's camera tile reacting to
+  `LocalCcScreenActive`; Alerts itself ~7 ms, of which `CcAlertRules.item` ~5 ms — two new `SimpleDateFormat`s per
+  card ("Sat 7 Nov" + "2:33 pm"), plus two more in the header subtitle.
+- Apply 10–13 ms (modifier-chain structural updates in the rail/slots, effect cancellation), measure 5–8 ms.
+- The second long frame is mostly inherited latency plus RenderThread (offscreen rail/header region layers
+  re-rendered 4–10 ms) and the semantics diff (5–10 ms, accessibility services on).
+- Not significant: vector icon inflation (cached), shadows (dark theme), rounded-clip masks (analytic).
+
+**Changes (`cc-alerts`):**
+1. `ControlCenterScreenSlots.kt` `ccSlotDraw` / `CC_KEEP_RECORDED`: Alerts stays `RECORDING` (transparent, in the
+   render tree) while parked, like the map, so the switch re-uses its display lists.
+2. Alert icon tile, `CcTag` and the toggle thumb draw `background(color, shape)` instead of `clip(shape).background()`
+   (no child render node; same pixels — nothing inside overflows, none is clickable).
+3. `ControlCenterDateFormats.kt` `CcDateFormats`: one `SimpleDateFormat` per thread / pattern / locale, zone set per
+   call; used by `ccTime`, `ccSubtitle` and the alert day label.
+
+| | official 1.308 (16 taps) | v1 (8 taps) | v2 (12 taps) |
+|---|---|---|---|
+| Frames over 32 ms per tap | 2 ×15, 3 ×1 (33 total) | 2 ×6, 0 ×2 (12) | 2 ×11, 1 ×1 (23) |
+| Worst frame, median ms | 64 | 55 | 56 |
+| Worst frame range ms | 56–83 | 31–69 | 33–73 |
+| Sum of frames over 32 ms, median ms | 127 | 103 | 104 |
+| Frames over 16 ms per tap (mean) | 5.8 | 5.6 | 5.8 |
+| After leaving: PSS / Graphics MB | 178–183 / 47 (r1 after a dream: 240 / 82) | 180–183 / 46–48 | 180–191 / 47–60 |
+
+- Main-thread draw in the switch frame fell from 18–26 ms to 5–11 ms (simpleperf), and `CcAlertRules.item` from
+  ~5 to ~2.5 ms. The worst switch frame drops ~8 ms at the median (64 → 55/56).
+- **Target (no switch frame over 32 ms) not met**: 2 of 20 branch taps had none over 32 ms; the rest still show the
+  two-frame pattern (one long frame, the next inheriting its latency). What remains in the switch frame is mostly
+  outside Alerts: chrome recomposition (rail items' conditional `ccCard`, header), composition-local updates for both
+  slots, the map's camera tile stopping, the parked/shown semantics swap and the rail/header offscreen layers on the
+  RenderThread. Alerts' own composition is now ~6 ms of diffuse work (LazyColumn setup, item derivation).
+- No memory retained: GPU/PSS after leaving match 1.308 (one v2 round read 60 MB graphics, within the official spread
+  seen after a dream).

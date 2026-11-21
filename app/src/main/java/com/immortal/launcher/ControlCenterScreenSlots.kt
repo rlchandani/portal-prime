@@ -130,14 +130,20 @@ internal enum class CcSlotDraw { SHOWN, RECORDING, DETACHED }
  * A parked screen is drawn fully transparent until it has recorded its draw lists, then left out
  * of the render tree. The renderer skips transparent nodes when drawing but still walks every node
  * in the tree on every frame (sync + prepare), so the four parked screens cost the map about 0.5 ms
- * of RenderThread per frame. Their draw lists stay recorded, so showing one again only re-adds it.
- * The map is never detached: its plan keeps cached textures, and it is the screen most returned to.
+ * of RenderThread per frame. Android 10's renderer deletes the display lists of a node that leaves
+ * the tree, so showing a detached screen again re-records all of it.
+ * [CC_KEEP_RECORDED] screens are never detached: the map's plan keeps cached textures and it is the
+ * screen most returned to; Alerts is small but is opened from the map's attention rows, and
+ * re-recording it (text, icons, cards) was about 20 ms of the switch frame.
  */
 internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): CcSlotDraw = when {
   active -> CcSlotDraw.SHOWN
-  screen == CcScreen.MAP || !settled -> CcSlotDraw.RECORDING
+  screen in CC_KEEP_RECORDED || !settled -> CcSlotDraw.RECORDING
   else -> CcSlotDraw.DETACHED
 }
+
+/** Parked screens that stay in the render tree (transparent) so their draw lists survive; see [ccSlotDraw]. */
+internal val CC_KEEP_RECORDED = setOf(CcScreen.MAP, CcScreen.ALERTS)
 
 /** Suspends until there has been no touch for [PREWARM_QUIET_MS]. */
 private suspend fun awaitQuiet(ui: CcUi) {
