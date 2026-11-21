@@ -23,6 +23,11 @@
 -keep class org.webrtc.** { *; }
 -dontwarn org.webrtc.**
 
+# ML Kit (face detection) finds its components by calling each registrar's no-arg constructor
+# reflectively. firebase-components only keeps the class; under R8 full mode that drops <init>,
+# MlKitContext then has no face component and FaceDetection.getClient throws NullPointerException.
+-keep class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }
+
 # Cold start: keep code that names classes missing on Android 10 (API 29) out of the classes Home's
 # first frame loads. R8 merged or inlined these into Compose startup classes (Recomposer's Latch,
 # MeasureAndLayoutDelegate's depth sets, AndroidParagraph, animateValueAsState's coroutine), so the
