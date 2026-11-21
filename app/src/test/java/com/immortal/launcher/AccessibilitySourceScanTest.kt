@@ -78,6 +78,24 @@ class AccessibilitySourceScanTest {
         bad.joinToString("\n"), bad.isEmpty())
   }
 
+  /** A dimmed background that dismisses its sheet or dialog is announced as one "Close" or "Cancel" action. */
+  @Test fun dismissingScrimsAreLabelledCloseOrCancel() {
+    val found = mutableListOf<String>()
+    val bad = mutableListOf<String>()
+    for ((path, text) in sources) {
+      for (m in SCRIM_BACKGROUND.findAll(text)) {
+        val chain = text.substring(m.range.first).lineSequence().take(SCRIM_CHAIN_LINES).joinToString("\n")
+        if (!SCRIM_DISMISS.containsMatchIn(chain)) continue
+        val label = SCRIM_LABEL.find(chain)?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }
+            ?: if (chain.contains("dismissScrim(")) "Close" else null
+        found += "$path:${line(text, m.range.first)}"
+        if (label !in SCRIM_LABELS) bad += "$path:${line(text, m.range.first)} ($label)"
+      }
+    }
+    assertTrue("No dismissing scrims found; the scan pattern is stale", found.size >= MIN_DISMISSING_SCRIMS)
+    assertTrue("Label these dismissing scrims \"Close\" or \"Cancel\":\n" + bad.joinToString("\n"), bad.isEmpty())
+  }
+
   @Test fun tvFocusableDefaultsToAButtonRole() {
     val tv = sources.first { it.first == "TvFocus.kt" }.second
     // Both helpers (tvFocusable, tvFocusableRow) default to a Button role.
@@ -126,6 +144,14 @@ class AccessibilitySourceScanTest {
     private val ROLE_ARG = Regex("""\brole\s*=""")
     private val FUN_DECL = Regex("""^\s*(private |internal )?fun """)
     private val CALLEE = Regex("""([\w.]+)\s*$""")
+    private val SCRIM_BACKGROUND = Regex("""\.background\((c\.scrim|\w*Colors\.Scrim|Color\(0x[0-9A-Fa-f]{2}000000\))\)""")
+    private val SCRIM_DISMISS = Regex("""dismissScrim\(|\.clickable\(|callClick\(""")
+    private val SCRIM_LABEL = Regex("""dismissScrim\("([^"]+)"|callClick\("([^"]+)"|contentDescription = "([^"]+)"""")
+    private val SCRIM_LABELS = setOf("Close", "Cancel")
+    /** The scrim modifier chain spans at most this many lines from its `.background(…)`. */
+    private const val SCRIM_CHAIN_LINES = 3
+    /** Fewer than the dismissing scrims in the tree on 2026-11-20 (11) means the scan stopped matching. */
+    private const val MIN_DISMISSING_SCRIMS = 9
     private val NO_OP_BODY = Regex("""\{\s*(/\*[^*]*\*/\s*)?}""")
     private val LABEL = Regex("""\bText\s*\(|contentDescription|stateDescription|\btext\s*=|[Ll]abel\b|\btitle\b|\bname\s*=|spoken|ccSpeak|description|Caption|ToolsText""")
 
