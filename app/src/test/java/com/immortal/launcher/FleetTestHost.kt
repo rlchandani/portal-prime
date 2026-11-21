@@ -127,6 +127,7 @@ internal class FleetTestHost : FleetDevice, FleetSettings, FleetPackages, FleetA
     note("cc:$dryRun:$testPlan:$testAlert:$haUnreachable:${fake?.entityId}")
     return "dry=$dryRun"
   }
+  override fun ccShowTest(kind: String): String { note("ccShowTest:$kind"); return "shown=$kind" }
   override fun testSourceAvailable() = testSourceAvailable
   override fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin?): Boolean {
     note("enableTestSource:$minutes:$night" + (pin?.let { ":${it.mode}@${it.intervalSec}" } ?: ""))

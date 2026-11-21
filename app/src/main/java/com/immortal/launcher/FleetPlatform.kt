@@ -115,6 +115,8 @@ internal interface FleetActions {
   fun ageTestSessions(ms: Long): Int
   fun revokeTestSessions(): Int
   fun ccDebug(dryRun: Boolean?, testPlan: String?, testAlert: String?, haUnreachable: Boolean?, fake: CcFakeState?): String
+  /** `cc_debug` `showTest` ([CcOverlayTest.KINDS]): a silent held overlay, for the unbind/update checks. Dry run only. */
+  fun ccShowTest(kind: String): String = "unsupported"
   fun testSourceAvailable(): Boolean
   /** [pin] holds one screensaver mode at a fixed interval for the same span (performance A/B). */
   fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin? = null): Boolean

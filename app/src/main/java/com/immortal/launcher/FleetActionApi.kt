@@ -100,7 +100,7 @@ internal class FleetActionApi(private val actions: FleetActions) {
     else -> json(400, err("bad_op"))
   }
 
-  /** Control Center test switches (operator only): {"dryRun":true|false, "testPlan":"load"|"clear", "haUnreachable":true|false}. */
+  /** Control Center test switches (operator only): {"dryRun":true|false, "testPlan":"load"|"clear", "haUnreachable":true|false, "showTest":kind}. */
   private fun ccDebug(body: JSONObject): FleetHttpServer.Response {
     val dry = if (body.has("dryRun")) body.optBoolean("dryRun") else null
     val plan = body.optString("testPlan").takeIf { it in CC_TEST_PLANS }
@@ -109,6 +109,11 @@ internal class FleetActionApi(private val actions: FleetActions) {
     // {"fakeState":{"slug":"leak1","state":"on","deviceClass":"moisture","changedMinAgo":0}}: dry run only.
     val fake = if (body.has("fakeState")) CcFakeState.parse(body.optJSONObject("fakeState"))
         ?: return json(400, err("bad_fakeState")) else null
+    // {"showTest":"takeover"|"doorbell"}: a silent held overlay (dry run only), for the accessibility-unbind checks.
+    if (body.has("showTest")) {
+      val kind = body.optString("showTest").takeIf { it in CcOverlayTest.KINDS } ?: return json(400, err("bad_showTest"))
+      return json(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", actions.ccShowTest(kind)))
+    }
     return json(200, JSONObject().put("ok", true).put("action", "cc_debug")
         .put("result", actions.ccDebug(dry, plan, alert, unreachable, fake)))
   }

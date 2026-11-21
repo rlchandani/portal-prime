@@ -65,8 +65,8 @@ class BarWatchService : AccessibilityService() {
     DinnerCardOverlay.detach()
     FollowMeCardOverlay.detach()
     TimerDoneOverlay.detach()
-    DoorbellCardOverlay.detach()
-    ControlCenterBanners.detach()
+    DoorbellCardOverlay.detach(this) // held; back on the next bind (see OverlayHold)
+    ControlCenterBanners.detach(this) // real alerts held; back on the next bind
     return super.onUnbind(intent)
   }
 
