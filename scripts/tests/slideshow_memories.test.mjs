@@ -24,7 +24,7 @@ function released(image) {
 }
 async function collage(r) { await r.cleanup.ready; await r.advanceTo(25000); }
 
-test('Memories starts with one opaque whole photo and no duplicate blurred fills', async () => {
+test('Memories starts with one opaque full-bleed photo and no duplicate blurred fills', async () => {
   const r = fixture();
   try {
     assert.equal(await r.cleanup.ready, true);
@@ -34,7 +34,8 @@ test('Memories starts with one opaque whole photo and no duplicate blurred fills
     assert.equal(r.resolutions.length, 1);
     assert.equal(r.resolutions[0].edge, 2200);
     assert.equal(r.nodes().filter(n => n.classList.contains('ss-fill')).length, 0);
-    assert.equal(r.computed(photos(r)[0])['background-size'], 'contain');
+    // The first generated photo (16:10) keeps 94 % on the 3:2 screen, so it fills.
+    assert.equal(r.computed(photos(r)[0])['background-size'], 'cover');
   } finally { r.cleanup(); }
 });
 
@@ -49,7 +50,7 @@ test('the sixth beat retains the neutral three-photo collage with whole static p
     const text = r.nodes().map(n => n.textContent).filter(Boolean);
     assert.deepEqual(text, ['Photo memories']);
     for (const image of photos(r)) {
-      assert.equal(image.style.backgroundSize, 'contain');
+      assert.equal(image.style.backgroundSize, 'cover', 'each card has its photo\'s exact aspect');
       assert.equal(r.state(image).animation, 'none');
       assert.equal(r.state(image).promotion, 'auto');
     }

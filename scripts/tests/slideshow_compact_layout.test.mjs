@@ -126,11 +126,11 @@ for (const mode of ['kenBurns', 'push']) {
     } finally { r.cleanup(); }
   });
 
-  test(`${mode}: the Portal+ keeps its shipped contained photo and no compact layer`, async () => {
+  test(`${mode}: the Portal+ fills with a matched photo: no backdrop and no 320 px decode`, async () => {
     const r = createSceneFixture({ mode, photos: landscapes() });
     try {
       assert.equal(await r.cleanup.ready, true);
-      assert.ok(heroes(r).every(n => !n.classList.contains('ss-compact')));
+      assert.ok(heroes(r).every(n => !n.classList.contains('ss-whole')));
       assert.equal(r.nodes().filter(n => n.classList.contains('ss-compact-fill')).length, 0);
       assert.ok(!r.resolutions.some(n => n.edge === 320));
     } finally { r.cleanup(); }
@@ -174,8 +174,11 @@ test('hero + sidebar upright puts the hero on top across the width', async () =>
   try {
     assert.equal(await r.cleanup.ready, true);
     const stage = r.nodes().find(n => n.classList.contains('ss-hs'));
-    assert.ok(stage.classList.contains('upright'));
-    assert.equal(stage.children[0].style.flex, `0 0 ${(800 - 48) / 1.5}px`);
+    assert.ok(stage.classList.contains('trio'));
+    const [hero, a, b] = r.nodes().filter(n => n.classList.contains('ss-cell')).map(c =>
+      ({ x: parseFloat(c.style.left), y: parseFloat(c.style.top), w: parseFloat(c.style.width), h: parseFloat(c.style.height) }));
+    near(a.y, hero.y + hero.h + 14, 1e-6); near(b.y, a.y, 1e-6); near(b.x, a.x + a.w + 14, 1e-6);
+    near(hero.x, a.x, 1e-6); near(hero.x + hero.w, b.x + b.w, 1e-6);
   } finally { r.cleanup(); }
 });
 
