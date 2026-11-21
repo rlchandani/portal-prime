@@ -77,6 +77,7 @@
       dim(false);
       scene.layer.classList.remove("freeze");
       scene.layer.classList.add("on");
+      try { console.info("photo_beat " + scene.modeId); } catch (_) {}
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
       if (opts.onReady) opts.onReady();
       // Photo bands (SS.paintStrips) wait for this dissolve to end.

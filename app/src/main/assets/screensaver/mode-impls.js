@@ -687,6 +687,7 @@
     if (!await t.load(urls) || !active()) return null;
     // A shape measured by the load is honoured: plan again now.
     const plan = pair || SS.largeSingle(p, W, H);
+    try { console.info("photo_plan " + (plan.pair ? "pair" : plan.mode)); } catch (_) {}
     if (plan.mode !== "whole") {
       const strips = plan.mode === "fill" ? await prepareStrips(t, active, urls[0], plan, W, H) : null;
       if (!active()) { releaseStrips(strips); return null; }
