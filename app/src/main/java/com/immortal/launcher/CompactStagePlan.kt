@@ -97,22 +97,25 @@ internal object CompactStagePlan {
       style: Style?, cls: LayoutClass, photos: List<Pair<Int, Int>>, width: Int, height: Int,
       density: Float, motion: Boolean, parity: Boolean, backdrop: Boolean,
       regions: List<SlideshowGeometry.Region> = emptyList(),
+      /** Overlays measured on screen (the upright calendar card); whole cards and prints clear them. */
+      occupied: List<ScreensaverLayout.Box> = emptyList(),
   ): Plan? {
     if (style == null || !cls.compact || photos.isEmpty() || width <= 0 || height <= 0 || density <= 0f) return null
     if (photos.any { it.first <= 0 || it.second <= 0 }) return null
     if (cls.compactLandscape && (style == Style.PRINT || style == Style.SPREAD)) return null
     val pair = photos.size >= 2 && pairs(style, cls, photos[0], photos[1])
+    val clear = { zone: ScreensaverLayout.Box -> clearTop(zone, occupied, height, density) }
     val plan = when (style) {
       Style.SMART -> if (pair) stack(photos, width, height, density, motion, 24, 16, 18f)
-          else single(photos[0], cls, width, height, density, motion, parity, regions)
+          else single(photos[0], cls, width, height, density, motion, parity, regions, clear)
       Style.PAIR -> when {
         pair && cls.compactPortrait -> stack(photos, width, height, density, motion, 0, 12, 0f)
         pair -> sideBySide(photos, width, height, density, motion)
-        else -> single(photos[0], cls, width, height, density, motion, parity, regions)
+        else -> single(photos[0], cls, width, height, density, motion, parity, regions, clear)
       }
-      Style.WHOLE -> whole(photos[0], cls, width, height, density)
-      Style.PRINT -> print(listOf(photos[0]), width, height, density)
-      Style.SPREAD -> print(if (pair) photos.take(2) else listOf(photos[0]), width, height, density)
+      Style.WHOLE -> whole(photos[0], cls, width, height, density, clear)
+      Style.PRINT -> print(listOf(photos[0]), width, height, density, clear)
+      Style.SPREAD -> print(if (pair) photos.take(2) else listOf(photos[0]), width, height, density, clear)
     }
     return if (plan.ground == Ground.BACKDROP && !backdrop) plan.copy(ground = Ground.MATTE) else plan
   }
@@ -122,6 +125,7 @@ internal object CompactStagePlan {
   private fun single(
       photo: Pair<Int, Int>, cls: LayoutClass, w: Int, h: Int, density: Float, motion: Boolean,
       parity: Boolean, regions: List<SlideshowGeometry.Region>,
+      clear: (ScreensaverLayout.Box) -> ScreensaverLayout.Box = { it },
   ): Plan {
     val (pw, ph) = photo
     val screen = ScreensaverLayout.Box(0, 0, w, h)
@@ -146,7 +150,7 @@ internal object CompactStagePlan {
           else if (parity) SlideshowGeometry.Motion(b, a, false) else SlideshowGeometry.Motion(a, b, false)
       return Plan(Ground.BLACK, listOf(Tile(0, screen, m)))
     }
-    val zone = ScreensaverLayout.wholeZone(cls, w, h, density) ?: screen
+    val zone = clear(ScreensaverLayout.wholeZone(cls, w, h, density) ?: screen)
     val card = contain(pw, ph, zone)
     val m = if (motion) drift(pw, ph, card.width, card.height, 1f, ScreensaverLayout.WHOLE_ZOOM, 0f, 0f, 0f, 0f)
         else drift(pw, ph, card.width, card.height, 1f, 1f, 0f, 0f, 0f, 0f)
@@ -188,7 +192,10 @@ internal object CompactStagePlan {
   }
 
   /** Whole photo never crops; a mismatched photo sits over its backdrop in a raised zone. */
-  private fun whole(photo: Pair<Int, Int>, cls: LayoutClass, w: Int, h: Int, density: Float): Plan {
+  private fun whole(
+      photo: Pair<Int, Int>, cls: LayoutClass, w: Int, h: Int, density: Float,
+      clear: (ScreensaverLayout.Box) -> ScreensaverLayout.Box = { it },
+  ): Plan {
     val (pw, ph) = photo
     val still = { box: ScreensaverLayout.Box -> drift(pw, ph, box.width, box.height, 1f, 1f, 0f, 0f, 0f, 0f) }
     if (PremiumFraming.mismatch(pw, ph, w, h) <= WHOLE_MISMATCH) {
@@ -196,17 +203,20 @@ internal object CompactStagePlan {
       return Plan(Ground.BLACK, listOf(Tile(0, box, still(box))))
     }
     fun px(dp: Int) = (dp * density).roundToInt()
-    val zone = if (cls.compactPortrait) ScreensaverLayout.Box(px(24), px(40), w - px(24), h - px(280))
-        else ScreensaverLayout.Box(px(56), px(32), w - px(56), h - px(32))
+    val zone = clear(if (cls.compactPortrait) ScreensaverLayout.Box(px(24), px(40), w - px(24), h - px(280))
+        else ScreensaverLayout.Box(px(56), px(32), w - px(56), h - px(32)))
     val box = contain(pw, ph, zone)
     return Plan(Ground.BACKDROP, listOf(Tile(0, box, still(box), cornerDp = 6f, elevationDp = CARD_ELEVATION_DP)))
   }
 
   /** Upright prints sit still in the fixed zone above the clock; a spread is a column of two. */
-  private fun print(photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float): Plan {
+  private fun print(
+      photos: List<Pair<Int, Int>>, w: Int, h: Int, density: Float,
+      clear: (ScreensaverLayout.Box) -> ScreensaverLayout.Box = { it },
+  ): Plan {
     fun px(dp: Int) = (dp * density).roundToInt()
     val single = photos.size == 1
-    val zone = ScreensaverLayout.Box(px(40), px(if (single) 48 else 44), w - px(40), h - px(if (single) 282 else 286))
+    val zone = clear(ScreensaverLayout.Box(px(40), px(if (single) 48 else 44), w - px(40), h - px(if (single) 282 else 286)))
     val boxes = if (single) listOf(zone) else {
       val gap = px(24)
       val ch = ((zone.height - gap) / 2).coerceAtLeast(1)
@@ -222,6 +232,21 @@ internal object CompactStagePlan {
   }
 
   // ---- Geometry ------------------------------------------------------------------------------
+
+  /** The gap kept under a cleared overlay. */
+  private const val CLEAR_GAP_DP = 16
+
+  /**
+   * [zone] with its top moved below any overlay hanging into the top of it (the upright calendar
+   * card), keeping at least half the zone's height; bottom overlays (the clock) are already below.
+   */
+  fun clearTop(zone: ScreensaverLayout.Box, occupied: List<ScreensaverLayout.Box>, h: Int, density: Float): ScreensaverLayout.Box {
+    val gap = (CLEAR_GAP_DP * density).roundToInt()
+    val reach = occupied.filter { it.top <= zone.top + zone.height / 4 && it.bottom > zone.top && it.bottom < h / 2 &&
+        it.right > zone.left && it.left < zone.right }.maxOfOrNull { it.bottom + gap } ?: return zone
+    val top = minOf(reach, zone.top + zone.height / 2)
+    return if (top <= zone.top) zone else zone.copy(top = top)
+  }
 
   /** The [pw] x [ph] photo contained in [zone], centred. */
   fun contain(pw: Int, ph: Int, zone: ScreensaverLayout.Box): ScreensaverLayout.Box {

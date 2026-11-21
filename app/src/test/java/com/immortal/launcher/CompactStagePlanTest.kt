@@ -177,6 +177,24 @@ class CompactStagePlanTest {
     assertFalse(ScreensaverLayout.stackable(square.first, square.second))
   }
 
+  @Test fun wholeCardsAndPrintsClearTheUprightCalendarCard() {
+    val calendar = ScreensaverLayout.Box(40, 40, 760, 240)
+    val clock = ScreensaverLayout.Box(40, 1080, 400, 1224)
+    fun first(style: Style, vararg photos: Pair<Int, Int>) = CompactStagePlan.plan(style, cp, photos.toList(), 800, 1280, 1f,
+        true, false, true, occupied = listOf(calendar, clock))!!.tiles.first().box
+    assertTrue(first(Style.SMART, landscape).top >= 256)
+    assertTrue(first(Style.WHOLE, landscape).top >= 256)
+    assertTrue(first(Style.PRINT, landscape).top >= 256)
+    assertTrue(first(Style.SPREAD, landscape, landscape43).top >= 256)
+    // Full-bleed photos and stacks keep the whole screen (the overlays sit over them by design).
+    assertEquals(0, first(Style.SMART, portrait).top)
+    assertEquals(24, first(Style.SMART, landscape, landscape43).top)
+    // A bottom overlay never moves the zone, and the zone keeps at least half its height.
+    val zone = ScreensaverLayout.Box(32, 40, 768, 990)
+    assertEquals(zone, CompactStagePlan.clearTop(zone, listOf(clock), 1280, 1f))
+    assertEquals(40 + 475, CompactStagePlan.clearTop(zone, listOf(ScreensaverLayout.Box(0, 0, 800, 600)), 1280, 1f).top)
+  }
+
   @Test fun driftClampsToCover() {
     val m = CompactStagePlan.drift(1000, 1000, 800, 600, 1f, 1.02f, .3f, -.3f, 0f, 0f)
     assertCovers(CompactStagePlan.Tile(0, ScreensaverLayout.Box(0, 0, 800, 600), m), 1000 to 1000)

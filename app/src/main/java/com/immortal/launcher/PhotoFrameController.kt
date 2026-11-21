@@ -241,7 +241,10 @@ class PhotoFrameController(
   // The overlay (clock / date / weather / battery / now-playing) is built and driven by the
   // FaceRenderer from a Face descriptor; this controller owns only the photo/video layer.
   private val faceRendererDelegate: Lazy<FaceRenderer> = lazy {
-    FaceRenderer(context, weatherRefreshMs).also { it.onTopStackChanged = { calendar.relayout() } }
+    FaceRenderer(context, weatherRefreshMs).also {
+      it.onTopStackChanged = { calendar.relayout() }
+      it.reservedTop = { calendar.shownBottom() }
+    }
   }
   private val faceRenderer get() = faceRendererDelegate.value
 
@@ -1493,6 +1496,7 @@ class PhotoFrameController(
     if (!photosOnly) {
       root.addView(faceRenderer.view)
       calendar.build(root)
+      calendar.onBoundsChanged = { faceRenderer.view.post { faceRenderer.refreshReservedTop() } }
     }
 
     // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.

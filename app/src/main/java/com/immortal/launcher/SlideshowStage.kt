@@ -572,7 +572,8 @@ internal class SlideshowStage(
       val first = p.photos[0]
       val plan = CompactStagePlan.plan(p.style, cls, p.photos.map { it.bitmap.width to it.bitmap.height },
           width, height, density, p.motion, p.parity, backdrop = first.look != null,
-          regions = if (p.keepPeople) first.regions else emptyList()) ?: return false
+          regions = if (p.keepPeople) first.regions else emptyList(),
+          occupied = p.occupied.map { ScreensaverLayout.Box(it.left, it.top, it.right, it.bottom) }) ?: return false
       compactLaid = true
       visibility = View.VISIBLE
       background = when (plan.ground) {

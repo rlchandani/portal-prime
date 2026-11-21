@@ -99,6 +99,19 @@ class FaceRenderer(
   private var gridClass: LayoutClass? = null
   /** The compact Bold date's wanted size in px (null = the shipped meta text size). */
   private var centreDatePx: Float? = null
+  /**
+   * Upright Mini: the bottom (px) of a card reserved across the top (the calendar), so a centred
+   * face (Big, Bold, Flip) is centred in the space below it instead of running into it. 0 = none.
+   */
+  var reservedTop: () -> Int = { 0 }
+
+  /** Re-place the centred face after [reservedTop] changed. No-op outside the upright grid. */
+  fun refreshReservedTop() {
+    val cls = gridClass ?: return
+    if (!cls.compactPortrait) return
+    buckets[GridPosition.MIDDLE_CENTER]?.let { placeBucket(GridPosition.MIDDLE_CENTER, it, cls) }
+  }
+
   /** The timer, now playing and calendar stack under the top margin upright; see [topStackBottom]. */
   var onTopStackChanged: (() -> Unit)? = null
 
@@ -477,6 +490,7 @@ class FaceRenderer(
     val width = context.resources.displayMetrics.widthPixels
     val m = ScreensaverLayout.bucketMargins(cls, column, bottomRow, width, context.resources.displayMetrics.density, cap)
     val lp = (col.layoutParams as? FrameLayout.LayoutParams) ?: return
+    if (cls.compactPortrait && pos == GridPosition.MIDDLE_CENTER) m[1] = maxOf(m[1], reservedTop())
     lp.width = if (topStack) MATCH else WRAP
     lp.gravity = if (topStack) Gravity.TOP or Gravity.START else gravityFor(pos)
     lp.setMargins(m[0], m[1], m[2], m[3])
