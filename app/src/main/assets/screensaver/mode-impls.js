@@ -24,7 +24,10 @@
       node.style.animation = "none";
     }
   }
-  function kbVars(node, photo) {
+  // [fit] (a whole photo or pair on the Portal+) is the largest scale that keeps the box on screen:
+  // the zoom then runs between 1 and that scale, centred, so nothing leaves the screen. The same
+  // random draws are taken either way, so photo selection never depends on the layout.
+  function kbVars(node, photo, fit) {
     // Keep a prepared photo's animation alive when its parent starts fading out.
     node.classList.add("ss-motion");
     if (hasFace(photo)) {
@@ -32,13 +35,18 @@
       ["--x0", "--y0", "--x1", "--y1"].forEach(k => node.style.setProperty(k, "0%"));
       return;
     }
-    const zoomIn = Math.random() > 0.4; const s0 = zoomIn ? 1.04 : 1.15, s1 = zoomIn ? 1.15 : 1.04;
+    const zoomIn = Math.random() > 0.4; let s0 = zoomIn ? 1.04 : 1.15, s1 = zoomIn ? 1.15 : 1.04;
     const s = Math.max(s0, s1), bound = ((s - 1) / 2) * 100 * 0.82;
     const wide = aspect(photo) > 1.2; const bx = wide ? bound : bound * 0.5, by = wide ? bound * 0.5 : bound;
     const rx = () => (Math.random() * 2 - 1) * bx, ry = () => (Math.random() * 2 - 1) * by;
+    let x = [rx(), ry(), rx(), ry()];
+    if (fit) {
+      const top = Math.max(1, Math.min(1.15, fit));
+      s0 = zoomIn ? 1 : top; s1 = zoomIn ? top : 1; x = [0, 0, 0, 0];
+    }
     node.style.setProperty("--s0", s0); node.style.setProperty("--s1", s1);
-    node.style.setProperty("--x0", rx() + "%"); node.style.setProperty("--y0", ry() + "%");
-    node.style.setProperty("--x1", rx() + "%"); node.style.setProperty("--y1", ry() + "%");
+    node.style.setProperty("--x0", x[0] + "%"); node.style.setProperty("--y0", x[1] + "%");
+    node.style.setProperty("--x1", x[2] + "%"); node.style.setProperty("--y1", x[3] + "%");
   }
   // One owner for initial readiness, decode cancellation, non-overlapping swaps and pausable timers.
   function makeTimers(ctx) {
@@ -603,6 +611,12 @@
       if (plan.position) hero.style.backgroundPosition = plan.position;
     }
   }
+  // The scale at which a whole photo (or pair) would touch the screen edge; null for a fill.
+  function largeFit(ctx, plan) {
+    if (plan.mode !== "whole") return null;
+    const { W, H } = compactSize(ctx), r = plan.rect;
+    return Math.min(W / r.w, H / r.h);
+  }
   const stillPhotos = ps => ps.some(hasFace);
   const seedsOf = ps => ps.map(p => p.seed);
 
@@ -636,7 +650,7 @@
         L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
         if (!stillPhotos(prep.ps)) {
           // Keep the same random draws so motion preference cannot alter later photo selection.
-          kbVars(L.hero, p);
+          kbVars(L.hero, p, largeFit(ctx, prep.plan));
           if (ctx.photoMotion !== false) {
             L.hero.style.willChange = "transform";
             void L.hero.offsetWidth; L.hero.style.animation = "";

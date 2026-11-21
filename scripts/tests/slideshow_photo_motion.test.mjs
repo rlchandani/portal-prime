@@ -97,7 +97,7 @@ function galleryGoldenSnapshot(r) {
 // sit whole over a pre-blurred copy (portraits paired); Memories' collage and Hero + Sidebar use the
 // exact-fit trio grid. Their hashes were re-pinned; random draw counts are unchanged.
 const legacyOutput = [
-  ['kenBurns', 30, 'f6f8dc7443c51d1d9932f0f4911e78868d5d4a6b4ec49606e1e9e8a67dc00582'],
+  ['kenBurns', 30, '5c268483026d1429b4497f043af6f9556dda854c59b2bf94d8f0ba5fc27e1118'],
   ['diptych', 12, 'fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef'],
   ['framed', 6, '95a97824d4030098e30c1d421b25d87e7611aae3115062474e9b72d1c7190551'],
   ['push', 0, '95cae37d32b8bc6f23df4a61de06b5dec4b67e9d3b58e00192b393461268143f'],

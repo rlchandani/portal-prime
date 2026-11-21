@@ -215,3 +215,27 @@ test('hero + sidebar on the Portal+: hero left, 20 px gutters, clear of the cloc
     assert.ok(r.nodes().every(n => !/photo-doodles/.test(r.computed(n)['background-image'] || '')), 'no doodles');
   } finally { r.cleanup(); }
 });
+
+test('ken burns keeps a whole photo or pair on screen: the zoom stops at the screen edge', async () => {
+  for (const [photos, random] of [[[portrait('a'), portrait('b')], .9], [[portrait('a'), portrait('b')], .1],
+    [[square('a'), square('b')], .9]]) {
+    const r = scene('kenBurns', photos, { random });
+    try {
+      await r.cleanup.ready;
+      const hero = shown(r), w = px(hero.style.width), h = px(hero.style.height);
+      const s = [Number(hero.style['--s0']), Number(hero.style['--s1'])];
+      const fit = Math.min(2160 / w, 1440 / h);
+      assert.deepEqual([...s].sort(), [1, Math.min(1.15, fit)].sort(), 'zooms between rest and the edge');
+      assert.ok(Math.max(...s) * h <= 1440 + 1e-6 && Math.max(...s) * w <= 2160 + 1e-6);
+      for (const k of ['--x0', '--y0', '--x1', '--y1']) assert.equal(hero.style[k], '0%', 'centred, no drift off screen');
+      assert.equal(s[0] < s[1], random > .4, 'the same zoom-in / zoom-out draw as before');
+    } finally { r.cleanup(); }
+  }
+  // A full-bleed photo keeps the shipped 1.04 <-> 1.15 Ken Burns with its drift.
+  const r = scene('kenBurns', [landscape('a'), landscape('b')], { random: .9 });
+  try {
+    await r.cleanup.ready;
+    const hero = shown(r);
+    assert.deepEqual([hero.style['--s0'], hero.style['--s1']].map(Number), [1.04, 1.15]);
+  } finally { r.cleanup(); }
+});
