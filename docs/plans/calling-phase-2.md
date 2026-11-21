@@ -112,7 +112,8 @@ state, so they can't share a try between them (`HomeLinkInviterSessionTest`).
 | Relay DoS | drop messages, burn an invite with 3 garbage commits | denial of service | accepted: make a new code |
 | Local timing observer | PAKE map timing | partition attack on the secret | RFC 9380 SSWU map, straight-line (same field operations for every input, no secret branches of our own); secret scalars via platform ECDH. Residual: `BigInteger` arithmetic and the final affine addition (`modInverse`) aren't constant-time, so timing can leak a little about the secret-derived point. Only the device holding the secret computes it, once per PAKE start, so this needs fine-grained local timing of that Portal or phone while it pairs |
 | A paired phone (holds the household key) posing as a Portal | `/remote/homelinkpeer` from a spoofed Portal id at that Portal's announced address, or answering a Portal's pull in another Portal's place | fetch the vault = the household identity's private key | **closed by Portal device keys** (wire v2): a pull must be signed by a Keystore device key pinned in person, the answer is sealed to the pull's one-time ECDH key and signed by the responder's pinned key; the household key opens nothing (`HomeLinkSyncTest.aPhoneWithTheHouseholdKeyButNoPinnedDeviceKeyGetsNothing`, `anAnswerFromAnUnpinnedKeyOrTamperedCiphertextIsDropped`). Still measurement-build only until review (`HomeLinkGate`) |
-| A paired phone trying to get pinned | join a Portal-pinning ceremony | add its own key to a Portal's roster | the code is shown only on a Portal's screen, ≤ 3 guesses per code (PAKE), then the pictures are compared by people standing at both Portals; no route or sync writes the roster |
+| A paired phone trying to get pinned | join a Portal-pinning ceremony | add its own key to a Portal's roster | the code is shown only on a Portal's screen, ≤ 3 guesses per code (PAKE) and ≤ 3 commits per mailbox, then the pictures are compared by people standing at both Portals; phone ids are refused by `/remote/portalpin` and by the pin itself; no route or sync writes the roster |
+| A household member's Portal (or anything with the household key) on the LAN during a pinning | ask for mailboxes, post commits, butt into the open/attestation swap, claim another Portal's id | pin itself in place of the Portal being paired, or swap the pinned key under a known id | nameplates are public (1,024 pinning ones; misses rate-limited), each commit is one online PAKE guess (≤ 3), after the first answered commit only that Portal may continue, the signed device id must equal the calling household id both ways, and a second key for a pinned id needs an explicit *Pair again* on screen (`PortalPinTransportTest`). Accepted: burning a code (DoS) |
 | Someone who stole a recorded LAN exchange, then later a device key | replay or decrypt an old pull/answer | read an old vault | ephemeral-ephemeral ECDH per pull, never stored: forward secret; a replayed pull gets an answer sealed to a key only the original requester had |
 | Fleet-token holder / file routes | write `no_backup/hearthpane_portal_roster` | plant a pin | directory blocked by `FleetSecretPaths`; the file is AES-GCM under its own Keystore key, so a written file fails to open and the roster starts empty (sync off) |
 
@@ -158,11 +159,34 @@ remote roster is phone-owned. So S3b adds a Portal-only trust root and a pinning
   checked against the roster. `VAULT_SYNC` (the build switch) stays `PORTAL_CALL_LOOPBACK` until
   this is reviewed and the pinning screens ship; after that it can be `true` everywhere because
   safety no longer depends on the build.
-- **Open items**: pinning screens + their LAN message transport (the bus can carry the
-  `HomeLinkWire` messages; security comes from the PAKE, not the bus); a distinct nameplate salt
-  for pinning codes so a pinning code can never complete a home link (domain separation); verifying
-  the attestation chain at pinning (Google root, `TEE`/`StrongBox` level); "Remove this Portal"
-  unpins it everywhere and should rotate the household identity (a re-link with each linked home).
+- **Code namespace** (`HomeLinkDomain`): pinning codes always start with `P`, home codes never
+  do, and every label is domain-separated (mailbox salt, PAKE DST, sid/isk, commit, reveal, open),
+  so a pinning code can never complete a home link nor a home code pin a Portal, even if a screen's
+  check is bypassed (`HomeLinkDomainTest`). Home linking keeps its v2 labels.
+- **Device id binding**: pinning reveal/open carry and sign the Portal's household device id (MAC'd
+  too). The mailbox requires the open's id to be the id the request came from; the joiner requires
+  the reveal's id to be the id it reached the host under. A pin is one key per id and one id per
+  key; anything else is `NEEDS_REPAIR` and changes nothing until people choose *Pair again*. The
+  vault route refuses a pinned key calling under another id (`device_mismatch`).
+- **LAN transport** (`/remote/portalpin`, `PortalPinWire`/`PortalPinMailbox`/`PortalPinRoute`/
+  `PortalPinJoin`, no relay): the Portal showing the code hosts the mailbox in memory; the typing
+  Portal asks each household Portal it knows for that mailbox's hello, then posts commit (reply:
+  reveal) and open. Rules: only our own inviter opens a box, ≤ 2 boxes, 5 min TTL (never past the
+  invite), ≤ 3 commits per box, one joiner after the first answered commit, one message ≤ 4 KB,
+  misses rate-limited (20/min per caller). The household `portal_pin` header (signed, fresh, not
+  replayed, body-pinned, Portal id at its announced address, never a phone) is an outer filter only.
+- **Attestation** (`PortalAttestation`): after the pictures the joiner swaps Keystore certificate
+  chains with the host through the mailbox (once, joiner only). Verified: leaf key = pinned key,
+  each cert signed by the next, root key ∈ Google's two roots (RSA-4096 and the 2025 P-384), the
+  KeyDescription challenge, security level → `TEE`/`STRONGBOX`/`SOFTWARE`/`UNTRUSTED_ROOT`/
+  `ABSENT`/`INVALID`, recorded on the pin and shown in the list; never blocks a pin. Not checked:
+  validity dates, Google's revocation list.
+- **Screens** (measurement builds, Households & devices › This home › *Pair Portals*,
+  `PortalPinFlowScreen`): paired Portals with Remove, Show a code / Type a code, Verify (pictures +
+  digits), Pair again, done / failure.
+- **Open items**: review; "Remove this Portal" unpins only on this Portal (each Portal removes
+  its own pin) and should rotate the household identity (a re-link with each linked home);
+  revocation-list check; a two-Portal device run.
 
 ### Transport options (owner decision D1)
 
@@ -216,7 +240,7 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 | S1 | **Household pairing core**: identity key, invite code (public nameplate + PAKE secret, 3 tries), commit/reveal protocol with typed+sequenced MAC'd messages, SAS (4 pictures + 12 digits), link + permissions model and codec | nothing | **built**, protocol v2 after security review (`HomeLink*.kt`, `HomeLinkPake.kt`) |
 | S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired/Too many tries, Connected, **Households & devices** (`HomeLinkHouseholdsScreen`), **Permissions** (`HomeLinkPermissionsScreen`), **Mini 800×1280 layouts** for all of them (`HomeLinkDims`/`HomeLinkLayout`, ≥ 64 dp). Reachable only from the measurement-build "Link homes test" (`HomeLinkTestFlow`) until S4 | nothing (flag off) | **built** |
 | S3 | Vault (`HomeLinkVault`: identity + revisioned entries, key-less tombstones) sealed at rest (`HomeLinkRepository`: own Keystore alias, `no_backup/hearthpane_homelinks`; not `CallMessageKeys`, whose delete-all forgets its alias), shared with this home's Portals (`HomeLinkSync`, `/remote/homelinkpeer`), Remove wipes the home's key on every Portal. Wire v2: only to **pinned Portal device keys** (below). **Sync is measurement-build only** (`HomeLinkGate.VAULT_SYNC`) until review and S3b | nothing | **built** (sync gated) |
-| S3b | **Portal-only device keys**: Keystore device key (`PortalDeviceKey`), roster (`PortalRoster`/`PortalRosterStore`), signed-DH vault pull (`HomeLinkSyncWire` v2), gate on pins (`HomeLinkGate.syncs`), pinning = linking protocol with device keys (`PortalPinning`). **Left**: the pinning screens + LAN transport for its messages, nameplate domain separation, attestation-chain check, review | nothing | **core built** (JVM tests); ceremony UI/transport not built |
+| S3b | **Portal-only device keys**: Keystore device key (`PortalDeviceKey`), roster (`PortalRoster`/`PortalRosterStore`) bound to device ids, signed-DH vault pull (`HomeLinkSyncWire` v2), gate on pins (`HomeLinkGate.syncs`), pinning = linking protocol with device keys (`PortalPinning`) in its own code namespace (`HomeLinkDomain`), LAN mailbox (`/remote/portalpin`), screens (`PortalPinFlowScreen`), attestation check recorded (`PortalAttestation`). **Left**: review, two-Portal device run, identity rotation on removal | nothing | **built** (measurement builds only) |
 | S4 | Relay mailbox client + Worker/DO + TURN credentials. **Security-critical relay rules**: a nameplate is claimed by one inviter `hello` (a nameplate in use is refused; the inviter makes a new code); the mailbox accepts **at most 3 joiner commits per nameplate**, then closes; mailboxes and their messages are deleted at 10 minutes or on the first completed `open`; one message ≤ 4 KB; per-IP rate limit on nameplate claims and commits. The Portal's own 3-try limit stands even if the relay is hostile — the relay limit protects against third parties who see the nameplate. | **D1 relay choice, D2 account** | blocked |
 | S5 | Cross-home 1:1 call: STUN/TURN candidates, trickle, identity-signed offer/answer, honest route chip ("Direct" / "Relay") | S4 | blocked |
 | S6 | Cross-home video messages (R2 blob, delete on delivery, 7-day expiry) | S4, **D3 storage** | blocked |
