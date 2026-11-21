@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.graphics.Bitmap
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,15 @@ import java.time.ZoneId
 /** Where the "Link homes test" is (mock flow: hh → invite → join → verify → perms → invitedone → hh). */
 internal enum class HomeLinkTestStage { HOUSEHOLDS, INVITE, JOIN, VERIFY, PERMS, ROOMS, CONNECTED, FAILED, PORTALS }
 
+/** Where the system Back key goes in the Link homes test: one screen back, null to leave it. Pure. */
+internal object HomeLinkTestNav {
+  fun back(stage: HomeLinkTestStage): HomeLinkTestStage? = when (stage) {
+    HomeLinkTestStage.HOUSEHOLDS -> null
+    HomeLinkTestStage.JOIN -> HomeLinkTestStage.INVITE
+    else -> HomeLinkTestStage.HOUSEHOLDS
+  }
+}
+
 /**
  * Measurement builds only ([BuildConfig.PORTAL_CALL_LOOPBACK]): Households & devices with the real
  * sealed store ([HomeLinkRepository]) and sync, and "Add a household" running both homes on this
@@ -54,8 +64,8 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   val vault by store.vault.collectAsState()
   val selfName = remember { DinnerCall.selfName(context) }
   val rooms = CallingStore.peers.collectAsState().value
-  var households by remember { mutableStateOf(HomeLinkHouseholdsState(vault.book)) }
-  LaunchedEffect(vault) { households = households.withBook(vault.book) }
+  var households by remember { mutableStateOf(HomeLinkHouseholdsState(vault.book, reverify = vault.reverifyIds)) }
+  LaunchedEffect(vault) { households = households.withBook(vault.book, vault.reverifyIds) }
   var stage by remember { mutableStateOf(HomeLinkTestStage.HOUSEHOLDS) }
   var invite by remember { mutableStateOf(HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())) }
   var now by remember { mutableLongStateOf(feature.clock()) }
@@ -96,6 +106,12 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   fun newInvite() {
     invite = HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())
     entry = HomeLinkCodeEntry(); result = null; inviter = null; noAnswer = false; stage = HomeLinkTestStage.INVITE
+  }
+  // Back steps back one screen; Pair Portals (composed later) handles its own steps first.
+  val compact = currentLayoutClass().compact
+  BackHandler {
+    if (stage == HomeLinkTestStage.HOUSEHOLDS) households.backOrNull(compact)?.let { households = it } ?: onClose()
+    else stage = HomeLinkTestNav.back(stage) ?: HomeLinkTestStage.HOUSEHOLDS
   }
   Box(Modifier.fillMaxSize().background(p.background)) {
     when (stage) {

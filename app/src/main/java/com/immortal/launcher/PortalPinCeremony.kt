@@ -115,8 +115,8 @@ internal class PortalPinCeremony(
   }
 
   private fun record(peer: HomeLinkPeer, chain: List<ByteArray>) {
-    val level = if (chain.isEmpty()) PortalAttestationLevel.UNCHECKED
-    else PortalAttestation.verify(chain, peer.publicKey, challenge = challenge)
-    store.attested(HomeLinkIdentity.fingerprint(peer.publicKey), level)
+    val result = if (chain.isEmpty()) PortalAttestationCheck(PortalAttestationLevel.UNCHECKED, outOfDate = false)
+    else PortalAttestation.check(chain, peer.publicKey, challenge = challenge, now = clock())
+    store.attested(HomeLinkIdentity.fingerprint(peer.publicKey), result.level, result.outOfDate)
   }
 }

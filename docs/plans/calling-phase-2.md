@@ -115,6 +115,8 @@ state, so they can't share a try between them (`HomeLinkInviterSessionTest`).
 | A paired phone trying to get pinned | join a Portal-pinning ceremony | add its own key to a Portal's roster | the code is shown only on a Portal's screen, ≤ 3 guesses per code (PAKE) and ≤ 3 commits per mailbox, then the pictures are compared by people standing at both Portals; phone ids are refused by `/remote/portalpin` and by the pin itself; no route or sync writes the roster |
 | A household member's Portal (or anything with the household key) on the LAN during a pinning | ask for mailboxes, post commits, butt into the open/attestation swap, claim another Portal's id | pin itself in place of the Portal being paired, or swap the pinned key under a known id | nameplates are public (1,024 pinning ones; misses rate-limited), each commit is one online PAKE guess (≤ 3), after the first answered commit only that Portal may continue, the signed device id must equal the calling household id both ways, and a second key for a pinned id needs an explicit *Pair again* on screen (`PortalPinTransportTest`). Accepted: burning a code (DoS) |
 | Someone who stole a recorded LAN exchange, then later a device key | replay or decrypt an old pull/answer | read an old vault | ephemeral-ephemeral ECDH per pull, never stored: forward secret; a replayed pull gets an answer sealed to a key only the original requester had |
+| A Portal pinned under one id answering a pull sent to another | answer a pull the requester sent to Portal X with its own (pinned) key | feed X's requester a vault of its choosing (an old identity, resurrected links) | the answer signs the responder's household device id (`dev`, give label v3); the requester accepts it only if the signed id and the pin's id both equal the id it asked (`HomeLinkSyncTest.anAnswerFromAPinnedKeyUnderAnotherDeviceIdIsRejected`) |
+| A removed Portal (sold, given away, stolen) | keeps its copy of the vault: the household identity's private key and the linked homes' keys | sign future cross-home offers as this home; pull newer vaults | **Remove** unpins it here first, stores a marker signed by this Portal's device key that every Portal which pinned this one applies before merging (so no Portal holds the new key while still pinning it), and rotates the identity a generation up: its copy matches nothing this home uses. Linked homes verified under the old key are marked *needs checking again* until the pictures are re-checked (`PortalRemovalTest`). Residual: until the marker reaches a Portal, the removed one is still a trusted Portal there; links keep their old pin on the other home's side until re-checked (S4 has no channel to tell them, see "Removing a Portal") |
 | Fleet-token holder / file routes | write `no_backup/hearthpane_portal_roster` | plant a pin | directory blocked by `FleetSecretPaths`; the file is AES-GCM under its own Keystore key, so a written file fails to open and the roster starts empty (sync off) |
 
 A memory-hard KDF on the mailbox id was considered and not needed: with the nameplate public and
@@ -179,57 +181,63 @@ remote roster is phone-owned. So S3b adds a Portal-only trust root and a pinning
   chains with the host through the mailbox (once, joiner only). Verified: leaf key = pinned key,
   each cert signed by the next, root key ∈ Google's two roots (RSA-4096 and the 2025 P-384), the
   KeyDescription challenge, security level → `TEE`/`STRONGBOX`/`SOFTWARE`/`UNTRUSTED_ROOT`/
-  `ABSENT`/`INVALID`, recorded on the pin and shown in the list; never blocks a pin. Not checked:
-  validity dates, Google's revocation list.
+  `ABSENT`/`INVALID`, recorded on the pin and shown in the list; never blocks a pin. Validity
+  dates are checked **leniently** (`PortalAttestation.check`): attestation intermediates are often
+  expired on older devices, so a certificate outside its dates only sets `attestationOutOfDate` on
+  the pin ("a certificate is out of date" in the list) and never changes the level. **Deferred**:
+  Google's revocation list (`android.googleapis.com/attestation/status`) needs a network fetch and
+  a cache; until then a revoked chain is recorded at the level it shows.
+- **Legacy pins**: pins saved without a device id by older test builds can't be bound to an id, so
+  the roster still drops them, and logs one non-secret count when it loads ("pair them again").
 - **Screens** (measurement builds, Households & devices › This home › *Pair Portals*,
   `PortalPinFlowScreen`): paired Portals with Remove, Show a code / Type a code, Verify (pictures +
   digits), Pair again, done / failure.
-- **Open items**: review; "Remove this Portal" unpins only on this Portal (each Portal removes
-  its own pin) and should rotate the household identity (a re-link with each linked home);
-  revocation-list check; a two-Portal device run.
+- **Back key**: each pairing step and each Link homes test screen steps back one screen
+  (`PortalPinFlowState.back`, `HomeLinkTestNav.back`, `HomeLinkHouseholdsState.backOrNull`); only the
+  top screen leaves, never the whole Calls screen.
+- **Wrong kind of code**: a complete home-link code on the pairing keypad (or a pairing code on
+  Join a household) says where it belongs instead of a silently disabled button
+  (`HomeLinkJoinWords.hint`).
+- **Open items**: review; revocation-list check; a two-Portal device run.
 
-### Transport options (owner decision D1)
+### Removing a Portal (identity rotation)
 
-| Option | Signalling | Media when NAT blocks direct | Runs | Cost (1 family) |
-|---|---|---|---|---|
-| **A. Cloudflare** (mock's recommendation) | Worker + Durable Object per mailbox (WebSocket, sealed blobs, TTL) | Cloudflare Realtime TURN (short-lived credentials from the Worker) | Nothing to patch | ≈ $0/month |
-| B. Self-hosted | Small Kotlin/Go mailbox on a $5 VPS | coturn on the same VPS | Owner patches/monitors | ≈ $5–6/month |
-| C. Tailscale/Headscale overlay | Direct over the overlay (reuse LAN code) | DERP relays | Client on every Portal (no VPN app on Portal without root is the catch) | $0 / VPS |
-| D. SFU for groups | — | Server forwards media (needs SFrame for E2E) | Only if a 4-way cross-home mesh overloads the QCS605 | varies |
+"Remove" on a paired Portal (`PortalRemover.remove`) does three things, in this order:
 
-Recommendation: **A**, with the protocol written against a `HouseholdMailbox` interface so B is a
-drop-in. Media path: STUN first (direct for most homes), TURN only as fallback; about 1 call in 5
-relayed at ~1.3 GB/h (720p). C is unattractive: a Portal cannot run a VPN client without root.
+1. **Unpin here** first, so the removed Portal can't pull what comes next from this Portal.
+2. **Signed removal marker** in the vault (`PortalRemoval`: kid, household id, time, vault
+   revision, signer kid, signature by this Portal's device key over all of them; label
+   `hearthpane-portal-remove-v1`). Revisioned with the vault's clock like its tombstones, one per
+   removed kid (higher revision wins, then the smaller signer; ≤ 32 kept), so merging is
+   commutative and idempotent. Each Portal applies markers to its roster on every pulled vault
+   **before merging it** (`PortalRemover.apply`) and once at startup. A marker counts only if it is
+   signed by a Portal this one pinned (or by itself), names a pin held under the same household id,
+   isn't about itself or its own signer, and is newer than that pin — so a Portal paired again in
+   person after its removal stays pinned.
+3. **Rotate the household identity**: a new key one `generation` up, made at the removal time, in
+   the same vault change. `HomeLinkStoredIdentity.pick` prefers the higher generation, then the older,
+   then the smaller key, so every Portal converges on it and the removed Portal's copy (older
+   generation) can never win again, even if it is merged later. If two Portals remove at once and
+   the winning identity is older than one of the markers (`HomeLinkVault.identityStale`), the merging
+   Portal rotates again; markers dated more than a day ahead are ignored for this, so a bad clock
+   can't force a rotation per merge.
 
-What any relay can see: IPs, call timing and size, mailbox ids. What it cannot: who, which room,
-SDP contents, video, sound, messages. Logs at the relay: none beyond Cloudflare's default request
-metrics (owner to confirm).
+**Linked homes**: each link now records which of our identities it verified (`HomeLink.verifiedAs`,
+the identity's fingerprint; older links count as generation 0). After a rotation every link
+verified under another identity is in `HomeLinkVault.reverifyIds`, and Households shows "This home
+has a new key. Check again to keep calling." on it; *Check again* runs the pictures with the new key
+and replaces the link. We deliberately do **not** send the other home a rotation statement signed
+by the old key: the removed Portal holds that key and could sign one pointing at a key of its own.
+Until S4 there is no channel to the other home at all, so it keeps the old pin; once S4/S5 ship,
+cross-home offers are signed by the new key and fail against that pin, which the other home must show
+as *needs checking again* too (never silently re-pin). A removed Portal isn't asked to forget
+anything (it can't be trusted to); the rotation is what makes its copy useless.
 
-### Group calls across homes
-
-Keep the mesh, cap 4, 360p (already measured in 2a for LAN). Cross-home legs add TURN latency and
-upstream limits: a 4-way mesh sends 3 encodes upstream (~3 × 0.6 Mbps at 360p). Rule: if any leg
-is relayed or the uplink estimate is under 2.5 Mbps, cap cross-home groups at 3. SFU (D) only
-if device measurement shows the mesh failing — not planned.
-
-### Video messages across homes
-
-Same sealed format as in-home (`CallMessageCrypto`, chunked AES-GCM), but the transit key comes
-from the household link key, not the household key. Store-and-forward via the relay's blob store
-(R2 for option A), **deleted on delivery**, hard expiry 7 days, ≤ 2 min (≈ 25 MB). The relay
-holds ciphertext only. The sender keeps its own encrypted copy (newest 10, as today).
-
-### Grandma mode across homes
-
-Already built for in-home callers. Across homes, auto-answer may only apply to a person from a
-**verified** linked household, set in person at that Portal, never in quiet hours, with the
-chime + 10 s countdown + Not now. Needs only a new caller kind in `CallAutoAnswerPolicy`.
-
-### Phones (Portal Toolkit) across homes
-
-Walt's phone links by scanning the inviter's QR (same protocol, phone is the joiner) and then
-belongs to Lakeview. A sleeping phone needs a push to ring (owner decision D4): FCM content-free
-data message, or UnifiedPush/ntfy, or "rings only when Toolkit is open" (today's behaviour).
+Residuals: until a Portal receives the marker, the removed Portal is still pinned there (a removed
+Portal that turns hostile in that window is a trusted Portal on that one); a Portal that didn't pin
+the remover can't check its marker and keeps the removed Portal until a marker from a Portal it did
+pin arrives (pin every Portal pairwise); markers are compared with pin times, so clock skew between
+Portals of more than the gap between pinning and removal can keep a stale pin.
 
 ## Slices
 
@@ -240,7 +248,7 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 | S1 | **Household pairing core**: identity key, invite code (public nameplate + PAKE secret, 3 tries), commit/reveal protocol with typed+sequenced MAC'd messages, SAS (4 pictures + 12 digits), link + permissions model and codec | nothing | **built**, protocol v2 after security review (`HomeLink*.kt`, `HomeLinkPake.kt`) |
 | S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired/Too many tries, Connected, **Households & devices** (`HomeLinkHouseholdsScreen`), **Permissions** (`HomeLinkPermissionsScreen`), **Mini 800×1280 layouts** for all of them (`HomeLinkDims`/`HomeLinkLayout`, ≥ 64 dp). Reachable only from the measurement-build "Link homes test" (`HomeLinkTestFlow`) until S4 | nothing (flag off) | **built** |
 | S3 | Vault (`HomeLinkVault`: identity + revisioned entries, key-less tombstones) sealed at rest (`HomeLinkRepository`: own Keystore alias, `no_backup/hearthpane_homelinks`; not `CallMessageKeys`, whose delete-all forgets its alias), shared with this home's Portals (`HomeLinkSync`, `/remote/homelinkpeer`), Remove wipes the home's key on every Portal. Wire v2: only to **pinned Portal device keys** (below). **Sync is measurement-build only** (`HomeLinkGate.VAULT_SYNC`) until review and S3b | nothing | **built** (sync gated) |
-| S3b | **Portal-only device keys**: Keystore device key (`PortalDeviceKey`), roster (`PortalRoster`/`PortalRosterStore`) bound to device ids, signed-DH vault pull (`HomeLinkSyncWire` v2), gate on pins (`HomeLinkGate.syncs`), pinning = linking protocol with device keys (`PortalPinning`) in its own code namespace (`HomeLinkDomain`), LAN mailbox (`/remote/portalpin`), screens (`PortalPinFlowScreen`), attestation check recorded (`PortalAttestation`). **Left**: review, two-Portal device run, identity rotation on removal | nothing | **built** (measurement builds only) |
+| S3b | **Portal-only device keys**: Keystore device key (`PortalDeviceKey`), roster (`PortalRoster`/`PortalRosterStore`) bound to device ids, signed-DH vault pull (`HomeLinkSyncWire` v2), gate on pins (`HomeLinkGate.syncs`), pinning = linking protocol with device keys (`PortalPinning`) in its own code namespace (`HomeLinkDomain`), LAN mailbox (`/remote/portalpin`), screens (`PortalPinFlowScreen`), attestation check recorded (`PortalAttestation`). answers bound to the asked device id, removal markers + identity rotation (`PortalRemoval`), lenient attestation dates. **Left**: review, two-Portal device run, revocation list | nothing | **built** (measurement builds only) |
 | S4 | Relay mailbox client + Worker/DO + TURN credentials. **Security-critical relay rules**: a nameplate is claimed by one inviter `hello` (a nameplate in use is refused; the inviter makes a new code); the mailbox accepts **at most 3 joiner commits per nameplate**, then closes; mailboxes and their messages are deleted at 10 minutes or on the first completed `open`; one message ≤ 4 KB; per-IP rate limit on nameplate claims and commits. The Portal's own 3-try limit stands even if the relay is hostile — the relay limit protects against third parties who see the nameplate. | **D1 relay choice, D2 account** | blocked |
 | S5 | Cross-home 1:1 call: STUN/TURN candidates, trickle, identity-signed offer/answer, honest route chip ("Direct" / "Relay") | S4 | blocked |
 | S6 | Cross-home video messages (R2 blob, delete on delivery, 7-day expiry) | S4, **D3 storage** | blocked |
@@ -276,8 +284,9 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
   a phone holding the household key can neither pull it nor answer a Portal's pull. Until S3b is
   reviewed and its pinning screens exist, nothing gets pinned on a real Portal and the route stays
   measurement-build only (`HomeLinkGate`). Residual: the device key is only as non-exportable as
-  that Portal's Keystore (attestation requested, chain not yet verified); a Portal that is removed
-  keeps the identity it already had, so removal must rotate the identity (not built). The
+  that Portal's Keystore (attestation chain verified and recorded, never required); a Portal that is
+  removed keeps the identity it already had, so removal rotates the identity and marks linked homes
+  for checking again ("Removing a Portal"). The
   alternative — never sync the private key, one identity per Portal pinned by the other home as a
   set — stays on the table if pinning proves too fiddly for families (it costs a re-link when a
   Portal joins).

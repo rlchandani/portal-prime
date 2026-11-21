@@ -56,7 +56,7 @@ internal class HomeLinkSyncRoute(
     // The pin is bound to the household id that Portal signed when it was pinned: another id with its key gets nothing.
     if (pin.deviceId != from) return refuse(from, "device_mismatch")
     val ours = vault()
-    val answer = HomeLinkSyncWire.give(device, pull, ours, random) ?: return reply(500, "seal_failed")
+    val answer = HomeLinkSyncWire.give(device, self, pull, ours, random) ?: return reply(500, "seal_failed")
     if (!pull.back && pull.digest != HomeLinkSyncWire.digest(ours, key)) pullBack(from)
     log("home-link vault to ${pin.kid} ($from)")
     return FleetHttpServer.Response(200, answer)

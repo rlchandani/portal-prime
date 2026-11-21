@@ -63,10 +63,10 @@ class HomeLinkSyncTest {
     val asking = ask()
     val (status, answer) = post(asking)
     assertEquals(200, status)
-    val theirs = HomeLinkSyncWire.receive(asking, answer, requesterRoster, requesterKid)!!
+    val theirs = HomeLinkSyncWire.receive(asking, answer, requesterRoster, requesterKid, "family-1")!!
     assertEquals(source.vault.value, theirs)
     // Another pull's key (same requester, same device) can't open this answer.
-    assertNull(HomeLinkSyncWire.receive(ask(), answer, requesterRoster, requesterKid))
+    assertNull(HomeLinkSyncWire.receive(ask(), answer, requesterRoster, requesterKid, "family-1"))
   }
 
   @Test fun theAnswerNeverCarriesThePrivateKeyOrNamesInTheClear() {
@@ -95,22 +95,22 @@ class HomeLinkSyncTest {
   @Test fun anAnswerFromAnUnpinnedKeyOrTamperedCiphertextIsDropped() {
     val asking = ask()
     val (_, answer) = post(asking)
-    assertNull(HomeLinkSyncWire.receive(asking, answer, PortalRoster(), requesterKid))
+    assertNull(HomeLinkSyncWire.receive(asking, answer, PortalRoster(), requesterKid, "family-1"))
     val o = JSONObject(answer)
     val s = o.getString("s")
     val flipped = s.substring(0, s.length - 1) + (if (s.last() == '0') '1' else '0')
-    assertNull(HomeLinkSyncWire.receive(asking, o.put("s", flipped).toString(), requesterRoster, requesterKid))
+    assertNull(HomeLinkSyncWire.receive(asking, o.put("s", flipped).toString(), requesterRoster, requesterKid, "family-1"))
     // A phone answering in the responder's place signs with its own key: not pinned.
     val phone = HomeLinkIdentity.generate(random)
-    val fake = HomeLinkSyncWire.give(phone, asking.pull, HomeLinkVault(), random)
-    assertNull(HomeLinkSyncWire.receive(asking, fake, requesterRoster, requesterKid))
+    val fake = HomeLinkSyncWire.give(phone, "family-1", asking.pull, HomeLinkVault(), random)
+    assertNull(HomeLinkSyncWire.receive(asking, fake, requesterRoster, requesterKid, "family-1"))
   }
 
   @Test fun ourOwnKeyIsNeverAPeer() {
     val selfRoster = PortalRoster().pin(HomeLinkPeer("Me", requesterDevice.publicKey, requester), "other", now)!!
     val asking = ask()
-    val selfAnswer = HomeLinkSyncWire.give(requesterDevice, asking.pull, HomeLinkVault(), random)
-    assertNull(HomeLinkSyncWire.receive(asking, selfAnswer, selfRoster, requesterKid))
+    val selfAnswer = HomeLinkSyncWire.give(requesterDevice, requester, asking.pull, HomeLinkVault(), random)
+    assertNull(HomeLinkSyncWire.receive(asking, selfAnswer, selfRoster, requesterKid, requester))
     assertNull(HomeLinkSyncWire.admit(asking.pull, selfRoster, requesterKid, now))
   }
 
@@ -141,6 +141,32 @@ class HomeLinkSyncTest {
     assertEquals(listOf(requester), pulledBack)
   }
 
+  /** The answer is bound to the Portal we asked: a pinned key answering under (or for) another device id gets nowhere. */
+  @Test fun anAnswerFromAPinnedKeyUnderAnotherDeviceIdIsRejected() {
+    val kitchenDevice = HomeLinkIdentity.generate(random)
+    val both = requesterRoster.pin(HomeLinkPeer("Kitchen", kitchenDevice.publicKey, "kitchen-1"), requesterDevice.publicKey, now)!!
+    val asking = ask()
+    // We asked family-1; kitchen-1 (pinned, but not who we asked) answers, honestly or claiming family-1.
+    assertNull(HomeLinkSyncWire.receive(asking, HomeLinkSyncWire.give(kitchenDevice, "kitchen-1", asking.pull, source.vault.value, random),
+        both, requesterKid, "family-1"))
+    assertNull(HomeLinkSyncWire.receive(asking, HomeLinkSyncWire.give(kitchenDevice, "family-1", asking.pull, source.vault.value, random),
+        both, requesterKid, "family-1"))
+    // The real answer, but from a Portal other than the one we asked.
+    val (_, answer) = post(asking)
+    assertNull(HomeLinkSyncWire.receive(asking, answer, both, requesterKid, "kitchen-1"))
+    // The signed id can't be swapped after signing.
+    assertNull(HomeLinkSyncWire.receive(asking, JSONObject(answer).put("dev", "kitchen-1").toString(), both, requesterKid, "kitchen-1"))
+    assertNotNull(HomeLinkSyncWire.receive(asking, answer, both, requesterKid, "family-1"))
+    assertEquals("family-1", JSONObject(answer).getString("dev"))
+  }
+
+  @Test fun anAnswerWithoutADeviceIdIsRejected() {
+    val asking = ask()
+    val (_, answer) = post(asking)
+    assertNull(HomeLinkSyncWire.receive(asking, JSONObject(answer).apply { remove("dev") }.toString(), requesterRoster, requesterKid,
+        "family-1"))
+  }
+
   @Test fun theDigestChangesWithTheVaultAndNeedsTheKey() {
     val v = source.vault.value
     assertEquals(HomeLinkSyncWire.digest(v, key), HomeLinkSyncWire.digest(v, key))
@@ -151,11 +177,11 @@ class HomeLinkSyncTest {
   @Test fun aRemovalTravelsAndWipesTheKeyOnThePullingPortal() {
     val puller = HomeLinkRepository(MemorySecureStore(), random, { now }, {})
     val asking = ask()
-    puller.merge(HomeLinkSyncWire.receive(asking, post(asking).second, requesterRoster, requesterKid)!!)
+    puller.merge(HomeLinkSyncWire.receive(asking, post(asking).second, requesterRoster, requesterKid, "family-1")!!)
     val gone = source.vault.value.book.links.single()
     source.remove(gone.id)
     val again = ask()
-    puller.merge(HomeLinkSyncWire.receive(again, post(again).second, requesterRoster, requesterKid)!!)
+    puller.merge(HomeLinkSyncWire.receive(again, post(again).second, requesterRoster, requesterKid, "family-1")!!)
     assertTrue(puller.vault.value.book.links.isEmpty())
     assertFalse(HomeLinkVaultCodec.encode(puller.vault.value).contains(gone.publicKey))
   }

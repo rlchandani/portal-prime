@@ -61,7 +61,8 @@ class PortalPinningTest {
       val asking = HomeLinkSyncWire.ask(officeKey, "0".repeat(24), now, "0".repeat(32), back = false, random = random)
       val admitted = HomeLinkSyncWire.admit(asking.pull, family.roster, familyKid, now) ?: return null
       assertEquals(officeKid, admitted.kid)
-      return HomeLinkSyncWire.receive(asking, HomeLinkSyncWire.give(familyKey, asking.pull, vault, random), office.roster, officeKid)
+      return HomeLinkSyncWire.receive(asking, HomeLinkSyncWire.give(familyKey, "family-1", asking.pull, vault, random), office.roster, officeKid,
+          "family-1")
     }
     assertFalse(HomeLinkGate.syncs(family.roster, buildSwitch = true))
     assertNull(pull())

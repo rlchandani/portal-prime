@@ -18,7 +18,9 @@ import org.json.JSONObject
  * required). Public key material only.
  */
 internal data class PortalPin(val kid: String, val name: String, val publicKey: String, val pinnedAt: Long,
-                              val deviceId: String = "", val attestation: PortalAttestationLevel = PortalAttestationLevel.UNCHECKED)
+                              val deviceId: String = "", val attestation: PortalAttestationLevel = PortalAttestationLevel.UNCHECKED,
+                              /** A certificate in its attestation chain was outside its validity dates (flagged, never blocking). */
+                              val attestationOutOfDate: Boolean = false)
 
 /** What a pin attempt would do. */
 internal enum class PortalPinOutcome {
@@ -85,8 +87,8 @@ internal data class PortalRoster(val pins: Map<String, PortalPin> = emptyMap()) 
   }
 
   /** Records what [kid]'s attestation chain showed. Unknown kid: unchanged. */
-  fun attested(kid: String, level: PortalAttestationLevel): PortalRoster =
-      pins[kid]?.let { copy(pins = pins + (kid to it.copy(attestation = level))) } ?: this
+  fun attested(kid: String, level: PortalAttestationLevel, outOfDate: Boolean = false): PortalRoster =
+      pins[kid]?.let { copy(pins = pins + (kid to it.copy(attestation = level, attestationOutOfDate = outOfDate))) } ?: this
 
   /** Forgets a Portal (it was removed from the home): it gets nothing from here again. */
   fun unpin(kid: String): PortalRoster = copy(pins = pins - kid)
@@ -99,25 +101,32 @@ internal data class PortalRoster(val pins: Map<String, PortalPin> = emptyMap()) 
   }
 }
 
-/** `{v, pins: [{key, name, at, dev, att}]}`. Untrusted on the way in: anything off is dropped. Pure. */
+/** `{v, pins: [{key, name, at, dev, att, old?}]}`. Untrusted on the way in: anything off is dropped. Pure. */
 internal object PortalRosterCodec {
   private const val VERSION = 1
 
   fun encode(r: PortalRoster): String = JSONObject().put("v", VERSION).put("pins", JSONArray().apply {
     r.pins.values.sortedBy { it.kid }.forEach {
       put(JSONObject().put("key", it.publicKey).put("name", it.name).put("at", it.pinnedAt).put("dev", it.deviceId)
-          .put("att", it.attestation.name))
+          .put("att", it.attestation.name).apply { if (it.attestationOutOfDate) put("old", true) })
     }
   }).toString()
 
+  /** A decoded file: the roster, and how many pins were dropped for having no device id (saved by older test builds). */
+  data class Decoded(val roster: PortalRoster, val withoutDevice: Int)
+
   /** The roster, or null for a file that isn't one (wrong version, not JSON). Bad pins (and a second pin for one device) are skipped. */
-  fun parse(text: String?): PortalRoster? {
+  fun parse(text: String?): PortalRoster? = decode(text)?.roster
+
+  /** Like [parse], also counting the pins dropped for having no device id (a count only: nothing about them is kept). */
+  fun decode(text: String?): Decoded? {
     val o = text?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return null
     if (o.opt("v") != VERSION) return null
     val arr = o.optJSONArray("pins") ?: return null
-    val pins = (0 until minOf(arr.length(), PortalRoster.MAX_PINS)).mapNotNull { i -> pin(arr.optJSONObject(i)) }
-        .distinctBy { it.deviceId }
-    return PortalRoster(pins.associateBy { it.kid })
+    val raw = (0 until minOf(arr.length(), PortalRoster.MAX_PINS)).map { i -> arr.optJSONObject(i) }
+    val withoutDevice = raw.count { it != null && !it.has("dev") }
+    val pins = raw.mapNotNull(::pin).distinctBy { it.deviceId }
+    return Decoded(PortalRoster(pins.associateBy { it.kid }), withoutDevice)
   }
 
   private fun pin(o: JSONObject?): PortalPin? {
@@ -127,6 +136,6 @@ internal object PortalRosterCodec {
     val dev = (o.opt("dev") as? String)?.takeIf(HomeLinkWire::validDevice) ?: return null
     val att = PortalAttestationLevel.entries.firstOrNull { it.name == o.opt("att") } ?: PortalAttestationLevel.UNCHECKED
     if (!HomeLinkWire.validName(name) || HomeLinkIdentity.decodePublic(key) == null) return null
-    return PortalPin(HomeLinkIdentity.fingerprint(key), name, key, at, dev, att)
+    return PortalPin(HomeLinkIdentity.fingerprint(key), name, key, at, dev, att, attestationOutOfDate = o.opt("old") == true)
   }
 }

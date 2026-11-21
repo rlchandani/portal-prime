@@ -99,6 +99,14 @@ class PortalRosterTest {
     assertEquals(1, PortalRosterCodec.parse(o.toString())!!.pins.size)
   }
 
+  @Test fun anOutOfDateAttestationIsRecordedAndSurvivesTheCodec() {
+    val kid = HomeLinkIdentity.fingerprint(kitchen)
+    val r = PortalRoster().pin(HomeLinkPeer("Kitchen", kitchen, "kitchen-1"), me, 5L)!!.attested(kid, PortalAttestationLevel.TEE, outOfDate = true)
+    assertTrue(r.pins[kid]!!.attestationOutOfDate)
+    assertEquals(r, PortalRosterCodec.parse(PortalRosterCodec.encode(r)))
+    assertFalse(r.attested(kid, PortalAttestationLevel.TEE).pins[kid]!!.attestationOutOfDate)
+  }
+
   @Test fun aFullRosterRefusesMore() {
     var r = PortalRoster()
     repeat(PortalRoster.MAX_PINS) { r = r.pin(HomeLinkPeer("P$it", HomeLinkIdentity.generate(random).publicKey, "p-$it"), me, 1L)!! }
@@ -138,5 +146,26 @@ class PortalRosterTest {
     assertEquals(PortalPinOutcome.NOT_STORED, empty.pin(HomeLinkPeer("Kitchen", kitchen, "kitchen-1"), me, 5L))
     assertTrue(empty.roster.isEmpty)
     assertEquals(2, warnings.size)
+  }
+  /** Older test builds saved pins without a device id: still dropped (they can't be bound), but counted once, without keys or names. */
+  @Test fun pinsWithoutADeviceIdAreDroppedAndCountedOnceInTheLog() {
+    val r = PortalRoster().pin(HomeLinkPeer("Kitchen", kitchen, "kitchen-1"), me, 5L)!!
+    val o = JSONObject(PortalRosterCodec.encode(r))
+    val legacy = List(2) { HomeLinkIdentity.generate(random).publicKey }
+    legacy.forEachIndexed { i, k -> o.getJSONArray("pins").put(JSONObject().put("key", k).put("name", "Old $i").put("at", 1)) }
+    val decoded = PortalRosterCodec.decode(o.toString())!!
+    assertEquals(r, decoded.roster)
+    assertEquals(2, decoded.withoutDevice)
+    val warnings = ArrayList<String>()
+    val store = PortalRosterStore(MemorySecureStore(o.toString())) { warnings += it }
+    assertEquals(r, store.roster)
+    assertEquals(1, warnings.size)
+    assertTrue(warnings.single().contains("2 "))
+    assertTrue(warnings.none { w -> legacy.any { w.contains(it) } || w.contains("Old") || w.contains(kitchen) })
+    // A clean file says nothing.
+    val quiet = ArrayList<String>()
+    PortalRosterStore(MemorySecureStore(PortalRosterCodec.encode(r))) { quiet += it }
+    assertTrue(quiet.isEmpty())
+    assertEquals(0, PortalRosterCodec.decode(PortalRosterCodec.encode(r))!!.withoutDevice)
   }
 }

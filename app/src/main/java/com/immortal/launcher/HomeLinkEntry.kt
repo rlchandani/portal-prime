@@ -21,6 +21,11 @@ internal data class HomeLinkCodeEntry(val symbols: String = "", val domain: Home
   /** The typed code once complete and of this screen's [domain] (a pinning code on the home screen stays null). */
   val code: HomeLinkCode? get() = if (complete) HomeLinkCode.parse(symbols, domain) else null
 
+  /** A complete code that belongs to the other ceremony (a home code on the pairing keypad, or the reverse), or null. */
+  val otherDomain: HomeLinkDomain?
+    get() = if (!complete || code != null) null
+    else HomeLinkDomain.entries.firstOrNull { it != domain && HomeLinkCode.parse(symbols, it) != null }
+
   /** Adds [c] (normalised like [HomeLinkCode.parse]); anything else, or a full code, is ignored. */
   fun type(c: Char): HomeLinkCodeEntry {
     if (complete) return this
@@ -72,6 +77,8 @@ internal object HomeLinkCopy {
   const val CLOSE = "Close"
   const val DONE = "Done"
   const val NO_ANSWER = "Nothing answered that code. Check it with the person who read it out."
+  /** A Portal pairing code typed on Join a household. */
+  const val PIN_CODE_HERE = "That’s a Portal pairing code. Use This home › Pair Portals › Type a code instead."
   private const val QR_PREFIX = "hearthpane:link:"
 
   /** What the invite QR holds: Portal Toolkit reads the code from it. */

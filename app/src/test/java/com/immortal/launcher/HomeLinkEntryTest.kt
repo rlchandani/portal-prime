@@ -78,4 +78,31 @@ class HomeLinkEntryTest {
     assertEquals("Check it’s really Lakeview", HomeLinkCopy.verifyTitle("Lakeview"))
     assertEquals("Expires in 9:42", HomeLinkCopy.expires(HomeLinkInvite(HomeLinkCode.parse("MPT7Q4K2PA")!!, 0L), 18_000L))
   }
+  private fun typed(symbols: String, domain: HomeLinkDomain) =
+      symbols.fold(HomeLinkCodeEntry(domain = domain)) { e, c -> e.type(c) }
+
+  /** A code of the other ceremony leaves the button off and says where it goes, in the screens' voice. */
+  @Test fun aCodeForTheOtherCeremonySaysWhyTheButtonIsOff() {
+    val homeOnPin = typed("MPT7Q4K2PA", HomeLinkDomain.PORTAL_PIN)
+    assertNull(homeOnPin.code)
+    assertEquals(HomeLinkDomain.HOME, homeOnPin.otherDomain)
+    assertEquals(HomeLinkJoinHint("That’s a home-link code. Use Join with a code in Households instead.", error = true),
+        HomeLinkJoinWords.PORTAL_PIN.hint(homeOnPin))
+    val pinOnHome = typed("PK7M2Q9X4A", HomeLinkDomain.HOME)
+    assertNull(pinOnHome.code)
+    assertEquals(HomeLinkDomain.PORTAL_PIN, pinOnHome.otherDomain)
+    assertEquals(HomeLinkJoinHint("That’s a Portal pairing code. Use This home › Pair Portals › Type a code instead.", error = true),
+        HomeLinkJoinWords.HOME.hint(pinOnHome))
+  }
+
+  @Test fun theRightOrAnUnfinishedCodeKeepsTheUsualLine() {
+    val right = typed("PK7M2Q9X4A", HomeLinkDomain.PORTAL_PIN)
+    assertNotNull(right.code)
+    assertNull(right.otherDomain)
+    assertEquals(HomeLinkJoinHint(PortalPinCopy.TYPE_HOW, error = false), HomeLinkJoinWords.PORTAL_PIN.hint(right))
+    val half = typed("MPT7Q", HomeLinkDomain.PORTAL_PIN)
+    assertNull(half.otherDomain)
+    assertEquals(HomeLinkJoinHint(PortalPinCopy.TYPE_HOW, error = false), HomeLinkJoinWords.PORTAL_PIN.hint(half))
+    assertEquals(HomeLinkJoinHint(HomeLinkCopy.JOIN_HOW, error = false), HomeLinkJoinWords.HOME.hint(typed("MPT7Q4K2PA", HomeLinkDomain.HOME)))
+  }
 }

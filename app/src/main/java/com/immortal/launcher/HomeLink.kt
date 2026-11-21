@@ -34,13 +34,18 @@ internal data class HomeLinkPermissions(
   }
 }
 
-/** A home linked after both sides said the safety pictures match. [id] is its key's fingerprint. */
+/**
+ * A home linked after both sides said the safety pictures match. [id] is its key's fingerprint.
+ * [verifiedAs] is the fingerprint of *our* identity they checked (empty for links made before it
+ * was recorded): once this home's identity rotates, the link needs checking again
+ * ([HomeLinkVault.reverifyIds]).
+ */
 @Immutable
 internal data class HomeLink(val id: String, val name: String, val publicKey: String, val verifiedAt: Long,
-                             val permissions: HomeLinkPermissions) {
+                             val permissions: HomeLinkPermissions, val verifiedAs: String = "") {
   companion object {
-    fun verified(peer: HomeLinkPeer, at: Long, permissions: HomeLinkPermissions): HomeLink =
-        HomeLink(HomeLinkIdentity.fingerprint(peer.publicKey), peer.name, peer.publicKey, at, permissions)
+    fun verified(peer: HomeLinkPeer, at: Long, permissions: HomeLinkPermissions, verifiedAs: String = ""): HomeLink =
+        HomeLink(HomeLinkIdentity.fingerprint(peer.publicKey), peer.name, peer.publicKey, at, permissions, verifiedAs)
   }
 }
 
@@ -74,7 +79,7 @@ internal object HomeLinkBookCodec {
   /** One link as stored (also inside [HomeLinkVaultCodec]). */
   fun linkJson(l: HomeLink): JSONObject = JSONObject().put("id", l.id).put("n", l.name).put("k", l.publicKey).put("at", l.verifiedAt)
       .put("call", l.permissions.canCall).put("avail", l.permissions.seesAvailability)
-      .put("rooms", JSONArray(l.permissions.ringRooms.sorted()))
+      .put("rooms", JSONArray(l.permissions.ringRooms.sorted())).apply { if (l.verifiedAs.isNotEmpty()) put("as", l.verifiedAs) }
 
   /** One stored link, validated like wire data, or null. */
   fun parseLink(o: JSONObject): HomeLink? = try { entry(o) } catch (e: JSONException) { null }
@@ -98,6 +103,9 @@ internal object HomeLinkBookCodec {
     val at = o.getLong("at").takeIf { it >= 0 } ?: return null
     val roomsArr = o.getJSONArray("rooms")
     val rooms = (0 until roomsArr.length()).map { roomsArr.getString(it).takeIf(HomeLinkWire::validName) ?: return null }
-    return HomeLink(id, name, key, at, HomeLinkPermissions(o.getBoolean("call"), o.getBoolean("avail"), rooms.toSet()))
+    val verifiedAs = if (o.has("as")) o.getString("as").takeIf { FINGERPRINT.matches(it) } ?: return null else ""
+    return HomeLink(id, name, key, at, HomeLinkPermissions(o.getBoolean("call"), o.getBoolean("avail"), rooms.toSet()), verifiedAs)
   }
+
+  private val FINGERPRINT = Regex("^[0-9a-f]{16}$")
 }

@@ -140,6 +140,8 @@ class PortalPinCeremonyTest {
     assertEquals(HomeLinkCopy.failure(HomeLinkFailure.MISMATCH), PortalPinCopy.failure(HomeLinkFailure.MISMATCH))
     val pin = PortalPin("kid", "Office", officeKey.publicKey, 1L, "office-1", PortalAttestationLevel.TEE)
     assertEquals("office-1 · Key in secure hardware", PortalPinCopy.pinDetail(pin))
+    assertEquals("office-1 · Key in secure hardware · a certificate is out of date",
+        PortalPinCopy.pinDetail(pin.copy(attestationOutOfDate = true)))
     PortalAttestationLevel.entries.forEach { assertTrue(PortalPinCopy.attestation(it).isNotBlank()) }
   }
 }

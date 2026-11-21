@@ -146,4 +146,12 @@ class HomeLinkHouseholdsTest {
     assertEquals(CallPresence.OFFLINE, devices[1].presence)
     assertEquals(CallPresence.AVAILABLE, devices[2].presence)
   }
+  /** After a Portal is removed the identity rotates: links checked under the old key say so instead of their date. */
+  @Test fun aLinkCheckedUnderAnOldKeySaysItNeedsCheckingAgain() {
+    val zone = ZoneId.of("UTC")
+    val s = HomeLinkHouseholdsState(book).withBook(book, setOf(lake.id))
+    assertEquals(HomeLinkHouseholdsCopy.KEY_CHANGED, s.checkedLine(lake, zone))
+    assertEquals(HomeLinkHouseholdsCopy.checked(priya.verifiedAt, zone), s.checkedLine(priya, zone))
+    assertEquals(setOf(lake.id), s.withBook(book.upsert(lake)).reverify)
+  }
 }

@@ -30,6 +30,9 @@ internal enum class PortalAttestationLevel {
   val hardware: Boolean get() = this == TEE || this == STRONGBOX
 }
 
+/** What [PortalAttestation.check] found: the level, and whether a certificate was outside its validity dates. */
+internal data class PortalAttestationCheck(val level: PortalAttestationLevel, val outOfDate: Boolean)
+
 /**
  * Checks a Portal's Keystore key attestation chain (API 24+, so fine on a Portal's Android 9/10):
  * leaf first, each certificate signed by the next, the last self-signed by one of Google's
@@ -38,8 +41,11 @@ internal enum class PortalAttestationLevel {
  * where the key lives. Pure; the result is only recorded on the pin (Portals aren't
  * Google-certified, so a vendor root or no attestation at all is expected and never blocks).
  *
- * Not checked (recorded as residual): certificate validity dates (attestation intermediates are
- * routinely expired on older devices) and Google's revocation list (needs a network fetch).
+ * Validity dates are checked **leniently** ([check]): attestation intermediates are routinely
+ * expired on older devices, so a certificate outside its dates only sets
+ * [PortalAttestationCheck.outOfDate], recorded on the pin and shown in the list; it never changes
+ * the level or blocks a pin. Deferred: Google's revocation list (`android.googleapis.com/attestation/status`
+ * needs a network fetch and a cache; a revoked chain is today recorded at the level it shows).
  */
 internal object PortalAttestation {
   const val MAX_CHAIN = 6
@@ -68,6 +74,20 @@ internal object PortalAttestation {
     if (chain.size <= 1) return PortalAttestationLevel.ABSENT
     if (chain.size > MAX_CHAIN || chain.any { it.size > MAX_CERT_BYTES }) return PortalAttestationLevel.INVALID
     val certs = parse(chain) ?: return PortalAttestationLevel.INVALID
+    return level(certs, expectedKey, roots, challenge)
+  }
+
+  /** [verify], plus whether any certificate in a readable chain is outside its validity dates at [now] (flagged, never blocking). */
+  fun check(chain: List<ByteArray>, expectedKey: String, roots: List<String> = GOOGLE_ROOTS, challenge: ByteArray? = null,
+            now: Long): PortalAttestationCheck {
+    if (chain.size <= 1) return PortalAttestationCheck(PortalAttestationLevel.ABSENT, outOfDate = false)
+    if (chain.size > MAX_CHAIN || chain.any { it.size > MAX_CERT_BYTES }) return PortalAttestationCheck(PortalAttestationLevel.INVALID, false)
+    val certs = parse(chain) ?: return PortalAttestationCheck(PortalAttestationLevel.INVALID, outOfDate = false)
+    return PortalAttestationCheck(level(certs, expectedKey, roots, challenge),
+        outOfDate = certs.any { now < it.notBefore.time || now > it.notAfter.time })
+  }
+
+  private fun level(certs: List<X509Certificate>, expectedKey: String, roots: List<String>, challenge: ByteArray?): PortalAttestationLevel {
     if (HomeLinkHash.b64(certs.first().publicKey.encoded) != expectedKey) return PortalAttestationLevel.INVALID
     if (!signedInOrder(certs)) return PortalAttestationLevel.INVALID
     val description = keyDescription(certs.first()) ?: return PortalAttestationLevel.INVALID

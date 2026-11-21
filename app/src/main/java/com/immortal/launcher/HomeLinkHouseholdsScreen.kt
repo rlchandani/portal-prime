@@ -177,7 +177,7 @@ private fun presenceTone(p: CallPresence): CallChipTone = when (p) {
 @Composable
 private fun LinkDetail(state: HomeLinkHouseholdsState, link: HomeLink, selfName: String, zone: ZoneId,
                        actions: HomeLinkHouseholdsActions) = DetailColumn {
-  HeroCard(link.name, HomeLinkHouseholdsCopy.ringSummary(link), HomeLinkHouseholdsCopy.checked(link.verifiedAt, zone)) {
+  HeroCard(link.name, HomeLinkHouseholdsCopy.ringSummary(link), state.checkedLine(link, zone)) {
     CallPill(HomeLinkHouseholdsCopy.CHECK_AGAIN, { actions.onCheckAgain(link) }, icon = "key", surface = callsSurface())
   }
   Column {
