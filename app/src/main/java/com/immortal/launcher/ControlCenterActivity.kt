@@ -77,8 +77,11 @@ class ControlCenterActivity : ComponentActivity() {
     super.onStart()
     started = true
     CcJarvisHome.screenStarted()
-    ControlCenter.reloadSettings(this)
+    CcGpuTrim.instance.started()
+    // Visible first: the settings reload then publishes once, with the plan models built on the
+    // engine thread before the first frame instead of inside it (a hidden engine keeps none).
     ControlCenter.setVisible(this, true)
+    ControlCenter.reloadSettings(this)
     registerReceiver(screen, IntentFilter().apply {
       addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON)
       addAction(Intent.ACTION_DREAMING_STARTED); addAction(Intent.ACTION_DREAMING_STOPPED)
@@ -96,6 +99,7 @@ class ControlCenterActivity : ComponentActivity() {
     runCatching { unregisterReceiver(screen) }
     ControlCenter.setVisible(this, false)
     ControlCenterBanners.releaseActivity(this)
+    CcGpuTrim.instance.stopped()
     super.onStop()
   }
 

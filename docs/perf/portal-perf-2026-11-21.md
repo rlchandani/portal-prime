@@ -102,3 +102,57 @@ No code changes this round. Shipped 1.303 (`com.immortal.launcher.debug`, versio
 2. CC: move `reloadSettings` / `RoomSignals.refresh` off the open path, and find what holds the extra ~13 MB of graphics after `onStop`.
 3. Screensaver: release `SlideshowLoader` bitmaps on activity or dream stop, and check that PSS returns to the Home baseline.
 4. Tabs: still 2 frames of 40–80 ms per switch (round 3's activation recomposition plus the `queueBuffer` stall).
+
+## Control Center (Phase B, branch `cc-open`)
+
+**Device:** Family Portal+, the same session method as above (gfxinfo reset → tap Home Control → 3 s → framestats; then the read-only "door is open" attention row → 3 s; Back twice). No screenshots. STREAM_MUSIC was set to 0 and restored to 3.
+- A/B builds: a `main` performance build and the branch performance build, each installed with its own dex metadata (`install-multiple` apk + dm, so both were `speed-profile`, as an OTA is), then 25 s idle and one unmeasured warm-up open. 3 repeats each.
+- The HWUI cache is the "Total GPU memory usage" line of `dumpsys gfxinfo`.
+
+### What the trace showed (official 1.303)
+
+- Open: the tap reaches `activityPause` about 75 ms later (system_server). CC's first frame is one 61 ms traversal: ~16 ms attach + composition, 15 ms measure, 12 ms draw.
+  - The frame after it is janky only because its vsync passed during the first one.
+  - Home's window draws a layout-changed frame at the same vsync, queued behind CC's. It counts as a second janky frame of about 90 ms.
+  - About 230 ms in, the foreground subscription's snapshot arrives: 6.5 ms of recomposition and 17 ms of draw recording, plus the frame queued behind it.
+- `onStart` work is not on the main thread. `reloadSettings`/`setVisible` post to the engine thread, and `RoomSignals.refresh` is a few preference reads. It wasn't the cause.
+- Sheet: the tap frame costs ~23 ms of recomposition and ~26–56 ms of draw recording. A branch experiment composed the sheet page off screen over several frames (a paused precomposition plus premeasure) before the slide started. The long tap frame stayed. That frame is the plan's room highlight (`openRoom` sets `highlightRoom`, so the plan canvas recomposes and re-records its layers), not the sheet. The experiment didn't improve the sheet numbers (sheet frames over 32 ms: base 3 / 6 / 5, experiment 4 / 4 / 4), so it was dropped.
+
+### Changes
+
+1. `ControlCenterGpuTrim.kt` (new): `CcGpuTrim`. Once no Control Center window has been on screen for 4 s, it runs the renderer's UI_HIDDEN trim (`WindowManagerGlobal.trimMemory(TRIM_MEMORY_UI_HIDDEN)`, a hidden API that Android 10 allowed). An open within 4 s cancels the trim, so a quick re-open keeps its cache.
+   - Wired in `ControlCenterActivity.onStart` / `onStop`.
+   - 5 JVM tests in `CcGpuTrimTest`.
+2. `ControlCenterActivity.onStart`: `setVisible(true)` now runs before `reloadSettings()`. The reload's publish is then a visible one, so the plan models are built on the engine thread. Before, a hidden engine published empty models and the map built them on the main thread.
+   - This had no measurable effect on the open (see below). It is kept because it removes a main-thread build and doesn't change the result.
+
+### Before / after (performance builds; frames over 32 ms from framestats)
+
+The branch columns are build `5daab363`: the final changes plus the sheet experiment, which was dropped afterwards. An earlier run of the final code alone (`ce514f53`) gave the same picture:
+- Open: 3 / 3 / 3 frames over 32 ms (66 / 72 / 52).
+- Sheet: 4 / 4 / 4 (102 / 102 / 74).
+- The GPU-cache rows are from the final code.
+
+
+| | main r1 / r2 / r3 | branch r1 / r2 / r3 |
+|---|---|---|
+| CC open: janky %, p90 / p99 ms | 67 / 78 / 58; 57–89 / 65–101 | 62 / 46 / 67; 65–101 / 69–101 |
+| CC open: frames over 32 ms (max) | 2 / 3 / 3 (40 / 54 / 59) | 3 / 2 / 3 (50 / 69 / 63) |
+| Sheet: frames over 32 ms (max) | 3 / 6 / 5 (91 / 101 / 98) | 4 / 4 / 4 (95 / 82 / 95) |
+| HWUI GPU cache, Home before → CC +10 s → Home +2 s → **Home +6 s** → +30 s | 15.5 → 15.5 → 16.4 → **16.4** → 16.4; then 16.4 → 17.3 → 17.3 → **17.3** → 17.3 MB | 10.1 → 15.5 → 15.5 → **10.1** → 10.1; then 10.1 → 17.3 → 17.3 → **10.1** → 10.1 MB |
+| Re-open 30 s after leaving (after the trim): frames over 32 ms (max) | 4 (60); 3 (62) | 3 (73); 3 (54) — the same as an untrimmed open |
+
+- **Memory:**
+  - With the trim, the renderer's cache returns to Home's own 10.1 MB (1.9 MB purgeable) about 4 s after leaving.
+  - Without it, it stays at 16.4–17.3 MB (8–9 MB purgeable) and grows with each visit.
+  - meminfo "Graphics" moves in steps of about 12 MB (46 ↔ 58 MB) on both builds whether or not CC was opened, which is one 2160×1440 buffer of Home's window. TOTAL PSS / Graphics alone can't show the CC difference in a fresh process. The HWUI cache line can.
+- **Open / sheet: not fixed.**
+  - The open still has 2–3 frames over 32 ms: CC's first composition, Home's layout-changed frame queued behind it, and the snapshot redraw about 230 ms in.
+  - The sheet still has the plan-highlight frame.
+  - The targets (≤ 1 janky frame, p90 < 16, p99 < 32, no sheet frame over 32 ms) are not met.
+
+### Next
+
+1. Sheet: make the plan's room highlight cheap. Draw it as its own layer, so the plan's other layers keep their recordings when `highlightRoom` changes. To attribute first, trace the `cc:*` sections with a profileable (benchmark) build. They don't appear in performance builds, because Android 10 enables app tracing only for profileable apps.
+2. Open: the first frame is one composition of the whole map (~45 ms of main-thread work). Making it smaller needs either a lighter first composition or keeping CC alive behind Home, which trades against the memory result above.
+3. The +230 ms redraw happens because the background subscription drops the plan's non-alert entities. Keeping their last states would avoid the redraw, but would show stale states for ~200 ms. That is an owner decision.
