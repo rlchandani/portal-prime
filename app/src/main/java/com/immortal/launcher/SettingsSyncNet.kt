@@ -25,12 +25,12 @@ internal object SettingsSyncNet {
 
   /** POSTs our payload to a peer; returns its verified payload text, or null. Blocking. */
   fun post(context: Context, host: String, port: Int, body: String): String? =
-      SyncPeerClient({ HouseholdKey.get(context) }, { RemoteCompanionStore.id(context) }, HttpSyncTransport, System::currentTimeMillis,
+      SyncPeerClient({ HouseholdKey.get(context) }, { RemoteCompanionStore.id(context) }, HttpSyncTransport, { SettingsSync.clock() },
           { ByteArray(NONCE_BYTES).also(random::nextBytes).let(HouseholdKey::toHex) }).post(host, port, body)
 
   /** The route: verify the household signature, merge, reply signed against the caller's nonce. */
   fun handle(context: Context, req: FleetHttpServer.Request): FleetHttpServer.Response =
-      SyncPeerRoute({ HouseholdKey.get(context) }, { runCatching { RemoteCompanionStore.id(context) }.getOrNull() }, System::currentTimeMillis,
+      SyncPeerRoute({ HouseholdKey.get(context) }, { runCatching { RemoteCompanionStore.id(context) }.getOrNull() }, { SettingsSync.clock() },
           replay) { from, text -> SettingsSync.handlePeer(context, from, text) }.handle(req)
 }
 

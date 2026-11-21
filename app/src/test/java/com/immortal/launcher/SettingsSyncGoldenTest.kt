@@ -119,7 +119,7 @@ private class SyncGoldenRun(private val data: JSONObject, private val sc: JSONOb
   }
 
   private fun message(type: String, from: String, body: JSONObject) =
-      HouseholdMessage(type, id(from), System.currentTimeMillis(), "n${nonce++}", body)
+      HouseholdMessage(type, id(from), h.now(), "n${nonce++}", body)
 
   private fun payload(o: JSONObject): String =
       SettingsSyncWire.payload(o.optString("name", "Living"), o.optBoolean("joining"), records(o.optJSONArray("records")))
@@ -158,10 +158,10 @@ private class SyncGoldenRun(private val data: JSONObject, private val sc: JSONOb
     val n = step.optString("nonce").ifBlank { "nonce${nonce++}" }
     val headers = HashMap<String, String>()
     when (step.optString("auth", "good")) {
-      "good" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, System.currentTimeMillis(), body)!!
-      "otherKey" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(OTHER_KEY, from, n, System.currentTimeMillis(), body)!!
-      "otherBody" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, System.currentTimeMillis(), "$body ")!!
-      "stale" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, System.currentTimeMillis() - STALE_MS, body)!!
+      "good" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, h.now(), body)!!
+      "otherKey" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(OTHER_KEY, from, n, h.now(), body)!!
+      "otherBody" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, h.now(), "$body ")!!
+      "stale" -> headers[SettingsSyncWire.HEADER] = SettingsSyncWire.requestHeader(KEY, from, n, h.now() - STALE_MS, body)!!
       "none" -> Unit
     }
     val bytes = body.toByteArray(Charsets.UTF_8)
