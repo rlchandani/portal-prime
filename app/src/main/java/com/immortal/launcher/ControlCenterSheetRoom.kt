@@ -106,12 +106,14 @@ private fun RoomAlert(ui: CcUi, ra: CcRoomAlert, canControl: Boolean) {
   Row(Modifier.fillMaxWidth().padding(bottom = 14.dp).ccCard(CcStyle.Tile).clickable(role = Role.Button) { ui.openDevice(a.entityId) }
       .padding(horizontal = 22.dp, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     Box(Modifier.size(58.dp).clip(CcStyle.CardSmall).background(bg), contentAlignment = Alignment.Center) { CcIcon(CcIcons.forKind(a.kind), fg, 32.dp) }
-    Column(Modifier.weight(1f)) {
+    // The row's words as one node, numbered when another alert here reads the same; the Close button keeps its own node.
+    Column(Modifier.weight(1f).ccSpeak(CcSpeech.row(a.title, a.body) + ra.repeat)) {
       Text(a.title, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
       Text(a.body, color = c.sec, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
     val e = ra.closable
-    if (e != null) CcButton("Close…", { ui.act(e, CcCalls.coverClose(e)) }, icon = "garage", height = 64, enabled = canControl)
+    if (e != null) CcButton("Close…", { ui.act(e, CcCalls.coverClose(e)) }, icon = "garage", height = 64, enabled = canControl,
+        spoken = CcSpeech.alertAction(a.title, "Close…") + ra.repeat)
     else CcIcon("chev", c.faint, 28.dp)
   }
 }

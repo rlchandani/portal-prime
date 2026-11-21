@@ -55,6 +55,8 @@ internal fun CcButton(
     style: CcButtonStyle = CcButtonStyle.TONAL,
     enabled: Boolean = true,
     height: Int = 76,
+    /** Screen-reader name when [label] repeats on the screen (e.g. each alert's Close); visual unchanged. */
+    spoken: String = label,
 ) {
   val c = LocalCc.current
   val (bg, fg) = when (style) {
@@ -64,7 +66,7 @@ internal fun CcButton(
     CcButtonStyle.DANGER -> c.red to Color.White
   }
   Row(modifier.height(height.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(CcStyle.Pill).background(bg)
-      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).ccSpeak(label).padding(horizontal = 34.dp),
+      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).ccSpeak(spoken).padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)) {
     icon?.let { CcIcon(it, fg, 30.dp) }
     Text(label, color = fg, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)

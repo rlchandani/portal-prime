@@ -63,9 +63,9 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
   }
   val items = remember(filter, active, resolved, s.entitiesVersion, s.plan, s.connection.canControl, s.minute) {
     val roomOf: (String) -> String? = { id -> s.plan?.roomOf(id)?.id }
-    CcAlertRules.list(filter, active, resolved).map { (a, on) ->
+    CcAlertRules.named(CcAlertRules.list(filter, active, resolved).map { (a, on) ->
       CcAlertRules.item(a, on, s.entities, roomOf, s.connection.canControl, System.currentTimeMillis(), ::ccTime)
-    }
+    })
   }
   val onOp = remember(ui) { { item: CcAlertItem -> runOp(ui, item) } }
   if (currentLayoutClass().compactPortrait) {
@@ -142,7 +142,7 @@ private fun AlertCard(item: CcAlertItem, onOp: (CcAlertItem) -> Unit) {
     if (!item.active) CcTag("Resolved", CcTone.GREEN)
     else item.label?.let { label ->
       val click = remember(item, onOp) { { onOp(item) } }
-      SmallButton(label, item.danger, item.enabled, click)
+      SmallButton(label, item.spoken ?: CcSpeech.alertAction(a.title, label), item.danger, item.enabled, click)
     }
   }
 }
@@ -151,11 +151,12 @@ private const val RESOLVED_ALPHA = 0.6f
 
 /** `.btn.sm.pri` (or `.danger` for critical): 64 tall here for the touch floor. */
 @Composable
-private fun SmallButton(label: String, danger: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun SmallButton(label: String, spoken: String, danger: Boolean, enabled: Boolean, onClick: () -> Unit) {
   val c = LocalCc.current
   val (bg, fg) = if (danger) c.red to Color.White else c.accent to c.accentInk
   Box(Modifier.height(CcStyle.MinTarget).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(CcStyle.Pill).background(bg)
-      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 24.dp), contentAlignment = Alignment.Center) {
+      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).ccSpeak(spoken).padding(horizontal = 24.dp),
+      contentAlignment = Alignment.Center) {
     Text(label, color = fg, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
   }
 }

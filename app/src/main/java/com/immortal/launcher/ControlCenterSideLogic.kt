@@ -16,7 +16,9 @@ internal enum class CcSceneTone { NIGHT, MOVIE, LEAVE, MORNING, NEUTRAL }
 
 /** One "Needs attention" row: the alert, the entity it acts on, its plan room and whether it offers Close. */
 @Immutable
-internal data class CcAttentionRow(val alert: CcAlert, val entity: CcEntity?, val roomId: String?, val close: Boolean)
+internal data class CcAttentionRow(val alert: CcAlert, val entity: CcEntity?, val roomId: String?, val close: Boolean,
+    /** ", 2 of 3" when another row reads the same (see [CcSpeech.repeatSuffixes]); spoken only. */
+    val repeat: String = "")
 
 /** The attention card's whole input; equal slices skip the card. */
 @Immutable
@@ -93,9 +95,11 @@ internal object CcSideLogic {
 
   /** The attention card from the active alerts (top [ATTENTION_ROWS]); the all-clear line when there are none. */
   fun attention(alerts: List<CcAlert>, entities: Map<String, CcEntity>, plan: CcPlan?, settings: ControlCenterConfig.Settings): CcAttentionSlice {
-    val rows = alerts.take(ATTENTION_ROWS).map { a ->
+    val top = alerts.take(ATTENTION_ROWS)
+    val repeats = CcSpeech.repeatSuffixes(top.map { CcSpeech.row(it.title, it.body) })
+    val rows = top.mapIndexed { i, a ->
       val e = entities[a.entityId]
-      CcAttentionRow(a, e, plan?.roomOf(a.entityId)?.id, a.action == CcAlertAction.CLOSE && e?.domain == "cover")
+      CcAttentionRow(a, e, plan?.roomOf(a.entityId)?.id, a.action == CcAlertAction.CLOSE && e?.domain == "cover", repeats[i])
     }
     val clear = if (rows.isEmpty()) allClear(entities.values.filter { !CcPolicy.hidden(it, settings) }) else ""
     return CcAttentionSlice(rows, clear)

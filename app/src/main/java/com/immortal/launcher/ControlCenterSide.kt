@@ -68,7 +68,7 @@ private fun AttentionRow(row: CcAttentionRow, canControl: Boolean, ui: CcUi) {
   val e = row.entity
   val tap = remember(row, ui) { if (row.close && row.roomId != null) ({ ui.openRoom(row.roomId) }) else ({ ui.go(CcScreen.ALERTS) }) }
   val closes = row.close && e != null
-  val speech = CcSpeech.row(a.title, a.body)
+  val speech = CcSpeech.row(a.title, a.body) + row.repeat
   // One node per row; a row with its own Close button keeps that button as a second node.
   Row(Modifier.fillMaxWidth().heightIn(min = 76.dp).clip(ROW).clickable(role = Role.Button, onClick = tap)
       .then(if (closes) Modifier else Modifier.ccSpeak(speech))
@@ -81,7 +81,8 @@ private fun AttentionRow(row: CcAttentionRow, canControl: Boolean, ui: CcUi) {
       Text(a.title, color = c.text, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
       Text(a.body, color = c.sec, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 26.sp)
     }
-    if (closes && e != null) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = canControl)
+    if (closes && e != null) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = canControl,
+        spoken = CcSpeech.alertAction(a.title, "Close") + row.repeat)
     else CcIcon("chev", c.sec, 30.dp)
   }
 }

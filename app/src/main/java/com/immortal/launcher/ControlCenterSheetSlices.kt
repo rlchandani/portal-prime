@@ -43,7 +43,9 @@ internal data class CcRoomScenes(val scenes: List<CcEntity>, val lightsOn: List<
 
 /** An alert card; [closable] is the garage it can close in place. */
 @Immutable
-internal data class CcRoomAlert(val alert: CcAlert, val closable: CcEntity?)
+internal data class CcRoomAlert(val alert: CcAlert, val closable: CcEntity?,
+    /** ", 2 of 3" when another alert in this room reads the same; spoken only. */
+    val repeat: String = "")
 
 /** The room page header chips. */
 @Immutable
@@ -86,8 +88,11 @@ internal object CcSlices {
     return CcRoomSlice(
         room = room,
         head = CcRoomHead(view.temperature?.let { CcSheetLogic.temp(it) }, view.humidity?.let { "$it%" }, CcSheetLogic.presence(s, room), lightsOn.size),
-        alerts = CcSheetLogic.alerts(s, room).map { a ->
-          CcRoomAlert(a, s.entity(a.entityId)?.takeIf { a.action == CcAlertAction.CLOSE && CcModalLogic.closable(it) })
+        alerts = CcSheetLogic.alerts(s, room).let { list ->
+          val repeats = CcSpeech.repeatSuffixes(list.map { CcSpeech.row(it.title, it.body) })
+          list.mapIndexed { i, a ->
+            CcRoomAlert(a, s.entity(a.entityId)?.takeIf { a.action == CcAlertAction.CLOSE && CcModalLogic.closable(it) }, repeats[i])
+          }
         },
         contents = contents,
         climateRoomTemp = CcRooms.view(room, s.entities).temperature ?: contents.climate?.currentTemp,

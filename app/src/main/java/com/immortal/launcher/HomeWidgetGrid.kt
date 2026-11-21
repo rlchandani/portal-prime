@@ -153,27 +153,28 @@ private fun ApprovedWidgetCell(
                 })
               }
             }
+          val widgetName = remember(widget.key, widget.appWidgetId) { widgetSpokenName(widget, manager, context) }
           val legend = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
               .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
               .background(ApprovedHomePalette.Card).padding(start = 6.dp, top = 6.dp, bottom = 6.dp, end = 58.dp)
           if (!compactLegend) {
             Row(legend, horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
-              ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
-              ApprovedWidgetAction("Size", Modifier.weight(1f), onClick = onSize)
-              ApprovedWidgetAction("Settings", Modifier.weight(1f), onClick = onSettings)
-              ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+              ApprovedWidgetAction("Move", widgetName, Modifier.weight(1f), onClick = onMove)
+              ApprovedWidgetAction("Size", widgetName, Modifier.weight(1f), onClick = onSize)
+              ApprovedWidgetAction("Settings", widgetName, Modifier.weight(1f), onClick = onSettings)
+              ApprovedWidgetAction("Remove", widgetName, Modifier.weight(1f)) { onRemove(widget) }
             }
           } else {
             // Narrow cards (compact Customize): two rows of two, so no label is cut to a letter.
             Column(legend) {
               Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
-                ApprovedWidgetAction("Size", Modifier.weight(1f), onClick = onSize)
+                ApprovedWidgetAction("Move", widgetName, Modifier.weight(1f), onClick = onMove)
+                ApprovedWidgetAction("Size", widgetName, Modifier.weight(1f), onClick = onSize)
               }
               Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                ApprovedWidgetAction("Settings", Modifier.weight(1f), onClick = onSettings)
-                ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+                ApprovedWidgetAction("Settings", widgetName, Modifier.weight(1f), onClick = onSettings)
+                ApprovedWidgetAction("Remove", widgetName, Modifier.weight(1f)) { onRemove(widget) }
               }
             }
           }
@@ -237,10 +238,19 @@ private fun ApprovedWidgetDragGrip(drag: Modifier, modifier: Modifier = Modifier
   }
 }
 
+/** The card's name for its Customize actions: the widget kind, or the hosted app widget's own label. */
+private fun widgetSpokenName(widget: HomeWidgetStore.HomeWidget, manager: AppWidgetManager, context: Context): String =
+    if (!widget.isAppWidget) customWidgetLabel(widget.kind)
+    else runCatching { manager.getAppWidgetInfo(widget.appWidgetId)?.loadLabel(context.packageManager) }
+        .onFailure { android.util.Log.w("HomeWidgetGrid", "app widget label unavailable", it) }
+        .getOrNull()?.takeIf { it.isNotBlank() } ?: "App widget"
+
 @Composable
-private fun ApprovedWidgetAction(label: String, modifier: Modifier, onClick: () -> Unit) {
+private fun ApprovedWidgetAction(label: String, widgetName: String, modifier: Modifier, onClick: () -> Unit) {
+  // Every card in Customize has these four; the spoken name says which card ("Move Weather").
+  val spoken = HomeRefinements.widgetEditSpoken(label, widgetName)
   Box(modifier.heightIn(min = 52.dp)
-      .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick)
+      .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick).ccSpeak(spoken)
       .padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
     Text(label, color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 26.sp, maxLines = 1,
         overflow = TextOverflow.Ellipsis)

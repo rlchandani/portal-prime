@@ -20,6 +20,20 @@ internal object HomeRefinements {
   }
 
   /**
+   * What a screen reader calls a widget header's action. Every card shows the same "Settings" or
+   * "Open", so the spoken name says whose it is ("Weather settings", "Open Routines"); the visible
+   * word stays the start or end of it, so voice control still matches what's on screen.
+   */
+  fun headerActionSpoken(action: HeaderAction, title: String): String = when (action) {
+    HeaderAction.OPEN -> "Open $title"
+    HeaderAction.SETTINGS -> "$title settings"
+  }
+
+  /** Customize's per-card Move/Size/Settings/Remove, named for their card ("Move Weather", "Weather settings"). */
+  fun widgetEditSpoken(label: String, widgetName: String): String =
+      if (label == HeaderAction.SETTINGS.label) "$widgetName settings" else "$label $widgetName"
+
+  /**
    * The header action for a widget, or null when it would only repeat a button the card already
    * shows in its body (e.g. Home Assistant's "Open dashboard").
    */

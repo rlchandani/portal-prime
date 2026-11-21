@@ -105,13 +105,15 @@ internal object JarvisHandoff {
     true
   }.getOrDefault(false)
 
-  /** What the card is told: the screen behind it, quiet hours, a Hearthpane call, the theme, the tap time. */
+  /** What the card is told: the screen behind it, quiet hours, a Hearthpane call (and with whom), the theme, the tap time. */
   private fun floatIntent(context: Context, tapUptimeMs: Long, wake: Boolean): Intent {
+    val call = Calling.state.value.call
     val request = JarvisFloatLaunch.Request(
         screen = runCatching { HearthpaneScreens.current()?.id?.invoke() }.getOrNull(),
         quiet = ChimeConfig.isQuietNow(context,
             BriefingPolicy.minuteOfDay(System.currentTimeMillis(), java.util.TimeZone.getDefault())),
-        callActive = Calling.state.value.busy,
+        callActive = call != null,
+        callWith = JarvisFloatLaunch.callWithOf(call),
         light = ImmortalSettings.settingsTheme(context) == "light",
         tapUptimeMs = tapUptimeMs,
         wake = wake,

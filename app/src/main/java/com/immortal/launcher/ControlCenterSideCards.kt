@@ -28,7 +28,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,10 +49,15 @@ internal fun CcScenesCard(grid: CcSceneGrid, canControl: Boolean, ui: CcUi) {
           color = c.sec, fontSize = 19.sp, lineHeight = 26.sp)
       return@Column
     }
-    tiles.chunked(2).forEach { pair ->
-      Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-        pair.forEach { key(it.entity.id) { SceneTile(it, canControl, ui) } }
-        if (pair.size == 1) Box(Modifier.weight(1f))
+    // A grid to a screen reader ("2 rows, 2 columns"). Same 14 dp gap as the card's column, so the
+    // wrapper moves nothing: label, 14 dp, row, 14 dp, row.
+    val rows = tiles.chunked(2)
+    Column(Modifier.semantics { collectionInfo = CollectionInfo(rows.size, 2) }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+      rows.forEach { pair ->
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+          pair.forEach { key(it.entity.id) { SceneTile(it, canControl, ui) } }
+          if (pair.size == 1) Box(Modifier.weight(1f))
+        }
       }
     }
   }

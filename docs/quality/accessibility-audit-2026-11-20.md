@@ -46,7 +46,7 @@ neither it nor such a child carries a widget class.
 | F10 | Medium | Home widget grid, favorites strip, CC device tiles | Not exposed as containers | **Fixed**: `collectionInfo` on the grid/strip, `collectionItemInfo` (row/column spans) per widget. Lazy grids (Apps, Tools, Calls, widget picker) already were |
 | F11 | Medium | Control Center `faint` text (17–19 sp reasons, counts, stale status) | Light 2.38–3.00:1, dark 2.61:1 on selected | **Fixed** (token change, see Contrast) |
 | F12 | Low | Widget card long-press container | Announced a click that does nothing | **Fixed**: `role = null`, no click label, long-press label "Customize Home" |
-| F13 | Low | Duplicates | Five identical "Read" buttons in Bedtime story; "Settings" on every widget header, "Video call"/"Audio call" per room, "Show on Home", CC door alert repeated 3× | **Fixed** for Bedtime ("Read <title>"). **Open** for the rest: they need the card or room name, which is a copy change for the owner |
+| F13 | Low | Duplicates | Five identical "Read" buttons in Bedtime story; "Settings" on every widget header, "Video call"/"Audio call" per room, "Show on Home", CC door alert repeated 3× | **Fixed** (polish-3): Bedtime "Read <title>"; widget headers "Weather settings"/"Open Routines"; Customize "Move Weather"…; Calls "Video call Living Area", "Show Kitchen on Home", "Leave a message for Priya"; CC alert buttons "Office door is open · Close". Exact repeats (Family's office sensor has 3 HA entities raising the same alert) are numbered ", 1 of 3". Spoken names only, visible text unchanged |
 | F14 | Low | Rows at a scrolled viewport's edge (Settings bottom row, Mini Tools "Advanced" tab, Mini landscape Apps/Tools bottom row) | Reported small or unlabeled because the viewport clips them | Not a defect: full size and labelled when scrolled into view |
 | F16 | Low | Small controls at a card or row edge (widget Settings chip 64×61, Mini "Add calendar" 136×63, page dot 64×57 dp) | The 64 dp area is cut by the parent card's clip by 1–7 dp | **Residual**: closing the gap needs layout padding, which is a visual change |
 | F15 | Info | Dividers/outlines, CC plan `dotOff`, page-dot inactive | Non-text graphics under 3:1 (see Contrast) | **Not applied**: decorative or state also shown in text; owner decision |
@@ -109,7 +109,11 @@ Light `faint` is now close to `sec` (1.12:1 apart), so faint text reads less "fa
   - every interactive element's owning composable has a label source;
   - no no-op click handlers;
   - every `setContent`/`Dialog`/`Popup` root applies the touch-target floor;
-  - `tvFocusable` defaults to a Button role.
+  - `tvFocusable` defaults to a Button role;
+  - a repeated card action ("Video call", "Close" …) passes a `spoken =` name (polish-3).
+- `AccessibilityDuplicateLabelsTest`: builds each screen's spoken names (Home headers, Customize,
+  Calls, CC alerts, including three identical sensor alerts) from the same pure helpers and fails
+  on a repeat (polish-3).
   
   Each rule fails with `File.kt:line`. Mutation check: removing a role, a remove-badge label or a
   root's wrapper, or restoring a no-op swallower, each turned the matching rule red.
@@ -147,13 +151,39 @@ story opens inside the Tools host; the Control Center "home" chip opens the Secu
 rather than a modal. The semantics change is source- and test-checked. Check one CC sheet and
 one household list on a Portal with a floor plan before release.
 
+## Follow-up (polish-3, 1.298 base)
+
+Family dumps (`uiautomator` text only) of Home, Calls and Control Center overview/Alerts: official
+1.298 before, the polish-3 performance build after. Family was then put on official 1.299 (sha
+verified). Per clickable: its own name, otherwise the names and texts in its subtree.
+
+| Screen | Before (1.298) | After (polish-3) |
+|---|---|---|
+| Home | "Settings" ×4 (header + 3 widget headers) | "Settings", "Today settings", "Calendar settings", "Weather settings" |
+| Calls | "Video call + Video call" ×2, "Audio call" ×2, "Show on Home" ×2 | "Video call Living Area", "Audio call Rohit Office", "Show Living Area on Home" … no repeats |
+| CC overview | "Rohit's Office door is open. Open 13 days" ×3 | "…, 1 of 3", "…, 2 of 3", "…, 3 of 3" |
+| CC Alerts | "Remind 10 pm" ×3 | "Rohit's Office door is open · Remind in 1 h, 1 of 3" … |
+
+Left on Home: the Photo memory card is two nodes with the same bounds (the long-press Customize
+container, F12, and the photo's own tap), so the dump shows its text twice. It is one control
+to the user; folding the two nodes is a semantics restructure, not done here. Family has no HA
+scenes, so the scene-grid change was checked in code only (identical arrangement and gap).
+
+- A `semantics { contentDescription }` placed *before* a click on a control that also draws a
+  `Text` stays on a child node, so `uiautomator` (and a reader) gets the name *and* the bare word
+  ("Video call + Video call" on 1.298). Icon-only buttons are fine. Set a spoken name with
+  `ccSpeak` *after* the click: it replaces the child text on the button's own node.
+- The CC "door alert repeated 3×" is three alerts, not one alert shown 3 times: one office sensor
+  exposes three HA entities, all named "Rohit's Office door". Each card is drawn identically.
+  Readers now hear ", 1 of 3"… Whether to merge such alerts into one card is an **owner decision**
+  (it is a visible change).
+
 ## Remaining
 
 - Device check of the F7 tap behaviour (above).
-- F13 duplicate labels need copy with the card or room name.
 - Non-text contrast items in F15.
 - Compact-landscape Mini dumps (the emulation rotated upright).
 - TalkBack itself is not on the Portal; this audit is semantics-tree evidence, not reader
   usability (gate G9).
-- `ControlCenterSideCards` scene tiles are not yet a collection: they share the parent column's
-  spacing, so wrapping them would shift layout.
+- ~~`ControlCenterSideCards` scene tiles are not a collection~~ **Fixed** (polish-3): wrapped in a
+  column with the card's own 14 dp gap, so nothing moves; `collectionInfo` rows × 2.

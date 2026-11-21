@@ -120,7 +120,9 @@ internal val CallDarkSurface = CallSurface(Color(0xFF2B2B2B), Color.White, Color
 @Composable
 internal fun CallPill(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, icon: String? = null,
                       style: CallButtonStyle = CallButtonStyle.DEFAULT, size: CallButtonSize = CallButtonSize.MD,
-                      enabled: Boolean = true, surface: CallSurface = CallDarkSurface) {
+                      enabled: Boolean = true, surface: CallSurface = CallDarkSurface,
+                      /** Screen-reader name when [label] repeats on the screen (a per-card action); visual unchanged. */
+                      spoken: String = label) {
   val (fill, ink) = when (style) {
     CallButtonStyle.DEFAULT -> surface.fill to surface.ink
     CallButtonStyle.PRIMARY -> surface.accent to surface.onAccent
@@ -137,7 +139,10 @@ internal fun CallPill(label: String, onClick: () -> Unit, modifier: Modifier = M
   val shape = RoundedCornerShape(50)
   Row(modifier.alpha(if (enabled) 1f else DISABLED_ALPHA).height(size.height).background(fill, shape)
       .let { if (edge != null) it.border(OUTLINE, edge, shape) else it }
-      .callClick(label, enabled, onClick).padding(horizontal = size.padding),
+      .callClick(spoken, enabled, onClick)
+      // A spoken name that differs from the visible word replaces it on the button's own node (the
+      // pill's Text would otherwise be read as a second, bare "Video call").
+      .let { if (spoken != label) it.ccSpeak(spoken) else it }.padding(horizontal = size.padding),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
     icon?.let { CallIcon(it, ink, size.icon) }
     Text(label, color = ink, fontSize = size.text, fontWeight = FontWeight.SemiBold, maxLines = 1,
@@ -148,10 +153,12 @@ internal fun CallPill(label: String, onClick: () -> Unit, modifier: Modifier = M
 /** `.rb`: an 88 dp round button with an optional count badge. */
 @Composable
 internal fun CallRoundButton(icon: String, label: String, onClick: () -> Unit, modifier: Modifier = Modifier, badge: Int = 0,
-                             surface: CallSurface = CallDarkSurface, size: Dp = 88.dp) {
+                             surface: CallSurface = CallDarkSurface, size: Dp = 88.dp,
+                             /** Screen-reader name when [label] repeats on the screen; the button shows only its icon. */
+                             spoken: String = label) {
   Box(modifier.size(size)) {
     Box(Modifier.size(size).background(surface.fill, CircleShape).border(OUTLINE, surface.outline, CircleShape)
-        .callClick(label, true, onClick), contentAlignment = Alignment.Center) { CallIcon(icon, surface.ink, size * ICON_SHARE) }
+        .callClick(spoken, true, onClick), contentAlignment = Alignment.Center) { CallIcon(icon, surface.ink, size * ICON_SHARE) }
     if (badge > 0) Box(Modifier.align(Alignment.TopEnd).padding(0.dp).heightIn(min = 36.dp).width(36.dp)
         .background(CallColors.Bad, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
       Text(badge.coerceAtMost(MAX_BADGE).toString(), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)

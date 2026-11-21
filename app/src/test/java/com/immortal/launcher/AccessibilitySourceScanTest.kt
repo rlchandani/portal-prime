@@ -96,6 +96,37 @@ class AccessibilitySourceScanTest {
     assertTrue("Label these dismissing scrims \"Close\" or \"Cancel\":\n" + bad.joinToString("\n"), bad.isEmpty())
   }
 
+  /**
+   * Audit F13: a per-card action whose visible word repeats on its screen ("Video call", "Close") passes a
+   * `spoken =` name saying whose it is. Unique ones (the one door's own sheet, a modal's Close) are listed.
+   */
+  @Test fun repeatedCardActionsNameTheirCard() {
+    val found = mutableListOf<String>()
+    val bad = mutableListOf<String>()
+    for ((path, text) in sources) {
+      for (m in CARD_ACTION_CALL.findAll(text)) {
+        val lineStart = text.lastIndexOf('\n', m.range.first) + 1
+        if (FUN_DECL.containsMatchIn(text.substring(lineStart, m.range.first))) continue
+        val args = text.substring(m.range.last, closing(text, m.range.last))
+        val generic = STRING_LITERAL.findAll(args).map { it.groupValues[1] }.firstOrNull { it in REPEATED_WORDS }
+            ?: if (args.contains("CallMessageCopy.LEAVE")) CallMessageCopy.LEAVE else continue
+        found += "$path:${line(text, m.range.first)}"
+        if (!args.contains(SPOKEN_ARG) && "$path|$generic" !in UNIQUE_ON_SCREEN) bad += "$path:${line(text, m.range.first)} ($generic)"
+      }
+    }
+    assertTrue("No repeated card actions found; the scan pattern is stale", found.size >= MIN_REPEATED_CARD_ACTIONS)
+    assertTrue("Pass spoken = \"<word> <card name>\" so each copy is told apart:\n" + bad.joinToString("\n"), bad.isEmpty())
+  }
+
+  /** The widget header action and Customize legend build their names from the card (pure rules tested in AccessibilityDuplicateLabelsTest). */
+  @Test fun widgetHeaderAndCustomizeLegendUseTheirCardName() {
+    val ui = sources.first { it.first == "ApprovedHomeUi.kt" }.second
+    assertTrue(ui.contains("HomeRefinements.headerActionSpoken(action, title)"))
+    val grid = sources.first { it.first == "HomeWidgetGrid.kt" }.second
+    assertTrue(grid.contains("HomeRefinements.widgetEditSpoken(label, widgetName)"))
+    assertEquals(0, Regex("""ApprovedWidgetAction\("\w+", Modifier""").findAll(grid).count())
+  }
+
   @Test fun tvFocusableDefaultsToAButtonRole() {
     val tv = sources.first { it.first == "TvFocus.kt" }.second
     // Both helpers (tvFocusable, tvFocusableRow) default to a Button role.
@@ -152,6 +183,16 @@ class AccessibilitySourceScanTest {
     private const val SCRIM_CHAIN_LINES = 3
     /** Fewer than the dismissing scrims in the tree on 2026-11-20 (11) means the scan stopped matching. */
     private const val MIN_DISMISSING_SCRIMS = 9
+    private val CARD_ACTION_CALL = Regex("""(?<![\w.])(CallPill|CallRoundButton|CcButton)\s*\(""")
+    private val STRING_LITERAL = Regex(""""([^"\\]*)"""")
+    private val SPOKEN_ARG = Regex("""\bspoken\s*=""")
+    /** Visible words that sit on every room, phone or alert card. */
+    private val REPEATED_WORDS = setOf("Video call", "Audio call", "Show on Home", "Remove from Home", "Close", "Close…")
+    /** Shown once on their screen: a door's own device sheet, a modal's dismiss, the ended-call screen's Message and Close. */
+    private val UNIQUE_ON_SCREEN = setOf("ControlCenterControlDoor.kt|Close…", "ControlCenterModalChecks.kt|Close",
+        "CallScreensEnded.kt|${CallMessageCopy.LEAVE}", "CallScreensEnded.kt|Close")
+    /** Fewer than the card actions in the tree on 2026-11-20 (16) means the scan stopped matching. */
+    private const val MIN_REPEATED_CARD_ACTIONS = 14
     private val NO_OP_BODY = Regex("""\{\s*(/\*[^*]*\*/\s*)?}""")
     private val LABEL = Regex("""\bText\s*\(|contentDescription|stateDescription|\btext\s*=|[Ll]abel\b|\btitle\b|\bname\s*=|spoken|ccSpeak|description|Caption|ToolsText""")
 

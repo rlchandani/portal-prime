@@ -134,7 +134,8 @@ private fun RoomCardCompact(peer: CallPeer, self: String, now: Long) {
       }
       CallRoundButton("star", if (peer.favourite) "Remove from Home" else "Show on Home",
           { CallingStore.setFavourite(context, peer.id, !peer.favourite) }, surface = if (peer.favourite)
-            surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp)
+            surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp,
+          spoken = CallRoomActions.favouriteSpoken(peer.favourite, peer.name))
     }
     RoomNote(CallRoomActions.note(calls, drop))
     val actions = CallRoomActions.of(calls, drop)
@@ -191,7 +192,8 @@ private fun RoomCard(peer: CallPeer, self: String, now: Long) {
       }
       CallRoundButton("star", if (peer.favourite) "Remove from Home" else "Show on Home",
           { CallingStore.setFavourite(context, peer.id, !peer.favourite) }, surface = if (peer.favourite)
-            surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp)
+            surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp,
+          spoken = CallRoomActions.favouriteSpoken(peer.favourite, peer.name))
     }
     RoomNote(CallRoomActions.note(calls, drop))
     val actions = CallRoomActions.of(calls, drop)
@@ -210,12 +212,16 @@ private fun RoomActions(peer: CallPeer, actions: List<CallRoomAction>, drop: Dro
     when (action) {
       CallRoomAction.VIDEO -> CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
           Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_VIDEO_TARGET + peer.id, 48.dp), icon = "video",
-          style = CallButtonStyle.OK, surface = surface, size = size)
-      CallRoomAction.DROP_IN -> CallPill(CallRoomActions.dropInLabel(drop),
-          { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", surface = surface, size = size)
+          style = CallButtonStyle.OK, surface = surface, size = size, spoken = CallRoomActions.spoken("Video call", peer.name))
+      CallRoomAction.DROP_IN -> CallRoomActions.dropInLabel(drop).let { label ->
+        CallPill(label, { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", surface = surface,
+            size = size, spoken = CallRoomActions.spoken(label, peer.name))
+      }
       CallRoomAction.AUDIO -> if (compact) CallRoundButton("phone", "Audio call",
-          { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface, size = 72.dp)
-      else CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface)
+          { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface, size = 72.dp,
+          spoken = CallRoomActions.spoken("Audio call", peer.name))
+      else CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface,
+          spoken = CallRoomActions.spoken("Audio call", peer.name))
     }
   }
 }
