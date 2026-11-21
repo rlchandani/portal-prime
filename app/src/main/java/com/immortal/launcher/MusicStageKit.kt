@@ -93,10 +93,9 @@ private val EmberInk = Color(0xFF2A1406)
 internal fun MusicStageCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
   val ink = LocalMusicStageInk.current
   val shape = RoundedCornerShape(30.dp)
-  val none = remember { MutableInteractionSource() }
   Column(modifier.clip(shape).background(ink.card, shape).border(1.dp, ink.line, shape)
       // Taps on the card's padding don't fall through to the dismiss layer.
-      .clickable(none, indication = null) {}.padding(horizontal = 30.dp, vertical = 22.dp), content = content)
+      .blockScrimTaps().padding(horizontal = 30.dp, vertical = 22.dp), content = content)
 }
 
 /** "Section title  small detail …  [actions]" (the mock's `.sh`). */
@@ -122,7 +121,8 @@ internal fun MusicStageHeading(
 @Composable
 internal fun BoxScope.MusicStageDismissLayer(onDismiss: () -> Unit) {
   val none = remember { MutableInteractionSource() }
-  Box(Modifier.matchParentSize().clickable(none, indication = null, onClick = onDismiss))
+  Box(Modifier.matchParentSize().clickable(none, indication = null, role = Role.Button, onClick = onDismiss)
+      .semantics { contentDescription = "Close" })
 }
 
 /** The stage toast: an opaque pill, one or two lines, with an optional action (Undo). */

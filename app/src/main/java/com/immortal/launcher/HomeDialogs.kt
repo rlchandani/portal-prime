@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -49,7 +50,7 @@ internal fun ApprovedHomeDialog(
 ) {
   if (!LocalApprovedLauncherPageActive.current || !LocalApprovedWidgetPageInput.current) return
   androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss,
-      properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+      properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     CompositionLocalProvider(LocalApprovedHomePopup provides true) {
     ApprovedHomeSurface(Modifier.widthIn(max = 880.dp).fillMaxWidth(.8f).heightIn(max = 1096.dp), radius = 28.dp) {
       Column(Modifier.padding(36.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(18.dp)) {
@@ -62,7 +63,7 @@ internal fun ApprovedHomeDialog(
       }
     }
     }
-  }
+  }}
 }
 
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */

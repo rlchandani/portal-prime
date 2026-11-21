@@ -100,7 +100,7 @@ internal fun SettingsTileTrack(
             Box(
                 Modifier.weight(1f).defaultMinSize(minWidth = TileMinWidth, minHeight = TileMinHeight)
                     .background(if (tile.selected) selectedFill else Color.Transparent, shape)
-                    .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled) {
+                    .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, role = null) {
                         if (enabled) onSelect(index)
                     }
                     .semantics { role = Role.RadioButton; selected = tile.selected },

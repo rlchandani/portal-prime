@@ -102,10 +102,10 @@ internal fun HouseholdListSheet(startInSettings: Boolean, onClose: () -> Unit) {
     Modifier.padding(horizontal = 44.dp, vertical = 36.dp)
   }
   Box(Modifier.fillMaxSize().background(Color(0x99000000))
-      .clickable(MutableInteractionSource(), indication = null, onClick = onClose)) {
+      .dismissScrim(onDismiss = onClose)) {
     Column(Modifier.fillMaxSize().then(sheetFrame)
         .clip(RoundedCornerShape(36.dp)).background(palette.background)
-        .clickable(MutableInteractionSource(), indication = null) {}
+        .blockScrimTaps()
         .then(sheetInset)) {
       if (showSettings) {
         HouseholdListSettingsPanel(view, onBack = { showSettings = false }, onClose = onClose)

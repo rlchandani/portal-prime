@@ -174,7 +174,7 @@ private fun TabButton(tab: MusicSheetTab, on: Boolean, compact: Boolean, onClick
     else -> ink.muted
   }
   Box(Modifier.heightIn(min = MusicStageGeometry.MIN_TARGET.dp).height((dims.tab - if (compact) 0f else 12f).coerceAtLeast(64f).dp)
-      .clip(shape).background(fill).tvFocusable(shape, focusScale = 1f, ringColor = ink.ember, onClick = onClick)
+      .clip(shape).background(fill).tvFocusable(shape, focusScale = 1f, ringColor = ink.ember, onClick = onClick, role = null)
       .semantics { role = Role.Tab; selected = on }.padding(horizontal = if (compact) 22.dp else 34.dp),
       contentAlignment = Alignment.Center) {
     Text(tab.label, color = text, fontSize = dims.tabText.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)

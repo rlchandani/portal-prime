@@ -121,16 +121,16 @@ private fun ItemDetails(id: String, view: HouseholdListView, toast: HouseholdLis
 private fun DialogFrame(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
   val palette = LocalApprovedPalette.current
   val compact = currentLayoutClass().compact
-  Box(Modifier.fillMaxSize().background(Color(0x66000000)).clickable(MutableInteractionSource(), null, onClick = onDismiss),
+  Box(Modifier.fillMaxSize().background(Color(0x66000000)).dismissScrim(onDismiss = onDismiss),
       contentAlignment = Alignment.Center) {
     // Compact: nearly full width (60% of 800 dp is too narrow) and scrolling on the short landscape window.
     val frame = if (compact) {
       Modifier.padding(horizontal = 24.dp, vertical = 32.dp).fillMaxWidth().widthIn(max = 980.dp)
           .clip(RoundedCornerShape(32.dp)).background(palette.surface)
-          .clickable(MutableInteractionSource(), null) {}.verticalScroll(rememberScrollState()).padding(32.dp)
+          .blockScrimTaps().verticalScroll(rememberScrollState()).padding(32.dp)
     } else {
       Modifier.widthIn(max = 980.dp).fillMaxWidth(0.6f).clip(RoundedCornerShape(32.dp)).background(palette.surface)
-          .clickable(MutableInteractionSource(), null) {}.padding(40.dp)
+          .blockScrimTaps().padding(40.dp)
     }
     Column(frame, content = content)
   }

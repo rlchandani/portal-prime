@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.ui.semantics.Role
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -167,7 +168,7 @@ internal fun CcToastHost(toast: CcToast?) {
         if (t.error) CcIcon("warn", c.red, 30.dp) else CcIcon("check", c.green, 30.dp)
         Text(t.text, color = if (c.dark) c.text else c.bg, fontSize = 23.sp, maxLines = 2,
             modifier = (if (layout.compact) Modifier.weight(1f, fill = false) else Modifier).padding(vertical = 14.dp))
-        if (t.undo) Row(Modifier.clip(CcStyle.Pill).background(c.bg.copy(alpha = 0.18f)).clickable {
+        if (t.undo) Row(Modifier.clip(CcStyle.Pill).background(c.bg.copy(alpha = 0.18f)).clickable(role = Role.Button) {
           ControlCenter.undo(context); ControlCenter.dismissToast(context, t.id)
         }.padding(horizontal = 26.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
           CcIcon("undo", CcStyle.EmberLight, 26.dp)

@@ -72,7 +72,7 @@ private fun BedtimeScreen() {
   val cardMaxHeight = (cfg.screenHeightDp * 0.82f).dp
   Box(
       modifier = Modifier.fillMaxSize().background(Color(0xCC000000))
-          .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { activity?.finish() },
+          .dismissScrim("Close") { activity?.finish() },
       contentAlignment = Alignment.Center,
   ) {
     Surface(
@@ -81,7 +81,7 @@ private fun BedtimeScreen() {
         // Compact: two-thirds of 800 dp is too narrow for the reader, so fill the width less a margin.
         modifier = (if (currentLayoutClass().compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = cardMaxHeight.value.toInt())
             else Modifier.width(cardWidth).heightIn(max = cardMaxHeight))
-            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume card taps */ },
+            .blockScrimTaps(),
     ) {
       BedtimeContent(onExit = { activity?.finish() })
     }

@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import android.Manifest
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
@@ -544,7 +546,9 @@ internal fun ToolsStoriesContent() {
                         ToolsText("${entry.emoji}  ${entry.title}")
                         ToolsText("Bundled short story", secondary = true)
                     }
-                    ToolsButton("Read", primary = true) { selected = index }
+                    // Five identical "Read" buttons: name the story for screen readers.
+                    ToolsButton("Read", primary = true,
+                        modifier = Modifier.semantics { contentDescription = "Read ${entry.title}" }) { selected = index }
                 }
             }
         }

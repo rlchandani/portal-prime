@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import android.app.ActivityManager
+import androidx.compose.ui.semantics.Role
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.app.usage.UsageStatsManager
 import android.content.ComponentName
 import android.content.Context
@@ -64,7 +66,9 @@ class AppSwitcherActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      ApprovedAppsScreen(onExit = { finish() }, initiallyRecent = !intent.getBooleanExtra(EXTRA_ALL_APPS, false), initiallySearching = intent.getBooleanExtra("approved_search", false))
+      ProvideHearthpaneTouchTargets {
+        ApprovedAppsScreen(onExit = { finish() }, initiallyRecent = !intent.getBooleanExtra(EXTRA_ALL_APPS, false), initiallySearching = intent.getBooleanExtra("approved_search", false))
+      }
     }
   }
 }
@@ -475,7 +479,7 @@ private fun InstalledAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: I
       CompactAppTile(entry, layout, badge, subtitle, shortcutIcon, onOpen, onOptions)
       return
     }
-    Column(Modifier.fillMaxWidth().heightIn(min = 205.dp).combinedClickable(
+    Column(Modifier.fillMaxWidth().heightIn(min = 205.dp).combinedClickable(role = Role.Button,
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
         .padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -493,7 +497,7 @@ private fun InstalledAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: I
 @Composable
 private fun CompactAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: Int, subtitle: String?, shortcutIcon: ImageBitmap?, onOpen: () -> Unit, onOptions: () -> Unit) {
     val lines = remember(entry.label) { AppsGridMetrics.labelLines(entry.label) }
-    Column(Modifier.fillMaxWidth().heightIn(min = 168.dp).combinedClickable(
+    Column(Modifier.fillMaxWidth().heightIn(min = 168.dp).combinedClickable(role = Role.Button,
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
         .padding(horizontal = 10.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -541,7 +545,7 @@ private fun AppsSelectionRow(label: String, selected: Boolean, onClick: () -> Un
 @Composable
 private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
   if (!LocalApprovedLauncherPageActive.current) return
-  Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+  Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider),
         modifier = Modifier.widthIn(max = 900.dp).fillMaxWidth().heightIn(max = 1160.dp)) {
       Column {
@@ -565,7 +569,7 @@ private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composabl
         }
       }
     }
-  }
+  }}
 }
 
 private fun launchApprovedIntent(context: Context, intent: Intent, onLaunched: () -> Unit = {}): Boolean = runCatching {

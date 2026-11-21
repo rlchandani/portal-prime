@@ -59,7 +59,7 @@ internal fun SettingsAppearanceTiles(dark: Boolean, enabled: Boolean, onSelect: 
             val selected = swatch.dark == dark
             Column(
                 Modifier.tvFocusable(RoundedCornerShape(PreviewRadius), focusScale = 1f, ringColor = IosBlue,
-                    enabled = enabled) { if (enabled) onSelect(swatch.dark) }
+                    enabled = enabled, role = null) { if (enabled) onSelect(swatch.dark) }
                     .semantics { role = Role.RadioButton; this.selected = selected; contentDescription = swatch.label }
                     .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

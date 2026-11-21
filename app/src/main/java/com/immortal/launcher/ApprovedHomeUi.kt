@@ -7,6 +7,10 @@
 package com.immortal.launcher
 
 import android.animation.Animator
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectableGroup
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.animation.AnimatorListenerAdapter
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
@@ -127,7 +131,10 @@ internal fun ApprovedHomeTabs(
                     LocalApprovedLauncherPageActive provides active,
                     LocalApprovedLauncherHostOwner provides hostOwner,
                 ) {
-                  ApprovedLauncherPageLifecycle(active, page.input) { latestContent.value(tab) }
+                  // Each page is its own ComposeView, which resets the touch-target floor.
+                  ProvideHearthpaneTouchTargets {
+                    ApprovedLauncherPageLifecycle(active, page.input) { latestContent.value(tab) }
+                  }
                 }
               }
             }
@@ -458,13 +465,14 @@ internal fun ApprovedHomeIcon(
 @Composable
 internal fun ApprovedHomeDock(selected: String, onSelect: (String) -> Unit) {
   ApprovedHomeSurface(radius = 26.dp, modifier = Modifier.height(92.dp)) {
-    Row(Modifier.fillMaxHeight().padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
+    Row(Modifier.fillMaxHeight().padding(8.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically) {
       listOf("home" to "Home", "apps" to "Apps", "tools" to "Tools").forEach { (id, label) ->
         val active = selected == id
         Row(Modifier.width(176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
             .background(if (active) ApprovedHomePalette.Selected else Color.Transparent)
-            .tvFocusable(RoundedCornerShape(18.dp), ringColor = ApprovedHomePalette.Accent) { onSelect(id) },
+            .semantics { this.selected = active }
+            .tvFocusable(RoundedCornerShape(18.dp), ringColor = ApprovedHomePalette.Accent, role = Role.Tab) { onSelect(id) },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
           ApprovedHomeIcon(id, tint = if (active) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary)

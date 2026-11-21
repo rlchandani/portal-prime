@@ -89,6 +89,7 @@ internal fun MiniPlayer(state: NowPlayingState, modifier: Modifier = Modifier, o
             Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(8.dp))
+                .semantics { contentDescription = if (state.state == PlaybackState.PLAYING) "Pause" else "Play" }
                 .tvFocusable(RoundedCornerShape(8.dp)) { NowPlayingHub.playPause() },
         contentAlignment = Alignment.Center,
     ) {

@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Intent
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -303,7 +304,7 @@ private fun LampControlDialog(
     var draft by remember(control) { mutableStateOf(((if (control == ApprovedLampControl.BRIGHTNESS)
         state.brightness else state.warmth) * 100).roundToInt().toString()) }
     var error by remember { mutableStateOf<String?>(null) }
-    Dialog(onDismissRequest = onCancel, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = onCancel, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
         val compact = currentLayoutClass().compact
         // Compact: a side margin at 800 dp and a height cap for the 740 dp landscape window.
         val frame = if (compact) compactDialogFrame(maxWidthDp = 900, maxHeightDp = 1100)
@@ -354,5 +355,5 @@ private fun LampControlDialog(
                 }
             }
         }
-    }
+    }}
 }

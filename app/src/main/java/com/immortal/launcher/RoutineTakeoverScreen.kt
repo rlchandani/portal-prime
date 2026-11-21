@@ -107,7 +107,7 @@ private fun KidTabs(screen: RoutineScreen, kids: List<RoutineKid>) {
       Row(Modifier.heightIn(min = 88.dp).clip(shape).background(if (on) RoutineColors.Selected else RoutineColors.Card)
           .border(2.dp, if (on) RoutineColors.Text else RoutineColors.Border, shape)
           .semantics { role = Role.Tab; selected = on }
-          .clickable { RoutineEngine.selectKid(id) }.padding(start = 12.dp, end = 26.dp),
+          .clickable(role = Role.Tab) { RoutineEngine.selectKid(id) }.padding(start = 12.dp, end = 26.dp),
           verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
         Image(painterResource(RoutinePictureRes.avatar(k.avatar)), null, Modifier.size(64.dp))
         Text(k.name, color = RoutineColors.Text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
@@ -163,7 +163,7 @@ private fun PictureCard(c: RoutineCard, done: Boolean, fresh: Boolean, dense: Bo
   Box(modifier.clip(shape).background(if (done) RoutineColors.DoneCard else RoutineColors.Card)
       .border(2.dp, if (done) RoutineColors.Green else RoutineColors.Border, shape)
       .semantics { contentDescription = c.label + if (done) ", done" else "" }
-      .clickable(onClick = onTap)) {
+      .clickable(role = Role.Button, onClick = onTap)) {
     Column(Modifier.fillMaxSize().padding(horizontal = if (dense) 12.dp else 6.dp, vertical = if (dense) 18.dp else 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(if (dense) 14.dp else 30.dp, Alignment.CenterVertically)) {
       Image(painterResource(RoutinePictureRes.pic(c.pic)), null,
@@ -217,7 +217,7 @@ private const val HOLDING = "\u0000holding"
 @Composable
 private fun PillButton(label: String, onClick: () -> Unit) {
   Box(Modifier.heightIn(min = 92.dp).clip(RoundedCornerShape(46.dp)).background(RoutineColors.Raised)
-      .clickable(onClick = onClick).padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
+      .clickable(role = Role.Button, onClick = onClick).padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
     Text(label, color = RoutineColors.Text, fontSize = 26.sp)
   }
 }

@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.Image
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +45,7 @@ internal fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: ()
                                  layout: LayoutClass = LayoutClass.LARGE) {
   if (layout.compactPortrait) {
     ApprovedHomeSurface(modifier.height(COMPACT_FAVORITE_TILE_HEIGHT), radius = 16.dp) {
-      Column(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
+      Column(Modifier.fillMaxSize().combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick)
           .padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center) {
         Image(app.icon, contentDescription = null, modifier = Modifier.size(40.dp))
@@ -56,7 +57,7 @@ internal fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: ()
     return
   }
   ApprovedHomeSurface(modifier.height(FAVORITE_TILE_HEIGHT), radius = 16.dp) {
-    Row(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
+    Row(Modifier.fillMaxSize().combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick)
         .padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)) {
       Image(app.icon, contentDescription = null, modifier = Modifier.size(FAVORITE_ICON_SIZE))

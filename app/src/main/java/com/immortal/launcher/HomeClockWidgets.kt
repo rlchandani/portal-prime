@@ -8,6 +8,10 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -194,7 +198,8 @@ internal fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
             .size(width = 64.dp, height = 38.dp)
             .clip(RoundedCornerShape(19.dp))
             .background(if (cfg.enabled) ApprovedHomePalette.Accent else ApprovedHomePalette.Chrome)
-            .clickable {
+            .semantics { contentDescription = "Alarm" }
+            .toggleable(value = cfg.enabled, role = Role.Switch) {
               AlarmConfig.setEnabled(context, !cfg.enabled)
               AlarmScheduler.reschedule(context)
               cfg = AlarmConfig.load(context)

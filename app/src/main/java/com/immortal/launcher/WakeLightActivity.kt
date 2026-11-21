@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.os.Bundle
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,7 +61,7 @@ class WakeLightActivity : ComponentActivity() {
 
     val rampMin = intent.getIntExtra(EXTRA_RAMP_MIN, 20).coerceIn(1, 60)
     val chime = intent.getBooleanExtra(EXTRA_CHIME, true)
-    setContent { WakeLightScreen(rampMin, chime, ::applyBrightness, ::dismiss) }
+    setContent { ProvideHearthpaneTouchTargets { WakeLightScreen(rampMin, chime, ::applyBrightness, ::dismiss) } }
   }
 
   private fun dismiss() {
@@ -105,7 +106,7 @@ private fun WakeLightScreen(rampMin: Int, chime: Boolean, onBrightness: (Float) 
   val color = if (progress < 0.5f) lerp(ember, amber, progress * 2f) else lerp(amber, day, (progress - 0.5f) * 2f)
 
   Box(
-      modifier = Modifier.fillMaxSize().background(color).clickable { onDismiss() },
+      modifier = Modifier.fillMaxSize().background(color).dismissScrim("Dismiss") { onDismiss() },
       contentAlignment = Alignment.BottomCenter,
   ) {
     Surface(color = Color(0x33000000), shape = RoundedCornerShape(16.dp),

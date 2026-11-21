@@ -217,7 +217,7 @@ internal fun BootAppsContent() {
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit) { onSelectionChange(app.pkg, false) }
+                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit, role = null) { onSelectionChange(app.pkg, false) }
                     .semantics {
                       role = Role.Switch
                       toggleableState = ToggleableState(app.pkg in selected)

@@ -45,8 +45,8 @@ internal fun CcPinSetOverlay(onCancel: () -> Unit, onDone: (String) -> Unit) {
   val c = LocalCc.current
   var pin by remember { mutableStateOf(CcPinSet()) }
   LaunchedEffect(pin.done) { pin.done?.let(onDone) }
-  Box(Modifier.fillMaxSize().background(c.scrim).clickable(onClick = onCancel), contentAlignment = Alignment.Center) {
-    Column(Modifier.width(640.dp).ccCard(CcStyle.Modal).clickable(enabled = false, onClick = {}).padding(44.dp),
+  Box(Modifier.fillMaxSize().background(c.scrim).dismissScrim("Cancel", onCancel), contentAlignment = Alignment.Center) {
+    Column(Modifier.width(640.dp).ccCard(CcStyle.Modal).blockScrimTaps().padding(44.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp)) {
       Text(pin.title, color = c.text, fontSize = 44.sp, fontFamily = CcStyle.Serif)
       Text(pin.subtitle, color = if (pin.error != null) c.red else c.sec, fontSize = 21.sp, textAlign = TextAlign.Center, lineHeight = 28.sp)

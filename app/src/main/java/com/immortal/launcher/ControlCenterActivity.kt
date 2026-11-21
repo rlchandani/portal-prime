@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import com.immortal.launcher.jarvis.ScreenContext
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -45,7 +46,11 @@ class ControlCenterActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val start = screenOf(intent)
-    setContent { CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish) }
+    setContent {
+      ProvideHearthpaneTouchTargets {
+        CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish)
+      }
+    }
     // The Compose root paints the whole window opaque, so the theme's window background would only
     // be a second full-screen fill on every frame.
     window.setBackgroundDrawable(null)

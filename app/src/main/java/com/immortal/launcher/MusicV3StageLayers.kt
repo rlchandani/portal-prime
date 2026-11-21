@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.text.format.DateFormat
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -83,7 +84,7 @@ internal fun StripLayer(
       }
       .then(if (closedActive) Modifier.clearAndSetSemantics { } else Modifier
           .musicSheetDrag(motion, layout.sheetTravel, onStart = {}, onSettled = onSettled)
-          .clickable(none, indication = null, onClick = onClose)
+          .clickable(none, indication = null, role = Role.Button, onClick = onClose)
           .semantics { contentDescription = "Now playing. Tap to show it full screen" }),
       contentAlignment = Alignment.CenterStart) {
     content()

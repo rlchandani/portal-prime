@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.app.Activity
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -469,7 +470,7 @@ private fun StorePausedBanner() {
 
 @Composable
 private fun StoreDialog(title: String, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-  Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+  Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     val compact = currentLayoutClass().compact
     val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp).heightIn(max = 980.dp)
     Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider), modifier = frame) {
@@ -482,5 +483,5 @@ private fun StoreDialog(title: String, onDismiss: () -> Unit, content: @Composab
         }
       }
     }
-  }
+  }}
 }
