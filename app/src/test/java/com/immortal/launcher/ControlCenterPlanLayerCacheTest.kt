@@ -23,6 +23,25 @@ class ControlCenterPlanLayerCacheTest {
     assertNotEquals(CcPassKey(CcPlanPass.FLOORS, CcSame(a)), CcPassKey(CcPlanPass.WALLS, CcSame(a)))
   }
 
+  @Test fun onlyTheLabelsAreRecordedPerHighlightedRoom() {
+    // A sheet opening changes the highlight, never the draw object: the floor's other passes are
+    // looked up with the same keys (cache hits), and the labels get their own per-room recording.
+    val ctx = Any()
+    val lru = CcEvictingLru<CcPassKey, Int>(CcPlanLayers.MAX_LAYERS) {}
+    var made = 0
+    fun frame(focus: String?) {
+      listOf(CcPlanPass.UNDER, CcPlanPass.OPENINGS, CcPlanPass.MARKS).forEach { p -> lru.getOrPut(CcPassKey(p, CcSame(ctx))) { ++made } }
+      lru.getOrPut(CcPassKey(CcPlanPass.TOP, CcSame(ctx), focus)) { ++made }
+    }
+    frame(null)
+    assertEquals(4, made)
+    frame("office")
+    assertEquals("opening the office's sheet records only its labels", 5, made)
+    frame(null); frame("office")
+    assertEquals("closing and reopening records nothing", 5, made)
+    assertNotEquals(CcPassKey(CcPlanPass.TOP, CcSame(ctx), "office"), CcPassKey(CcPlanPass.TOP, CcSame(ctx), "kitchen"))
+  }
+
   @Test fun evictingLruReleasesWhatItDrops() {
     val released = ArrayList<String>()
     val lru = CcEvictingLru<String, String>(2) { released += it }
@@ -40,30 +59,29 @@ class ControlCenterPlanLayerCacheTest {
   }
 
   @Test fun aFloorsCanvasKeepsItsPassesAndOneReplacedSet() {
-    // One canvas per floor: its five passes, then an HA update replaces the model-keyed three.
+    // One canvas per floor: its six passes, then an HA update replaces the model-keyed four.
     var made = 0
     val released = ArrayList<Int>()
     val lru = CcEvictingLru<CcPassKey, Int>(CcPlanLayers.MAX_LAYERS) { released += it }
     val base = Any()
-    val passes = listOf(CcPlanPass.UNDER, CcPlanPass.OVER, CcPlanPass.TOP)
+    val passes = listOf(CcPlanPass.UNDER, CcPlanPass.OPENINGS, CcPlanPass.MARKS, CcPlanPass.TOP)
     repeat(3) {
       listOf(CcPlanPass.FLOORS, CcPlanPass.WALLS).forEach { p -> lru.getOrPut(CcPassKey(p, CcSame(base))) { ++made } }
     }
     val first = Any(); val second = Any()
     repeat(2) { passes.forEach { p -> lru.getOrPut(CcPassKey(p, CcSame(first))) { ++made } } }
     passes.forEach { p -> lru.getOrPut(CcPassKey(p, CcSame(second))) { ++made } }
-    assertEquals(8, made)
+    assertEquals(10, made)
     assertTrue("within budget nothing is dropped", released.isEmpty())
   }
 
   @Test fun drawKeysCompareInputsByIdentityAndSettingsByValue() {
     val model = Any(); val px = Any(); val paint = Any(); val labels = Any(); val chips = Any()
     val c = CcDark
-    fun key(lens: CcLens = CcLens.LIVE, focus: String? = null, m: Any = model) =
-        CcDrawKey(CcSame(m), CcSame(px), CcSame(paint), c, CcSame(labels), CcSame(chips), lens, focus, false, true, 1.5f)
+    fun key(lens: CcLens = CcLens.LIVE, m: Any = model) =
+        CcDrawKey(CcSame(m), CcSame(px), CcSame(paint), c, CcSame(labels), CcSame(chips), lens, false, true, 1.5f)
     assertEquals(key(), key())
     assertNotEquals(key(), key(lens = CcLens.CLIMATE))
-    assertNotEquals(key(), key(focus = "kitchen"))
     assertNotEquals(key(), key(m = Any()))
     assertEquals(CcBaseKey(CcSame(px), c, 1.5f), CcBaseKey(CcSame(px), c, 1.5f))
   }

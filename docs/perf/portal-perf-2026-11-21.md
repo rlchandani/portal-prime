@@ -157,6 +157,66 @@ The branch columns are build `5daab363`: the final changes plus the sheet experi
 2. Open: the first frame is one composition of the whole map (~45 ms of main-thread work). Making it smaller needs either a lighter first composition or keeping CC alive behind Home, which trades against the memory result above.
 3. The +230 ms redraw happens because the background subscription drops the plan's non-alert entities. Keeping their last states would avoid the redraw, but would show stale states for ~200 ms. That is an owner decision.
 
+### Follow-up: the room highlight as its own layers (branch `cc-highlight`)
+
+**Attribution (main 1.304, profileable benchmark build, 3 atrace captures of the read-only "door is open" row, after one warm-up open).**
+- No `cc:record:*` or `cc:drawCtx` section appears on a repeat open: the plan re-records nothing. The draw object and
+  the recorded passes for that focus are still in their LRUs from the warm-up, so the earlier "re-records its layers"
+  holds only for the first open of a room.
+- The tap frame is main-thread work: `Recomposer:recompose` 9–28 ms (`applyChanges` 2–7, `onForgotten` 1–2.4),
+  then a traversal of 12–19 ms (measure/layout 4–7 ms, the rest draw recording). The UI frames were 21–44 ms.
+- RenderThread: 16–28 ms for the same frame, of which `flush layers` 4.8–8.4 ms (the plan's offscreen textures and the
+  sheet's texture being rastered).
+- So a repeat open pays for the highlight in recomposition plus re-rastering, not in recording.
+
+**Change (commit on `cc-highlight`).** The highlight moved out of `CcPlanDraw` into `CcPlanFocus`
+(`ControlCenterPlanFocus.kt`): tint, veil, edge, which labels fade. `CcPlanDraw` and `CcDrawKey` no longer depend on it.
+- The floors, washes, glows, walls, openings and markers keep one draw object and one recording across every highlight.
+- Only these change: the tint and veil layers (a few rects), the labels (`CcPassKey` keyed by the highlighted room),
+  and the per-frame animation layer.
+- The draw order is unchanged: tint between floors and washes, veil between openings and markers, edge after the pulses.
+  `OVER` is split into `OPENINGS` + `MARKS` to make room for the veil. `MAX_LAYERS` went from 16 to 20.
+- JVM tests: `ControlCenterPlanFocusTest` (6) and `ControlCenterPlanLayerCacheTest.onlyTheLabelsAreRecordedPerHighlightedRoom`.
+
+**Highlight on / off (main, profileable build; atrace of the sheet's tap frame, repeat opens).** A temporary
+`debug.cc.nohl` switch opened the same sheet without setting `highlightRoom`.
+
+| Build | UI frame ms | recompose ms | traversal ms | RenderThread ms (flush layers) |
+|---|---|---|---|---|
+| main, highlight on (n = 2) | 48.6 / 46.8 | 30.5 / 23.7 | 17.9 / 22.9 | 17.1 / 17.2 (4.8) |
+| main, highlight off (n = 3) | 35.2 / 29.8 / 32.8 | 18.4 / 13.0 / 15.8 | 16.4 / 16.6 / 16.8 | 24.1 / 18.9 / 25.6 (5.6–7.7) |
+| **branch**, highlight on (n = 3) | 29.8 / 35.4 / 39.2 | 10.9 / 19.7 / 24.0 | 18.7 / 15.5 / 14.9 | 18.2 / 19.1 / 18.9 (4.7–5.6) |
+
+- The highlight cost about 13 ms of the tap frame's main thread, almost all of it recomposition: a new draw object
+  meant every plan layer's lambda changed. On the branch the tap frame costs about what it costs with no highlight.
+- With or without the highlight, the tap frame still does 30–35 ms of main-thread work. That is the sheet itself:
+  composing the room sheet (13–18 ms) and measuring and recording it (15–17 ms).
+- The app's own `cc:*` / temporary `cc:x:*` sections never appeared, although the dex calls `Trace.beginSection` and
+  Compose's sections from the same thread do. That is unexplained; the attribution above uses Compose's and HWUI's sections.
+
+**Before / after (performance builds, apk + dm; framestats of the Control Center window, 3 s from the tap).** Two
+rounds per build, 3 opens per round, after 25 s idle and one warm-up open.
+
+| | main r1 / r2 | branch r1 / r2 |
+|---|---|---|
+| Sheet: frames over 32 ms per open | 2, 2, 2 / 2, 3, 2 | 2, 2, 2 / 2, 2, 1 |
+| Sheet: worst frame ms | 64, 53, 53 / 56, 59, 43 | 54, 61, 53 / 52, 64, 43 |
+| Sheet: frames over 16 ms per open | 7, 6, 6 / 2, 8, 6 | 6, 6, 4 / 6, 9, 8 |
+
+- **Not fixed on the user-visible measure.** The worst sheet frame stays at 43–64 ms on both builds. The tap frame and
+  the frame queued behind it are still both over 32 ms. framestats measures from the intended vsync, so 13 ms less
+  main-thread work inside a ~50 ms frame doesn't move it below the 32 ms line.
+- The change is kept. It removes the highlight's recomposition (and, on a first open of a room, the re-record of
+  every plan pass), it is pixel-for-pixel the same draw order, and it costs nothing.
+- Targets (no sheet frame over 32 ms, p90 under 16 ms) **not met**.
+
+**Next.** The remaining tap frame is the room sheet's own first composition. Two options:
+- compose its page ahead, off screen, the moment the tap lands, and slide it in one frame later;
+- or keep the last room's sheet composed (hidden) so a reopen is a re-place.
+
+The `cc-open` experiment precomposed the sheet while the highlight was still in the tap frame, so it measured both at
+once. Rerun it on this branch.
+
 ---
 
 # Phase B: Settings open (settings-open, 2026-11-21)

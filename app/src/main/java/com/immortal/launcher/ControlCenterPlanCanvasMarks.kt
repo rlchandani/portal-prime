@@ -68,15 +68,15 @@ private fun CcPlanDraw.drawBadge(s: DrawScope, b: CcMapBadge, view: CcAffine) {
 }
 
 /**
- * Names centred in each room with the caption below; other rooms fade while one is focused. In 3D
+ * Names centred in each room with the caption below; other rooms fade while [focus] is open. In 3D
  * the text stays upright at the projected centre, and the caption shows only if the room's
  * projected height still holds it.
  */
-internal fun CcPlanDraw.drawLabels(s: DrawScope, view: CcAffine) {
+internal fun CcPlanDraw.drawLabels(s: DrawScope, view: CcAffine, focus: CcPlanFocus) {
   for (v in model.views) {
     val r = px.rects[v.room.id] ?: continue
     val t = labels[v.room.id] ?: continue
-    val alpha = if (focus != null && focus != v.room.id) FADED else 1f
+    val alpha = if (focus.veiled(v.room.id)) FADED else 1f
     val tall = if (view.isIdentity) r.height else kotlin.math.abs(view.b) * r.width + kotlin.math.abs(view.d) * r.height
     val cap = t.caption?.takeIf { tall > (t.name.height + it.height) * FIT_SLACK }
     val total = t.name.height + (cap?.height ?: 0f) + if (cap != null) LINE_GAP * dp else 0f
