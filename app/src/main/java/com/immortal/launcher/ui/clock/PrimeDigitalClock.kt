@@ -14,7 +14,10 @@ import android.view.View
 import androidx.compose.ui.graphics.toArgb
 import com.immortal.launcher.AssetResolver
 import com.immortal.launcher.ClockFaceView
+import com.immortal.launcher.ClockMath
 import com.immortal.launcher.ClockSpec
+import com.immortal.launcher.ScreensaverFaceLayout
+import com.immortal.launcher.ScreensaverLayout
 import com.immortal.launcher.FaceStyle
 import com.immortal.launcher.ui.theme.AccentGlow
 import com.immortal.launcher.ui.theme.ArcTrack
@@ -45,6 +48,10 @@ class PrimeDigitalClockFaceView(
     private var measuredTextSize = 0f
     private var measuredTimeWidthPerPixel = 0f
     private val fontMetrics = Paint.FontMetrics()
+    /** Big / Bold on the Mini: the measured compact type (null = the shipped geometry). */
+    private var compactType: ScreensaverFaceLayout.CentreType? = null
+    private val centreKind = ScreensaverFaceLayout.centreKind(spec)
+    private var rawHourMin = ""
 
     // Paint for the large time text — left-aligned so left edge matches the date row below
     private val timePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -76,6 +83,13 @@ class PrimeDigitalClockFaceView(
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             val density = context.resources.displayMetrics.density
+            val compact = ScreensaverFaceLayout.centreType(
+                ScreensaverLayout.of(context), centreKind, spec.sizeScale)
+            compactType = compact
+            if (compact != null) {
+                measureCompact(compact, density, widthMeasureSpec, heightMeasureSpec)
+                return
+            }
             timePaint.textSize = 100f
             timePaint.getFontMetrics(fontMetrics)
             // Stable digit reservation prevents the layout changing every minute.
@@ -106,6 +120,7 @@ class PrimeDigitalClockFaceView(
             val w = width.toFloat()
             val h = height.toFloat()
             if (w <= 0f || h <= 0f) return
+            compactType?.let { drawCompact(canvas, it, w, h); return }
 
             val padding = minOf(2f * context.resources.displayMetrics.density, w / 2f, h / 2f)
             timePaint.textSize = measuredTextSize
@@ -158,6 +173,78 @@ class PrimeDigitalClockFaceView(
                 }
             }
         }
+
+        /**
+         * Compact Big / Bold: the mock's dp size (hours over minutes upright), shrunk only to fit
+         * the bucket and, turned Bold, the .7 H cluster cap. Reserved "88" digits keep it steady.
+         */
+        private fun measureCompact(
+            type: ScreensaverFaceLayout.CentreType, density: Float, widthSpec: Int, heightSpec: Int,
+        ) {
+            fun limit(measureSpec: Int): Int =
+                if (MeasureSpec.getMode(measureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE
+                else MeasureSpec.getSize(measureSpec)
+            val padding = 2f * density
+            val maxW = limit(widthSpec)
+            val maxH = ScreensaverFaceLayout.clockHeightLimit(
+                type, limit(heightSpec), context.resources.displayMetrics.heightPixels, density)
+            val desired = type.clockDp * density
+            val (unitW, unitH) = compactUnits(type)
+            val fit = ScreensaverFaceLayout.fitScale(
+                unitW * desired, unitH * desired, maxW - padding * 2f, maxH - padding * 2f)
+            measuredTextSize = desired * fit
+            setMeasuredDimension(
+                resolveSize(kotlin.math.ceil(unitW * measuredTextSize + padding * 2f).toInt().coerceAtMost(maxW), widthSpec),
+                resolveSize(kotlin.math.ceil(unitH * measuredTextSize + padding * 2f).toInt().coerceAtMost(maxH), heightSpec),
+            )
+        }
+
+        /** Width and height per pixel of text size for the compact layout (measured at 100 px). */
+        private fun compactUnits(type: ScreensaverFaceLayout.CentreType): Pair<Float, Float> {
+            timePaint.textSize = 100f
+            timePaint.getFontMetrics(fontMetrics)
+            val textHeight = (fontMetrics.descent - fontMetrics.ascent) / 100f
+            if (!type.stacked) {
+                val width = maxOf(
+                    DigitalClockTimeFormat.reservedLabels(spec, formatterLocale).maxOf { timePaint.measureText(it) },
+                    timePaint.measureText(currentHourMin),
+                ) / 100f
+                return width to textHeight
+            }
+            val (hours, minutes) = stacked()
+            val eight = (java.text.DecimalFormatSymbols.getInstance(formatterLocale).zeroDigit.code + 8).toChar()
+            val width = maxOf(timePaint.measureText("$eight$eight"), timePaint.measureText(hours),
+                timePaint.measureText(minutes)) / 100f
+            return width to 2f * type.lineHeight
+        }
+
+        private fun stacked(): Pair<String, String> = ScreensaverFaceLayout.stackedLines(
+            rawHourMin, ClockMath.separator(spec.separator, true), spec.showAmPm)
+
+        private fun drawCompact(canvas: Canvas, type: ScreensaverFaceLayout.CentreType, w: Float, h: Float) {
+            val padding = minOf(2f * context.resources.displayMetrics.density, w / 2f, h / 2f)
+            val (unitW, unitH) = compactUnits(type)
+            // Shrink-only, as the shipped face does, for a tighter exact parent or a new locale.
+            val textSize = measuredTextSize * ScreensaverFaceLayout.fitScale(
+                unitW * measuredTextSize, unitH * measuredTextSize, w - padding * 2f, h - padding * 2f)
+            if (textSize <= 0f) return
+            timePaint.textSize = textSize
+            timePaint.getFontMetrics(fontMetrics)
+            val glyphH = fontMetrics.descent - fontMetrics.ascent
+            if (!type.stacked) {
+                val x = (w - timePaint.measureText(currentHourMin)) / 2f
+                canvas.drawText(currentHourMin, x, (h - glyphH) / 2f - fontMetrics.ascent, timePaint)
+                return
+            }
+            // CSS-style line boxes: each line is lineHeight em, its glyph box centred within it.
+            val line = type.lineHeight * textSize
+            val top = (h - 2f * line) / 2f
+            val (hours, minutes) = stacked()
+            listOf(hours, minutes).forEachIndexed { i, text ->
+                val x = (w - timePaint.measureText(text)) / 2f
+                canvas.drawText(text, x, top + i * line + (line - glyphH) / 2f - fontMetrics.ascent, timePaint)
+            }
+        }
     }
 
     override fun update(now: Date, blinkOn: Boolean) {
@@ -179,6 +266,7 @@ class PrimeDigitalClockFaceView(
             view.contentDescription = "Clock $raw"
         }
         val hourMin = if (!blinkOn && spec.separator.name == "BLINK") raw.replace(':', ' ') else raw
+        rawHourMin = raw
         val seconds = if (spec.showSeconds) secondsFmt.format(now).toIntOrNull() ?: 0 else 0
         if (currentHourMin == hourMin && currentSeconds == seconds) return
         currentHourMin = hourMin
