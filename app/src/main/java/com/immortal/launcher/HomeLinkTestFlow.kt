@@ -34,7 +34,7 @@ import kotlinx.coroutines.withContext
 import java.time.ZoneId
 
 /** Where the "Link homes test" is (mock flow: hh → invite → join → verify → perms → invitedone → hh). */
-internal enum class HomeLinkTestStage { HOUSEHOLDS, INVITE, JOIN, VERIFY, PERMS, ROOMS, CONNECTED, FAILED }
+internal enum class HomeLinkTestStage { HOUSEHOLDS, INVITE, JOIN, VERIFY, PERMS, ROOMS, CONNECTED, FAILED, PORTALS }
 
 /**
  * Measurement builds only ([BuildConfig.PORTAL_CALL_LOOPBACK]): Households & devices with the real
@@ -103,7 +103,8 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
           HomeLinkDevices.ofThisHome(selfName, rooms, now), ZoneId.systemDefault(), HomeLinkHouseholdsActions(
           onState = { households = it }, onEdit = { l -> write { it.edit(l) } }, onRemove = { id -> write { it.remove(id) } },
           onInvite = ::newInvite, onJoin = ::newInvite, onRooms = { editing = it; stage = HomeLinkTestStage.ROOMS },
-          onCheckAgain = { newInvite() }, onBack = onClose))
+          onCheckAgain = { newInvite() }, onBack = onClose, onPortals = { stage = HomeLinkTestStage.PORTALS }))
+      HomeLinkTestStage.PORTALS -> PortalPinFlowScreen(feature, onClose = { stage = HomeLinkTestStage.HOUSEHOLDS })
       HomeLinkTestStage.INVITE -> {
         // In the invite's own scroll, so it never covers New code / Cancel (it floated over them on the Mini).
         HomeLinkInviteScreen(invite, now, qr, onNewCode = ::newInvite, onCancel = { stage = HomeLinkTestStage.HOUSEHOLDS }) {

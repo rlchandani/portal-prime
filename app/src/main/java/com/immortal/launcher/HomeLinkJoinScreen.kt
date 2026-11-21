@@ -40,7 +40,7 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
  */
 @Composable
 internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCodeEntry) -> Unit, onJoin: (HomeLinkCode) -> Unit,
-                                onBack: () -> Unit) {
+                                onBack: () -> Unit, words: HomeLinkJoinWords = HomeLinkJoinWords.HOME) {
   val p = LocalApprovedPalette.current
   var letters by rememberSaveable { mutableStateOf(false) }
   val compact = currentLayoutClass().compact
@@ -54,18 +54,18 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
     }
   }
   val join: @Composable () -> Unit = {
-    CallPill(HomeLinkCopy.JOIN, { code?.let(onJoin) }, icon = "check", style = CallButtonStyle.OK, size = CallButtonSize.LG,
+    CallPill(words.join, { code?.let(onJoin) }, icon = "check", style = CallButtonStyle.OK, size = CallButtonSize.LG,
         enabled = code != null, surface = callsSurface())
   }
   Column(Modifier.fillMaxSize().background(p.background)) {
-    HomeLinkHeader(HomeLinkCopy.JOIN_TITLE, onBack = onBack)
+    HomeLinkHeader(words.title, onBack = onBack)
     if (compact) {
       // Mini: code on top, keypad full width under it, Join last (thumb reach).
       Column(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        Text(HomeLinkCopy.JOIN_H2, color = p.text, fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(words.h2, color = p.text, fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         HomeLinkSlots(entry.slots, entry.cursor, spoken = typedSpoken(entry))
-        Text(HomeLinkCopy.JOIN_HOW, color = p.secondary, fontSize = 20.sp, textAlign = TextAlign.Center)
+        Text(words.how, color = p.secondary, fontSize = 20.sp, textAlign = TextAlign.Center)
         HomeLinkKeys(letters, compact = true, modifier = Modifier.fillMaxWidth(), onKey = onKey)
         join()
       }
@@ -73,9 +73,9 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
       Row(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 24.dp), verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(60.dp)) {
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(30.dp)) {
-          Text(HomeLinkCopy.JOIN_H2, color = p.text, fontSize = 36.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+          Text(words.h2, color = p.text, fontSize = 36.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
           HomeLinkSlots(entry.slots, entry.cursor, spoken = typedSpoken(entry))
-          Text(HomeLinkCopy.JOIN_HOW, color = p.secondary, fontSize = 24.sp, textAlign = TextAlign.Center)
+          Text(words.how, color = p.secondary, fontSize = 24.sp, textAlign = TextAlign.Center)
           join()
         }
         // One fixed slot for both pads (the wider one), so toggling ABC/123 doesn't slide the code across.
@@ -120,3 +120,11 @@ private fun typedSpoken(entry: HomeLinkCodeEntry): String =
 
 private val DIGIT_PAD = 540.dp
 private val LETTER_PAD = 760.dp
+
+/** The Join screen's words: joining a household, or pairing another Portal ([PortalPinCopy]). */
+internal data class HomeLinkJoinWords(val title: String, val h2: String, val how: String, val join: String) {
+  companion object {
+    val HOME = HomeLinkJoinWords(HomeLinkCopy.JOIN_TITLE, HomeLinkCopy.JOIN_H2, HomeLinkCopy.JOIN_HOW, HomeLinkCopy.JOIN)
+    val PORTAL_PIN = HomeLinkJoinWords(PortalPinCopy.TYPE_TITLE, PortalPinCopy.TYPE_H2, PortalPinCopy.TYPE_HOW, PortalPinCopy.PAIR_BUTTON)
+  }
+}

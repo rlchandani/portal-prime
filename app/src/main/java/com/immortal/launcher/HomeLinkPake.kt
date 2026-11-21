@@ -45,16 +45,15 @@ internal class HomeLinkPakeHalf internal constructor(internal val scalar: BigInt
  */
 internal object HomeLinkPake {
   const val SHARE_BYTES = 32
-  /** RFC 9380 domain separation tag: this protocol, its version, and the suite. */
-  val DST: ByteArray get() = DST_BYTES.copyOf()
-  private val DST_BYTES = HomeLinkHash.utf8("hearthpane-homelink-cpace-v2-P256_XMD:SHA-256_SSWU_RO_")
+  /** RFC 9380 domain separation tag for linking homes: this protocol, its version, and the suite ([HomeLinkDomain.pakeDst]). */
+  val DST: ByteArray get() = HomeLinkDomain.HOME.pakeDst
   private val CURVE: ECParameterSpec get() = HomeLinkP256.CURVE
   private val PRIME: BigInteger get() = HomeLinkP256.PRIME
   private val SQRT_EXP: BigInteger by lazy { PRIME.add(BigInteger.ONE).shiftRight(2) }
 
-  /** This side's half for a pairing in [mailbox] with [secret] (the code's secret part). */
-  fun start(secret: String, mailbox: String, random: SecureRandom): HomeLinkPakeHalf {
-    val g = generator(secret, mailbox)
+  /** This side's half for a pairing in [mailbox] with [secret] (the code's secret part), in [domain]. */
+  fun start(secret: String, mailbox: String, random: SecureRandom, domain: HomeLinkDomain = HomeLinkDomain.HOME): HomeLinkPakeHalf {
+    val g = generator(secret, mailbox, domain)
     while (true) {
       val scalar = BigInteger(CURVE.order.bitLength(), random)
       if (scalar.signum() == 0 || scalar >= CURVE.order) continue
@@ -82,8 +81,8 @@ internal object HomeLinkPake {
   }
 
   /** The password-derived base point. Visible for tests (it is not secret-free: never send it). */
-  internal fun generator(secret: String, mailbox: String): ECPoint {
-    val g = HomeLinkHashToCurve.hashToCurve(HomeLinkHash.join(HomeLinkHash.utf8(secret), HomeLinkHash.utf8(mailbox)), DST_BYTES)
+  internal fun generator(secret: String, mailbox: String, domain: HomeLinkDomain = HomeLinkDomain.HOME): ECPoint {
+    val g = HomeLinkHashToCurve.hashToCurve(HomeLinkHash.join(HomeLinkHash.utf8(secret), HomeLinkHash.utf8(mailbox)), domain.pakeDst)
     // Q0 + Q1 = infinity has probability about 2^-256.
     check(HomeLinkP256.isValidPoint(g)) { "hash_to_curve gave no usable point" }
     return g
@@ -114,20 +113,20 @@ internal object HomeLinkPake {
  * per direction, so a message can't be reflected back to its sender. [sid] is public: it binds
  * the identity signatures to this session. Holds secrets: [toString] says nothing.
  */
-internal class HomeLinkSession private constructor(val sid: String, private val toInviter: ByteArray, private val toJoiner: ByteArray) {
+internal class HomeLinkSession private constructor(val sid: String, val domain: HomeLinkDomain, private val toInviter: ByteArray,
+                                                   private val toJoiner: ByteArray) {
   fun macKey(towardInviter: Boolean): ByteArray = (if (towardInviter) toInviter else toJoiner).copyOf()
 
   override fun toString(): String = "HomeLinkSession(sid=$sid)"
 
   companion object {
-    private val SID = HomeLinkHash.utf8("hearthpane-homelink-sid-v1")
-    private val ISK = HomeLinkHash.utf8("hearthpane-homelink-isk-v1")
-
-    fun derive(mailbox: String, inviterShare: String, joinerShare: String, shared: ByteArray): HomeLinkSession {
+    fun derive(mailbox: String, inviterShare: String, joinerShare: String, shared: ByteArray,
+               domain: HomeLinkDomain = HomeLinkDomain.HOME): HomeLinkSession {
       val transcript = arrayOf(HomeLinkHash.utf8(mailbox), HomeLinkHash.utf8(inviterShare), HomeLinkHash.utf8(joinerShare))
-      val sid = HomeLinkHash.b64(HomeLinkHash.sha256(SID, *transcript))
-      val isk = HomeLinkHash.hmac(HomeLinkHash.sha256(ISK, *transcript), shared)
-      return HomeLinkSession(sid, HomeLinkHash.hmac(isk, HomeLinkHash.utf8("to-inviter")), HomeLinkHash.hmac(isk, HomeLinkHash.utf8("to-joiner")))
+      val sid = HomeLinkHash.b64(HomeLinkHash.sha256(domain.sidLabel, *transcript))
+      val isk = HomeLinkHash.hmac(HomeLinkHash.sha256(domain.iskLabel, *transcript), shared)
+      return HomeLinkSession(sid, domain, HomeLinkHash.hmac(isk, HomeLinkHash.utf8("to-inviter")),
+          HomeLinkHash.hmac(isk, HomeLinkHash.utf8("to-joiner")))
     }
   }
 }

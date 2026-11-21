@@ -36,15 +36,15 @@ internal sealed interface HomeLinkMessage {
     companion object { const val SEQ = 1 }
   }
 
-  /** Inviter → joiner: its key and name, signed. */
+  /** Inviter → joiner: its key and name (pinning: and its device id), signed. */
   data class Reveal(override val mailbox: String, val key: String, val name: String, val sig: String,
-                    override val mac: String = "", override val seq: Int = SEQ) : HomeLinkMessage {
+                    override val mac: String = "", override val seq: Int = SEQ, val device: String = "") : HomeLinkMessage {
     companion object { const val SEQ = 2 }
   }
 
-  /** Joiner → inviter: what it committed to, signed over the inviter's key. */
+  /** Joiner → inviter: what it committed to (pinning: including its device id), signed over the inviter's key. */
   data class Open(override val mailbox: String, val key: String, val nonce: String, val name: String, val sig: String,
-                  override val mac: String = "", override val seq: Int = SEQ) : HomeLinkMessage {
+                  override val mac: String = "", override val seq: Int = SEQ, val device: String = "") : HomeLinkMessage {
     companion object { const val SEQ = 3 }
   }
 }
@@ -62,6 +62,9 @@ internal object HomeLinkWire {
   private const val REVEAL = "reveal"
   private const val OPEN = "open"
 
+  /** A household device id as Portals announce it (pinning binds the pin to it). Never a phone's. */
+  fun validDevice(id: String): Boolean = DinnerWire.isDeviceId(id) && !CallPhoneId.isPhone(id)
+
   /** A home name fit to show on the other home's screen: 1–40 characters, no control characters. */
   fun validName(name: String): Boolean =
       name.isNotBlank() && name.length <= MAX_NAME && name.none { Character.isISOControl(it) }
@@ -74,6 +77,7 @@ internal object HomeLinkWire {
       is HomeLinkMessage.Reveal -> o.put("t", REVEAL).put("k", m.key).put("n", m.name).put("s", m.sig).put("m", m.mac)
       is HomeLinkMessage.Open -> o.put("t", OPEN).put("k", m.key).put("r", m.nonce).put("n", m.name).put("s", m.sig).put("m", m.mac)
     }
+    deviceOf(m).takeIf { it.isNotEmpty() }?.let { o.put("d", it) }
     return o.toString()
   }
 
@@ -88,9 +92,9 @@ internal object HomeLinkWire {
       COMMIT -> HomeLinkMessage.Commit(mailbox, field(o, "y") ?: return null, field(o, "c") ?: return null,
           field(o, "m") ?: return null, seq)
       REVEAL -> HomeLinkMessage.Reveal(mailbox, field(o, "k") ?: return null, name(o) ?: return null,
-          field(o, "s") ?: return null, field(o, "m") ?: return null, seq)
+          field(o, "s") ?: return null, field(o, "m") ?: return null, seq, device(o) ?: return null)
       OPEN -> HomeLinkMessage.Open(mailbox, field(o, "k") ?: return null, field(o, "r") ?: return null,
-          name(o) ?: return null, field(o, "s") ?: return null, field(o, "m") ?: return null, seq)
+          name(o) ?: return null, field(o, "s") ?: return null, field(o, "m") ?: return null, seq, device(o) ?: return null)
       else -> null
     }
   }
@@ -103,7 +107,21 @@ internal object HomeLinkWire {
       is HomeLinkMessage.Reveal -> listOf(REVEAL, m.mailbox, m.key, m.name, m.sig)
       is HomeLinkMessage.Open -> listOf(OPEN, m.mailbox, m.key, m.nonce, m.name, m.sig)
     }
-    return (listOf("v$VERSION", "q${m.seq}") + parts).joinToString("") { "${it.length}:$it" }
+    // A device id (pinning only) is MAC'd too; absent, the text is exactly the home-link v2 text.
+    val device = deviceOf(m).takeIf { it.isNotEmpty() }?.let { listOf("d", it) }.orEmpty()
+    return (listOf("v$VERSION", "q${m.seq}") + parts + device).joinToString("") { "${it.length}:$it" }
+  }
+
+  private fun deviceOf(m: HomeLinkMessage): String = when (m) {
+    is HomeLinkMessage.Reveal -> m.device
+    is HomeLinkMessage.Open -> m.device
+    else -> ""
+  }
+
+  /** Absent is "" (linking homes); present must be a Portal device id. Null for anything else. */
+  private fun device(o: JSONObject): String? {
+    if (!o.has("d")) return ""
+    return (o.opt("d") as? String)?.takeIf(::validDevice)
   }
 
   private fun field(o: JSONObject, key: String): String? =
