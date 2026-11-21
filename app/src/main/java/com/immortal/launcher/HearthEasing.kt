@@ -69,6 +69,8 @@ object HearthEasing {
   val DRIFT = CubicEase(.33f, 0f, .15f, 1f)
   /** Text arriving (minute change, captions, clock emergence). */
   val OUT = CubicEase(.22f, 1f, .36f, 1f)
+  /** CSS sine ease-in-out (mock EZ.sine): a long pan that starts and stops without a jolt. */
+  val SINE_IN_OUT = android.animation.TimeInterpolator { t -> (-(Math.cos(Math.PI * t) - 1) / 2).toFloat() }
 
   const val DISSOLVE_MS = 1600L
   /** Settle motion: begins with the dissolve and is finished well before the next photo. */
