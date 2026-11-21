@@ -126,6 +126,9 @@ class RemoteRoutes internal constructor(
         // bound, sealed (AES-256-GCM) per requester, nonce and direction. Never answers a phone. Measurement
         // builds only (HomeLinkGate): elsewhere the path is unregistered, the same 404 as any unknown path.
         HomeLinkSyncWire.PATH -> if (HomeLinkGate.VAULT_SYNC) HomeLinkSync.handle(context, req) else json(404, err("not_found"))
+        // Portal↔Portal pinning mailbox (in-person device-key pinning, LAN only): household header as an outer
+        // filter, PAKE + pictures inside. Measurement builds only, like the vault it unlocks.
+        PortalPinWire.PATH -> if (HomeLinkGate.VAULT_SYNC) PortalPinNet.handle(context, req) else json(404, err("not_found"))
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
         CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
         // Portal↔Portal video message delivery: household-signed header, sealed chunked body.

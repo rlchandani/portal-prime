@@ -35,7 +35,7 @@ class HomeLinkGateTest {
   @Test fun syncNeedsAPinnedPortalEvenWithTheBuildSwitchOn() {
     val random = java.security.SecureRandom()
     val me = HomeLinkIdentity.generate(random).publicKey
-    val pinned = PortalRoster().pin(HomeLinkPeer("Kitchen", HomeLinkIdentity.generate(random).publicKey), me, 1L)!!
+    val pinned = PortalRoster().pin(HomeLinkPeer("Kitchen", HomeLinkIdentity.generate(random).publicKey, "kitchen-1"), me, 1L)!!
     assertFalse(HomeLinkGate.syncs(PortalRoster(), buildSwitch = true))
     assertTrue(HomeLinkGate.syncs(pinned, buildSwitch = true))
     assertFalse(HomeLinkGate.syncs(pinned, buildSwitch = false))
@@ -50,6 +50,16 @@ class HomeLinkGateTest {
     assertEquals(404, vault.status)
     assertEquals(text(unknown), text(vault))
     assertTrue(text(vault).contains("not_found"))
+    verifyNoInteractions(context)
+  }
+
+  @Test fun thePinningMailboxIsNotRegisteredWhenTheFlagIsOff() {
+    val context = mock(Context::class.java)
+    val routes = RemoteRoutes(context)
+    val pin = routes.handle(post(PortalPinWire.PATH))
+    assertEquals(404, pin.status)
+    assertEquals(text(routes.handle(post("/remote/nosuchroute"))), text(pin))
+    assertEquals(404, PortalPinNet.handle(context, post(PortalPinWire.PATH)).status)
     verifyNoInteractions(context)
   }
 

@@ -33,9 +33,9 @@ class HomeLinkSyncTest {
   private val responderKid = HomeLinkIdentity.fingerprint(responderDevice.publicKey)
   private val requesterKid = HomeLinkIdentity.fingerprint(requesterDevice.publicKey)
   /** What the requester (living-1) pinned: the responder. */
-  private val requesterRoster = PortalRoster().pin(HomeLinkPeer("Family", responderDevice.publicKey), requesterDevice.publicKey, now)!!
+  private val requesterRoster = PortalRoster().pin(HomeLinkPeer("Family", responderDevice.publicKey, "family-1"), requesterDevice.publicKey, now)!!
   /** What the responder (family-1) pinned: the requester. */
-  private var responderRoster = PortalRoster().pin(HomeLinkPeer("Living room", requesterDevice.publicKey), responderDevice.publicKey, now)!!
+  private var responderRoster = PortalRoster().pin(HomeLinkPeer("Living room", requesterDevice.publicKey, requester), responderDevice.publicKey, now)!!
   private var announced = mapOf(requester to host)
   private val route = HomeLinkSyncRoute({ key }, { "family-1" }, { responderDevice }, { responderRoster }, { now },
       HouseholdMessage.ReplayGuard(), { announced[it] }, { source.vault.value }, { pulledBack += it }, random, { logs += it })
@@ -107,7 +107,7 @@ class HomeLinkSyncTest {
   }
 
   @Test fun ourOwnKeyIsNeverAPeer() {
-    val selfRoster = PortalRoster().pin(HomeLinkPeer("Me", requesterDevice.publicKey), "other", now)!!
+    val selfRoster = PortalRoster().pin(HomeLinkPeer("Me", requesterDevice.publicKey, requester), "other", now)!!
     val asking = ask()
     val selfAnswer = HomeLinkSyncWire.give(requesterDevice, asking.pull, HomeLinkVault(), random)
     assertNull(HomeLinkSyncWire.receive(asking, selfAnswer, selfRoster, requesterKid))
@@ -122,6 +122,15 @@ class HomeLinkSyncTest {
   @Test fun anUnpinnedPortalIsRefusedAfterRemoval() {
     responderRoster = responderRoster.unpin(requesterKid)
     assertEquals(403, post(ask()).first)
+  }
+
+  /** A pin is bound to the household id it was pinned under: the same key calling as another Portal gets nothing. */
+  @Test fun aPinnedKeyCallingUnderAnotherDeviceIdIsRefused() {
+    announced = announced + ("kitchen-1" to "10.9.8.22")
+    val (status, body) = post(ask(), from = "kitchen-1", addr = "10.9.8.22")
+    assertEquals(403, status)
+    assertTrue(body.contains("device_mismatch"))
+    assertTrue(pulledBack.isEmpty())
   }
 
   @Test fun aDifferentVaultIsPulledBackButAPullBackIsNot() {

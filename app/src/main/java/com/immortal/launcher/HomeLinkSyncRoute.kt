@@ -14,8 +14,9 @@ import java.security.SecureRandom
  *
  * 1. the household `home_link_sync` header (signed, fresh, not replayed, pins the body) from a
  *    Portal id at the address that Portal last announced — a cheap filter, not the trust anchor;
- * 2. the pull must be signed by a device key in our [PortalRoster] (pinned in person), and the
- *    answer is sealed to the pull's one-time ECDH key and signed by our device key.
+ * 2. the pull must be signed by a device key in our [PortalRoster] (pinned in person) that is
+ *    pinned to the calling Portal's household id, and the answer is sealed to the pull's
+ *    one-time ECDH key and signed by our device key.
  *
  * If the caller's vault differs from ours and this wasn't already a pull-back, [pullBack] asks
  * for theirs in turn. Logs device ids and key ids only, never vault contents.
@@ -52,6 +53,8 @@ internal class HomeLinkSyncRoute(
     val pull = HomeLinkSyncWire.parsePull(text) ?: return reply(400, "bad_pull")
     val pin = HomeLinkSyncWire.admit(pull, roster(), HomeLinkIdentity.fingerprint(device.publicKey), clock())
         ?: return refuse(from, "not_pinned")
+    // The pin is bound to the household id that Portal signed when it was pinned: another id with its key gets nothing.
+    if (pin.deviceId != from) return refuse(from, "device_mismatch")
     val ours = vault()
     val answer = HomeLinkSyncWire.give(device, pull, ours, random) ?: return reply(500, "seal_failed")
     if (!pull.back && pull.digest != HomeLinkSyncWire.digest(ours, key)) pullBack(from)

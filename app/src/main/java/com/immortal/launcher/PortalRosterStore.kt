@@ -28,11 +28,22 @@ internal class PortalRosterStore(private val secure: YtSecureStore, private val 
     return PortalRosterCodec.parse(text) ?: PortalRoster().also { warn("portal roster corrupt, starting empty") }
   }
 
-  /** Keeps [peer] once people confirmed the pairing. False if it was refused or couldn't be stored. */
-  @Synchronized fun pin(peer: HomeLinkPeer, selfKey: String, now: Long): Boolean {
-    val next = roster.pin(peer, selfKey, now) ?: return false
-    return store(next)
+  /**
+   * Keeps [peer] once people confirmed the pairing. A device id already pinned with another key
+   * comes back [PortalPinOutcome.NEEDS_REPAIR] and changes nothing unless [repair] (the person
+   * chose "Pair again" on screen).
+   */
+  @Synchronized fun pin(peer: HomeLinkPeer, selfKey: String, now: Long, selfDevice: String = "",
+                        repair: Boolean = false): PortalPinOutcome {
+    val outcome = roster.check(peer, selfKey, selfDevice)
+    if (outcome == PortalPinOutcome.REFUSED || outcome == PortalPinOutcome.ALREADY_PINNED) return outcome
+    if (outcome == PortalPinOutcome.NEEDS_REPAIR && !repair) return outcome
+    val next = roster.pin(peer, selfKey, now, selfDevice, repair) ?: return PortalPinOutcome.REFUSED
+    return if (store(next)) PortalPinOutcome.PINNED else PortalPinOutcome.NOT_STORED
   }
+
+  /** Records what a pinned Portal's attestation chain showed. */
+  @Synchronized fun attested(kid: String, level: PortalAttestationLevel): Boolean = store(roster.attested(kid, level))
 
   @Synchronized fun unpin(kid: String): Boolean = store(roster.unpin(kid))
 

@@ -19,10 +19,13 @@ package com.immortal.launcher
  * Keystore. Nothing here syncs a roster: every Portal pins each other Portal it shares with.
  */
 internal object PortalPinning {
-  /** This Portal as it introduces itself in a pinning: its device key and its room name. */
-  fun self(device: HomeLinkSigner, portalName: String): HomeLinkSelf = HomeLinkSelf(device, portalName)
+  /** This Portal as it introduces itself in a pinning: its device key, room name and household device id. */
+  fun self(device: HomeLinkSigner, portalName: String, deviceId: String): HomeLinkSelf = HomeLinkSelf(device, portalName, deviceId)
 
-  /** People said the pictures match: pin [peer]. False if refused (bad key, ourselves, full) or not stored. */
-  fun confirm(store: PortalRosterStore, peer: HomeLinkPeer, device: HomeLinkSigner, now: Long): Boolean =
-      store.pin(peer, device.publicKey, now)
+  /**
+   * People said the pictures match: pin [peer] to the device id it signed. A Portal already pinned
+   * with another key needs [repair] (an explicit "Pair again"); see [PortalPinOutcome].
+   */
+  fun confirm(store: PortalRosterStore, peer: HomeLinkPeer, self: HomeLinkSelf, now: Long, repair: Boolean = false): PortalPinOutcome =
+      store.pin(peer, self.identity.publicKey, now, self.deviceId, repair)
 }

@@ -7,13 +7,23 @@
 package com.immortal.launcher
 
 
-/** This home, as it introduces itself to another. */
-internal class HomeLinkSelf(val identity: HomeLinkSigner, val name: String) {
-  init { require(HomeLinkWire.validName(name)) { "home name must be 1-${HomeLinkWire.MAX_NAME} printable characters" } }
+/**
+ * This home (or, pinning, this Portal) as it introduces itself. [deviceId] is this Portal's
+ * household device id, sent and signed only when pinning ([HomeLinkDomain.bindsDevice]); empty
+ * when linking homes.
+ */
+internal class HomeLinkSelf(val identity: HomeLinkSigner, val name: String, val deviceId: String = "") {
+  init {
+    require(HomeLinkWire.validName(name)) { "home name must be 1-${HomeLinkWire.MAX_NAME} printable characters" }
+    require(deviceId.isEmpty() || HomeLinkWire.validDevice(deviceId)) { "bad device id" }
+  }
 }
 
-/** The other home: its name as it told us, and the key we pin once people say the pictures match. */
-internal data class HomeLinkPeer(val name: String, val publicKey: String)
+/**
+ * The other home: its name as it told us, and the key we pin once people say the pictures match.
+ * Pinning, [deviceId] is the other Portal's household device id as it signed it (else empty).
+ */
+internal data class HomeLinkPeer(val name: String, val publicKey: String, val deviceId: String = "")
 
 internal enum class HomeLinkFailure {
   /** The code's 10 minutes ran out. */
@@ -43,21 +53,28 @@ internal data class HomeLinkStep<S>(val state: S, val outgoing: HomeLinkMessage?
 /** MACs, commitments and signed texts for the pairing exchange. Pure. */
 internal object HomeLinkPairingProof {
   const val NONCE_BYTES = 32
-  private val COMMIT = HomeLinkHash.utf8("hearthpane-homelink-commit-v1")
-  private const val REVEAL = "hearthpane-homelink-reveal-v2"
-  private const val OPEN = "hearthpane-homelink-open-v2"
 
-  fun commitment(key: String, nonce: String, name: String): String? {
+  /**
+   * Hash of what the joiner will open: key, nonce, name and (pinning only) its device id. The
+   * labels are [domain]'s, so a commitment made for one ceremony never opens in the other.
+   */
+  fun commitment(key: String, nonce: String, name: String, domain: HomeLinkDomain = HomeLinkDomain.HOME,
+                 device: String = ""): String? {
     val n = HomeLinkHash.unb64(nonce)?.takeIf { it.size == NONCE_BYTES } ?: return null
-    return HomeLinkHash.b64(HomeLinkHash.sha256(COMMIT, HomeLinkHash.utf8(key), n, HomeLinkHash.utf8(name)))
+    val parts = listOf(domain.commitLabel, HomeLinkHash.utf8(key), n, HomeLinkHash.utf8(name)) +
+        (if (domain.bindsDevice) listOf(HomeLinkHash.utf8(device)) else emptyList())
+    return HomeLinkHash.b64(HomeLinkHash.sha256(*parts.toTypedArray()))
   }
 
-  /** What the inviter signs: bound to this PAKE session, so it can't be replayed into another. */
-  fun revealText(session: HomeLinkSession, mailbox: String, name: String): ByteArray =
-      HomeLinkHash.join(*listOf(REVEAL, mailbox, session.sid, name).bytes())
+  /** What the inviter signs: bound to this PAKE session (and its domain), so it can't be replayed into another. */
+  fun revealText(session: HomeLinkSession, mailbox: String, name: String, device: String = ""): ByteArray =
+      HomeLinkHash.join(*(listOf(session.domain.reveal, mailbox, session.sid, name) + deviceParts(session, device)).bytes())
 
-  fun openText(session: HomeLinkSession, mailbox: String, inviterKey: String, nonce: String, name: String): ByteArray =
-      HomeLinkHash.join(*listOf(OPEN, mailbox, session.sid, inviterKey, nonce, name).bytes())
+  fun openText(session: HomeLinkSession, mailbox: String, inviterKey: String, nonce: String, name: String, device: String = ""): ByteArray =
+      HomeLinkHash.join(*(listOf(session.domain.open, mailbox, session.sid, inviterKey, nonce, name) + deviceParts(session, device)).bytes())
+
+  private fun deviceParts(session: HomeLinkSession, device: String): List<String> =
+      if (session.domain.bindsDevice) listOf(device) else emptyList()
 
   /** Joiner → inviter messages use one key, inviter → joiner the other. Hello is never MAC'd. */
   private fun towardInviter(m: HomeLinkMessage): Boolean = m is HomeLinkMessage.Commit || m is HomeLinkMessage.Open

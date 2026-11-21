@@ -39,6 +39,14 @@ internal class PortalDeviceKey private constructor(private val private: PrivateK
   override fun sign(data: ByteArray): String =
       HomeLinkHash.b64(Signature.getInstance(SIGNATURE).run { initSign(private); update(data); sign() })
 
+  /**
+   * The Keystore's certificate chain for this key, leaf first (DER): an attestation chain when the
+   * Keystore attested it, else one self-signed certificate. Public data; empty if unreadable.
+   */
+  fun attestationChain(): List<ByteArray> = runCatching {
+    KeyStore.getInstance(STORE).apply { load(null) }.getCertificateChain(ALIAS)?.map { it.encoded }.orEmpty()
+  }.onFailure { Log.w(TAG, "no attestation chain: ${it.javaClass.simpleName}") }.getOrDefault(emptyList())
+
   override fun toString(): String = "PortalDeviceKey($kid, hardware=$hardwareBacked)"
 
   companion object {
@@ -46,7 +54,9 @@ internal class PortalDeviceKey private constructor(private val private: PrivateK
     private const val STORE = "AndroidKeyStore"
     private const val ALIAS = "hearthpane.portal.device.v1"
     private const val SIGNATURE = "SHA256withECDSA"
-    private val CHALLENGE = HomeLinkHash.utf8("hearthpane-portal-device-v1")
+    private val CHALLENGE_BYTES = HomeLinkHash.utf8("hearthpane-portal-device-v1")
+    /** The attestation challenge the key is made with ([PortalAttestation.verify] checks it). */
+    val CHALLENGE: ByteArray get() = CHALLENGE_BYTES.copyOf()
     @Volatile private var shared: PortalDeviceKey? = null
 
     /** This Portal's key, made on first use. Null if the Keystore can't make or load one (sync stays off). */

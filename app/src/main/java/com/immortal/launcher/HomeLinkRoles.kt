@@ -47,7 +47,7 @@ internal object HomeLinkInviter {
   /** A new invite and the hello to post to its mailbox. */
   fun start(invite: HomeLinkInvite, random: SecureRandom): HomeLinkStep<HomeLinkInviterState> {
     val mailbox = HomeLinkCode.mailboxId(invite.code)
-    val pake = HomeLinkPake.start(invite.code.secret, mailbox, random)
+    val pake = HomeLinkPake.start(invite.code.secret, mailbox, random, invite.code.domain)
     return HomeLinkStep(HomeLinkInviterState.Waiting(invite, pake), HomeLinkMessage.Hello(mailbox, pake.share))
   }
 
@@ -87,11 +87,14 @@ internal object HomeLinkInviter {
   }
 
   private fun onCommit(state: HomeLinkInviterState.Waiting, self: HomeLinkSelf, m: HomeLinkMessage.Commit): HomeLinkStep<HomeLinkInviterState> {
+    val domain = state.invite.code.domain
     val shared = HomeLinkPake.finish(state.pake, m.share)
-    val session = shared?.let { HomeLinkSession.derive(m.mailbox, state.pake.share, m.share, it) }
+    val session = shared?.let { HomeLinkSession.derive(m.mailbox, state.pake.share, m.share, it, domain) }
     if (session == null || !HomeLinkPairingProof.fromPeer(session, m.mailbox, m)) return wrongTry(state)
-    val sig = self.identity.sign(HomeLinkPairingProof.revealText(session, m.mailbox, self.name))
-    val reveal = HomeLinkPairingProof.withMac(session, HomeLinkMessage.Reveal(m.mailbox, self.identity.publicKey, self.name, sig))
+    val device = HomeLinkDevicePolicy.own(self, domain) ?: return HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
+    val sig = self.identity.sign(HomeLinkPairingProof.revealText(session, m.mailbox, self.name, device))
+    val reveal = HomeLinkPairingProof.withMac(session,
+        HomeLinkMessage.Reveal(m.mailbox, self.identity.publicKey, self.name, sig, device = device))
     return HomeLinkStep(HomeLinkInviterState.AwaitingOpen(state.invite, session, m.commitment), reveal)
   }
 
@@ -105,12 +108,14 @@ internal object HomeLinkInviter {
   private fun onOpen(state: HomeLinkInviterState.AwaitingOpen, self: HomeLinkSelf, m: HomeLinkMessage.Open): HomeLinkStep<HomeLinkInviterState> {
     if (!HomeLinkPairingProof.fromPeer(state.session, m.mailbox, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     val tampered = HomeLinkStep<HomeLinkInviterState>(HomeLinkInviterState.Failed(HomeLinkFailure.TAMPERED))
-    val committed = HomeLinkPairingProof.commitment(m.key, m.nonce, m.name)
+    val domain = state.session.domain
+    if (!HomeLinkDevicePolicy.acceptsPeer(self, domain, m.device)) return tampered
+    val committed = HomeLinkPairingProof.commitment(m.key, m.nonce, m.name, domain, m.device)
     if (committed == null || !HomeLinkHash.same(HomeLinkHash.utf8(committed), HomeLinkHash.utf8(state.commitment))) return tampered
-    val text = HomeLinkPairingProof.openText(state.session, m.mailbox, self.identity.publicKey, m.nonce, m.name)
+    val text = HomeLinkPairingProof.openText(state.session, m.mailbox, self.identity.publicKey, m.nonce, m.name, m.device)
     if (m.key == self.identity.publicKey || !HomeLinkIdentity.verify(m.key, text, m.sig)) return tampered
     val safety = HomeLinkSafety.derive(self.identity.publicKey, m.key, m.nonce) ?: return tampered
-    return HomeLinkStep(HomeLinkInviterState.Comparing(HomeLinkPeer(m.name, m.key), safety))
+    return HomeLinkStep(HomeLinkInviterState.Comparing(HomeLinkPeer(m.name, m.key, m.device), safety))
   }
 }
 
@@ -119,7 +124,7 @@ internal fun <S> outOfSequence(state: S): HomeLinkStep<S> = HomeLinkStep(state, 
 /** Linking two homes, joiner side (the home that typed the code). Pure, like [HomeLinkInviter]. */
 internal object HomeLinkJoiner {
   fun start(code: HomeLinkCode, random: SecureRandom): HomeLinkJoinerState =
-      HomeLinkJoinerState.AwaitingHello(code, HomeLinkPake.start(code.secret, HomeLinkCode.mailboxId(code), random))
+      HomeLinkJoinerState.AwaitingHello(code, HomeLinkPake.start(code.secret, HomeLinkCode.mailboxId(code), random, code.domain))
 
   fun receive(state: HomeLinkJoinerState, self: HomeLinkSelf, m: HomeLinkMessage, random: SecureRandom): HomeLinkStep<HomeLinkJoinerState> = when {
     state is HomeLinkJoinerState.AwaitingHello && m is HomeLinkMessage.Hello ->
@@ -134,9 +139,11 @@ internal object HomeLinkJoiner {
     val mailbox = HomeLinkCode.mailboxId(state.code)
     if (m.mailbox != mailbox) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     val shared = HomeLinkPake.finish(state.pake, m.share) ?: return HomeLinkStep(state, ignored = HomeLinkIgnored.UNEXPECTED)
-    val session = HomeLinkSession.derive(mailbox, m.share, state.pake.share, shared)
+    val domain = state.code.domain
+    val session = HomeLinkSession.derive(mailbox, m.share, state.pake.share, shared, domain)
+    val device = HomeLinkDevicePolicy.own(self, domain) ?: return HomeLinkStep(HomeLinkJoinerState.Failed(HomeLinkFailure.TAMPERED))
     val nonce = HomeLinkHash.b64(ByteArray(HomeLinkPairingProof.NONCE_BYTES).also { random.nextBytes(it) })
-    val commitment = requireNotNull(HomeLinkPairingProof.commitment(self.identity.publicKey, nonce, self.name)) { "fresh nonce" }
+    val commitment = requireNotNull(HomeLinkPairingProof.commitment(self.identity.publicKey, nonce, self.name, domain, device)) { "fresh nonce" }
     val commit = HomeLinkPairingProof.withMac(session, HomeLinkMessage.Commit(mailbox, state.pake.share, commitment))
     return HomeLinkStep(HomeLinkJoinerState.Committing(state.code, session, nonce), commit)
   }
@@ -145,13 +152,15 @@ internal object HomeLinkJoiner {
     val mailbox = HomeLinkCode.mailboxId(state.code)
     if (!HomeLinkPairingProof.fromPeer(state.session, mailbox, m)) return HomeLinkStep(state, ignored = HomeLinkIgnored.WRONG_CODE)
     val tampered = HomeLinkStep<HomeLinkJoinerState>(HomeLinkJoinerState.Failed(HomeLinkFailure.TAMPERED))
-    if (m.key == self.identity.publicKey) return tampered
-    if (!HomeLinkIdentity.verify(m.key, HomeLinkPairingProof.revealText(state.session, mailbox, m.name), m.sig)) return tampered
+    val domain = state.session.domain
+    if (m.key == self.identity.publicKey || !HomeLinkDevicePolicy.acceptsPeer(self, domain, m.device)) return tampered
+    if (!HomeLinkIdentity.verify(m.key, HomeLinkPairingProof.revealText(state.session, mailbox, m.name, m.device), m.sig)) return tampered
     val safety = HomeLinkSafety.derive(m.key, self.identity.publicKey, state.nonce) ?: return tampered
-    val sig = self.identity.sign(HomeLinkPairingProof.openText(state.session, mailbox, m.key, state.nonce, self.name))
+    val device = HomeLinkDevicePolicy.own(self, domain) ?: return tampered
+    val sig = self.identity.sign(HomeLinkPairingProof.openText(state.session, mailbox, m.key, state.nonce, self.name, device))
     val open = HomeLinkPairingProof.withMac(state.session,
-        HomeLinkMessage.Open(mailbox, self.identity.publicKey, state.nonce, self.name, sig))
-    return HomeLinkStep(HomeLinkJoinerState.Comparing(HomeLinkPeer(m.name, m.key), safety), open)
+        HomeLinkMessage.Open(mailbox, self.identity.publicKey, state.nonce, self.name, sig, device = device))
+    return HomeLinkStep(HomeLinkJoinerState.Comparing(HomeLinkPeer(m.name, m.key, m.device), safety), open)
   }
 
   fun confirm(state: HomeLinkJoinerState, matched: Boolean): HomeLinkJoinerState = when {
@@ -159,4 +168,21 @@ internal object HomeLinkJoiner {
     matched -> HomeLinkJoinerState.Linked(state.peer)
     else -> HomeLinkJoinerState.Failed(HomeLinkFailure.MISMATCH)
   }
+}
+
+/**
+ * Device ids in the pairing messages: pinning ([HomeLinkDomain.bindsDevice]) sends and signs this
+ * Portal's household id and requires the other Portal's; linking homes sends none and refuses one.
+ */
+internal object HomeLinkDevicePolicy {
+  /** What we send: our device id when pinning, else nothing. Null if pinning without one (we can't take part). */
+  fun own(self: HomeLinkSelf, domain: HomeLinkDomain): String? = when {
+    !domain.bindsDevice -> ""
+    self.deviceId.isEmpty() -> null
+    else -> self.deviceId
+  }
+
+  /** The other side's device id is a Portal's (not ours) when pinning, and absent when linking homes. */
+  fun acceptsPeer(self: HomeLinkSelf, domain: HomeLinkDomain, device: String): Boolean =
+      if (domain.bindsDevice) HomeLinkWire.validDevice(device) && device != self.deviceId else device.isEmpty()
 }

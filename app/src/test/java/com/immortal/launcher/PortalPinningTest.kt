@@ -22,11 +22,13 @@ class PortalPinningTest {
   private val officeKey = HomeLinkIdentity.generate(random)
   private val family = PortalRosterStore(MemorySecureStore()) {}
   private val office = PortalRosterStore(MemorySecureStore()) {}
-  private val invite = HomeLinkInvite(HomeLinkCode.parse("K7M2Q9X4PA")!!, createdAt = 0L)
+  private val invite = HomeLinkInvite(HomeLinkCode.parse("PK7M2Q9X4A", HomeLinkDomain.PORTAL_PIN)!!, createdAt = 0L)
+  private val familySelf = PortalPinning.self(familyKey, "Family Area", "family-1")
+  private val officeSelf = PortalPinning.self(officeKey, "Office", "office-1")
   private val now = 1_000L
 
   private fun ceremony(typed: HomeLinkCode = invite.code) = HomeLinkLoopback.exchange(invite, typed,
-      PortalPinning.self(familyKey, "Family Area"), PortalPinning.self(officeKey, "Office"), random, now)
+      familySelf, officeSelf, random, now)
 
   @Test fun matchingPicturesPinEachOthersDeviceKey() {
     val r = ceremony()
@@ -35,14 +37,17 @@ class PortalPinningTest {
     assertEquals(i.safety, j.safety)
     val linkedI = HomeLinkInviter.confirm(i, matched = true) as HomeLinkInviterState.Linked
     val linkedJ = HomeLinkJoiner.confirm(j, matched = true) as HomeLinkJoinerState.Linked
-    assertTrue(PortalPinning.confirm(family, linkedI.peer, familyKey, now))
-    assertTrue(PortalPinning.confirm(office, linkedJ.peer, officeKey, now))
+    assertEquals("office-1", linkedI.peer.deviceId)
+    assertEquals("family-1", linkedJ.peer.deviceId)
+    assertEquals(PortalPinOutcome.PINNED, PortalPinning.confirm(family, linkedI.peer, familySelf, now))
+    assertEquals(PortalPinOutcome.PINNED, PortalPinning.confirm(office, linkedJ.peer, officeSelf, now))
+    assertEquals(officeKey.publicKey, family.roster.byDevice("office-1")!!.publicKey)
     assertEquals(officeKey.publicKey, family.roster.keyFor(HomeLinkIdentity.fingerprint(officeKey.publicKey)))
     assertEquals(familyKey.publicKey, office.roster.keyFor(HomeLinkIdentity.fingerprint(familyKey.publicKey)))
   }
 
   @Test fun aWrongCodePinsNothing() {
-    val r = ceremony(HomeLinkCode.parse("K7M2Q9X4PB")!!)
+    val r = ceremony(HomeLinkCode.parse("PK7M2Q9X4B", HomeLinkDomain.PORTAL_PIN)!!)
     assertFalse(r.inviter is HomeLinkInviterState.Comparing)
     assertFalse(r.joiner is HomeLinkJoinerState.Comparing)
     assertTrue(family.roster.isEmpty && office.roster.isEmpty)
@@ -61,8 +66,8 @@ class PortalPinningTest {
     assertFalse(HomeLinkGate.syncs(family.roster, buildSwitch = true))
     assertNull(pull())
     val r = ceremony()
-    PortalPinning.confirm(family, (r.inviter as HomeLinkInviterState.Comparing).peer, familyKey, now)
-    PortalPinning.confirm(office, (r.joiner as HomeLinkJoinerState.Comparing).peer, officeKey, now)
+    PortalPinning.confirm(family, (r.inviter as HomeLinkInviterState.Comparing).peer, familySelf, now)
+    PortalPinning.confirm(office, (r.joiner as HomeLinkJoinerState.Comparing).peer, officeSelf, now)
     assertTrue(HomeLinkGate.syncs(family.roster, buildSwitch = true))
     assertEquals(vault, pull())
   }
