@@ -156,6 +156,19 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-compact-fill { filter: blur(24px) saturate(1.1) brightness(0.55); }
 .ss-hero.ss-compact { background-position: center; }
 @keyframes compactSweep { from { transform: translateX(0); } to { transform: translateX(var(--sweep, 0px)); } }
+/* Pre-blurred backdrop: a tiny canvas scaled up (bilinear) with the dimming painted in, so no
+   live filter runs on a full-screen layer. Without canvas support the CSS blur above remains. */
+.ss-compact-fill.ss-preblur { inset: 0; filter: none; transform: none; }
+.ss-preblur-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+/* Ken Burns / Push compact: long-axis pan (transform only) or the matched photo's zoom. */
+@keyframes compactPanX { from { transform: translateX(var(--pan-from, 0px)); } to { transform: translateX(var(--pan-to, 0px)); } }
+@keyframes compactPanY { from { transform: translateY(var(--pan-from, 0px)); } to { transform: translateY(var(--pan-to, 0px)); } }
+@keyframes compactZoom { from { transform: scale(var(--z0, 1)); } to { transform: scale(var(--z1, 1.09)) translateX(var(--zx, 0%)); } }
+/* Gallery wall compact: cells never animate layout properties (left/top/width/height). */
+.ss-wall.compact .ss-gcell { transition: none; }
+/* Memories upright: the serif title of the tall collage. */
+.ss-memory-caption.upright { left: 40px; top: 34px; font-family: "Iowan Old Style", ui-serif, "Noto Serif", Georgia, serif;
+  font-weight: 400; color: #e9e1d4; text-shadow: 0 2px 10px rgba(0,0,0,.5); z-index: 5; }
 
 /* filmstrip */
 .ss-bd { position: absolute; inset: -10%; background-size: cover; background-position: center; filter: blur(24px) brightness(0.6) saturate(1.2); transform: scale(1.15); transition: opacity 1.2s ease; }

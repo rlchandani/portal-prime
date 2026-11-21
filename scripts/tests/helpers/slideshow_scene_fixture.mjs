@@ -165,10 +165,11 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
   }));
   const cursor = { i: 0 }, resolutions = [];
   const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H, ...(cls ? { cls } : {}),
-    photoMs, microMs: photoMs, motionMs: 5400, ambientMs, photoMotion, url: (photo, edge) => {
+    photoMs, microMs: photoMs, motionMs: 5400, ambientMs, photoMotion, url: (photo, edge, ...hint) => {
       const url = window.photoUrl ? window.photoUrl(photo, edge) :
         'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');
-      resolutions.push({ photo, edge, url }); return url;
+      // A compact mode may add the size it draws the photo at (the scheduler caps the decode).
+      resolutions.push(hint.length ? { photo, edge, url, drawn: hint[0] } : { photo, edge, url }); return url;
     } }, deck);
   function nodes(node = root) { return [node, ...node.children.flatMap(child => nodes(child))]; }
   function prints() { return nodes().filter(node =>
