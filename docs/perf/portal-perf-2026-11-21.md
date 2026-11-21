@@ -331,3 +331,27 @@ owner trade-off:
 3. **Shared Settings tile painters:** a contract change to `SettingsIconCache`.
 4. **Interpreted residue:** name the roughly 10 ms of interpreted callees with a debuggable build and extend
    `baseline-prof.txt`.
+
+## Screensaver (branch `ss-photo-2`)
+
+**Device:** Family Portal+. The operator test source, pinned to `smartFrame` at a 30 s beat, so only generated scenes were on screen. It opens the photo frame activity, not the dream. Each run: on Home, gfxinfo reset → enable → 44 s of polled framestats → disable (the frame goes back to Home) → meminfo at +5 s and +70 s. No screenshots. STREAM_MUSIC was set to 0 and restored to 3.
+- Before: official 1.305. After: the branch performance build, installed with its dex metadata (`speed-profile`, `install-dm`). 2 runs each.
+- Memory is TOTAL PSS / Graphics in MB.
+
+### Changes
+
+1. `SlideshowLookahead.kt` (new), used in `SlideshowLoader.load`: the next photo's decode and `prepareToDraw()` upload now wait 2 s (`SETTLE_MS`, longer than every day dissolve). Before, they ran while the published scene was dissolving in. A newer request cancels the wait at once. The lookahead is only a cache, so nothing visible changes. 6 JVM tests in `SlideshowLookaheadTest`.
+2. `CcGpuTrim` is now shared by the Control Center, the dream (`PhotoDreamService` attach / detach) and the photo frame activity (`onStart` / `onStop`). Once none of them has been on screen for 4 s, it runs one collection off the main thread and then the renderer's UI_HIDDEN trim. The collection is needed because the departed frame's photos are unreachable but nothing collects them. 1 new JVM test (one shared count).
+
+### Before / after
+
+| Run | Start, 0–25 s: frames > 32 ms (max) | Photo change, 25–38 s: frames > 32 ms of 14 (max) | Still photo, 38–44 s | Home → running → +5 s → **+70 s after leaving** |
+|---|---|---|---|---|
+| 1.305 r1 | 10 (47) | 2 (35) | 1 frame/s | 211/70 → 306/115 → 285/114 → **271/126** |
+| 1.305 r2 | 11 (51) | 7 (46) | 1 frame/s | 269/126 → 318/127 → 288/114 → **273/126** |
+| branch r1 | 11 (69) | 5 (35) | 1 frame/s | 208/49 → 289/85 → 239/84 → **240/82** |
+| branch r2 | 10 (49) | 4 (45) | 1 frame/s | 237/82 → 302/97 → 240/84 → **225/67** |
+
+- **Memory after leaving is fixed.** On 1.305, graphics stayed at 126 MB 70 s after leaving (+56 over the first Home reading). On the branch it was 82 / 67 MB at +70 s, back to the Home level. The log showed `surface closed: renderer caches trimmed` 4 s after the frame left.
+- **The photo change itself didn't reproduce here.** With generated scenes, the change had no frames over 46 ms on either build. The 64–108 ms frames in the round above came from household photos in `shuffle` mode with photo motion, which this test can't show without real photos on screen. The lookahead deferral is kept because it moves the next photo's texture upload out of the dissolve. Its effect on real photos is not measured yet.
+- **No redraws during a still photo.** With the test scenes the frame drew about once a second (the clock) between changes. The steady ~32 ms cadence in the round above is the photo motion (Ken Burns property animators run for the whole dwell when motion is on). That is by design, so it was left unchanged.
