@@ -63,9 +63,9 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
   }
   val items = remember(filter, active, resolved, s.entitiesVersion, s.plan, s.connection.canControl, s.minute) {
     val roomOf: (String) -> String? = { id -> s.plan?.roomOf(id)?.id }
-    CcAlertRules.list(filter, active, resolved).map { (a, on) ->
+    CcAlertRules.named(CcAlertRules.list(filter, active, resolved).map { (a, on) ->
       CcAlertRules.item(a, on, s.entities, roomOf, s.connection.canControl, System.currentTimeMillis(), ::ccTime)
-    }
+    })
   }
   val onOp = remember(ui) { { item: CcAlertItem -> runOp(ui, item) } }
   if (currentLayoutClass().compactPortrait) {
@@ -142,7 +142,7 @@ private fun AlertCard(item: CcAlertItem, onOp: (CcAlertItem) -> Unit) {
     if (!item.active) CcTag("Resolved", CcTone.GREEN)
     else item.label?.let { label ->
       val click = remember(item, onOp) { { onOp(item) } }
-      SmallButton(label, CcSpeech.alertAction(a.title, label), item.danger, item.enabled, click)
+      SmallButton(label, item.spoken ?: CcSpeech.alertAction(a.title, label), item.danger, item.enabled, click)
     }
   }
 }

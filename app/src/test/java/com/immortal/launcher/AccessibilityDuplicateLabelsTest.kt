@@ -82,4 +82,33 @@ class AccessibilityDuplicateLabelsTest {
     }
     assertDistinct("Control Center alerts", alerts)
   }
+
+  // Family's Home Assistant gives one office sensor three entities that all read the same alert.
+  private fun officeDoor(n: Int) = CcAlert("binary_sensor.office_$n@7", CcSeverity.WARNING, CcKind.DOOR, "binary_sensor.office_$n",
+      "Rohit's Office door is open", "Open 13 days", 7L, CcAlertAction.REMIND)
+
+  @Test fun identicalAlertsAreNumbered_onlyWhenTheyRepeat() {
+    assertEquals(listOf(", 1 of 3", "", ", 2 of 3", ", 3 of 3"), CcSpeech.repeatSuffixes(listOf("a", "b", "a", "a")))
+    assertEquals(listOf("", ""), CcSpeech.repeatSuffixes(listOf("a", "b")))
+    assertEquals(emptyList<String>(), CcSpeech.repeatSuffixes(emptyList()))
+  }
+
+  @Test fun overviewAttentionRowsFromOneSensorAreToldApart() {
+    val garage = CcAlert("cover.garage@1", CcSeverity.WARNING, CcKind.GARAGE, "cover.garage", "Garage door is open", "Open 5 min", 1L,
+        CcAlertAction.CLOSE)
+    val slice = CcSideLogic.attention(listOf(officeDoor(1), officeDoor(2), officeDoor(3), garage), emptyMap(), null,
+        ControlCenterConfig.Settings())
+    assertEquals(listOf(", 1 of 3", ", 2 of 3", ", 3 of 3", ""), slice.rows.map { it.repeat })
+    assertDistinct("Control Center overview", slice.rows.map { CcSpeech.row(it.alert.title, it.alert.body) + it.repeat })
+  }
+
+  @Test fun alertsScreenButtonsFromOneSensorAreToldApart() {
+    val now = 1_000_000_000L
+    val items = CcAlertRules.named((1..3).map { CcAlertRules.item(officeDoor(it), true, emptyMap(), { null }, true, now, { "2:33 pm" }) })
+    assertEquals("Rohit's Office door is open · ${items[0].label}, 1 of 3", items[0].spoken)
+    assertDistinct("Control Center Alerts", items.map { it.spoken.orEmpty() })
+    // A single alert keeps the plain name.
+    val one = CcAlertRules.named(listOf(CcAlertRules.item(officeDoor(1), true, emptyMap(), { null }, true, now, { "2:33 pm" })))
+    assertEquals("Rohit's Office door is open · ${one[0].label}", one[0].spoken)
+  }
 }

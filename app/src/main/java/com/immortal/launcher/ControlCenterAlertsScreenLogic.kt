@@ -38,6 +38,8 @@ internal data class CcAlertItem(
     val danger: Boolean,
     val enabled: Boolean,
     val op: CcAlertOp?,
+    /** The button's screen-reader name, "Office door is open · Remind 10 pm" (numbered by [CcAlertRules.named]). */
+    val spoken: String? = label?.let { CcSpeech.alertAction(alert.title, it) },
 )
 
 /** Pure Alerts screen rules (unit tested): snooze/remind times, button labels, the water valve. */
@@ -134,6 +136,12 @@ internal object CcAlertRules {
     }
     val enabled = op !is CcAlertOp.Act || canControl
     return CcAlertItem(alert, active, icon, line, op?.let { label(alert.action, now, zone) }, alert.severity == CcSeverity.CRITICAL, enabled, op)
+  }
+
+  /** Numbers buttons that would read the same ("…, 2 of 3"): one sensor can raise several identical alerts. */
+  fun named(items: List<CcAlertItem>): List<CcAlertItem> {
+    val repeats = CcSpeech.repeatSuffixes(items.map { it.spoken.orEmpty() })
+    return items.mapIndexed { i, item -> if (item.spoken == null || repeats[i].isEmpty()) item else item.copy(spoken = item.spoken + repeats[i]) }
   }
 
   /** "2:33 pm" today; "Sat 7 Nov 2:33 pm" on any other day, so an old alert's time isn't read as today's. */

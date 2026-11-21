@@ -110,4 +110,18 @@ internal object CcSpeech {
    * A trailing "…" (the visible confirm hint) is not spoken.
    */
   fun alertAction(title: String, action: String): String = "$title · ${action.removeSuffix("…")}"
+
+  /**
+   * ", 1 of 3" for each copy of a name heard more than once in [names], "" otherwise. Home Assistant
+   * can give one sensor several entities that all read "Office door is open"; the cards stay as drawn
+   * and a listener still hears them apart.
+   */
+  fun repeatSuffixes(names: List<String>): List<String> {
+    val total = names.groupingBy { it }.eachCount()
+    val seen = HashMap<String, Int>()
+    return names.map { name ->
+      val of = total.getValue(name)
+      if (of == 1) "" else ", ${seen.merge(name, 1, Int::plus)} of $of"
+    }
+  }
 }
