@@ -31,6 +31,8 @@ internal class FleetActionApi(private val actions: FleetActions) {
         json(200, ok().put("action", "identify"))
       }
       "settings_sync" -> settingsSync(body)
+      "ha_adopt" -> haAdopt(body)
+      "ha_peers" -> json(200, ok().put("action", "ha_peers").put("peers", actions.haPeers()))
       // Opens the Home Control Center (optionally on a screen: map, cameras, tesla, alerts,
       // security, edit, settings) — for remote checks and on-device measurement.
       "open_control_center" -> {
@@ -68,6 +70,21 @@ internal class FleetActionApi(private val actions: FleetActions) {
     val out = ok().put("action", "settings_sync").put("sync", actions.settingsSyncStatus())
     if (body.optString("op") == "values") out.put("values", actions.settingsSyncValues())
     return json(200, out)
+  }
+
+  /**
+   * Use another household Portal's Home Assistant connection: {"from":"<device id or Portal name>"}
+   * (+ "replace":true to swap out a different saved connection). The connection is validated with
+   * Home Assistant before it is saved. The reply carries the outcome and the peer's name only —
+   * never the address or token.
+   */
+  private fun haAdopt(body: JSONObject): FleetHttpServer.Response {
+    val from = (body.opt("from") as? String)?.trim()?.takeIf { it.length in 1..MAX_PEER_REF }
+        ?: return json(400, err("bad_from"))
+    val outcome = actions.haAdopt(from, replace = body.optBoolean("replace", false))
+    return json(200, JSONObject().put("ok", outcome.result.ok).put("action", "ha_adopt")
+        .put("result", outcome.result.wire).put("from", outcome.peerName ?: JSONObject.NULL)
+        .put("validated", outcome.validated))
   }
 
   /**
@@ -188,6 +205,8 @@ internal class FleetActionApi(private val actions: FleetActions) {
     const val DEFAULT_TEST_SOURCE_MINUTES = 30
     const val DEFAULT_PIN_INTERVAL_SEC = 30
     const val SETTINGS_SCREEN = "settings"
+    /** A device id (≤ 64) or a Portal name (≤ 40 after cleaning) for `ha_adopt`. */
+    const val MAX_PEER_REF = 64
     val SYNC_OPS = setOf("status", "values", "pause", "resume", "adopt", "keep", "rejoin")
     val ORIENTATIONS = setOf("portrait", "landscape", "reverse_landscape", "auto", "forget")
     val CC_TEST_PLANS = setOf("load", "clear")

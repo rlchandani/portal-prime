@@ -32,6 +32,7 @@ Limits are the body cap and, for clients, the reply cap.
 | `POST /remote/settingspeer` | HH | 256 KiB | Same | Header gate first |
 | `POST /remote/musicpeer` | HH | 1 KiB | Same | Header gate first |
 | `POST /remote/callpeer` | HH | 64 KiB | Same | Header gate first |
+| `POST /remote/hapeer` (branch `ha-share`) | HH (header first); the requester must be a Portal heard on the bus, calling from the LAN address it announced; never a phone id | 256 B body, 8 KiB reply; 3 shares per Portal and 6 in all per 10 min; 30 probes/min | - | New. Off (`404`) while the source has no HA connection. The token is sealed per requester and nonce |
 | `POST /remote/callmsg` | HH (header first) | sealed length must equal Content-Length; size, free space, 1 upload, deadline | OK | Unchanged |
 | `/remote/call/poll,send,offer` | Session + HH | 48 KiB; 2 parked long-polls | OK | Unchanged (the phone's chosen name is no longer logged) |
 | `/remote/call/msg{,/get,/ack}` | Session + HH | streamed and capped; 1 KiB | OK | Unchanged |
@@ -41,6 +42,7 @@ Limits are the body cap and, for clients, the reply cap.
 | ReminderSync reply (client) | HH-signed, sealed | 2 MiB | Capped (fixed in 1.270) | `BoundedRead` (adds the time budget) |
 | MusicHandoffNet queue (client) | HH-signed reply | 2x codec cap | Capped | `BoundedRead` |
 | SettingsSyncNet reply (client) | HH-signed reply | 256 KiB | Capped | `BoundedRead` |
+| HaShareClient reply (client) | HH-signed reply, sealed | 8 KiB (1 KiB error body) | - | `BoundedRead`; a reply that fails its signature or seal is dropped |
 | CallMessageSender ack and error (client) | HH-signed ack | 16 KiB | Capped, but silently truncated | `BoundedRead`; an oversized reply is refused |
 | Intercom TCP (LanAudio) | HH handshake with deadline | 4 KiB frames; handshake and listener slots | OK | Unchanged |
 | `/remote/*` session routes (list, chores, reminders, timers, dinner, CC, ...) | Session (+ remote enabled for companion routes) | 256 KiB companion; 1 MiB legacy; CC per-caller limiter | Bodies read after auth; JSON parse failures give 400 | Server-level head/body/drain budgets now apply |
@@ -205,6 +207,103 @@ On Family (Portal+, over the fleet route with its token), this build (performanc
 | `/fs/write` into `databases`, `files`, `no_backup`, `/data/user_de/0/<pkg>`, the fleet manifest | - | 403 `protected_path` each |
 | `/fs/write` through an adb-made symlink in `/data/local/tmp` pointing at `shared_prefs` | - | 500 `Permission denied` (the app can't traverse the shell's directory; nothing written). The symlink case itself is covered on the JVM |
 | `/fs/write` to `/sdcard/Download` and to `Android/data/<pkg>/files/dev` (dev APK location), then `/fs/read` | - | 200, content read back; probe files deleted |
+
+### Home Assistant connection hand-off (branch `ha-share`, on top of 1.293)
+
+Settings sync never copies secrets, so a Portal could only get a Home Assistant connection from
+someone typing the URL and token into it. This adds one explicit path for that:
+"Use <Portal>'s connection" in Settings › Home Assistant, and the operator action `ha_adopt`.
+
+**Wire (`HaShareWire`).** `POST /remote/hapeer` carries a fresh `ha_share` household message in
+`X-Immortal-Household`. It pins the SHA-256 of the 20-byte body `{v:1, op:"probe"|"share"}`. The
+reply `{payload, sig}` is HMAC-signed over `ha_share_reply|<request nonce>|payload`. A `probe`
+returns only the source's name and that it is connected. A `share` returns
+`{v, fn, s = hex(iv ‖ AES-256-GCM(ct+tag))}` of `{u, t}`. The AES key is
+`HMAC-SHA256(householdKey, "hearthpane-ha-share|v1|key|<requester>|<nonce>")`, so it is new for
+every request and every requesting Portal. The AAD is `hearthpane-ha-share|v1|<requester>|<source>|<nonce>`.
+A reply sealed for one Portal, or for one nonce, does not open for any other. LAN HTTP is plain
+text, so the seal is the only thing protecting the token in transit.
+
+**Source gate (`HaShareRoute`), in order:**
+1. `POST` only. The body must be 1..256 bytes.
+2. A household key must exist.
+3. `PeerRequestGate` checks the header before the body is read.
+4. `verifyRequest`: replay guard, body pin, not ourselves, a known op and version.
+5. The requester must not be a paired-phone id. Phones hold the household key too, and the token
+   never goes to the phone side.
+6. The requester must be a Portal this one has heard in a signed `call_hello`, calling **from the
+   LAN address that hello announced** (`403 unknown_peer`). Without this, anything that holds the
+   household key (a phone, the PWA) could claim a Portal's id from its own address.
+7. The source must be connected to Home Assistant (`404 not_connected`).
+8. Rate limits: 3 shares per Portal and 6 in all per 10 minutes, 30 probes a minute (`429`).
+
+Each share and each refusal of a signed request is logged by device id. The token and the HA
+address are never logged.
+
+**Target (`HaShareClient`, `HaAdoption`).**
+- It only contacts RFC 1918 hosts on ports 1024 and up, taken from the signed hello roster.
+- The reply is read through `BoundedRead` (8 KiB). The signature is checked, then the seal is
+  opened. Anything else is dropped as `invalid_reply`.
+- The connection is then checked against HA's own `GET /api/` with the token. It is saved only on
+  `{"message": "API running."}`.
+- If it matches the saved connection (constant-time compare), the result is `unchanged` and
+  nothing is written.
+- A different saved connection is replaced only with `"replace": true` (fleet only; Settings offers
+  the hand-off only while this Portal isn't connected).
+- On a `403 unknown_peer`, the target re-announces itself on the bus and retries once.
+- Saving goes through `HaConfig.setConnection`. It then restarts the Control Center (alerts and
+  banners) and the doorbell listener, and refreshes the Home Control tile inventory.
+  `HaConfig.revision` refreshes the header button and the HA widget while Home is on screen. The
+  same tile refresh was added to the manual "Save & connect" path, which previously waited for the
+  next package change.
+
+**Fleet.**
+- `POST /action {"action":"ha_adopt","from":"<device id or Portal name>"[,"replace":true]}` returns
+  `{ok, action, result, from: <peer name>, validated}` and nothing else.
+- `{"action":"ha_peers"}` lists `[{id, name}]` of the connected household Portals.
+- Both sit behind the fleet bearer token. Neither is reachable from `/remote/*`, and no `/remote/*`
+  route reads the token.
+
+| # | Finding (review of this surface) | Status | Fix |
+|---|---|---|---|
+| 16 | **High (availability): `offers()` probed peers one after another.** `ha_peers`, and the Settings probe, could hold one of the server's 6 threads for 8 peers × (two 8 s round trips + 1.5 s settle) | Fixed | Probes run in parallel (at most 4) with a 20 s overall budget |
+| 17 | Medium: a household-key holder that is not a Portal (a phone) could claim a Portal id | Fixed in design | Phone ids are refused, and the requester must call from the address its signed hello announced |
+| 18 | Low: `normalizedAddress` stripped a `/` prefix that `hostAddress` never produces | Fixed | Removed |
+| 19 | Info: `Http` logs the HA base URL (not the token) when a validation call fails | Accepted | Same as the existing manual connect path. The token travels only in the `Authorization` header |
+| 20 | Residual: a LAN attacker who holds the household key *and* can take over a household Portal's IP (ARP spoofing) could receive the token | Open (trust model) | Same household-key trust model as every other peer route. Per-device keys would close it |
+
+Tests:
+- `HaShareWireTest` (12): the seal opens only for the same key, requester, source and nonce;
+  there is no clear text on the wire; a fresh IV per seal; tamper, size and version are refused;
+  the per-request key derivation; URL and token shape; a redacted `toString`; constant-time
+  `same`; the signed, pinned, single-use request; another route's header is not accepted; the
+  reply is bound to the nonce.
+- `HaShareRouteTest` (16): the real client posts into the real route. Unsigned and forged requests
+  are refused before the body is read; method and size; replay; phone; unknown Portal; wrong
+  address; IPv4-mapped address; off while not connected; per-Portal and total share limits and
+  window expiry; the probe limit; no token or address in any log; the client refuses non-LAN
+  peers and forged replies; a reply meant for another requester; error-code sanitising.
+- `HaAdoptionTest` (13): validation before save; `unchanged`; `replace`; id/name/ambiguous
+  resolution; the re-announce retry (once); failure mapping; offers in parallel; the candidate
+  filter; HA's `/api/` answer.
+- `FleetActionApiTest` (+3): `bad_from`, reply keys, a failure is not ok, `ha_peers` keys.
+
+`:app:testDebugUnitTest`: 8,572 tests, 0 failures (rebased on 1.293). `:app:assemblePerformance`: passes.
+
+On the devices, with this build (performance APK, sha256 `3bade445...a95d21ee`) on Family (the
+source, over USB) and Living (the target, over the fleet dev path), then both restored to official
+1.293 (sha256 `c59f12e9...aefa248d`, matching the release manifest), with dev mode off:
+
+| Check | Result |
+|---|---|
+| Living `ha_peers` | `[Family Area]`: a signed probe reached Family, which answered connected |
+| Living `ha_adopt {"from":"Family Area"}` (Living was already on the same HA) | `{"ok":true,"result":"unchanged","validated":true}` in 0.3 s. Living opened the seal, HA's `/api/` accepted the token, and the constant-time compare found it identical to Living's saved token. Token fingerprints match, and none was printed |
+| Family log | One line: `shared the Home Assistant connection with <Living's device id>` |
+| Unsigned / forged header / `GET` to Family's `/remote/hapeer` | `401` / `401` / `405` |
+| logcat on both: JWT-like strings or `Bearer ` | 0 and 0; no FATAL |
+| Official 1.293 after restore | `/remote/hapeer` is `404 not_found`; `ha_peers` is `unknown_action` |
+
+The Mini was not touched.
 
 ### Still open
 

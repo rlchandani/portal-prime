@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,6 +81,9 @@ internal object HomeControlDotStore {
 internal fun rememberHomeControlShown(context: Context = LocalContext.current): Boolean {
   val shown = remember { mutableStateOf(homeControlShown(context)) }
   OnResume { shown.value = homeControlShown(context) }
+  // A connection adopted while Home is on screen shows the button without waiting for a resume.
+  val haRevision by HaConfig.revision.collectAsState()
+  LaunchedEffect(haRevision) { shown.value = homeControlShown(context) }
   return shown.value
 }
 

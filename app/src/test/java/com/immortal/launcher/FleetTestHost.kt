@@ -116,6 +116,9 @@ internal class FleetTestHost : FleetDevice, FleetSettings, FleetPackages, FleetA
   override fun settingsSync(op: String) = note("sync:$op")
   override fun settingsSyncStatus() = JSONObject().put("phase", "JOINED")
   override fun settingsSyncValues() = JSONObject().put("screensaver.fit", "fill")
+  var haOutcome = HaAdoption.Outcome(HaAdoption.Result.ADOPTED, "Family Area", validated = true)
+  override fun haAdopt(from: String, replace: Boolean): HaAdoption.Outcome { note("haAdopt:$from:$replace"); return haOutcome }
+  override fun haPeers(): org.json.JSONArray { note("haPeers"); return org.json.JSONArray().put(JSONObject().put("id", "fam-1").put("name", "Family Area")) }
   override fun openControlCenter(screen: String): Boolean { note("controlCenter:$screen"); return openResult }
   override fun remoteEnabled() = remoteEnabled
   override fun mintTestSession(householdGrant: Boolean): String { note("mint:$householdGrant"); return "session-token" }
