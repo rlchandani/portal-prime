@@ -106,6 +106,21 @@ class MemoryHealthPolicyTest {
     assertFalse("Broken" in parsed)
   }
 
+  @Test fun ownPssComesFromTheSmapsRollupPssLineOnly() {
+    // Debug.getPss() also asks the memtrack HAL, which SELinux denies an app on a Portal, so the
+    // framework logged "failed to get memory consumption info: -1" on every sample.
+    val rollup = """
+        12c00000-7fdda63000 ---p 00000000 00:00 0                                [rollup]
+        Rss:              334356 kB
+        Pss:              264357 kB
+        Pss_Anon:         170000 kB
+        Shared_Clean:      67508 kB
+    """.trimIndent()
+    assertEquals(264357L, MemoryHealthPolicy.parseOwnPssKb(rollup))
+    assertEquals(null, MemoryHealthPolicy.parseOwnPssKb("Rss: 12 kB\nPss: 0 kB"))
+    assertEquals(null, MemoryHealthPolicy.parseOwnPssKb(""))
+  }
+
   @Test fun theNewestSystemServerAmPssLineWinsAndOtherProcessesAreIgnored() {
     val events = """
         --------- beginning of events
