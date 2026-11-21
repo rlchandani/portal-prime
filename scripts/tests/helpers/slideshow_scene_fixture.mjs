@@ -22,7 +22,7 @@ const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, decl
 
 export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, changingUrls = false,
   mode = 'framed', W = 2160, H = 1440, ambientMs = 3500, random = .5, photoMotion,
-  configureWindow } = {}) {
+  configureWindow, cls } = {}) {
   let now = 0, nextId = 1, deferred = deferLoad;
   const pending = new Map(), loads = [], writes = [];
   function schedule(fn, ms) {
@@ -115,6 +115,14 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
       child.parent = this; this.children.push(child); return child;
     }
     get parentNode() { return this.parent; }
+    get firstChild() { return this.children[0] || null; }
+    insertBefore(child, before) {
+      if (child.parent) child.parent.children = child.parent.children.filter(node => node !== child);
+      child.parent = this;
+      const at = before ? this.children.indexOf(before) : -1;
+      if (at < 0) this.children.push(child); else this.children.splice(at, 0, child);
+      return child;
+    }
     remove() {
       if (this.parent) this.parent.children = this.parent.children.filter(node => node !== this);
       this.parent = null;
@@ -156,7 +164,7 @@ export function createSceneFixture({ photoMs = 5000, deferLoad = false, photos, 
     seed: 'generated-' + i, w: i % 2 ? 1000 : 1600, h: i % 2 ? 1600 : 1000,
   }));
   const cursor = { i: 0 }, resolutions = [];
-  const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H,
+  const cleanup = window.SS.MODES[mode].run({ root, cursor, W, H, ...(cls ? { cls } : {}),
     photoMs, microMs: photoMs, motionMs: 5400, ambientMs, photoMotion, url: (photo, edge) => {
       const url = window.photoUrl ? window.photoUrl(photo, edge) :
         'generated://' + photo.seed + (changingUrls ? '-r' + (resolutions.length + 1) : '');

@@ -131,6 +131,51 @@
     });
     return boxes;
   };
+  // ---- Screen-aware layout (mock mini-screensaver-20261120) ----------------------------------
+  // The layout class comes from the window size in CSS px (= dp here), never the device model,
+  // and mirrors LayoutClass.kt: a short side under 1000 is compact. "L" (the Portal+) is every
+  // shipped layout, unchanged; "CP" is the Portal Mini upright, "CL" the Mini turned.
+  const COMPACT_SHORT_SIDE = 1000;
+  window.SS.layoutClass = function (W, H) {
+    if (!(W > 0 && H > 0) || Math.min(W, H) >= COMPACT_SHORT_SIDE) return "L";
+    return H > W ? "CP" : "CL";
+  };
+  // Cinema's letterbox bars make no sense on a tall screen: upright it is hidden, and Panorama
+  // drift (the best tall-screen treatment of wide material) stands in for it.
+  window.SS.poolFor = function (cls, ids) {
+    return cls === "CP" ? ids.filter((id) => id !== "cinema") : ids;
+  };
+  window.SS.modeFor = function (cls, id) {
+    return cls === "CP" && id === "cinema" ? "panorama" : id;
+  };
+  // One photo on a compact screen: full-bleed when the cover crop keeps >= 80 % of it, a sweep
+  // at full height for a panorama, otherwise whole over its own blurred backdrop in the zone
+  // (raised clear of the clock upright). Mirrors ScreensaverLayout.single/wholeZone.
+  window.SS.compactSingle = function (photoAspect, W, H, cls) {
+    const a = Number.isFinite(photoAspect) && photoAspect > 0 ? photoAspect : 1;
+    const va = W / H, keep = Math.min(a / va, va / a);
+    if (keep >= 0.8) return { mode: "fill", rect: { x: 0, y: 0, w: W, h: H } };
+    if (a > 2) { const h = H, w = h * a; return { mode: "sweep", rect: { x: 0, y: 0, w, h }, travel: W - w }; }
+    const zone = cls === "CP" ? { x: 32, y: 40, w: W - 64, h: H - 330 } : { x: 64, y: 40, w: W - 128, h: H - 80 };
+    const s = Math.min(zone.w / a, zone.h) > 0 ? Math.min(zone.w / a, zone.h) : 1;
+    const w = s * a, h = s;
+    return { mode: "whole", zone, rect: { x: zone.x + (zone.w - w) / 2, y: zone.y + (zone.h - h) / 2, w, h } };
+  };
+  // Upright: two landscapes stacked, each the full width (a 3:2 photo keeps 83 %).
+  window.SS.stackable = function (p) {
+    const a = p && p.w / p.h;
+    return Number.isFinite(a) && a >= 1.2 && a <= 2;
+  };
+  // Vertical filmstrip (upright): cards sized by width so the selected 1.12x card fits the
+  // screen width minus 96 and half its height; mirrors FilmstripGeometry.layout(vertical = true).
+  window.SS.verticalCard = function (photoAspect, W, H) {
+    const a = Number.isFinite(photoAspect) && photoAspect > 0 ? photoAspect : 1;
+    let w = (W - 96) / 1.12, h = w / a;
+    const maxH = H * 0.5 / 1.12;
+    if (h > maxH) { h = maxH; w = h * a; }
+    return { w, h };
+  };
+
   window.SS.bucket = bucket;
   window.SS.counts = counts;
   window.SS.APPETITE = APPETITE;
@@ -139,9 +184,10 @@
 
   // Scheduler: given the enabled-mode list + the pool, pick the next mode. Avoids repeating the
   // immediately-previous mode, and only picks modes whose appetite the pool satisfies.
-  window.SS.pickNextMode = function (enabled, pool, prev) {
+  // [cls] (optional, default "L") applies the screen's pool: upright Cinema never runs.
+  window.SS.pickNextMode = function (enabled, pool, prev, cls) {
     const c = counts(pool);
-    let candidates = enabled.filter((id) => APPETITE[id] && APPETITE[id](c));
+    let candidates = window.SS.poolFor(cls || "L", enabled).filter((id) => APPETITE[id] && APPETITE[id](c));
     if (candidates.length > 1 && prev) candidates = candidates.filter((id) => id !== prev);
     if (!candidates.length) return "kenBurns"; // universal fallback
     return candidates[Math.floor(Math.random() * candidates.length)];

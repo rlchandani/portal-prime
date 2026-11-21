@@ -17,8 +17,11 @@ internal object FilmstripGeometry {
   /** Unscaled size and center offset measured from the track's left edge. */
   data class Card(val width: Float, val height: Float, val offset: Float)
 
-  /** Width and height describe the viewport, rather than the complete track. */
-  data class Layout(val width: Float, val height: Float, val cards: List<Card>)
+  /**
+   * Width and height describe the viewport, rather than the complete track. A [vertical] strip
+   * (the upright Portal Mini) runs top to bottom: offsets are along Y and the track moves in Y.
+   */
+  data class Layout(val width: Float, val height: Float, val cards: List<Card>, val vertical: Boolean = false)
 
   data class Appearance(val scale: Float, val opacity: Float, val brightness: Float)
 
@@ -34,6 +37,10 @@ internal object FilmstripGeometry {
   fun cardPixelBounds(layout: Layout, index: Int, density: Float): PixelBounds? {
     if (!valid(layout) || index !in layout.cards.indices || !positive(density)) return null
     val card = layout.cards[index]
+    if (layout.vertical) return PixelBounds(((layout.width-card.width)/2f*density).roundToInt(),
+        ((layout.height/2f+card.offset-card.height/2f)*density).roundToInt(),
+        (card.width*density).roundToInt().coerceAtLeast(1),
+        (card.height*density).roundToInt().coerceAtLeast(1))
     return PixelBounds(((layout.width/2f+card.offset-card.width/2f)*density).roundToInt(),
         ((layout.height-card.height)/2f*density).roundToInt(),
         (card.width*density).roundToInt().coerceAtLeast(1),
@@ -53,9 +60,26 @@ internal object FilmstripGeometry {
   private val dimmed = Appearance(.7f, .4f, .55f)
   private val selected = Appearance(1.12f, 1f, 1f)
 
+  /** The selected card's scale; a vertical card is sized so the selected one still fits. */
+  private const val SELECTED_SCALE = 1.12
+
+  /**
+   * Upright (vertical) card: the selected 1.12x card is at most the width minus 96 and half the
+   * height (mock), so a 3:2 card is the screen's width rather than 1271 dp on an 800 dp screen.
+   * Mirrors SS.verticalCard in modes.js.
+   */
+  fun verticalCard(width: Double, height: Double, aspect: Double): Pair<Double, Double> {
+    var w = (width - 96.0) / SELECTED_SCALE
+    var h = w / aspect
+    val maxH = height * .5 / SELECTED_SCALE
+    if (h > maxH) { h = maxH; w = h * aspect }
+    return w to h
+  }
+
   /** Reject invalid inputs or geometry that cannot be represented by finite positive Floats. */
-  fun layout(width: Float, height: Float, aspects: List<Float>): Layout? {
+  fun layout(width: Float, height: Float, aspects: List<Float>, vertical: Boolean = false): Layout? {
     if (!positive(width) || !positive(height) || aspects.size !in 1..MAX_CARDS) return null
+    if (vertical) return verticalLayout(width, height, aspects)
     // Double intermediates match the JS arithmetic before the final Float boundary.
     val cardHeight = height.toDouble() * HEIGHT_FRACTION
     val roundedHeight = cardHeight.toFloat()
@@ -72,6 +96,21 @@ internal object FilmstripGeometry {
       left += cardWidth + GAP
     }
     return Layout(width, height, cards)
+  }
+
+  private fun verticalLayout(width: Float, height: Float, aspects: List<Float>): Layout? {
+    if (width <= 96f) return null
+    val cards = ArrayList<Card>(aspects.size)
+    var top = 0.0
+    for (aspect in aspects) {
+      if (!positive(aspect)) return null
+      val (w, h) = verticalCard(width.toDouble(), height.toDouble(), aspect.toDouble())
+      val offset = (top + h / 2.0).toFloat()
+      if (!positive(w.toFloat()) || !positive(h.toFloat()) || !positive(offset)) return null
+      cards.add(Card(w.toFloat(), h.toFloat(), offset))
+      top += h + GAP
+    }
+    return Layout(width, height, cards, vertical = true)
   }
 
   /** Initial CSS pose before the first center transition; requires a valid layout. */
@@ -116,8 +155,9 @@ internal object FilmstripGeometry {
     val scale = state.appearances[index].scale.toDouble()
     val width = card.width.toDouble() * scale
     val height = card.height.toDouble() * scale
-    val centerX = layout.width.toDouble() / 2.0 + card.offset.toDouble() - state.trackOffset
-    val centerY = layout.height.toDouble() / 2.0
+    val along = card.offset.toDouble() - state.trackOffset
+    val centerX = layout.width.toDouble() / 2.0 + if (layout.vertical) 0.0 else along
+    val centerY = layout.height.toDouble() / 2.0 + if (layout.vertical) along else 0.0
     val rect = Rect((centerX - width / 2.0).toFloat(), (centerY - height / 2.0).toFloat(),
         width.toFloat(), height.toFloat())
     return rect.takeIf { it.left.isFinite() && it.top.isFinite() &&
