@@ -93,6 +93,7 @@ class SettingsDomainTest {
   fun slideshowControls_gateIdenticallyForDeviceAndRemote_withoutClearingStoredChoices() {
     val prefs = ScreensaverTestPrefs(mapOf("photo_motion" to false, "keep_people_in_frame" to false))
     val nativeControls = setOf("photo_motion", "keep_people_in_frame")
+    val fitStyles = setOf("smartFrame", "portraitPair", "classic")
     val expected = mapOf(
         "smartFrame" to nativeControls,
         "portraitPair" to nativeControls,
@@ -125,7 +126,7 @@ class SettingsDomainTest {
       val values = SettingsDomains.screensaver.flatJson(snapshot)
       assertFalse(values.getBoolean("photo_motion"))
       assertFalse(values.getBoolean("keep_people_in_frame"))
-      assertEquals("fit must only affect Classic", mode == "classic", "fit" in controls)
+      assertEquals("fit row for $mode", mode in fitStyles, "fit" in controls)
     }
     prefs.edit().putString("mode", "smartFrame").putBoolean("enabled", false).apply()
     assertTrue(slideshowControls(prefs).keys.intersect(nativeControls + "mode").isEmpty())

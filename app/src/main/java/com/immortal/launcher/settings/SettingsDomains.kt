@@ -26,6 +26,7 @@ import com.immortal.launcher.FleetCalendar
 import com.immortal.launcher.FleetConfig
 import com.immortal.launcher.FleetScreensaver
 import com.immortal.launcher.FrameMode
+import com.immortal.launcher.PhotoFitPolicy
 import com.immortal.launcher.PhotoFramePreviewActivity
 import com.immortal.launcher.ScreensaverDismiss
 import com.immortal.launcher.ScreensaverDismissAppActivity
@@ -300,8 +301,8 @@ object SettingsDomains {
                       // set it. (Was network-album-only: !s.usesFolder && source != DEFAULT.)
                       visible = { _, _ -> false },
                       scope = SettingScope.HOUSEHOLD),
-                  // Fit only affects Classic. The native stage and engine styles own their framing.
-                  // Photo interval drives all renderers, so it stays visible.
+                  // Fit shows only for styles that honour it (PhotoFitPolicy: Smart frame, Portrait
+                  // pair, Classic). Photo interval drives all renderers, so it stays visible.
                   EnumSpec(
                       "fit",
                       "Fit",
@@ -310,7 +311,7 @@ object SettingsDomains {
                       options =
                           listOf(ScreensaverConfig.FIT_FILL to "Fill", ScreensaverConfig.FIT_FIT to "Fit"),
                       coerce = { FleetScreensaver.coerceFit(it) },
-                      visible = { _, s -> s.enabled && s.mode == ScreensaverConfig.MODE_CLASSIC },
+                      visible = { _, s -> s.enabled && PhotoFitPolicy.honoursFit(s.mode) },
                       scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "intervalSec",
