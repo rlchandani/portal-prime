@@ -43,6 +43,12 @@ internal object SettingsSync {
   @Volatile private var installed = false
   @Volatile private var core: SettingsSyncCore? = null
   private val pausedFlag = AtomicBoolean(false)
+
+  /**
+   * Wall clock (epoch ms) for everything the sync stamps: peer sightings, record and sync times,
+   * the peer route's signatures. A seam so tests can replace it with a deterministic clock.
+   */
+  @Volatile internal var clock: () -> Long = System::currentTimeMillis
   private val _status = MutableStateFlow(SettingsSyncStatus())
   val status: StateFlow<SettingsSyncStatus> = _status.asStateFlow()
 
@@ -51,7 +57,7 @@ internal object SettingsSync {
   private fun core(context: Context): SettingsSyncCore = core ?: synchronized(this) {
     core ?: context.applicationContext.let { c ->
       SettingsSyncCore(CatalogSyncSettings(c), AndroidSyncHost(c), AndroidSyncBus(c), { host, port, body -> SettingsSyncNet.post(c, host, port, body) },
-          HandlerSyncTimers { main }, AndroidSyncLog(TAG), System::currentTimeMillis, worker, net, _status, pausedFlag)
+          HandlerSyncTimers { main }, AndroidSyncLog(TAG), { clock() }, worker, net, _status, pausedFlag)
     }.also { core = it }
   }
 

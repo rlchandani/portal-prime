@@ -18,6 +18,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Collections
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONObject
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
@@ -58,12 +59,22 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     Mockito.doAnswer { SyncGoldenMain.remove(it.getArgument(0)); null }.`when`(h).removeCallbacks(Mockito.any())
   }
   private val appliedHook = SettingsDomain.valuesApplied
+  private val realClock = SettingsSync.clock
+  private val ticks = AtomicLong(CLOCK_START_MS)
+
+  /**
+   * The sync's clock: a fixed start that moves on 1 ms per read. The real clock let two peer
+   * sightings share a millisecond, and peers are listed most recently seen first, so a tie flipped
+   * their order at random. Every read here is strictly later than the one before.
+   */
+  fun now(): Long = ticks.incrementAndGet()
 
   val worker: ExecutorService = staticField("worker")
   val net: ExecutorService = staticField("net")
 
   init {
     SyncGoldenMain.harness = this
+    SettingsSync.clock = this::now
     File(dir, "remote-companion.json").writeText(JSONObject().put("deviceId", SELF).toString())
     prefs("fleet_agent").edit().putString("name", "Family").putInt("port", PORT).apply()
     for (ex in listOf(worker, net)) workerMocks += ex to ex.submit<ThreadMocks> { ThreadMocks(out) }.get()
@@ -76,6 +87,7 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     drain()
     resetSync()
     SettingsDomain.valuesApplied = appliedHook
+    SettingsSync.clock = realClock
     workerMocks.forEach { (ex, m) -> ex.submit { m.close() }.get() }
     SyncGoldenMain.harness = null
     handlers.close(); looper.close(); testThread.close()
@@ -136,8 +148,10 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     const val PEER_LO = "11111111-1111-4111-8111-111111111111"
     const val PORT = 8765
     private const val DRAIN_ROUNDS = 4
+    /** 2027-01-15: inside [NOW_MS], so stamps still read as `<now>` in the golden. */
+    private const val CLOCK_START_MS = 1_800_000_000_000L
     val NAMES = mapOf(SELF to "self", PEER_HI to "hi", PEER_LO to "lo")
-    /** Wall-clock epoch ms (2023 onwards): stamps the sync takes from the real clock. */
+    /** Epoch ms (2023 onwards): stamps the sync takes from its clock. */
     private val NOW_MS = Regex("\\b1[7-9]\\d{11}\\b")
   }
 }
