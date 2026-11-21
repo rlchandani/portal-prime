@@ -714,3 +714,74 @@ transparent or not.
 - **The remaining household change cost belongs to the other modes** (Mosaic, Cinema, Hero + Sidebar, Panorama, the native Filmstrip handoff). A branch trace of one household change (no `photo_strips`) had a 310 ms frame whose time went to `prepareTree` (147 ms) and `flush layers` (96 ms) of a native `FrameLayout` layer, with `kswapd0` busy 97 ms. The GPU thread had 25 ms. That frame is native view work, not WebView upload. Mosaic, Hero + Sidebar, Cinema and Filmstrip still get their former copies (no drawn size), which is the next target.
 - **Memory:** running PSS was 378–394 MB in B1 and B2 against 268–290 MB on 1.313, and 273 MB in B3. +70 s was back at the Home level on every run (192–219 vs 203–210). No fill canvas existed in those runs, so the B1/B2 peaks are not band canvases. They match the 409–413 MB peaks seen in earlier rounds (1.306 A r2, B r3; `engine-upload-2` C r3). A painted fill canvas is the 2400 × 1600 crop (~15 MB) in place of the CSS background's decoded image and raster tiles. At most two exist (incoming and outgoing), and a retired one is zeroed at once.
 - **Verdict:** the mechanism works on the device. Bands upload a slice per frame, the dissolve composites without an upload, and on the test scenes no frame exceeded 28 ms against 35–54 ms on 1.313. On household photos it is not yet measured, because the 40 s method never landed on a fill single. Measuring it needs a longer window or several changes per run, which is a method change for the owner to approve. Device left on official 1.313.
+
+## Control Center return switch (Alerts → Map), 1.313 vs `cc-return`
+
+**Device:** Family Portal+ (no floor plan: Map is the "Build your floor plan" card plus the side column, with one
+snapshot camera tile). Plain `adb install -r -d`, no force-stop. STREAM_MUSIC 0 during each stint, restored to 3. No
+screenshots, no `debug.hwui` props. Ended on official 1.313 (on-device sha256 `2742f347…`, matching
+`hearthpane-latest.json`), Home on top and default, dev mode off.
+
+**Builds:** official 1.313; branch `cc-return` `assemblePerformance` (v1 `cc-return` first cut, v2 final, `1f19e1e4…`;
+the Map/Alerts code paths are identical, so their rounds are pooled), `assembleBenchmark` of 1.313 and of the
+branch for simpleperf, and one throw-away performance build with `ccTrace` sections (the sections did not appear in
+atrace on this build, so it only added frame timings).
+
+**Method:** as before: Map → Alerts via the read-only "door is open" row, BACK to return; warm-up + 4 measured taps per
+round, 4 rounds per build (off, off, v1, v1, v2, off, v2, off), `framestats` of the Control Center window. atrace
+`gfx view` around 3–4 BACKs per build, simpleperf 4 kHz around 4 BACKs per benchmark build.
+
+**Where the return went on 1.313:**
+- The two long frames of a return are one stall: the switch frame's main thread (`doFrame` 27–37 ms: Compose
+  `animation` 16–26 ms, `Record View#draw()` incl. measure 8–9 ms) plus its RenderThread (13–15 ms); the next frame is
+  short on both threads (5 ms + 10–13 ms) and is long only because its vsync was missed.
+- RenderThread of the switch frame: only the header texture re-renders (title, 2011 × 122, `drawLayer` ~1 ms,
+  `flush layers` 2–2.5 ms), then `flush commands` 3–4 ms and swap. The Map side column's re-texture 4 frames later
+  (`drawLayer` 608 × 1281, 0.8–1.5 ms; `flush layers` 1.4–2.8 ms) lands on a quiet frame (8–12 ms) and is not a
+  long frame. The plan is not re-recorded (no plan on this unit).
+- Main thread (benchmark simpleperf, worst frame of 4 BACKs, ~33 ms): composition 13–17 ms, of which
+  `CcCameraPicture` going live 2.5–4 ms (stream claim + snapshot loop composed in the switch frame), the rest of
+  `CcOverviewScreen` re-run with the fresh snapshot 1.5–2.5 ms, `CcHeaderTitle` + `rememberCcHeading` 1.25–3.25 ms;
+  semantics 2–6 ms (Alerts leaves the tree in the switch frame; the header description changes); apply 2–2.5 ms;
+  measure 1–3 ms. A large share of samples have unwindable short stacks and cannot be attributed.
+
+**Changes (`cc-return`):**
+1. `ControlCenterScreenSlots.kt:69,83,103,190` `ccSlotLive(active, awake, lingering)`: a shown screen's cameras and
+   loaders (`LocalCcScreenActive`) start 3 frames after the switch (`EXPOSE_FRAMES` + `WAKE_FRAMES`, one frame after
+   the semantics join), mirroring the 4-frame linger on leave. A returning tile keeps its last picture meanwhile.
+   Animations (`LocalCcMotion`, `ccSlotMoving` `:196`) are unchanged: on at once, off after the linger.
+2. `ControlCenterScreenSlots.kt:98` the slot's alpha/draw modifier is one remembered chain that reads its mode while
+   drawing (`ccSlotAlpha` `:177`), so shown ↔ parked is only a layer property change.
+3. `ControlCenterTeslaHero.kt:45` reads `LocalCcMotion` only (same value as before inside and outside the slots).
+
+| Alerts → Map (BACK) | official 1.313 (16 taps) | `cc-return` (16 taps) |
+|---|---|---|
+| Frames over 32 ms per tap | 2 ×11, 1 ×2, 0 ×3 (24) | 2 ×12, 1 ×3, 0 ×1 (27) |
+| Worst frame, median ms | 42 | 44 |
+| Sum of frames over 32 ms, median ms | 79 | 80 |
+| Frames over 16 ms, total | 66 | 66 |
+
+| Map → Alerts | official 1.313 (16 taps) | `cc-return` (16 taps) |
+|---|---|---|
+| Frames over 32 ms per tap | 2 ×7, 1 ×5, 0 ×4 (19) | 2 ×4, 1 ×8, 0 ×4 (16) |
+| Worst frame, median ms | 38 | 36 |
+| Sum of frames over 32 ms, median ms | 38 | 36 |
+| Frames over 16 ms, total | 52 | 58 |
+
+- **No measurable win in either direction; target not met.** The branch benchmark profile confirms the camera
+  start is gone from the switch frame (`CcCameraPicture` no longer appears), but the switch frame's main thread is
+  still 21–52 ms and its RenderThread 15–30 ms (benchmark build), so the return keeps its two long frames.
+- What remains on the return frame (branch, simpleperf): semantics 1.5–15 ms (the parked Alerts leaving the tree and
+  the header's spoken title changing, both in the switch frame, each forcing Compose's full tree rebuild + sort),
+  `CcHeaderTitle` + `rememberCcHeading` 2–5 ms (46 sp serif title and subtitle re-laid out; `CcDateFormats.format`),
+  `CcOverviewScreen` re-run with the fresh snapshot 1–4 ms, measure 2–11 ms.
+- Next candidates: move *every* semantics change of a switch (parked screen leaving, header description, rail
+  "selected") onto the same deferred frame as the shown screen joining, so the switch frame triggers no tree
+  rebuild; keep both titles' text layouts (`TextMeasurer`, drawn like `CcTabText`) so the title swap is a draw only.
+  Precomposing Alerts further is not the lever: it is already composed and recorded while parked; its switch-frame
+  cost is the header, semantics and measure, not Alerts' own composition.
+- Graphics memory after leaving: 44–46 MB on the branch, 43–45 MB official; PSS 172–183 vs 180–186 MB.
+- Accessibility (full uiautomator dump, Map and Alerts): same 49 / 71 nodes, order, bounds, flags and selected state
+  as 1.313; only the clock text and the camera's "just now / under a minute ago" differ (dumps 2 min apart).
+- Device incident: after the last benchmark → official reinstall the HOME intent resolved to the chooser
+  (`ResolverActivity`); restored with `cmd package set-home-activity …/HomeActivity` (Home on top, default again).
