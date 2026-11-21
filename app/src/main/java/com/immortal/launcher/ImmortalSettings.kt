@@ -80,7 +80,7 @@ object ImmortalSettings {
       val stayInStartupApp: Boolean = false,
   )
 
-  private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+  private fun prefs(c: Context) = processPrefs(c, PREFS)
 
   fun load(context: Context): Settings {
     val p = prefs(context)

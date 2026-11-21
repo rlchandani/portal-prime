@@ -70,7 +70,7 @@ object TimerStore {
   }
 
   fun load(context: Context): State {
-    val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    val p = processPrefs(context, PREFS)
     return State(
         running = p.getBoolean(KEY_RUNNING, false),
         endsAt = p.getLong(KEY_ENDS_AT, 0L),
@@ -80,8 +80,7 @@ object TimerStore {
   }
 
   private fun save(context: Context, state: State) {
-    context
-        .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    processPrefs(context, PREFS)
         .edit()
         .putBoolean(KEY_RUNNING, state.running)
         .putLong(KEY_ENDS_AT, state.endsAt)
