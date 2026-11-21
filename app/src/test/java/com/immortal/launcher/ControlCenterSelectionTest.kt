@@ -30,7 +30,8 @@ class ControlCenterSelectionTest {
   }
 
   @Test fun leaveKidsIsNeverSelected() {
-    assertFalse(CcNeverSelected.value)
+    assertFalse(CcNeverSelected.shown.value)
+    assertFalse(CcNeverSelected.spoken.value)
   }
 
   /** The selected look and card are shown only by layer alpha, so a switch re-renders no texture. */

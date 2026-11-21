@@ -59,9 +59,14 @@ internal data class CcRailSlice(val alerts: Int, val kids: Boolean, val hideCame
   }
 }
 
-/** True while [screen] is showing; a derived state, so a switch notifies only the two tabs that change. */
+/**
+ * Whether [screen] is showing ([CcTabSelection.shown]) and spoken as selected ([CcTabSelection.spoken]);
+ * derived states, so a switch notifies only the two tabs that change.
+ */
 @Composable
-internal fun rememberCcTabSelected(ui: CcUi, screen: CcScreen): State<Boolean> = remember(ui, screen) { derivedStateOf { ui.screen == screen } }
+internal fun rememberCcTabSelected(ui: CcUi, screen: CcScreen): CcTabSelection = remember(ui, screen) {
+  CcTabSelection(derivedStateOf { ui.screen == screen }, derivedStateOf { ui.spokenScreen == screen })
+}
 
 /**
  * Left rail (`.rail`): back to Hearthpane Home, the six sections, Edit plan + Settings at the foot.
@@ -99,7 +104,7 @@ internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
 
 /** One rail tab ([CcTab]): a fixed tree; [selected] is read only by layer alphas and the semantics. */
 @Composable
-private fun RailItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
+private fun RailItem(icon: String, label: String, selected: CcTabSelection, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
   CcTab(Modifier.size(104.dp, 96.dp), RAIL_ITEM, selected, if (badge > 0) "$label, $badge" else label, enabled, onClick,
       overlay = {
@@ -178,15 +183,12 @@ internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJa
   }
 }
 
-/** The serif title and subtitle: the only part of the header a screen (or floor) switch recomposes. */
+/** The serif title and subtitle ([CcHeadingText]): a screen switch only redraws them. */
 @Composable
 private fun CcHeaderTitle(inputs: CcHeadingInputs, ui: CcUi) {
   val c = LocalCc.current
-  val h = rememberCcHeading(inputs, ui)
-  Column(Modifier.ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
-    Text(h.title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
-    Text(h.subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-  }
+  CcHeadingText(inputs, ui, CcHeadingLine(c.text, 46.sp, CcStyle.Serif, lineHeight = 48.sp),
+      CcHeadingLine(c.sec, 21.sp, overflow = TextOverflow.Ellipsis))
 }
 
 /** "Live" / "Stale · 2 min" / "HA unreachable" pill with its status dot. */

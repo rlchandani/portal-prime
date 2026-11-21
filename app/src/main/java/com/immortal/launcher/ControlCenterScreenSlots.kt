@@ -66,8 +66,8 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         var settled by remember { mutableStateOf(false) }
         // True from a visit until a few frames after leaving (see [ccSlotLive]).
         var lingering by remember { mutableStateOf(false) }
-        // True a few frames into a visit (see [ccSlotSemantics]); a slot composed already shown starts exposed.
-        var exposed by remember { mutableStateOf(active) }
+        // True while this is the screen accessibility services are told about (see [ccSlotSemantics]).
+        val spoken by remember { derivedStateOf { screen == ui.spokenScreen } }
         // True a few frames after the semantics join (see [ccSlotCachesRegions]); a slot composed already shown starts cached.
         var cacheReady by remember { mutableStateOf(active) }
         val cache = remember { derivedStateOf { ccSlotCachesRegions(active, cacheReady) } }
@@ -75,12 +75,9 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
           settled = false
           if (active) {
             lingering = true
-            repeat(EXPOSE_FRAMES) { withFrameNanos { } }
-            exposed = true
-            repeat(CACHE_FRAMES) { withFrameNanos { } }
+            repeat(EXPOSE_FRAMES + CACHE_FRAMES) { withFrameNanos { } }
             cacheReady = true
           } else {
-            exposed = false
             cacheReady = false
             repeat(SETTLE_FRAMES) { withFrameNanos { } }
             settled = true
@@ -92,7 +89,7 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         val live = ccSlotLive(active, lingering)
         val layer = Modifier.graphicsLayer { alpha = if (mode == CcSlotDraw.RECORDING) 0f else 1f }
             .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
-            .then(if (ccSlotSemantics(active, exposed)) Modifier else Modifier.clearAndSetSemantics {})
+            .then(if (ccSlotSemantics(spoken)) Modifier else UNSPOKEN)
         Box(Modifier.fillMaxSize().then(layer)) {
           CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value),
               LocalCcRegionCache provides cache) {
@@ -101,6 +98,12 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         }
       }
     }
+  }
+
+  // Every accessibility change of a switch waits for this one frame (see [CcUi.spokenScreen]).
+  LaunchedEffect(current) {
+    repeat(EXPOSE_FRAMES) { withFrameNanos { } }
+    ui.spoke(current)
   }
 
   LaunchedEffect(Unit) {
@@ -175,14 +178,17 @@ internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): Cc
 internal fun ccSlotLive(active: Boolean, lingering: Boolean): Boolean = active || lingering
 
 /**
- * Whether a slot's screen is in the semantics tree. A parked screen is off-screen and leaves it at
- * once; a shown screen joins it [EXPOSE_FRAMES] frames after the switch. Compose rebuilds and
- * re-sorts the whole accessibility tree after any semantics change while the Portal's
- * accessibility services are on (always), 10-12 ms here, and doing that right after the switch
- * frame stacked it on the switch's own work. A few frames (~35 ms) later it runs on its own,
- * still well inside the 100 ms that Compose batches accessibility events by.
+ * Whether a slot's screen is in the semantics tree: while it is [CcUi.spokenScreen] ([spoken]),
+ * which catches up [EXPOSE_FRAMES] frames after a switch. So the parked screen leaves and the shown
+ * one joins on the same later frame, together with the header's heading and the tabs' "selected"
+ * state. Compose rebuilds and re-sorts the whole accessibility tree after any semantics change
+ * while the Portal's accessibility services are on (always), 2-15 ms here; one such change in the
+ * switch frame (Alerts leaving on the return, the heading's text) stacked it on the switch's own
+ * work. A few frames (~35 ms) later it runs once, on a quiet frame, still well inside the 100 ms
+ * that Compose batches accessibility events by. Meanwhile the parked screen's nodes sit off-screen
+ * ([PARK_OFFSET_PX]) and the shown one has none yet.
  */
-internal fun ccSlotSemantics(active: Boolean, exposed: Boolean): Boolean = active && exposed
+internal fun ccSlotSemantics(spoken: Boolean): Boolean = spoken
 
 /**
  * Whether a slot's region layers ([ccRegionLayer] with [LocalCcRegionCache]) are cached textures:
@@ -196,7 +202,7 @@ internal fun ccSlotCachesRegions(active: Boolean, cacheReady: Boolean): Boolean 
 /** Frames after the semantics join before a shown screen caches its regions (see [ccSlotCachesRegions]). */
 private const val CACHE_FRAMES = 2
 
-/** Frames a shown screen waits before joining the semantics tree (see [ccSlotSemantics]). */
+/** Frames after a switch before accessibility services are told (see [ccSlotSemantics], [CcUi.spokenScreen]). */
 private const val EXPOSE_FRAMES = 2
 
 /** Frames a parked screen keeps drawing (transparent) to record its draw lists. */
@@ -234,6 +240,9 @@ private class CcWarming {
 
   fun clear() { screen = null; paused = null }
 }
+
+/** One instance: a slot recomposed while unspoken (the switch frame) keeps an equal modifier, so no semantics update. */
+private val UNSPOKEN = Modifier.clearAndSetSemantics {}
 
 private const val PARK_OFFSET_PX = 100_000
 /** Past the opening frames and animations. */

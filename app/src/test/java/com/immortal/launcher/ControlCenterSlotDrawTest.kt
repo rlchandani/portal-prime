@@ -50,12 +50,10 @@ class ControlCenterSlotDrawTest {
     assertEquals(false, ccSlotLive(active = false, lingering = false))
   }
 
-  /** A parked screen leaves the accessibility tree at once; a shown one joins it once exposed (a few frames in). */
-  @Test fun aScreenIsInTheSemanticsTreeOnlyWhileShownAndExposed() {
-    assertEquals(true, ccSlotSemantics(active = true, exposed = true))
-    assertEquals(false, ccSlotSemantics(active = true, exposed = false))
-    assertEquals(false, ccSlotSemantics(active = false, exposed = true))
-    assertEquals(false, ccSlotSemantics(active = false, exposed = false))
+  /** A screen is in the accessibility tree exactly while it is the spoken screen: shown or parked, the switch frame changes nothing. */
+  @Test fun aScreenIsInTheSemanticsTreeOnlyWhileSpoken() {
+    assertEquals(true, ccSlotSemantics(spoken = true))
+    assertEquals(false, ccSlotSemantics(spoken = false))
   }
 
   /** A parked screen holds no region textures (they'd re-render while hidden); a shown one caches once ready. */

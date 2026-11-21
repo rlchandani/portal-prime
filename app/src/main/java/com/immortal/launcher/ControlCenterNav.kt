@@ -11,6 +11,7 @@ import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 
 /** The plan's two lenses on the same map (Live / Climate). */
 internal enum class CcLens { LIVE, CLIMATE }
@@ -82,6 +83,16 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   val topSheet: CcSheet? get() = sheetsOf.value.lastOrNull()
   val openModal: CcModal? get() = modalOf.value
   val cameraFull: String? get() = cameraFullOf.value
+
+  private val spokenOf = mutableStateOf(navState.value.screen)
+  /**
+   * The screen accessibility services are told is showing: [screen], caught up a few frames after a
+   * switch (see [CcScreenSlots]) so every semantics change of the switch (the parked screen leaving
+   * the tree, the shown one joining, the header's heading, the tabs' "selected") lands on one later,
+   * quiet frame instead of the switch frame.
+   */
+  val spokenScreen: CcScreen get() = spokenOf.value
+  fun spoke(screen: CcScreen) { spokenOf.value = screen }
 
   /** Uptime of the last touch anywhere on the Control Center (background work waits for quiet). */
   @Volatile var lastInputAt: Long = 0L
