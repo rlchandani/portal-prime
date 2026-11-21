@@ -138,17 +138,16 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
                   if (videoPrefetch === connection) videoPrefetch = null
                 })
             try {
-              c.inputStream.use { input ->
-                dst.outputStream().use { output ->
-                  val buffer = ByteArray(32 * 1024)
-                  while (keepGoing() && !Thread.currentThread().isInterrupted) {
-                    val count = input.read(buffer)
-                    if (count < 0) return@runCatching dst.length() > 0L && cutPrefetch !== c && keepGoing()
-                    output.write(buffer, 0, count)
-                  }
-                }
+              val declared = c.contentLengthLong // unknown (-1) or 0 trusts the clean EOF
+              val copied = c.inputStream.use { input ->
+                dst.outputStream().use { output -> copyWhile(input, output, keepGoing) }
               }
-              false
+              if (copied != null && declared > 0L && copied != declared) {
+                // The server closed early (or overran): a partial video must never be cached.
+                dst.delete()
+                return@runCatching false
+              }
+              copied != null && copied > 0L && cutPrefetch !== c && keepGoing()
             } finally {
               if (videoPrefetch === c) videoPrefetch = null
               if (cutPrefetch === c) cutPrefetch = null
@@ -156,6 +155,19 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
             }
           }
           .getOrDefault(false)
+
+  /** Bytes copied up to a clean EOF, or null when [keepGoing] or an interrupt stopped it first. */
+  private fun copyWhile(input: InputStream, output: java.io.OutputStream, keepGoing: () -> Boolean): Long? {
+    val buffer = ByteArray(32 * 1024)
+    var total = 0L
+    while (keepGoing() && !Thread.currentThread().isInterrupted) {
+      val count = input.read(buffer)
+      if (count < 0) return total
+      output.write(buffer, 0, count)
+      total += count
+    }
+    return null
+  }
 
   /** Drain the owned closes; never wait for a network read on the UI thread. */
   fun shutdown() = cancelIo.shutdown()
