@@ -15,15 +15,6 @@
   // Publish the exact URL admitted by t.load. Resolve again only for a new preparation
   // so derivative completion/eviction cannot silently substitute an unprepared resource.
   function bg(node, url, size) { node.style.backgroundImage = `url("${url}")`; node.style.backgroundSize = size || "cover"; node.style.backgroundPosition = "center"; node.style.backgroundRepeat = "no-repeat"; }
-  // The transparent outline uses the same contain fit and aspect as the decoded photo.
-  // As a hero child it follows resizing and the existing motion without another photo load.
-  function photoBorderUrl(photo) {
-    const ar = aspect(photo);
-    if (!Number.isFinite(ar) || ar <= 0) return null;
-    const w = Math.min(1000, 1000 * ar), h = w / ar;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="none" stroke="#c7b79c" stroke-opacity=".92" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
-    return "data:image/svg+xml," + encodeURIComponent(svg);
-  }
   // Anchor a cover-crop on the detected face (fx/fy in 0..1) so heads aren't clipped. Falls back to
   // the CSS default (a top-biased center) when the photo has no focal point yet.
   function hasFace(p) { return p && Number.isFinite(p.fx) && Number.isFinite(p.fy) && p.fx >= 0 && p.fx <= 1 && p.fy >= 0 && p.fy <= 1; }
@@ -33,7 +24,10 @@
       node.style.animation = "none";
     }
   }
-  function kbVars(node, photo) {
+  // [fit] (a whole photo or pair on the Portal+) is the largest scale that keeps the box on screen:
+  // the zoom then runs between 1 and that scale, centred, so nothing leaves the screen. The same
+  // random draws are taken either way, so photo selection never depends on the layout.
+  function kbVars(node, photo, fit) {
     // Keep a prepared photo's animation alive when its parent starts fading out.
     node.classList.add("ss-motion");
     if (hasFace(photo)) {
@@ -41,13 +35,18 @@
       ["--x0", "--y0", "--x1", "--y1"].forEach(k => node.style.setProperty(k, "0%"));
       return;
     }
-    const zoomIn = Math.random() > 0.4; const s0 = zoomIn ? 1.04 : 1.15, s1 = zoomIn ? 1.15 : 1.04;
+    const zoomIn = Math.random() > 0.4; let s0 = zoomIn ? 1.04 : 1.15, s1 = zoomIn ? 1.15 : 1.04;
     const s = Math.max(s0, s1), bound = ((s - 1) / 2) * 100 * 0.82;
     const wide = aspect(photo) > 1.2; const bx = wide ? bound : bound * 0.5, by = wide ? bound * 0.5 : bound;
     const rx = () => (Math.random() * 2 - 1) * bx, ry = () => (Math.random() * 2 - 1) * by;
+    let x = [rx(), ry(), rx(), ry()];
+    if (fit) {
+      const top = Math.max(1, Math.min(1.15, fit));
+      s0 = zoomIn ? 1 : top; s1 = zoomIn ? top : 1; x = [0, 0, 0, 0];
+    }
     node.style.setProperty("--s0", s0); node.style.setProperty("--s1", s1);
-    node.style.setProperty("--x0", rx() + "%"); node.style.setProperty("--y0", ry() + "%");
-    node.style.setProperty("--x1", rx() + "%"); node.style.setProperty("--y1", ry() + "%");
+    node.style.setProperty("--x0", x[0] + "%"); node.style.setProperty("--y0", x[1] + "%");
+    node.style.setProperty("--x1", x[2] + "%"); node.style.setProperty("--y1", x[3] + "%");
   }
   // One owner for initial readiness, decode cancellation, non-overlapping swaps and pausable timers.
   function makeTimers(ctx) {
@@ -461,7 +460,11 @@
     const fill = compactFillOf(root);
     if (!fill) return;
     fill.style.backgroundImage = "none"; fill.style.display = "none";
-    if (fill.children && fill.children.length) fill.innerHTML = "";
+    if (fill.children && fill.children.length) { Array.from(fill.children).forEach(releaseCanvas); fill.innerHTML = ""; }
+  }
+  // A detached canvas keeps its backing store until collected; zero it so it is freed now.
+  function releaseCanvas(canvas) {
+    if (canvas && canvas.className === "ss-preblur-canvas") { canvas.width = 0; canvas.height = 0; }
   }
   // Only a layer that was laid out compact has anything to undo; the Portal+ DOM is untouched.
   function clearCompact(root, hero) {
@@ -481,7 +484,9 @@
     if (plan.mode === "whole" && backdrop && backdrop.url) {
       const fill = compactFill(root);
       fill.style.display = "";
-      if (fill.children && fill.children.length) fill.innerHTML = "";
+      if (fill.children && fill.children.length) {
+        Array.from(fill.children).filter(c => c !== backdrop.canvas).forEach(releaseCanvas); fill.innerHTML = "";
+      }
       if (backdrop.canvas) {
         fill.classList.add("ss-preblur"); fill.style.backgroundImage = "none";
         fill.appendChild(backdrop.canvas);
@@ -548,12 +553,72 @@
       const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
       hero.classList.remove("ss-motion");
       bg(hero, u, applyCompact(plan, root, hero, null));
-      layer.border.style.backgroundImage = "none";
       compactMotion(ctx, hero, plan, p);
       beat = k + 1;
       dissolve.present(root);
     };
   }
+
+  // ---- One photo, or a portrait pair, on the Portal+ ("L") -------------------
+  // Ken Burns, Push and Memories singles: full-bleed when the crop keeps >= 80 % and the faces
+  // (SS.largeSingle), else the whole photo over its own pre-blurred backdrop (the Mini's preblur,
+  // no live filter). A portrait is paired with the next portrait of the deck (SS.takePartner)
+  // at one height (SS.pairPlan). Everything is decoded and drawn before the dissolve starts.
+  const PAIR_ZOOM = 1.15; // the Ken Burns zoom's upper bound: decode headroom for a pair
+  function pairEdge(ctx, plan, i, edge) {
+    const drawn = Math.max(plan.widths[i], plan.rect.h) * PAIR_ZOOM;
+    const dpr = Number(window.devicePixelRatio), ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
+    return Math.max(320, Math.min(edge, Math.ceil(drawn * ratio)));
+  }
+  // [onScreen] are the seeds still visible (the outgoing layer). Resolves null when the scene
+  // was disposed or a load failed; a computed backdrop is then released at once.
+  async function prepareLarge(ctx, t, active, deck, p, onScreen, edge) {
+    const { W, H } = compactSize(ctx);
+    const partner = SS.takePartner(deck, ctx.cursor, p, onScreen);
+    const ps = partner ? [p, partner] : [p];
+    const pair = partner ? SS.pairPlan(ps.map(aspect), W, H) : null;
+    const urls = ps.map((x, i) => ctx.url(x, pair ? pairEdge(ctx, pair, i, edge) : edge));
+    if (!await t.load(urls) || !active()) return null;
+    // A shape measured by the load is honoured: plan again now.
+    const plan = pair || SS.largeSingle(p, W, H);
+    if (plan.mode !== "whole") return { ps, urls, plan, backdrop: null };
+    const fillUrl = ctx.url(p, 320);
+    if (!await t.load(fillUrl) || !active()) return null;
+    const canvas = await preblur(fillUrl, W, H);
+    if (!active()) { releaseCanvas(canvas); return null; }
+    return { ps, urls, plan, backdrop: { url: fillUrl, canvas } };
+  }
+  // Publish a prepared beat once playback runs; a beat dropped before it shows frees its backdrop.
+  function publishLarge(t, active, prep, render) {
+    return t.publish(() => {
+      if (!active()) { releaseCanvas(prep.backdrop && prep.backdrop.canvas); return false; }
+      return render();
+    }).then(result => {
+      if (result === false && prep.backdrop) releaseCanvas(prep.backdrop.canvas);
+      return result;
+    });
+  }
+  function paintLarge(prep, root, hero) {
+    const plan = prep.plan, size = applyCompact(plan, root, hero, prep.backdrop);
+    hero.classList.toggle("ss-whole", plan.mode === "whole" && !plan.pair);
+    if (plan.pair) {
+      hero.style.backgroundImage = prep.urls.map(u => `url("${u}")`).join(", ");
+      hero.style.backgroundSize = plan.widths.map(w => `${w}px ${plan.rect.h}px`).join(", ");
+      hero.style.backgroundPosition = "left center, right center";
+      hero.style.backgroundRepeat = "no-repeat";
+    } else {
+      bg(hero, prep.urls[0], size);
+      if (plan.position) hero.style.backgroundPosition = plan.position;
+    }
+  }
+  // The scale at which a whole photo (or pair) would touch the screen edge; null for a fill.
+  function largeFit(ctx, plan) {
+    if (plan.mode !== "whole") return null;
+    const { W, H } = compactSize(ctx), r = plan.rect;
+    return Math.min(W / r.w, H / r.h);
+  }
+  const stillPhotos = ps => ps.some(hasFace);
+  const seedsOf = ps => ps.map(p => p.seed);
 
   const MODES = {};
 
@@ -563,40 +628,37 @@
     const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
     function mk() {
       const root = el("ss-layer ken-burns retired"), hero = el("ss-hero", root);
-      const border = el("ss-photo-border", hero);
       hero.style.animation = "none"; hero.style.willChange = "auto";
-      return { root, hero, border };
+      return { root, hero };
     }
     const dissolve = makeSceneDissolve(ctx, t, layers.map(l => l.root), 2200, root => {
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto"; hero.classList.remove("ss-motion");
-      layers.find(l => l.root === root).border.style.backgroundImage = "none";
       hideCompactFill(root);
     });
+    let onScreen = [];
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       if (compactClass(ctx)) return compactStep(p);
-      const u = ctx.url(p, 2200);
-      if (!await t.load(u) || !dissolve.active()) return false;
-      const borderUrl = photoBorderUrl(p);
-      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
-      const root = dissolve.next(), L = layers.find(l => l.root === root);
-      bg(L.hero, u, "contain");
-      if (borderUrl) bg(L.border, borderUrl, "contain");
-      else L.border.style.backgroundImage = "none";
-      L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
-      if (hasFace(p)) {
-        L.hero.style.willChange = "auto";
-      } else {
-        // Keep the same random draws so motion preference cannot alter later photo selection.
-        kbVars(L.hero, p);
-        if (ctx.photoMotion !== false) {
-          L.hero.style.willChange = "transform";
-          void L.hero.offsetWidth; L.hero.style.animation = "";
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      if (!prep) return false;
+      return publishLarge(t, dissolve.active, prep, () => {
+        const root = dissolve.next(), L = layers.find(l => l.root === root);
+        L.hero.classList.remove("ss-motion");
+        paintLarge(prep, root, L.hero);
+        L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
+        if (!stillPhotos(prep.ps)) {
+          // Keep the same random draws so motion preference cannot alter later photo selection.
+          kbVars(L.hero, p, largeFit(ctx, prep.plan));
+          if (ctx.photoMotion !== false) {
+            L.hero.style.willChange = "transform";
+            void L.hero.offsetWidth; L.hero.style.animation = "";
+          }
         }
-      }
-      dissolve.present(root);
+        onScreen = seedsOf(prep.ps);
+        dissolve.present(root);
+      });
     }
     const compactStep = compactPanStep(ctx, t, dissolve, layers, false);
     t.start(step); t.every(step, ctx.photoMs);
@@ -844,33 +906,31 @@
     const t = makeTimers(ctx); const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
     function mk() {
       const root = el("ss-layer cinematic-push retired"), hero = el("ss-hero", root);
-      const border = el("ss-photo-border", hero);
       hero.style.animation = "none"; hero.style.willChange = "auto";
-      return { root, hero, border };
+      return { root, hero };
     }
     const dissolve = makeSceneDissolve(ctx, t, layers.map(l => l.root), 2200, root => {
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto";
-      layers.find(l => l.root === root).border.style.backgroundImage = "none";
       hideCompactFill(root);
     });
+    let onScreen = [];
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       if (compactClass(ctx)) return compactStep(p);
-      const u = ctx.url(p, 2200);
-      if (!await t.load(u) || !dissolve.active()) return false;
-      const borderUrl = photoBorderUrl(p);
-      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
-      const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
-      bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
-      if (borderUrl) bg(layer.border, borderUrl, "contain");
-      else layer.border.style.backgroundImage = "none";
-      if (ctx.photoMotion !== false && !hasFace(p)) {
-        hero.style.willChange = "transform"; void hero.offsetWidth;
-        hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
-      }
-      dissolve.present(root);
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      if (!prep) return false;
+      return publishLarge(t, dissolve.active, prep, () => {
+        const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
+        paintLarge(prep, root, hero); hero.style.animation = "none"; hero.style.willChange = "auto";
+        if (ctx.photoMotion !== false && !stillPhotos(prep.ps)) {
+          hero.style.willChange = "transform"; void hero.offsetWidth;
+          hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+        }
+        onScreen = seedsOf(prep.ps);
+        dissolve.present(root);
+      });
     }
     const compactStep = compactPanStep(ctx, t, dissolve, layers, true);
     t.start(step); t.every(step, ctx.photoMs);
@@ -887,7 +947,7 @@
         image.style.backgroundImage = "none"; image.style.animation = "none";
         image.style.willChange = "auto";
       });
-      resources.set(scene, []); collages.delete(scene); scene.innerHTML = "";
+      resources.set(scene, []); collages.delete(scene); hideCompactFill(scene); scene.innerHTML = "";
       scene.style.opacity = ""; scene.style.transition = "";
     });
     let beat = 0;
@@ -904,24 +964,34 @@
       }
       return image;
     }
-    // Upright (the Mini) the collage uses the tall slot table, each card slightly tilted.
-    const upright = ctx.cls === "CP";
+    // The collage is one exact-fit grid (SS.trioLayout) under its caption, clear of the clock.
+    const upright = ctx.cls === "CP", CAPTION = upright ? 96 : 72, CAPTION_LIFT = 52;
     function layoutCollage(ps, images) {
       const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
-      const slots = upright && ps.length > 1 ? SS.MEMORY_SLOTS_UPRIGHT :
-        ps.length === 1 ? [[.16, .14, .68, .72]] :
-        ps.length === 2 ? [[.07, .14, .40, .72], [.53, .14, .40, .72]] :
-        [[.08, .16, .42, .5], [.53, .1, .36, .42], [.5, .56, .4, .3]];
-      ps.forEach((p, i) => {
-        const [x, y, sw, sh] = slots[i], boxW = W * sw, boxH = H * sh;
-        const imageH = Math.max(1, Math.min(boxH - 24, (boxW - 24) / aspect(p)));
-        const width = imageH * aspect(p) + 24, height = imageH + 24;
-        const tile = images[i].parentNode;
-        tile.style.left = (W * x + (boxW - width) / 2) + "px";
-        tile.style.top = (H * y + (boxH - height) / 2) + "px";
-        tile.style.width = width + "px"; tile.style.height = height + "px";
-        if (upright && ps.length > 1) tile.style.transform = `rotate(${SS.MEMORY_TILT_UPRIGHT[i]}deg)`;
+      if (ps.length === 1) {
+        const image = images[0], tile = image.parentNode;
+        const boxW = W * .68, boxH = H * .72, a = aspect(ps[0]);
+        const imageH = Math.max(1, Math.min(boxH - 24, (boxW - 24) / a));
+        const width = imageH * a + 24, height = imageH + 24;
+        Object.assign(tile.style, { left: (W * .16 + (boxW - width) / 2) + "px", top: (H * .14 + (boxH - height) / 2) + "px",
+          width: width + "px", height: height + "px" });
+        return;
+      }
+      const area = SS.photoLayoutArea(ctx), gap = compactClass(ctx) ? SS.TRIO_GAP.compact : SS.TRIO_GAP.L;
+      const grid = { x: area.x, y: area.y + CAPTION, w: area.w, h: Math.max(1, area.h - CAPTION) };
+      const boxes = SS.trioLayout(ps.map(aspect), grid, gap);
+      // Each card has its photo's exact aspect: cover only absorbs sub-pixel rounding.
+      boxes.forEach((b, i) => {
+        Object.assign(images[i].parentNode.style, { left: b.x + "px", top: b.y + "px",
+          width: b.w + "px", height: b.h + "px", transform: "none" });
+        images[i].style.backgroundSize = "cover";
       });
+      const scene = images[0].parentNode.parentNode;
+      const caption = Array.from(scene.children).find(node => node.classList.contains("ss-memory-caption"));
+      scene.classList.add("trio");
+      if (caption && boxes.length) Object.assign(caption.style, {
+        left: Math.min(...boxes.map(b => b.x)) + "px",
+        top: Math.max(8, Math.min(...boxes.map(b => b.y)) - CAPTION_LIFT) + "px" });
     }
     function renderCollage(scene, ps, urls) {
       const title = el("ss-memory-caption", scene);
@@ -946,16 +1016,36 @@
       if (!dissolve.active()) return false;
       const nextBeat = beat + 1, collage = nextBeat % 6 === 0;
       const ps = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, collage ? 3 : 1)).fill("any"));
+      if (!collage && !compactClass(ctx)) return largeStep(ps[0], nextBeat);
       const urls = await t.publish(() => ps.map(p => collage ? ctx.url(p, 1100) :
         compactUrl(ctx, p, 2200, compactPlan(ctx, p))));
       if (urls === false || !await t.load(urls) || !dissolve.active()) return false;
       const compact = collage ? null : await loadCompact(ctx, t, ps[0], urls[0], true);
-      if (!collage && !compact || !dissolve.active()) return false;
+      if (!collage && !compact || !dissolve.active()) {
+        if (compact && compact.backdrop) releaseCanvas(compact.backdrop.canvas);
+        return false;
+      }
       return t.publish(() => {
         if (!dissolve.active()) return false;
         const scene = dissolve.next();
         const images = collage ? renderCollage(scene, ps, urls) : [photo(scene, ps[0], urls[0], true, compact)];
-        resources.set(scene, images); beat = nextBeat; dissolve.present(scene);
+        resources.set(scene, images); beat = nextBeat; onScreen = seedsOf(ps); dissolve.present(scene);
+      });
+    }
+    // A Portal+ single (or portrait pair) keeps the shipped gentle push and its 2 s dissolve.
+    let onScreen = [];
+    async function largeStep(p, nextBeat) {
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      if (!prep) return false;
+      return publishLarge(t, dissolve.active, prep, () => {
+        const scene = dissolve.next(), image = el("ss-hero memory-photo", scene);
+        paintLarge(prep, scene, image);
+        image.style.animation = "none"; image.style.willChange = "auto";
+        if (ctx.photoMotion !== false && !stillPhotos(prep.ps)) {
+          image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+          image.style.willChange = "transform";
+        }
+        resources.set(scene, [image]); beat = nextBeat; onScreen = seedsOf(prep.ps); dissolve.present(scene);
       });
     }
     t.start(step); t.every(step, ctx.photoMs);
@@ -1568,13 +1658,8 @@
     const t = makeTimers(ctx), backdrop = el("ss-hero-sidebar", ctx.root);
     const stage = el("ss-hs", backdrop), heroCol = el("ss-col", stage), cells = [];
     const count = SS.slots(deck, 3);
-    // Upright (the Mini): the 3:2 hero spans the width on top, the two portraits share the rest.
+    // Upright (the Mini) the hero spans the width on top, the side photos share the row below.
     const upright = ctx.cls === "CP";
-    if (upright) {
-      stage.classList.add("upright");
-      const W = ctx.root.clientWidth || ctx.W;
-      heroCol.style.flex = count > 1 ? `0 0 ${Math.max(1, (W - 48) / 1.5)}px` : "1";
-    } else heroCol.style.flex = count > 1 ? "1.9" : "1";
     let disposed = false;
     function makeCell(column, edge) {
       const root = el("ss-cell contain", column);
@@ -1589,14 +1674,26 @@
         image.style.willChange = "auto";
         pane.style.opacity = ""; pane.style.transition = "";
       });
-      const cell = { photo: null, edge, layers, dissolve }; cells.push(cell); return cell;
+      const cell = { photo: null, edge, layers, dissolve, root }; cells.push(cell); return cell;
     }
     const hero = makeCell(heroCol, 1800), sides = [];
     if (count > 1) {
-      const side = el("ss-col", stage); side.style.flex = "1";
+      const side = el("ss-col", stage);
       for (let i = 1; i < count; i++) sides.push(makeCell(side, 1100));
     }
     function seeds() { return cells.filter(c => c.photo).map(c => c.photo.seed); }
+    // Exact-fit tiles (SS.trioLayout) clear of the clock: the hero left (on top upright) and
+    // every gutter one constant. Once shown, a swap to a new shape glides the grid (.8 s).
+    backdrop.classList.add("trio"); stage.classList.add("trio");
+    function relayout() {
+      const live = cells.filter(c => c.photo);
+      if (!live.length) return;
+      const area = SS.photoLayoutArea(ctx), gap = compactClass(ctx) ? SS.TRIO_GAP.compact : SS.TRIO_GAP.L;
+      const shape = live.length < 3 ? "row" : upright ? "heroTop" : "heroLeft";
+      const boxes = SS.trioLayout(live.map(c => aspect(c.photo)), area, gap, shape);
+      live.forEach((c, i) => Object.assign(c.root.style, { left: boxes[i].x + "px", top: boxes[i].y + "px",
+        width: boxes[i].w + "px", height: boxes[i].h + "px" }));
+    }
     async function fill(cell, photo) {
       if (disposed || !cell.dissolve.active()) return false;
       const url = await t.publish(() => ctx.url(photo, cell.edge));
@@ -1605,8 +1702,9 @@
       return t.publish(() => {
         if (disposed || !cell.dissolve.active()) return false;
         const pane = cell.dissolve.next(), image = cell.layers.find(l => l.pane === pane).image;
-        bg(image, url, "contain");
-        cell.photo = photo; cell.dissolve.present(pane);
+        // The cell takes the photo's exact aspect; cover keeps a gliding swap free of bars.
+        bg(image, url, "cover");
+        cell.photo = photo; relayout(); cell.dissolve.present(pane);
       });
     }
     t.start(async () => {
@@ -1615,6 +1713,8 @@
         if (await fill(cell, SS.take(deck, ctx.cursor, ["portrait"], seeds())[0]) === false) return false;
       }
     });
+    // The startup layout lands without a glide; later swaps animate.
+    t.cleanup.ready.then(ok => { if (ok && !disposed) stage.classList.add("glide"); });
     let turn = 0;
     t.every(async () => {
       if (disposed || !SS.unused(deck, seeds()).length) return;

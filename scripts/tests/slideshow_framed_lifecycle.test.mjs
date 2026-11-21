@@ -23,7 +23,7 @@ function breathing(r, print) {
   assert.equal(edge['animation-play-state'] || 'running', 'running');
 }
 
-test('Cinematic Push shows an opaque whole photo without duplicate blurred layers', async () => {
+test('Cinematic Push fills with a matched photo without duplicate blurred layers', async () => {
   const r = fixture({ mode: 'push' });
   try {
     assert.equal(await r.cleanup.ready, true);
@@ -31,8 +31,9 @@ test('Cinematic Push shows an opaque whole photo without duplicate blurred layer
     const photo = r.incoming();
     assert.ok(photo);
     assert.equal(r.state(photo).opacity, 1);
-    assert.equal(r.computed(photo)['background-size'], 'contain');
-    assert.equal(r.computed(photo).inset, '5%');
+    // A 16:10 photo keeps 94 % of itself on the 3:2 screen: full-bleed, no matte.
+    assert.equal(r.computed(photo)['background-size'], 'cover');
+    assert.deepEqual([photo.style.left, photo.style.top, photo.style.width, photo.style.height], ['0px', '0px', '2160px', '1440px']);
     assert.match(r.state(photo).animation, /^cinematicDrift 5400ms linear forwards$/);
     assert.equal(r.state(photo).promotion, 'transform');
     assert.ok(r.resolutions.every(resource => resource.edge === 2200));
@@ -48,7 +49,7 @@ test('Cinematic Push retains the opaque outgoing scene until each incoming disso
       const incoming = r.incoming(), outgoing = r.prints().find(photo => photo !== incoming);
       assert.equal(r.state(incoming).opacity, 0);
       assert.equal(r.state(outgoing).opacity, 1);
-      assert.equal(r.computed(r.slot(incoming)).background, '#1c1b19');
+      assert.equal(r.computed(r.slot(incoming)).background, '#121110');
       await r.advanceTo(swap * 5000 + 2199);
       assert.ok(r.state(incoming).opacity > 0 && r.state(incoming).opacity < 1);
       assert.equal(r.state(outgoing).opacity, 1);

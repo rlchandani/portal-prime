@@ -201,7 +201,8 @@
           opts.mode : SS.pickNextMode(opts.enabledModes || SS.MODE_IDS, deck, prev, cls);
       if (typeof SS.modeFor === "function") modeId = SS.modeFor(cls, modeId);
       if (!SS.MODES[modeId]) modeId = "kenBurns";
-      if (target) cursor.i = target.start;
+      // Replaying a beat replays its deck order, early-shown pair photos included.
+      if (target) { cursor.i = target.start; cursor.ahead = []; }
       const layer = document.createElement("div");
       layer.className = "ss-beat freeze";
       layer.style.setProperty("--motion-duration", (intervalMs + MOTION_OVERLAP_MS) + "ms");

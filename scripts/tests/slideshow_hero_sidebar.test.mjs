@@ -23,7 +23,7 @@ function released(r, image) {
   assert.equal(r.computed(r.slot(image)).visibility, 'hidden');
 }
 
-test('Hero + Sidebar prepares three whole static photos without duplicate blurred resources', async () => {
+test('Hero + Sidebar prepares three exact-fit static photos without duplicate blurred resources', async () => {
   const r = fixture();
   try {
     assert.equal(await r.cleanup.ready, true);
@@ -36,7 +36,8 @@ test('Hero + Sidebar prepares three whole static photos without duplicate blurre
       assert.equal(r.state(image).opacity, 1);
       assert.equal(r.state(image).animation, 'none');
       assert.equal(r.state(image).promotion, 'auto');
-      assert.equal(r.computed(image)['background-size'], 'contain');
+      // Exact-fit cells: each cell has its photo's aspect, so cover crops nothing.
+      assert.equal(r.computed(image)['background-size'], 'cover');
       assert.equal(r.computed(r.slot(image))['background-color'], '#1c1b19');
     }
   } finally { r.cleanup(); }

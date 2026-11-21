@@ -125,7 +125,7 @@ for (const mode of ['kenBurns', 'push']) {
       assert.match(hero.style.animation, /^compactPanX 5400ms ease-in-out forwards$/);
       assert.equal(hero.style['--pan-from'], '0px'); assert.equal(hero.style['--pan-to'], '-1120px');
       assert.equal(hero.style.willChange, 'transform');
-      assert.equal(hero.children[0].style.backgroundImage, 'none', 'no border over a full-bleed pan');
+      assert.equal(hero.children.length, 0, 'no border over a full-bleed pan');
       assert.equal(r.nodes().filter(n => n.classList.contains('ss-compact-fill')).length, 0);
       await r.advanceTo(5000);
       hero = heroes(r).at(-1);
@@ -182,16 +182,20 @@ for (const mode of ['kenBurns', 'push']) {
     } finally { r.cleanup(); }
   });
 
-  test(`${mode}: the Portal+ requests and lays out exactly as shipped`, async () => {
+  test(`${mode}: the Portal+ fills the screen with a matched photo and keeps its own motion`, async () => {
     const r = createSceneFixture({ mode, photos: landscapes() });
     try {
       assert.equal(await r.cleanup.ready, true);
-      assert.ok(r.resolutions.every(n => n.edge === 2200 && !('drawn' in n)));
+      assert.ok(r.resolutions.every(n => n.edge === 2200 && !('drawn' in n)), 'Portal+ requests unchanged');
       const hero = shown(r);
-      assert.equal(hero.style.backgroundSize, 'contain');
-      assert.ok(!hero.classList.contains('ss-compact'));
+      assert.equal(hero.style.backgroundSize, 'cover', 'a 3:2 photo keeps 100 % on the 3:2 screen');
+      assert.deepEqual([hero.style.left, hero.style.top, hero.style.width, hero.style.height],
+        ['0px', '0px', '2160px', '1440px']);
       assert.ok(!/compactPan|compactZoom/.test(hero.style.animation || ''));
-      assert.ok(hero.children[0].style.backgroundImage.startsWith('url('), 'border kept');
+      if (mode === 'kenBurns') assert.ok(hero.classList.contains('ss-motion'), 'the shipped kb animation');
+      else assert.equal(hero.style.animation, 'cinematicDrift 5400ms linear forwards');
+      assert.equal(hero.children.length, 0, 'no outline over a full-bleed photo');
+      assert.equal(r.nodes().filter(n => n.classList.contains('ss-compact-fill')).length, 0, 'no backdrop');
     } finally { r.cleanup(); }
   });
 }
@@ -210,47 +214,67 @@ async function toCollage(r) {
   r.end(r.prints().at(-1));
 }
 
-test('memories upright: the collage uses the tall slot table, tilted cards and the serif title', async () => {
+// The collage is one exact-fit grid in the clock-free area, under its caption.
+function assertTrio(r, W, H, gap, caption) {
+  const cards = r.nodes().filter(n => n.classList.contains('ss-memory-card'));
+  assert.equal(cards.length, 3);
+  const area = r.SS.photoLayoutArea({ root: r.nodes()[0], W, H });
+  const boxes = cards.map(card => ({ x: px(card.style.left), y: px(card.style.top), w: px(card.style.width), h: px(card.style.height) }));
+  boxes.forEach((b, i) => {
+    near(b.w / b.h, 1.5, 1e-6);
+    assert.ok(b.x >= area.x - 1e-6 && b.x + b.w <= area.x + area.w + 1e-6, JSON.stringify(b));
+    assert.ok(b.y >= area.y + caption - 1e-6 && b.y + b.h <= area.y + area.h + 1e-6, JSON.stringify(b));
+    assert.equal(cards[i].style.transform, 'none');
+  });
+  const gaps = [];
+  for (const a of boxes) for (const b of boxes) {
+    if (a === b) continue;
+    if (Math.abs(a.x + a.w + gap - b.x) < 1e-6 && a.y < b.y + b.h && b.y < a.y + a.h) gaps.push('x');
+    if (Math.abs(a.y + a.h + gap - b.y) < 1e-6 && a.x < b.x + b.w && b.x < a.x + a.w) gaps.push('y');
+  }
+  assert.ok(gaps.length >= 2, 'every tile meets a neighbour across exactly one gutter');
+  const title = r.nodes().find(n => n.classList.contains('ss-memory-caption'));
+  near(px(title.style.left), Math.min(...boxes.map(b => b.x)));
+  assert.ok(px(title.style.top) < Math.min(...boxes.map(b => b.y)));
+  assert.ok(title.parent.classList.contains('trio'));
+  return title;
+}
+
+test('memories upright: the collage is the exact-fit grid with 14 px gutters and the serif title', async () => {
   const photos = Array.from({ length: 9 }, (_, i) => ({ seed: 'm' + i, w: 1500, h: 1000 }));
-  const r = memories({ W: 800, H: 1280, cls: 'CP', photos });
+  const r = memories({ W: 800, H: 1280, cls: 'CP', photos, configureWindow: w => { r0 = w; } });
+  r.SS = r0.SS;
   try {
     await toCollage(r);
-    const cards = r.nodes().filter(n => n.classList.contains('ss-memory-card'));
-    assert.equal(cards.length, 3);
-    const slots = [[.06, .09, .7, .3], [.42, .3, .52, .42], [.08, .55, .62, .26]];
-    cards.forEach((card, i) => {
-      const [fx, fy, fw, fh] = slots[i], box = { x: fx * 800, y: fy * 1280, w: fw * 800, h: fh * 1280 };
-      const imageH = Math.min(box.h - 24, (box.w - 24) / 1.5), w = imageH * 1.5 + 24, h = imageH + 24;
-      near(px(card.style.left), box.x + (box.w - w) / 2); near(px(card.style.top), box.y + (box.h - h) / 2);
-      near(px(card.style.width), w); near(px(card.style.height), h);
-      assert.equal(card.style.transform, `rotate(${[-2, 1.5, -1][i]}deg)`);
-    });
-    const title = r.nodes().find(n => n.classList.contains('ss-memory-caption'));
+    const title = assertTrio(r, 800, 1280, 14, 96);
     assert.equal(title.textContent, 'On this day');
     assert.ok(title.classList.contains('upright'));
-    const style = r.computed(title);
-    assert.equal(style.left, '40px'); assert.equal(style.top, '34px');
-    assert.match(style['font-family'], /serif$/);
+    assert.match(r.computed(title)['font-family'], /serif$/);
   } finally { r.cleanup(); }
 });
 
-test('memories turned keeps the shipped collage and title', async () => {
+test('memories turned: the collage is the exact-fit grid with 14 px gutters', async () => {
   const photos = Array.from({ length: 9 }, (_, i) => ({ seed: 'm' + i, w: 1500, h: 1000 }));
-  const r = memories({ W: 1280, H: 800, cls: 'CL', photos });
+  const r = memories({ W: 1280, H: 800, cls: 'CL', photos, configureWindow: w => { r0 = w; } });
+  r.SS = r0.SS;
   try {
     await toCollage(r);
-    const cards = r.nodes().filter(n => n.classList.contains('ss-memory-card'));
-    assert.equal(cards.length, 3);
-    assert.ok(cards.every(card => !card.style.transform));
-    const [x, y, sw, sh] = [.08, .16, .42, .5], box = { w: sw * 1280, h: sh * 800 };
-    const imageH = Math.min(box.h - 24, (box.w - 24) / 1.5);
-    near(px(cards[0].style.left), 1280 * x + (box.w - imageH * 1.5 - 24) / 2);
-    near(px(cards[0].style.top), 800 * y + (box.h - imageH - 24) / 2);
-    const title = r.nodes().find(n => n.classList.contains('ss-memory-caption'));
+    const title = assertTrio(r, 1280, 800, 14, 72);
     assert.equal(title.textContent, 'Photo memories');
     assert.ok(!title.classList.contains('upright'));
   } finally { r.cleanup(); }
 });
+
+test('memories on the Portal+: the collage is the exact-fit grid with 20 px gutters, clear of the clock', async () => {
+  const photos = Array.from({ length: 9 }, (_, i) => ({ seed: 'm' + i, w: 1500, h: 1000 }));
+  const r = memories({ W: 2160, H: 1440, photos, configureWindow: w => { r0 = w; } });
+  r.SS = r0.SS;
+  try {
+    await toCollage(r);
+    assertTrio(r, 2160, 1440, 20, 72);
+  } finally { r.cleanup(); }
+});
+let r0 = null;
 
 // A canvas 2D stub and an Image that loads on the next microtask.
 function canvasWindow(calls) {

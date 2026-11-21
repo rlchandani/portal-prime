@@ -161,6 +161,108 @@
     const w = s * a, h = s;
     return { mode: "whole", zone, rect: { x: zone.x + (zone.w - w) / 2, y: zone.y + (zone.h - h) / 2, w, h } };
   };
+  // ---- One or two photos on the Portal+ ("L", mock screensaver-polish-20261121) ---------------
+  // The visible window of a face-centred cover crop along the clipped axis (0..1), whether the
+  // cached face box (padded) survives it, and the matching CSS background-position.
+  const LARGE_KEEP = 0.8, LARGE_MARGIN = 0.035, FACE_PAD = 0.03, PAIR_GAP = 24;
+  function validFace(p) {
+    return !!p && Number.isFinite(p.fx) && Number.isFinite(p.fy) && p.fx >= 0 && p.fx <= 1 && p.fy >= 0 && p.fy <= 1;
+  }
+  function faceBox(p) {
+    const b = p && p.fb;
+    return Array.isArray(b) && b.length === 4 && b.every(v => Number.isFinite(v) && v >= 0 && v <= 1) &&
+      b[0] < b[2] && b[1] < b[3] ? b : null;
+  }
+  window.SS.coverCrop = function (photo, W, H) {
+    const raw = photo && photo.w / photo.h, a = Number.isFinite(raw) && raw > 0 ? raw : 1, va = W / H;
+    const tall = a < va, visible = Math.min(1, tall ? a / va : va / a);
+    const focal = validFace(photo) ? (tall ? photo.fy : photo.fx) : .5;
+    const start = Math.min(1 - visible, Math.max(0, focal - visible / 2)), end = start + visible;
+    const fb = faceBox(photo), lo = fb && (tall ? fb[1] : fb[0]), hi = fb && (tall ? fb[3] : fb[2]);
+    const faces = !fb || visible >= 1 ||
+      (lo >= (start > 0 ? start + FACE_PAD : 0) && hi <= (end < 1 ? end - FACE_PAD : 1));
+    const pos = visible < 1 ? (start / (1 - visible) * 100).toFixed(1) + "%" : "50%";
+    return { visible, faces, position: tall ? "50% " + pos : pos + " 50%" };
+  };
+  // A single photo fills the screen when the crop keeps >= 80 % of it and the faces stay in;
+  // otherwise the whole photo sits, as large as the margin allows, over its own soft backdrop.
+  window.SS.largeMargin = function (W, H) {
+    const m = Math.round(Math.min(W, H) * LARGE_MARGIN);
+    return { x: m, y: m, w: Math.max(1, W - m * 2), h: Math.max(1, H - m * 2) };
+  };
+  window.SS.largeSingle = function (photo, W, H) {
+    const crop = window.SS.coverCrop(photo, W, H);
+    if (crop.visible >= LARGE_KEEP - 1e-9 && crop.faces) // the tolerance absorbs float division
+      return { mode: "fill", rect: { x: 0, y: 0, w: W, h: H }, position: crop.position };
+    const raw = photo && photo.w / photo.h, a = Number.isFinite(raw) && raw > 0 ? raw : 1;
+    const zone = window.SS.largeMargin(W, H), s = Math.min(zone.w / a, zone.h), w = s * a;
+    return { mode: "whole", zone, rect: { x: zone.x + (zone.w - w) / 2, y: zone.y + (zone.h - s) / 2, w, h: s } };
+  };
+  // Two portraits side by side at one height inside the margin, nothing cropped. [widths] are
+  // each photo's drawn width; the gap between them is PAIR_GAP.
+  window.SS.pairPlan = function (aspects, W, H) {
+    const as = aspects.map(v => Number.isFinite(v) && v > 0 ? v : 1), zone = window.SS.largeMargin(W, H);
+    const h = Math.min(zone.h, (zone.w - PAIR_GAP) / (as[0] + as[1])), widths = as.map(a => a * h);
+    const w = widths[0] + widths[1] + PAIR_GAP;
+    return { mode: "whole", pair: true, zone, gap: PAIR_GAP, widths,
+      rect: { x: (W - w) / 2, y: (H - h) / 2, w, h } };
+  };
+
+  // ---- Two or three photos as one exact-fit grid ------------------------------------------------
+  // Every tile keeps its photo's own aspect (nothing cropped or letterboxed), every gutter is
+  // exactly [gap] and the composition shares its outer edges. Candidates: one row, a hero beside
+  // (heroLeft) or above (heroTop) a stacked pair, and one column; each is solved in closed form at
+  // the largest size that fits [area], centred there. The largest covered area wins, damped when
+  // one tile would be a postage stamp. [only] fixes the shape (a named hero is photo 0).
+  window.SS.trioLayout = function (aspects, area, gap, only) {
+    const a = aspects.map(v => Number.isFinite(v) && v > 0 ? v : 1), n = a.length;
+    if (!n || !(area && area.w > 0 && area.h > 0)) return [];
+    const g = Math.max(0, gap || 0), cands = [];
+    const centre = (boxes, w, h) => boxes.map(b => ({ x: area.x + (area.w - w) / 2 + b.x,
+      y: area.y + (area.h - h) / 2 + b.y, w: b.w, h: b.h }));
+    if (!only || only === "row") {
+      const sum = a.reduce((s, v) => s + v, 0), h = Math.min(area.h, (area.w - (n - 1) * g) / sum);
+      let x = 0; const boxes = a.map(v => { const b = { x, y: 0, w: v * h, h }; x += v * h + g; return b; });
+      if (h > 0) cands.push(centre(boxes, x - g, h));
+    }
+    if (!only || only === "column") {
+      const sum = a.reduce((s, v) => s + 1 / v, 0), w = Math.min(area.w, (area.h - (n - 1) * g) / sum);
+      let y = 0; const boxes = a.map(v => { const b = { x: 0, y, w, h: w / v }; y += w / v + g; return b; });
+      if (w > 0) cands.push(centre(boxes, w, y - g));
+    }
+    if (n === 3) for (let i = 0; i < 3; i++) {
+      if (only && i !== 0) break;
+      const [j, k] = [0, 1, 2].filter(m => m !== i);
+      if (!only || only === "heroLeft") {
+        // Hero height H; the stack's width c satisfies c / a[j] + g + c / a[k] = H.
+        const s = 1 / a[j] + 1 / a[k], H = Math.min(area.h, (area.w - g * (1 - 1 / s)) / (a[i] + 1 / s));
+        const c = (H - g) / s, hw = H * a[i], boxes = [];
+        boxes[i] = { x: 0, y: 0, w: hw, h: H };
+        boxes[j] = { x: hw + g, y: 0, w: c, h: c / a[j] };
+        boxes[k] = { x: hw + g, y: c / a[j] + g, w: c, h: c / a[k] };
+        if (c > 0) cands.push(centre(boxes, hw + g + c, H));
+      }
+      if (!only || only === "heroTop") {
+        // Hero width W; the pair's height r satisfies r * a[j] + g + r * a[k] = W.
+        const t = a[j] + a[k], W = Math.min(area.w, (area.h - g * (1 - 1 / t)) / (1 / a[i] + 1 / t));
+        const r = (W - g) / t, hh = W / a[i], boxes = [];
+        boxes[i] = { x: 0, y: 0, w: W, h: hh };
+        boxes[j] = { x: 0, y: hh + g, w: r * a[j], h: r };
+        boxes[k] = { x: r * a[j] + g, y: hh + g, w: r * a[k], h: r };
+        if (r > 0) cands.push(centre(boxes, W, hh + g + r));
+      }
+    }
+    let best = [], bestScore = -1;
+    cands.forEach(boxes => {
+      const areas = boxes.map(b => b.w * b.h), total = areas.reduce((s, v) => s + v, 0);
+      const balance = Math.min(...areas) / Math.max(...areas);
+      const score = total * (0.6 + 0.4 * Math.min(1, balance * 2.5));
+      if (score > bestScore) { bestScore = score; best = boxes; }
+    });
+    return best;
+  };
+  window.SS.TRIO_GAP = { L: 20, compact: 14 };
+
   // Upright: two landscapes stacked, each the full width (a 3:2 photo keeps 83 %).
   window.SS.stackable = function (p) {
     const a = p && p.w / p.h;
@@ -267,24 +369,55 @@
   window.SS.take = function (deck, cursorRef, spec, exclude) {
     const out = [];
     const used = new Set(exclude || []);
+    // Photos a pairing already showed early (SS.takePartner) are skipped once, so each photo
+    // still appears once per pass of the deck.
+    const early = () => new Set(cursorRef.ahead || []);
     for (const want of spec) {
       let found = null;
+      const ahead = early();
       for (let k = 0; k < deck.length; k++) {
         const p = deck[(cursorRef.i + k) % deck.length];
-        if (used.has(p.seed)) continue;
-        if (want === "any" || bucket(p) === want) { found = p; cursorRef.i += k + 1; break; }
+        if (used.has(p.seed) || ahead.has(p.seed)) continue;
+        if (want === "any" || bucket(p) === want) { found = p; consume(deck, cursorRef, k); break; }
       }
       if (!found) {
         for (let k = 0; k < deck.length; k++) {
           const p = deck[(cursorRef.i + k) % deck.length];
-          if (!used.has(p.seed)) { found = p; cursorRef.i += k + 1; break; }
+          if (!used.has(p.seed) && !ahead.has(p.seed)) { found = p; consume(deck, cursorRef, k); break; }
         }
       }
-      if (!found) { found = deck[cursorRef.i % deck.length]; cursorRef.i++; }
+      if (!found) { found = deck[cursorRef.i % deck.length]; consume(deck, cursorRef, 0); }
       used.add(found.seed);
       out.push(found);
     }
     return out;
+  };
+  // Advance the cursor past [k + 1] slots; an early-shown photo whose slot is passed is settled.
+  function consume(deck, cursorRef, k) {
+    if (cursorRef.ahead && cursorRef.ahead.length) {
+      const passed = new Set();
+      for (let m = 0; m <= k; m++) passed.add(deck[(cursorRef.i + m) % deck.length].seed);
+      cursorRef.ahead = cursorRef.ahead.filter(seed => !passed.has(seed));
+    }
+    cursorRef.i += k + 1;
+  }
+  // The second portrait of a Portal+ pair: the next portrait within PAIR_LOOKAHEAD slots of
+  // the cursor that is not [first] and not on screen ([exclude]). The very next slot is taken
+  // in order; a later one is shown early and its own slot is skipped once (cursor.ahead), so
+  // the pair never repeats a photo in a pass and never skips one. Null when none is near.
+  const PAIR_LOOKAHEAD = 6;
+  window.SS.takePartner = function (deck, cursorRef, first, exclude) {
+    if (!first || bucket(first) !== "portrait" || deck.length < 2) return null;
+    const used = new Set([first.seed].concat(exclude || [], cursorRef.ahead || []));
+    const span = Math.min(PAIR_LOOKAHEAD, deck.length - 1);
+    for (let k = 0; k < span; k++) {
+      const p = deck[(cursorRef.i + k) % deck.length];
+      if (used.has(p.seed) || bucket(p) !== "portrait") continue;
+      if (k === 0) consume(deck, cursorRef, 0);
+      else cursorRef.ahead = (cursorRef.ahead || []).concat(p.seed);
+      return p;
+    }
+    return null;
   };
 
   // Compositions scale to the pool: a mode that designs for N slots asks for

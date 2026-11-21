@@ -93,16 +93,19 @@ function galleryGoldenSnapshot(r) {
 // Cinema matte fields preserve the previous normalized trace; its pseudo-frame needs native visual checks.
 // Polaroid now fits the existing reserved photo area; rotation, random draws, resources and timers stay pinned.
 // Gallery validates its exact composed backgrounds before removing only the added decorative fields.
+// Screensaver polish (mock screensaver-polish-20261121): Ken Burns, Push and Memories singles fill or
+// sit whole over a pre-blurred copy (portraits paired); Memories' collage and Hero + Sidebar use the
+// exact-fit trio grid. Their hashes were re-pinned; random draw counts are unchanged.
 const legacyOutput = [
-  ['kenBurns', 30, '3005c1e70712a249dbedd01585276ccadca7bfa140b86375ba5963d57c15ad63'],
+  ['kenBurns', 30, '5c268483026d1429b4497f043af6f9556dda854c59b2bf94d8f0ba5fc27e1118'],
   ['diptych', 12, 'fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef'],
   ['framed', 6, '95a97824d4030098e30c1d421b25d87e7611aae3115062474e9b72d1c7190551'],
-  ['push', 0, '70851e47d57b1f68d6db6a5c2643b91928bdca4e8c92817175dbb305d607714a'],
-  ['memories', 0, '450157eda127ccfa5a7696531686ce1b0607ebc7edd19922bcd11fadee86c9ef'],
+  ['push', 0, '95cae37d32b8bc6f23df4a61de06b5dec4b67e9d3b58e00192b393461268143f'],
+  ['memories', 0, '5cd915029c25b3bccda619eb940577f57d5caf47aae53dab9b979be3a17343a4'],
   ['panorama', 0, '64d5d2036eb082a85bab62c7718b97da2bb9289836eda98220a05a1c3b9ec0cd'],
   ['mosaic', 5, '5bcac3423cd4bb7973e4727270c64e614f7b97aa91faddc197a07443e5b22434'],
   ['cinema', 0, '05ab8f802f34a45f48a16ea90a0f485df8647abceb1f2226fc32abc62fa868d1'],
-  ['heroSidebar', 0, 'a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c'],
+  ['heroSidebar', 0, '92c2ee82719e017df5af299581efe21834f10996d0620d3f43ae81ac63880a96'],
   ['galleryWall', 5, '239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9'],
   ['polaroid', 44, '9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598'],
   ['filmstrip', 0, 'e55bbd40fc31709d71052f73d61ea3de6333fa2b804527a014cb5d79bde5e677'],

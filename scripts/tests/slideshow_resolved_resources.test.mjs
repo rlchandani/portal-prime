@@ -13,8 +13,10 @@ const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url
 const modes = ['kenBurns', 'diptych', 'framed', 'galleryWall', 'push', 'memories',
   'panorama', 'polaroid', 'mosaic', 'filmstrip', 'cinema', 'heroSidebar'];
 const affected = ['diptych', 'galleryWall', 'polaroid', 'mosaic', 'filmstrip'];
-const expectedEdges = { kenBurns: [2200], diptych: [1800], framed: [1800], galleryWall: [1200],
-  push: [2200], memories: [2200], panorama: [2400], polaroid: [1400], mosaic: [1200],
+// Ken Burns, Push and Memories open on a portrait (photo 0), paired on the Portal+ with the next
+// portrait at its drawn size (1340 px tall plus the 15 % zoom headroom), over one 320 px backdrop.
+const expectedEdges = { kenBurns: [320, 1541], diptych: [1800], framed: [1800], galleryWall: [1200],
+  push: [320, 1541], memories: [320, 1541], panorama: [2400], polaroid: [1400], mosaic: [1200],
   filmstrip: [1000, 1400], cinema: [2400], heroSidebar: [1100, 1800] };
 
 // Synthetic DOM, clock and image transport only. Execute the actual photo resolver,
@@ -37,11 +39,13 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
         set: value => {
           background = value;
           const match = /^url\("([^"]*)"\)(.*)$/.exec(value);
+          // A Portal+ portrait pair draws two prepared photos in one hero.
+          const pair = match && this.classList.contains('ss-hero') && /^, url\("([^"]*)"\)$/.exec(match[2]);
           if (match) assert.ok(match[2] === '' || (
             this.classList.contains('gallery-photo') && match[2] === ', url("photo-doodles-dark.svg")'
-          ), 'Only Gallery Wall may add the fixed bundled doodle below its prepared photo');
-          const url = match?.[1];
-          if (url) writes.push({ node: this, url, prepared: decoded.has(url) });
+          ) || (pair && this.classList.contains('ss-hero') && pair[1] !== 'photo-doodles-dark.svg'),
+          'Only Gallery Wall may add the fixed bundled doodle below its prepared photo');
+          [match?.[1], pair?.[1]].filter(Boolean).forEach(url => writes.push({ node: this, url, prepared: decoded.has(url) }));
         },
       });
     }
@@ -60,6 +64,13 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
       child.remove(); child.parent = this; this.children.push(child); return child;
     }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
+    get firstChild() { return this.children[0] || null; }
+    insertBefore(child, before) {
+      child.remove(); child.parent = this;
+      const at = before ? this.children.indexOf(before) : -1;
+      if (at < 0) this.children.push(child); else this.children.splice(at, 0, child);
+      return child;
+    }
     set innerHTML(value) { assert.equal(value, ''); this.children.forEach(child => { child.parent = null; }); this.children = []; }
     get offsetWidth() { return 100; }
     getAnimations() { return []; }
@@ -225,7 +236,7 @@ test('Memories: the sixth beat carries the three decoded collage resources', asy
     assert.equal(r.writes.slice(before).length, 3);
     assert.ok(r.writes.slice(before).every(write =>
       write.node.classList.contains('memory-photo') &&
-      write.node.style.backgroundSize === 'contain' &&
+      write.node.style.backgroundSize === 'cover' && // exact-fit card: its photo's own aspect
       write.node.style.animation === 'none'));
   } finally { r.stop(); }
 });

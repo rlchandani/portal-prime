@@ -36,6 +36,13 @@ function fixture({ mode = 'framed', paused = false, known = false, random = .5,
     appendChild(child) {
       child.remove(); child.parent = this; this.children.push(child); return child;
     }
+    insertBefore(child, before) {
+      child.remove(); child.parent = this;
+      const at = before ? this.children.indexOf(before) : -1;
+      if (at < 0) this.children.push(child); else this.children.splice(at, 0, child);
+      return child;
+    }
+    get firstChild() { return this.children[0] || null; }
     remove() {
       if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
       this.parent = null;
@@ -125,8 +132,11 @@ for (const mode of fixed) test(`${mode}: unknown metadata starts with display de
     assert.deepEqual(f.reports, [], 'Style cannot be reported before decode');
     await f.finishScene();
     assert.deepEqual(f.reports, [mode]);
-    assert.equal(f.requests.some(request => request.edge === 320), false);
-    assert.equal(f.requests.length, mode === 'polaroid' ? 6 : 1);
+    // A portrait on the Portal+ is shown whole over its own pre-blurred 320 px copy (no pair:
+    // the other photos' shapes are still unknown, so none is a known portrait).
+    const backdrop = ['kenBurns', 'push', 'memories'].includes(mode);
+    assert.equal(f.requests.some(request => request.edge === 320), backdrop);
+    assert.equal(f.requests.length, mode === 'polaroid' ? 6 : backdrop ? 2 : 1);
     assert.ok(f.context.PHOTOS.some(photo => photo.measured && photo.w / photo.h === 2 / 3));
     if (mode === 'framed') {
       const print = f.nodes().find(node => node.classList.contains('ss-print') && node.style.backgroundImage?.startsWith('url('));
@@ -253,7 +263,10 @@ test('Shuffle still sees measured portraits and can select Hero + Sidebar on its
 // Removing the gate must preserve the geometry/motion of real known metadata,
 // including the long-axis Ken Burns choice and the complete Polaroid paper fit.
 for (const mode of fixed) test(`${mode}: display-derived dimensions match known metadata geometry and resource admission`, async () => {
-  for (const [width, height] of [[1200, 1800], [6000, 1200]]) {
+  // Known portraits pair on the Portal+ (Ken Burns, Push, Memories): the partner's shape must be
+  // known, so that case is pinned separately ("known portraits pair ...").
+  const pairs = ['kenBurns', 'push', 'memories'].includes(mode);
+  for (const [width, height] of pairs ? [[6000, 1200]] : [[1200, 1800], [6000, 1200]]) {
     const known = fixture({ mode, known: true, width, height, face: false, random: .9 });
     const recovered = fixture({ mode, width, height, face: false, random: .9 });
     try {
@@ -272,15 +285,32 @@ test('Memories builds its later collage from display dimensions without adding p
     await f.finishScene();
     for (let beat = 2; beat <= 6; beat++) {
       await f.tick(5000);
-      f.active().forEach(image => image.complete()); await f.flush();
+      for (let i = 0; i < 3; i++) { f.active().forEach(image => image.complete()); await f.flush(); }
     }
     const cards = f.nodes().filter(node => node.classList.contains('ss-memory-card'));
     assert.equal(cards.length, 3);
+    // Exact-fit grid: each card is exactly its photo's aspect (no paper inset).
     for (const card of cards) {
-      const width = parseFloat(card.style.width) - 24, height = parseFloat(card.style.height) - 24;
+      const width = parseFloat(card.style.width), height = parseFloat(card.style.height);
       assert.ok(Math.abs(width / height - 2 / 3) < .000001);
     }
     assert.equal(f.requests.filter(request => request.edge === 1100).length, 3);
-    assert.equal(f.requests.some(request => request.edge === 320), false);
+    // Probes are never added: every 320 request is a single beat's backdrop, after its photo.
+    const backdrops = f.requests.filter(request => request.edge === 320);
+    assert.ok(backdrops.every(request => f.requests.some(r => r.url === request.url && r.edge === 2200)));
   } finally { f.close(); }
+});
+
+test('known portraits pair on the Portal+ in Ken Burns, Push and Memories singles', async () => {
+  for (const mode of ['kenBurns', 'push', 'memories']) {
+    const f = fixture({ mode, known: true, width: 1200, height: 1800, face: false, random: .9 });
+    try {
+      await f.finishScene();
+      assert.deepEqual(f.reports, [mode]);
+      const hero = f.nodes().find(node => node.classList.contains('ss-compact') && node.style.backgroundImage?.startsWith('url('));
+      assert.equal(hero.style.backgroundImage.split('url(').length - 1, 2, mode + ' draws two photos');
+      assert.equal(hero.style.backgroundPosition, 'left center, right center');
+      assert.equal(f.requests.filter(request => request.edge === 320).length, 1, 'one backdrop for the pair');
+    } finally { f.close(); }
+  }
 });
