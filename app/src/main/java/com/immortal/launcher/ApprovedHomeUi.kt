@@ -504,9 +504,10 @@ internal fun ApprovedHomeWidgetHeading(
       // The negative vertical margin in the approved CSS gives this action a 68dp minimum target.
       // Every card says "Settings"/"Open": the spoken name says whose ("Weather settings").
       val spoken = HomeRefinements.headerActionSpoken(action, title)
+      // After the click so the name sits on the button's node and replaces the bare word below it.
       Box(Modifier.widthIn(min = 68.dp).height(32.dp)
-          .semantics { contentDescription = spoken }
           .tvFocusable(RoundedCornerShape(9.dp), ringColor = ApprovedHomePalette.Accent, onClick = onOpen)
+          .ccSpeak(spoken)
           .padding(horizontal = 6.dp),
           contentAlignment = Alignment.Center) {
         Text(action.label, color = color, fontSize = 18.sp, lineHeight = 24.sp,

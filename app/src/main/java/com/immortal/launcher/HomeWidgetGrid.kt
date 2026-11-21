@@ -249,8 +249,8 @@ private fun widgetSpokenName(widget: HomeWidgetStore.HomeWidget, manager: AppWid
 private fun ApprovedWidgetAction(label: String, widgetName: String, modifier: Modifier, onClick: () -> Unit) {
   // Every card in Customize has these four; the spoken name says which card ("Move Weather").
   val spoken = HomeRefinements.widgetEditSpoken(label, widgetName)
-  Box(modifier.heightIn(min = 52.dp).semantics { contentDescription = spoken }
-      .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick)
+  Box(modifier.heightIn(min = 52.dp)
+      .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick).ccSpeak(spoken)
       .padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
     Text(label, color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 26.sp, maxLines = 1,
         overflow = TextOverflow.Ellipsis)

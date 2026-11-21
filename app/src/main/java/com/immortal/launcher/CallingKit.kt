@@ -139,7 +139,10 @@ internal fun CallPill(label: String, onClick: () -> Unit, modifier: Modifier = M
   val shape = RoundedCornerShape(50)
   Row(modifier.alpha(if (enabled) 1f else DISABLED_ALPHA).height(size.height).background(fill, shape)
       .let { if (edge != null) it.border(OUTLINE, edge, shape) else it }
-      .callClick(spoken, enabled, onClick).padding(horizontal = size.padding),
+      .callClick(spoken, enabled, onClick)
+      // A spoken name that differs from the visible word replaces it on the button's own node (the
+      // pill's Text would otherwise be read as a second, bare "Video call").
+      .let { if (spoken != label) it.ccSpeak(spoken) else it }.padding(horizontal = size.padding),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
     icon?.let { CallIcon(it, ink, size.icon) }
     Text(label, color = ink, fontSize = size.text, fontWeight = FontWeight.SemiBold, maxLines = 1,
