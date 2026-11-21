@@ -52,21 +52,24 @@ import androidx.compose.ui.unit.sp
 /** Alerts (`alerts`): Active / All / Resolved cards on the left, the Portal-wide banner policy on the right. */
 @Composable
 internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
-  val active = s.alerts()
-  LaunchedEffect(active) { CcAlertHistory.observe(active, System.currentTimeMillis()) }
+  // Only the Alerts slice reaches the body: an HA update that changes no card (or a switch back
+  // to this screen with a newer snapshot) compares equal and the body and its cards skip.
+  val st = s.settings
+  CcAlertsBody(s.alertCards, st.warningAfterMin, st.bannersWarnings, st.bannersInfo, ui)
+}
+
+@Composable
+private fun CcAlertsBody(cards: CcAlertCards, warnAfterMin: Int, warnings: Boolean, info: Boolean, ui: CcUi) {
+  LaunchedEffect(cards.active) { CcAlertHistory.observe(cards.active, System.currentTimeMillis()) }
   val resolved by CcAlertHistory.resolved.collectAsState()
   var filter by rememberSaveable { mutableStateOf(CcAlertFilter.ACTIVE) }
   val onFilter = remember { { f: CcAlertFilter -> filter = f } }
-  val segs = remember(active.size) {
-    listOf(Triple(CcAlertFilter.ACTIVE, "Active · ${active.size}", null), Triple(CcAlertFilter.ALL, "All", null),
+  val count = cards.active.size
+  val segs = remember(count) {
+    listOf(Triple(CcAlertFilter.ACTIVE, "Active · $count", null), Triple(CcAlertFilter.ALL, "All", null),
         Triple(CcAlertFilter.RESOLVED, "Resolved", null))
   }
-  val items = remember(filter, active, resolved, s.entitiesVersion, s.plan, s.connection.canControl, s.minute) {
-    val roomOf: (String) -> String? = { id -> s.plan?.roomOf(id)?.id }
-    CcAlertRules.named(CcAlertRules.list(filter, active, resolved).map { (a, on) ->
-      CcAlertRules.item(a, on, s.entities, roomOf, s.connection.canControl, System.currentTimeMillis(), ::ccTime)
-    })
-  }
+  val items = remember(filter, cards, resolved) { CcAlertRules.shown(filter, cards, resolved, ::ccTime) }
   val onOp = remember(ui) { { item: CcAlertItem -> runOp(ui, item) } }
   if (currentLayoutClass().compactPortrait) {
     // The Mini upright: one column; the Portal-wide banner policy follows the alerts.
@@ -77,8 +80,7 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
       if (items.isEmpty()) item(key = "clear") { AllClear(filter) }
       items(items, key = { "${it.alert.id}:${it.active}" }) { AlertCard(it, onOp) }
       item(key = "banners") {
-        BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set,
-            Modifier.fillMaxWidth().padding(top = 10.dp))
+        BannersCard(warnAfterMin, warnings, info, set, Modifier.fillMaxWidth().padding(top = 10.dp))
       }
       item(key = "preview") { BannerPreviewCard(Modifier.fillMaxWidth()) }
     }
@@ -92,7 +94,7 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
     }
     val set = remember(ui) { { key: String, v: Boolean -> com.immortal.launcher.settings.ControlCenterSettings.set(ui.context, key, v); Unit } }
     Column(Modifier.width(520.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-      BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set, Modifier.fillMaxWidth())
+      BannersCard(warnAfterMin, warnings, info, set, Modifier.fillMaxWidth())
       BannerPreviewCard(Modifier.fillMaxWidth())
     }
   }
@@ -102,7 +104,7 @@ private fun runOp(ui: CcUi, item: CcAlertItem) {
   when (val op = item.op) {
     is CcAlertOp.Act -> ui.act(op.entity, op.call)
     is CcAlertOp.OpenRoom -> { ui.go(CcScreen.MAP); ui.openRoom(op.roomId) }
-    is CcAlertOp.Dismiss -> { CcAlertHistory.dismissed(item.alert, System.currentTimeMillis()); ControlCenter.dismissAlert(ui.context, item.alert, op.until) }
+    is CcAlertOp.Dismiss -> { CcAlertHistory.dismissed(item, System.currentTimeMillis()); ControlCenter.dismissAlert(ui.context, item.alert, op.until) }
     null -> Unit
   }
 }

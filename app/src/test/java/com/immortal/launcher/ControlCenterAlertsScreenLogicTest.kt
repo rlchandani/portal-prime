@@ -78,13 +78,16 @@ class ControlCenterAlertsScreenLogicTest {
     assertEquals(CcAlertRules.RESOLVED_MAX, CcAlertRules.resolve(emptyList(), many, emptyList(), 1L).size)
   }
 
-  @Test fun list_filters() {
+  @Test fun shown_filters() {
+    val now = at(19, 42)
     val a = alert("a", CcAlertAction.CLOSE)
     val b = alert("b", CcAlertAction.SNOOZE)
+    val cards = CcAlertRules.cards(listOf(b), emptyMap(), { null }, true, now, { "t" }, utc)
     val resolved = listOf(CcResolvedAlert(a, 1L), CcResolvedAlert(b, 2L))
-    assertEquals(listOf("b" to true), CcAlertRules.list(CcAlertFilter.ACTIVE, listOf(b), resolved).map { it.first.id to it.second })
-    assertEquals(listOf("a" to false), CcAlertRules.list(CcAlertFilter.RESOLVED, listOf(b), resolved).map { it.first.id to it.second })
-    assertEquals(listOf("b" to true, "a" to false), CcAlertRules.list(CcAlertFilter.ALL, listOf(b), resolved).map { it.first.id to it.second })
+    fun ids(f: CcAlertFilter) = CcAlertRules.shown(f, cards, resolved, { "t" }, utc, { "d" }).map { it.alert.id to it.active }
+    assertEquals(listOf("b" to true), ids(CcAlertFilter.ACTIVE))
+    assertEquals(listOf("a" to false), ids(CcAlertFilter.RESOLVED))
+    assertEquals(listOf("b" to true, "a" to false), ids(CcAlertFilter.ALL))
   }
 
   @Test fun item_derivesTheButton() {
