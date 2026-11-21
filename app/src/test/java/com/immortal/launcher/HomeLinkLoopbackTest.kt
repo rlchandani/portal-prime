@@ -57,5 +57,7 @@ class HomeLinkLoopbackTest {
   @Test fun connectedWordsNameTheOtherHome() {
     assertEquals("Lakeview is connected", HomeLinkCopy.connectedTitle("Lakeview"))
     assertTrue(HomeLinkCopy.connectedBody("Lakeview").startsWith("Lakeview can call you now."))
+    // The household identity only ever reaches pinned Portal device keys, never a phone.
+    assertFalse(HomeLinkCopy.connectedBody("Lakeview").contains("phone"))
   }
 }

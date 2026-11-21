@@ -178,15 +178,21 @@ private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) ->
       Text("Calls", color = p.text, fontSize = 46.sp, fontWeight = FontWeight.Bold, letterSpacing = (-1).sp)
       Text("Rooms in this home · end-to-end encrypted", color = p.secondary, fontSize = 24.sp)
     }
-    Spacer(Modifier.weight(1f))
-    CallsSegmented(CallsTab.entries.map(badges::label),
-        tab.ordinal) { onTab(CallsTab.entries[it]) }
     if (BuildConfig.PORTAL_CALL_LOOPBACK) {
-      CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
-      CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
-      CallPill("Link homes test", onLinkTest, icon = "house", surface = surface, size = CallButtonSize.SM)
+      // Measurement builds: the three test pills don't fit beside the tabs, so this part scrolls
+      // sideways instead of squeezing the last pill and pushing the gear off screen.
+      Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        CallsSegmented(CallsTab.entries.map(badges::label), tab.ordinal) { onTab(CallsTab.entries[it]) }
+        CallsTestPills(onLoopback, onTestMessage, onLinkTest, surface)
+        CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
+      }
+    } else {
+      Spacer(Modifier.weight(1f))
+      CallsSegmented(CallsTab.entries.map(badges::label),
+          tab.ordinal) { onTab(CallsTab.entries[it]) }
+      CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     }
-    CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
         surface = surface)
   }
@@ -216,14 +222,18 @@ private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (Calls
         horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       CallsSegmented(CallsTab.entries.map(badges::label),
           tab.ordinal) { onTab(CallsTab.entries[it]) }
-      if (BuildConfig.PORTAL_CALL_LOOPBACK) {
-      CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
-      CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
-      CallPill("Link homes test", onLinkTest, icon = "house", surface = surface, size = CallButtonSize.SM)
-    }
+      if (BuildConfig.PORTAL_CALL_LOOPBACK) CallsTestPills(onLoopback, onTestMessage, onLinkTest, surface)
       CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     }
   }
+}
+
+/** Measurement builds only: the loopback call, test message and "Link homes test" entries. */
+@Composable
+private fun CallsTestPills(onLoopback: () -> Unit, onTestMessage: () -> Unit, onLinkTest: () -> Unit, surface: CallSurface) {
+  CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+  CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
+  CallPill("Link homes test", onLinkTest, icon = "house", surface = surface, size = CallButtonSize.SM)
 }
 
 /** `.seg`: surf2 track, white pill on the selected item. */

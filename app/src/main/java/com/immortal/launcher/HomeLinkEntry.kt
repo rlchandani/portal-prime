@@ -81,7 +81,7 @@ internal object HomeLinkCopy {
   fun connectedTitle(theirName: String): String = "$theirName is connected"
 
   fun connectedBody(theirName: String): String =
-      "$theirName can call you now. The keys live only on your Portals and phones. No company sits in the middle."
+      "$theirName can call you now. The keys live only on your Portals. No company sits in the middle."
 
   fun verifyTitle(theirName: String): String = "Check it’s really $theirName"
 

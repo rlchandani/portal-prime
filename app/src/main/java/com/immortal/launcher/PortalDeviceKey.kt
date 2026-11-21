@@ -10,6 +10,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import android.util.Log
+import java.security.GeneralSecurityException
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
@@ -67,9 +68,15 @@ internal class PortalDeviceKey private constructor(private val private: PrivateK
       try {
         generate(attest = true)
       } catch (e: ProviderException) {
-        Log.i(TAG, "attestation unavailable, plain Keystore key")
-        generate(attest = false)
+        plain()
+      } catch (e: GeneralSecurityException) {
+        plain()
       }
+    }
+
+    private fun plain() {
+      Log.i(TAG, "attestation unavailable, plain Keystore key")
+      generate(attest = false)
     }
 
     private fun generate(attest: Boolean) {
