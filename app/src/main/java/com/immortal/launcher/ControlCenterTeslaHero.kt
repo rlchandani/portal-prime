@@ -42,7 +42,7 @@ private const val PCT = 100f
 /** The hero card (`tesla-premium-final`): name and state, the car, the big battery figure, the charge bar and details. */
 @Composable
 internal fun CcTeslaHero(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, charger: CcChargerView?, canAct: Boolean, modifier: Modifier) {
-  val motion = LocalCcMotion.current && LocalCcScreenActive.current
+  val motion = LocalCcMotion.current // off on a parked screen (see [ccSlotMoving])
   val cable = when {
     car.charging -> CcCableLook.CHARGING
     car.pluggedIn == true -> CcCableLook.PLUGGED

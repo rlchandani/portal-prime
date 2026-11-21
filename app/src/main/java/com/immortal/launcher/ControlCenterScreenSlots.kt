@@ -68,6 +68,8 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         var lingering by remember { mutableStateOf(false) }
         // True while this is the screen accessibility services are told about (see [ccSlotSemantics]).
         val spoken by remember { derivedStateOf { screen == ui.spokenScreen } }
+        // True a few frames into a visit (see [ccSlotLive]); a slot composed already shown starts awake.
+        var awake by remember { mutableStateOf(active) }
         // True a few frames after the semantics join (see [ccSlotCachesRegions]); a slot composed already shown starts cached.
         var cacheReady by remember { mutableStateOf(active) }
         val cache = remember { derivedStateOf { ccSlotCachesRegions(active, cacheReady) } }
@@ -75,9 +77,12 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
           settled = false
           if (active) {
             lingering = true
-            repeat(EXPOSE_FRAMES + CACHE_FRAMES) { withFrameNanos { } }
+            repeat(EXPOSE_FRAMES + WAKE_FRAMES) { withFrameNanos { } }
+            awake = true
+            repeat(CACHE_FRAMES - WAKE_FRAMES) { withFrameNanos { } }
             cacheReady = true
           } else {
+            awake = false
             cacheReady = false
             repeat(SETTLE_FRAMES) { withFrameNanos { } }
             settled = true
@@ -85,13 +90,17 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
             lingering = false
           }
         }
-        val mode = ccSlotDraw(screen, active, settled)
-        val live = ccSlotLive(active, lingering)
-        val layer = Modifier.graphicsLayer { alpha = if (mode == CcSlotDraw.RECORDING) 0f else 1f }
-            .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
-            .then(if (ccSlotSemantics(spoken)) Modifier else UNSPOKEN)
-        Box(Modifier.fillMaxSize().then(layer)) {
-          CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value),
+        // Read only while drawing, through one stable modifier: a switch between shown and parked
+        // (alpha 1 / 0) is a layer property change and never re-records the screen's draw lists.
+        val layer = remember {
+          val mode = derivedStateOf { ccSlotDraw(screen, active, settled) }
+          val drawn = derivedStateOf { mode.value != CcSlotDraw.DETACHED }
+          Modifier.fillMaxSize().graphicsLayer { alpha = ccSlotAlpha(mode.value) }.drawWithContent { if (drawn.value) drawContent() }
+        }
+        val live = ccSlotLive(active, awake, lingering)
+        val moving = ccSlotMoving(active, lingering)
+        Box(layer.then(if (ccSlotSemantics(spoken)) Modifier else UNSPOKEN)) {
+          CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (moving && motionOn.value),
               LocalCcRegionCache provides cache) {
             draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
           }
@@ -167,15 +176,27 @@ internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): Cc
   else -> CcSlotDraw.DETACHED
 }
 
+/** A slot's layer alpha: transparent only while parked and recording (see [ccSlotDraw]). */
+internal fun ccSlotAlpha(mode: CcSlotDraw): Float = if (mode == CcSlotDraw.RECORDING) 0f else 1f
+
 /**
- * Whether a slot's content behaves as on screen ([LocalCcScreenActive], [LocalCcMotion]): at once
- * when it is shown, but only [SETTLE_FRAMES] + [LINGER_FRAMES] frames after it is parked. Leaving a
- * screen stops its cameras and animations (effects cancelled, streams released, the tile
- * recomposed), and doing that in the switch frame made it longer; a parked screen is already
- * transparent and out of the semantics tree, so the stop is invisible a few frames later too.
- * A screen that was never shown (prewarmed) is never live.
+ * Whether a slot's content behaves as on screen for its cameras and loaders ([LocalCcScreenActive]):
+ * [EXPOSE_FRAMES] + [WAKE_FRAMES] frames after it is shown (`awake`), and still [SETTLE_FRAMES] + [LINGER_FRAMES]
+ * frames after it is parked. Starting a screen's cameras (stream claim, video / MJPEG / snapshot
+ * loops composed) or stopping them (effects cancelled, streams released) recomposes every tile, and
+ * doing that in the switch frame made it longer. A returning tile keeps showing its last picture
+ * meanwhile, and a stream takes far longer than two frames to show its first frame, so starting it
+ * a frame or two later looks the same; a parked screen is transparent and out of the semantics
+ * tree, so its stop is invisible a few frames later too. A slot composed already shown starts
+ * awake (the first open is not delayed); a screen that was never shown (prewarmed) is never live.
  */
-internal fun ccSlotLive(active: Boolean, lingering: Boolean): Boolean = active || lingering
+internal fun ccSlotLive(active: Boolean, awake: Boolean, lingering: Boolean): Boolean = if (active) awake else lingering
+
+/**
+ * Whether a slot's animations run ([LocalCcMotion], with the motion setting): at once when it is
+ * shown, and until it stops lingering after it is parked (see [ccSlotLive]).
+ */
+internal fun ccSlotMoving(active: Boolean, lingering: Boolean): Boolean = active || lingering
 
 /**
  * Whether a slot's screen is in the semantics tree: while it is [CcUi.spokenScreen] ([spoken]),
@@ -204,6 +225,12 @@ private const val CACHE_FRAMES = 2
 
 /** Frames after a switch before accessibility services are told (see [ccSlotSemantics], [CcUi.spokenScreen]). */
 private const val EXPOSE_FRAMES = 2
+
+/**
+ * Frames after the semantics join before a shown screen starts its cameras and loaders (see
+ * [ccSlotLive]), so neither lands on the switch frame or on the semantics rebuild; at most [CACHE_FRAMES].
+ */
+private const val WAKE_FRAMES = 1
 
 /** Frames a parked screen keeps drawing (transparent) to record its draw lists. */
 private const val SETTLE_FRAMES = 2
