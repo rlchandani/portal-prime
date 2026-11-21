@@ -49,4 +49,12 @@ class ControlCenterSlotDrawTest {
     assertEquals(true, ccSlotLive(active = false, lingering = true))
     assertEquals(false, ccSlotLive(active = false, lingering = false))
   }
+
+  /** A parked screen leaves the accessibility tree at once; a shown one joins it once exposed (a few frames in). */
+  @Test fun aScreenIsInTheSemanticsTreeOnlyWhileShownAndExposed() {
+    assertEquals(true, ccSlotSemantics(active = true, exposed = true))
+    assertEquals(false, ccSlotSemantics(active = true, exposed = false))
+    assertEquals(false, ccSlotSemantics(active = false, exposed = true))
+    assertEquals(false, ccSlotSemantics(active = false, exposed = false))
+  }
 }

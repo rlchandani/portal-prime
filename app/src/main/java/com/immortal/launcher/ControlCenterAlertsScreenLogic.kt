@@ -15,9 +15,17 @@ import java.util.TimeZone
 /** The Alerts screen's filter (`Active · N` / `All` / `Resolved`). */
 internal enum class CcAlertFilter { ACTIVE, ALL, RESOLVED }
 
-/** An alert that went away this session: dismissed here, or resolved in the house. */
+/** An alert that went away this session: dismissed here, or resolved in the house. [icon] is its card's icon while active. */
 @Immutable
-internal data class CcResolvedAlert(val alert: CcAlert, val at: Long)
+internal data class CcResolvedAlert(val alert: CcAlert, val at: Long, val icon: String? = null)
+
+/**
+ * The Alerts screen's slice of a snapshot: the active alerts' cards, derived once per snapshot on
+ * the engine thread ([CcUiState.alertCards]), and the start of today (resolved cards' stamps).
+ * Equal whenever nothing a card shows changed, so the screen and its cards skip on HA updates.
+ */
+@Immutable
+internal data class CcAlertCards(val active: List<CcAlertItem>, val dayStart: Long)
 
 /** What an alert card's button does. */
 @Immutable
@@ -114,10 +122,11 @@ internal object CcAlertRules {
    * Updates the session's resolved list: alerts [seen] before that are no longer [active] are
    * resolved now (newest first, capped). [dismissed] alerts are added by the screen directly.
    */
-  fun resolve(resolved: List<CcResolvedAlert>, seen: Collection<CcAlert>, active: List<CcAlert>, now: Long): List<CcResolvedAlert> {
+  fun resolve(resolved: List<CcResolvedAlert>, seen: Collection<CcAlert>, active: List<CcAlert>, now: Long,
+              iconOf: (CcAlert) -> String? = { null }): List<CcResolvedAlert> {
     val activeIds = active.map { it.id }.toSet()
     val known = resolved.map { it.alert.id }.toSet()
-    val gone = seen.filter { it.id !in activeIds && it.id !in known }.map { CcResolvedAlert(it, now) }
+    val gone = seen.filter { it.id !in activeIds && it.id !in known }.map { CcResolvedAlert(it, now, iconOf(it)) }
     return (gone + resolved).take(RESOLVED_MAX)
   }
 
@@ -125,8 +134,7 @@ internal object CcAlertRules {
   fun item(alert: CcAlert, active: Boolean, entities: Map<String, CcEntity>, roomOf: (String) -> String?, canControl: Boolean,
            now: Long, time: (Long) -> String, zone: TimeZone = TimeZone.getDefault(),
            day: (Long) -> String = { dayLabel(it, zone) }): CcAlertItem {
-    val line = listOfNotNull(alert.body, alert.since.takeIf { it > 0 }?.let { stamp(it, now, time, day, zone) })
-        .joinToString(" · ")
+    val line = line(alert, now, time, day, zone)
     val icon = icon(alert, entities[alert.entityId])
     val op: CcAlertOp? = if (!active) null else when (alert.action) {
       CcAlertAction.CLOSE -> garageFor(alert, entities)?.takeIf { it.isOpen }?.let { CcAlertOp.Act(it, CcCalls.coverClose(it)) }
@@ -137,6 +145,41 @@ internal object CcAlertRules {
     val enabled = op !is CcAlertOp.Act || canControl
     return CcAlertItem(alert, active, icon, line, op?.let { label(alert.action, now, zone) }, alert.severity == CcSeverity.CRITICAL, enabled, op)
   }
+
+  /** "body · time" under the card's title. */
+  private fun line(alert: CcAlert, now: Long, time: (Long) -> String, day: (Long) -> String, zone: TimeZone): String =
+      listOfNotNull(alert.body, alert.since.takeIf { it > 0 }?.let { stamp(it, now, time, day, zone) }).joinToString(" · ")
+
+  /** The active alerts' cards for one snapshot (the engine derives them off the main thread). */
+  fun cards(active: List<CcAlert>, entities: Map<String, CcEntity>, roomOf: (String) -> String?, canControl: Boolean,
+            now: Long, time: (Long) -> String, zone: TimeZone = TimeZone.getDefault()): CcAlertCards =
+      CcAlertCards(active.map { item(it, true, entities, roomOf, canControl, now, time, zone) }, dayStart(now, zone))
+
+  /** A resolved alert's card: no button, the icon it had while active, stamped against [dayStart] (today). */
+  fun resolvedItem(r: CcResolvedAlert, dayStart: Long, time: (Long) -> String, zone: TimeZone = TimeZone.getDefault(),
+                   day: (Long) -> String = { dayLabel(it, zone) }): CcAlertItem {
+    val a = r.alert
+    return CcAlertItem(a, false, r.icon ?: icon(a, null), line(a, dayStart, time, day, zone), null, a.severity == CcSeverity.CRITICAL, true, null)
+  }
+
+  /** The cards [filter] shows: active first, then resolved ones that aren't active again; repeated buttons numbered. */
+  fun shown(filter: CcAlertFilter, cards: CcAlertCards, resolved: List<CcResolvedAlert>, time: (Long) -> String,
+            zone: TimeZone = TimeZone.getDefault(), day: (Long) -> String = { dayLabel(it, zone) }): List<CcAlertItem> {
+    val done = if (filter == CcAlertFilter.ACTIVE) emptyList() else {
+      val activeIds = cards.active.mapTo(HashSet()) { it.alert.id }
+      resolved.filter { it.alert.id !in activeIds }.map { resolvedItem(it, cards.dayStart, time, zone, day) }
+    }
+    return named(when (filter) {
+      CcAlertFilter.ACTIVE -> cards.active
+      CcAlertFilter.RESOLVED -> done
+      CcAlertFilter.ALL -> cards.active + done
+    })
+  }
+
+  /** Local midnight of [now]'s day. */
+  fun dayStart(now: Long, zone: TimeZone = TimeZone.getDefault()): Long = Calendar.getInstance(zone).apply {
+    timeInMillis = now; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+  }.timeInMillis
 
   /** Numbers buttons that would read the same ("…, 2 of 3"): one sensor can raise several identical alerts. */
   fun named(items: List<CcAlertItem>): List<CcAlertItem> {
@@ -156,31 +199,24 @@ internal object CcAlertRules {
 
   private fun dayLabel(ms: Long, zone: TimeZone): String =
       CcDateFormats.format("EEE d MMM", ms, zone)
-
-  fun list(filter: CcAlertFilter, active: List<CcAlert>, resolved: List<CcResolvedAlert>): List<Pair<CcAlert, Boolean>> {
-    val activeIds = active.map { it.id }.toSet()
-    val done = resolved.filter { it.alert.id !in activeIds }.map { it.alert to false }
-    return when (filter) {
-      CcAlertFilter.ACTIVE -> active.map { it to true }
-      CcAlertFilter.RESOLVED -> done
-      CcAlertFilter.ALL -> active.map { it to true } + done
-    }
-  }
 }
 
 /** This session's resolved alerts (process lifetime; replaced, never mutated in place). */
 internal object CcAlertHistory {
   private val state = MutableStateFlow<List<CcResolvedAlert>>(emptyList())
-  private val seen = HashMap<String, CcAlert>()
+  private val seen = HashMap<String, CcAlertItem>()
   val resolved: StateFlow<List<CcResolvedAlert>> get() = state
 
-  @Synchronized fun observe(active: List<CcAlert>, now: Long) {
-    state.value = CcAlertRules.resolve(state.value, seen.values, active, now)
+  @Synchronized fun observe(active: List<CcAlertItem>, now: Long) {
+    state.value = CcAlertRules.resolve(state.value, seen.values.map { it.alert }, active.map { it.alert }, now) { seen[it.id]?.icon }
     seen.clear()
-    active.forEach { seen[it.id] = it }
+    active.forEach { seen[it.alert.id] = it }
   }
 
-  @Synchronized fun dismissed(alert: CcAlert, now: Long) {
-    if (state.value.none { it.alert.id == alert.id }) state.value = (listOf(CcResolvedAlert(alert, now)) + state.value).take(CcAlertRules.RESOLVED_MAX)
+  @Synchronized fun dismissed(item: CcAlertItem, now: Long) {
+    val alert = item.alert
+    if (state.value.none { it.alert.id == alert.id }) {
+      state.value = (listOf(CcResolvedAlert(alert, now, item.icon)) + state.value).take(CcAlertRules.RESOLVED_MAX)
+    }
   }
 }

@@ -96,16 +96,21 @@ internal data class CcUiState(
         .filter { a -> a.severity == CcSeverity.CRITICAL || entities[a.entityId]?.let { !CcPolicy.hidden(it, settings) } != false }
   }
 
+  /** The Alerts screen's active cards, derived once per snapshot ([warm] does it off the main thread). */
+  val alertCards: CcAlertCards by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    CcAlertRules.cards(alerts(), entities, { id -> plan?.roomOf(id)?.id }, connection.canControl, now, ::ccTime)
+  }
+
   /** The overview's side column, derived once per snapshot ([warm] does it off the main thread). */
   val side: CcSideSlices by lazy(LazyThreadSafetyMode.PUBLICATION) { CcSideSlices.of(this) }
 
   /**
-   * Computes the per-snapshot derivations ([ofDomain] grouping, [alerts], [fahrenheit], [side])
+   * Computes the per-snapshot derivations ([ofDomain] grouping, [alerts], [alertCards], [fahrenheit], [side])
    * now. The engine calls it on its own thread before publishing, so screens reading them on
    * the main thread find them ready instead of building them inside a frame.
    */
   fun warm(): CcUiState {
-    byDomain; alerts(); fahrenheit; weather; side
+    byDomain; alerts(); alertCards; fahrenheit; weather; side
     return this
   }
 

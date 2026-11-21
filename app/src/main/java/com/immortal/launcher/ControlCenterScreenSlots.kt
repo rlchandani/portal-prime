@@ -66,10 +66,16 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         var settled by remember { mutableStateOf(false) }
         // True from a visit until a few frames after leaving (see [ccSlotLive]).
         var lingering by remember { mutableStateOf(false) }
+        // True a few frames into a visit (see [ccSlotSemantics]); a slot composed already shown starts exposed.
+        var exposed by remember { mutableStateOf(active) }
         LaunchedEffect(active) {
           settled = false
-          if (active) lingering = true
-          else {
+          if (active) {
+            lingering = true
+            repeat(EXPOSE_FRAMES) { withFrameNanos { } }
+            exposed = true
+          } else {
+            exposed = false
             repeat(SETTLE_FRAMES) { withFrameNanos { } }
             settled = true
             repeat(LINGER_FRAMES) { withFrameNanos { } }
@@ -78,11 +84,9 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
         }
         val mode = ccSlotDraw(screen, active, settled)
         val live = ccSlotLive(active, lingering)
-        // A parked screen is off-screen: it stays out of the semantics tree, which Compose diffs
-        // after every change while the Portal's accessibility services are on (always).
         val layer = Modifier.graphicsLayer { alpha = if (mode == CcSlotDraw.RECORDING) 0f else 1f }
             .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
-            .then(if (active) Modifier else Modifier.clearAndSetSemantics {})
+            .then(if (ccSlotSemantics(active, exposed)) Modifier else Modifier.clearAndSetSemantics {})
         Box(Modifier.fillMaxSize().then(layer)) {
           CompositionLocalProvider(LocalCcScreenActive provides live, LocalCcMotion provides (live && motionOn.value)) {
             draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
@@ -162,6 +166,19 @@ internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): Cc
  * A screen that was never shown (prewarmed) is never live.
  */
 internal fun ccSlotLive(active: Boolean, lingering: Boolean): Boolean = active || lingering
+
+/**
+ * Whether a slot's screen is in the semantics tree. A parked screen is off-screen and leaves it at
+ * once; a shown screen joins it [EXPOSE_FRAMES] frames after the switch. Compose rebuilds and
+ * re-sorts the whole accessibility tree after any semantics change while the Portal's
+ * accessibility services are on (always), 10-12 ms here, and doing that right after the switch
+ * frame stacked it on the switch's own work. A few frames (~35 ms) later it runs on its own,
+ * still well inside the 100 ms that Compose batches accessibility events by.
+ */
+internal fun ccSlotSemantics(active: Boolean, exposed: Boolean): Boolean = active && exposed
+
+/** Frames a shown screen waits before joining the semantics tree (see [ccSlotSemantics]). */
+private const val EXPOSE_FRAMES = 2
 
 /** Frames a parked screen keeps drawing (transparent) to record its draw lists. */
 private const val SETTLE_FRAMES = 2

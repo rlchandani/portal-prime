@@ -127,8 +127,10 @@ class ControlCenterAlertsScreenLogicCoverageTest {
     val a = alert("a.a", CcAlertAction.DISMISS)
     val b = alert("b.b", CcAlertAction.DISMISS)
     val resolved = listOf(CcResolvedAlert(b, 1L), CcResolvedAlert(a, 2L))
-    assertEquals(listOf(a to true), CcAlertRules.list(CcAlertFilter.ACTIVE, listOf(a), resolved))
-    assertEquals(listOf(b to false), CcAlertRules.list(CcAlertFilter.RESOLVED, listOf(a), resolved))
-    assertEquals(listOf(a to true, b to false), CcAlertRules.list(CcAlertFilter.ALL, listOf(a), resolved))
+    val cards = CcAlertRules.cards(listOf(a), emptyMap(), { null }, true, noon, { "" }, utc)
+    fun shown(f: CcAlertFilter) = CcAlertRules.shown(f, cards, resolved, { "" }, utc).map { it.alert to it.active }
+    assertEquals(listOf(a to true), shown(CcAlertFilter.ACTIVE))
+    assertEquals(listOf(b to false), shown(CcAlertFilter.RESOLVED))
+    assertEquals(listOf(a to true, b to false), shown(CcAlertFilter.ALL))
   }
 }

@@ -507,3 +507,55 @@ header 2.75–6 ms (title/subtitle were in `CcHeaderSlice`, so all the pills re-
   recomposition (`items` keyed on `entitiesVersion`, so any HA update since parking rebuilds every card),
   measure 7–8 ms and RenderThread. Next candidates: give Alerts an equality-skipping slice of what its cards
   show; consider a cheaper semantics shape for the parked/shown swap.
+
+## Control Center screen switch: Alerts slice and deferred semantics, 1.310 vs `cc-alerts-2`
+
+**Device:** Family Portal+ (this unit has no floor plan, so Map is the "Build your floor plan" card plus the side
+column). Plain `adb install -r -d`, no force-stop. STREAM_MUSIC 0 during the stint, restored to 3. No screenshots.
+Ended on official 1.310, Home on top and default, dev mode off.
+
+**Builds:** official 1.310 (sha256 `819e02ce…f7e21e`, matching `hearthpane-latest.json`); branch `cc-alerts-2`
+`assemblePerformance` (`31be9339…`) and `assembleBenchmark` (`caab7747…`) for simpleperf.
+
+**Method:** as before (Map → Alerts via the read-only "door is open" row, warm-up + 4 measured taps per round,
+`framestats` of the Control Center window). 4 rounds each, interleaved (off, off, v1, v1, off, v1, off, v1).
+simpleperf 4 kHz, 3 taps; the 1.310 attribution is the `cc-rail` benchmark profile (same code).
+
+**Where the switch frame went on 1.310 (main thread, worst frames):** composition up to 27 ms, `CcAlertsScreen` up
+to 10 ms of it (every card re-derived: `CcAlertRules.item` scans all entities for garage covers and valves, ~3 ms,
+plus the LazyColumn), semantics 10–12.5 ms (`checkForSemanticsChanges` → `getCurrentSemanticsNodes` →
+`subtreeSortedByGeometryGrouping`, posted right after the switch frame so it delays the next one), measure 7–8 ms.
+
+**Changes (`cc-alerts-2`):**
+1. `ControlCenterState.kt:100` `CcUiState.alertCards` (+ `warm()`): the active alerts' cards are derived once per
+   snapshot on the engine thread into `CcAlertCards` (`ControlCenterAlertsScreenLogic.kt:28`, immutable,
+   equality-comparable: cards + start of today). `ControlCenterAlertsScreen.kt:54` passes only that slice and three
+   banner settings to a skippable `CcAlertsBody`; an HA update or a newer snapshot on switch that changes no card
+   compares equal and the body and its keyed cards skip. Resolved cards (`resolvedItem`/`shown`) keep the icon the
+   card had while active (`CcResolvedAlert.icon`), so they no longer need the entity map.
+2. `ControlCenterScreenSlots.kt:69,178` `ccSlotSemantics`: a parked screen still leaves the semantics tree at once;
+   the shown screen joins it 2 frames (~35 ms) after the switch, inside Compose's 100 ms accessibility batching, so
+   the tree rebuild + sort runs on a quiet frame instead of stacking on the switch.
+- Not done: `mergeDescendants` on cards. Compose sorts the *unmerged* tree, so it would not shrink the sort, and it
+  changes the nodes accessibility services see. Traversal groups would split the sort but change TalkBack order.
+
+| | official 1.310 (16 taps) | `cc-alerts-2` (16 taps) |
+|---|---|---|
+| Frames over 32 ms per tap | 2 ×14, 3 ×1, 0 ×1 (30) | 2 ×11, 1 ×4, 0 ×1 (26) |
+| Worst frame, median ms | 48 | 44 |
+| Worst frame range ms | 27–64 | 22–57 |
+| Sum of frames over 32 ms, median ms | 87 | 81 |
+| Frames over 16 ms, total | 89 | 85 |
+| After leaving: PSS MB / Graphics MB | 178–205 / 45–64 | 174–181 / 45–47 |
+
+- simpleperf (benchmark build, worst two frames of 3 taps): `CcAlertsScreen` / `CcAlertRules.item` no longer
+  appear; switch-frame composition 6 ms (mostly `CcHeaderTitle` 2 ms); semantics in the switch frame ≤1.25 ms
+  and 4.5–5.5 ms on the deferred frame. Main thread of the worst frame 13–38 ms (was up to 56).
+- Accessibility (full uiautomator dump, Map and Alerts): same nodes, order, bounds, labels and selected/checked
+  state as 1.310; only the clock and "Open N min" texts differ (dumps 9 min apart).
+- **Target (no switch frame over 32 ms) still not met.** The switch is now RenderThread-bound: 24–47 ms per long
+  frame, `renderLayersImpl` ~9 ms (rail/header region layers re-rendered for the selection and title change) plus
+  GPU command submission for the whole window (`GrOp::execute` / Adreno draw calls, 8–12 ms) and the first opaque
+  draw of the newly shown screen; the second long frame waits on the first's RenderThread. Next: avoid
+  re-rendering the region layers on a switch (selection highlight outside the rail layer), and measure what part of
+  the window flush is the shown screen versus the whole-window replay.
