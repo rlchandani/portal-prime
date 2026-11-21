@@ -355,3 +355,19 @@ owner trade-off:
 - **Memory after leaving is fixed.** On 1.305, graphics stayed at 126 MB 70 s after leaving (+56 over the first Home reading). On the branch it was 82 / 67 MB at +70 s, back to the Home level. The log showed `surface closed: renderer caches trimmed` 4 s after the frame left.
 - **The photo change itself didn't reproduce here.** With generated scenes, the change had no frames over 46 ms on either build. The 64–108 ms frames in the round above came from household photos in `shuffle` mode with photo motion, which this test can't show without real photos on screen. The lookahead deferral is kept because it moves the next photo's texture upload out of the dissolve. Its effect on real photos is not measured yet.
 - **No redraws during a still photo.** With the test scenes the frame drew about once a second (the clock) between changes. The steady ~32 ms cadence in the round above is the photo motion (Ken Burns property animators run for the whole dwell when motion is on). That is by design, so it was left unchanged.
+
+## Screensaver on household photos, 1.306
+
+**Device:** Family Portal+, official 1.306 (versionCode 300) as installed. Household screensaver settings unchanged (`shuffle`, 9 photos); no test source. Same method as Phase A: on Home, meminfo → gfxinfo reset → real dream via SystemUI `Somnambulator` → framestats polled every 2.5 s for 40 s (through the first photo change at ~31 s) → HWUI summary and meminfo while running → tap to leave → meminfo at +5 s and +70 s. 3 runs, back to back. No screenshots. STREAM_MUSIC was set to 0 and restored to 3. Device lock held 04:27–04:34 PST; Home on top at the end.
+
+| Run | Janky % | p90 / p99 ms | Start spikes > 60 ms | Photo change: frames > 60 ms (ms) | Home → running → +5 s → **+70 s after leaving** |
+|---|---|---|---|---|---|
+| Phase A (1.303) run A | 57 | 32 / 93 | SF gaps up to 300 | (clock-like face) | 255/89 → 386/179 → 342/144 → **308/144** |
+| Phase A (1.303) run B | 88 | 22 / 73 | — | 6 + 3 (64–108) | 320/155 → 357/191 → 249/84 |
+| 1.306 r1 | 68 | 48 / 250 | 5 (69–272) | 6 + 2 (150, 168, 161, 270, 290, 283; then 104, 61) | 180/48 → 276/137 → 183/48 → **197/61** |
+| 1.306 r2 | 22 | 21 / 133 | 1 (135) | 5 (124, 125, 243, 134, 129) | 194/61 → 283/145 → 183/49 → **197/61** |
+| 1.306 r3 | 31 | 29 / 200 | 1 (147) | 4 (166, 349, 355, 216) | 195/61 → 283/142 → 187/51 → **201/63** |
+
+- **Memory after leaving is fixed on real photos too.** All 3 runs were back at the Home level 5 s after leaving and stayed there at +70 s (graphics 61–63 MB vs 144 MB in Phase A run A). The log showed `surface closed: renderer caches trimmed` about 4.3 s after each exit.
+- **The photo change is not better; it is worse.** Each run had 4–6 frames of 124–355 ms in a ~0.4 s burst at t ≈ 31 s, against Phase A's 64–108 ms. The 2 s lookahead deferral did not remove the change-time cost on household photos. The work that remains at the change (decode, upload or the dissolve's first composite) still needs a trace.
+- Between changes all 3 faces drew about 1 frame/s, so none of these shuffle draws had the ~30 fps photo motion seen in Phase A run B.
