@@ -41,6 +41,8 @@ internal data class HomeLinkHouseholdsState(
     val detailOpen: Boolean = false,
     /** "Remove Lakeview?" is showing for [selected]. */
     val confirmingRemove: Boolean = false,
+    /** Linked homes that checked an identity this home no longer has ([HomeLinkVault.reverifyIds]). */
+    val reverify: Set<String> = emptySet(),
 ) {
   /** The linked home being shown, or null for this home (also when [selected] was removed elsewhere). */
   val link: HomeLink? get() = selected?.let { id -> book.links.firstOrNull { it.id == id } }
@@ -62,11 +64,15 @@ internal data class HomeLinkHouseholdsState(
   fun cancelRemove(): HomeLinkHouseholdsState = copy(confirmingRemove = false)
 
   /** A new book (edited here, or synced from another Portal): drops a selection that no longer exists. */
-  fun withBook(next: HomeLinkBook): HomeLinkHouseholdsState {
+  fun withBook(next: HomeLinkBook, reverifyIds: Set<String> = reverify): HomeLinkHouseholdsState {
     val keep = selected?.takeIf { id -> next.links.any { it.id == id } }
     return copy(book = next, selected = keep, confirmingRemove = confirmingRemove && keep != null,
-        detailOpen = detailOpen && (keep != null || selected == null))
+        detailOpen = detailOpen && (keep != null || selected == null), reverify = reverifyIds)
   }
+
+  /** The line under a linked home's name: when its safety number was checked, or that it needs checking again. */
+  fun checkedLine(link: HomeLink, zone: ZoneId): String =
+      if (link.id in reverify) HomeLinkHouseholdsCopy.KEY_CHANGED else HomeLinkHouseholdsCopy.checked(link.verifiedAt, zone)
 
   fun pane(compact: Boolean): HomeLinkPane = when {
     !compact -> HomeLinkPane.BOTH
@@ -101,6 +107,8 @@ internal object HomeLinkHouseholdsCopy {
   const val PORTALS = "Pair Portals"
   const val SIDE_NOTE = "Each household has its own keys. Removing one deletes its keys from every Portal here."
   const val CHECK_AGAIN = "Check again"
+  /** A Portal was removed and this home's key changed: this link must check the pictures again. */
+  const val KEY_CHANGED = "This home has a new key. Check again to keep calling."
   const val DEVICES = "Devices"
   const val SUB_CALL = "Rings the rooms you choose"
   const val AVAILABILITY = "See when we’re available"

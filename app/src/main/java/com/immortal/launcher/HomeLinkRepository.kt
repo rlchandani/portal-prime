@@ -50,9 +50,9 @@ internal class HomeLinkRepository(
     return if (update { it.copy(identity = HomeLinkStoredIdentity.of(made, clock())) }) made else null
   }
 
-  /** People said the pictures match: keep the home. */
+  /** People said the pictures match: keep the home, recording which of our identities they checked. */
   fun link(peer: HomeLinkPeer, permissions: HomeLinkPermissions): HomeLink? {
-    val link = HomeLink.verified(peer, clock(), permissions)
+    val link = HomeLink.verified(peer, clock(), permissions, verifiedAs = mutable.value.identity?.kid.orEmpty())
     return if (update { it.put(link) } && mutable.value.entries[link.id]?.link == link) link else null
   }
 
@@ -62,11 +62,28 @@ internal class HomeLinkRepository(
   /** Forgets a home here; sync carries the removal to every Portal in the home. */
   fun remove(id: String): Boolean = update { it.remove(id) }
 
-  /** Another Portal's vault. True if anything here changed. */
+  /**
+   * A Portal was removed from this home ([PortalRemover]): stores its signed marker ([sign] gets the
+   * revision) and, if there is an identity, a new one a generation up, made at [at], in one change.
+   * The removed Portal's copy of the old key then matches nothing this home uses.
+   */
+  fun removePortal(at: Long, sign: (rev: Long) -> PortalRemoval): Boolean = update { v ->
+    val marked = v.withRemoval(sign(v.clock + 1))
+    marked.identity?.let { marked.rotated(next(it, at)) } ?: marked
+  }
+
+  /** Another Portal's vault. True if anything here changed. A removal newer than the winning identity rotates it again. */
   fun merge(theirs: HomeLinkVault): Boolean {
     val before = mutable.value
-    return update { it.merge(theirs) } && mutable.value != before
+    return update { v ->
+      val merged = v.merge(theirs)
+      val now = clock()
+      merged.identity?.takeIf { merged.identityStale(now) }?.let { merged.rotated(next(it, merged.rotationTime(now))) } ?: merged
+    } && mutable.value != before
   }
+
+  private fun next(current: HomeLinkStoredIdentity, at: Long): HomeLinkStoredIdentity =
+      HomeLinkStoredIdentity.of(HomeLinkIdentity.generate(random), at, current.generation + 1)
 
   @Synchronized
   private fun update(edit: (HomeLinkVault) -> HomeLinkVault): Boolean {

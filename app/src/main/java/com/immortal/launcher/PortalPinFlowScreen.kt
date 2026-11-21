@@ -33,7 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** What the screens need from this Portal, made off the main thread (Keystore and sealed file reads). */
-private class PortalPinDeps(val ceremony: PortalPinCeremony, val store: PortalRosterStore, val selfName: String)
+private class PortalPinDeps(val ceremony: PortalPinCeremony, val store: PortalRosterStore, val remover: PortalRemover,
+                            val selfName: String)
 
 /**
  * "Pair this Portal with another Portal" (calling-phase-2.md S3b), measurement builds only like
@@ -95,7 +96,7 @@ internal fun PortalPinFlowScreen(feature: HomeLinkFeature, onClose: () -> Unit) 
     when (state.stage) {
       PortalPinStage.LIST -> PortalPinListScreen(d.selfName, roster.sorted, state.removing, PortalPinListActions(
           onShow = ::show, onType = { state = state.typeCode() }, onAskRemove = { state = state.askRemove(it) },
-          onRemove = { kid -> io { d.store.unpin(kid); scope.launch { roster = d.store.roster; state = state.cancelRemove() } } },
+          onRemove = { kid -> io { d.remover.remove(kid); scope.launch { roster = d.store.roster; state = state.cancelRemove() } } },
           onCancelRemove = { state = state.cancelRemove() }, onBack = onClose))
       PortalPinStage.SHOW -> state.invite?.let { PortalPinShowScreen(it, now, onNewCode = ::show, onCancel = ::back) }
       PortalPinStage.TYPE, PortalPinStage.JOINING -> {
@@ -130,7 +131,7 @@ private fun buildDeps(context: android.content.Context, feature: HomeLinkFeature
   val store = PortalRosterStore.get(context)
   val ceremony = PortalPinCeremony(HomeLinkSelf(device, name, id), store, PortalPinNet.mailbox, PortalPinNet.transport(context),
       PortalPinNet::peers, device::attestationChain, feature.random, feature.clock, PortalDeviceKey.CHALLENGE)
-  return PortalPinDeps(ceremony, store, name)
+  return PortalPinDeps(ceremony, store, PortalRemover(store, HomeLinkRepository.get(context), device, feature.clock), name)
 }
 
 private const val TICK_MS = 1_000L

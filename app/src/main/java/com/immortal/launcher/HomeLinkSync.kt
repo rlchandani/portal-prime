@@ -20,7 +20,8 @@ import java.util.concurrent.Executors
  * **pulls** the sender's vault over `/remote/homelinkpeer` ([HomeLinkSyncWire] v2: signed by its
  * Keystore device key, answered sealed to a one-time ECDH key) and merges it; the sender pulls
  * back when the puller's digest differs. Startup announces, which is the catch-up path after
- * being off. A removal is a tombstone in the vault, so "Remove Lakeview" reaches every Portal.
+ * being off. A removal is a tombstone in the vault, so "Remove Lakeview" reaches every Portal;
+ * a removed Portal is a signed marker ([PortalRemover]) applied to the roster before the merge.
  *
  * Two gates ([HomeLinkGate]): the build switch, and per Portal the pinned device keys — a Portal
  * that pinned nobody neither asks nor answers, so the household key alone (phones hold it) gets
@@ -44,7 +45,10 @@ internal object HomeLinkSync {
     val app = context.applicationContext
     HouseholdBus.register(HomeLinkSyncWire.SIGNAL_TYPE) { ctx, m -> onSignal(ctx, m) }
     net.execute {
-      HomeLinkRepository.get(app).onChange = { signal(app) }
+      val repo = HomeLinkRepository.get(app)
+      // Catch up on removals already in our vault (an unpin that failed to store last time).
+      PortalDeviceKey.get()?.let { PortalRemover.apply(PortalRosterStore.get(app), repo.vault.value, it.publicKey) }
+      repo.onChange = { signal(app) }
       signal(app)
     }
   }
@@ -132,6 +136,9 @@ internal object HomeLinkSync {
       if (conn.responseCode != 200) return false
       val answer = BoundedRead.reply(conn, HomeLinkSyncWire.MAX_BODY * 2) ?: return false
       val theirs = HomeLinkSyncWire.receive(asking, answer, roster, device.kid, peer) ?: return false
+      // Removed Portals first, so this Portal never holds a rotated identity while still pinning the Portal it was rotated against.
+      val unpinned = PortalRemover.apply(PortalRosterStore.get(context), theirs, device.publicKey)
+      if (unpinned > 0) Log.i(TAG, "unpinned $unpinned removed Portal(s)")
       repo.merge(theirs)
       return true
     } finally {

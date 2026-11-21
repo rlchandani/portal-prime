@@ -139,7 +139,8 @@ internal object PortalPinCopy {
       "This Portal now shares linked households with $name. Pair it on the other Portal’s screen too if it didn’t finish there."
 
   fun removeBody(name: String): String =
-      "This Portal stops sharing linked households with $name. To share again, pair them in person."
+      "Every Portal here stops sharing linked households with $name, and this home gets a new key, so linked households " +
+          "will need checking again. To share again, pair them in person."
 
   fun failure(f: HomeLinkFailure): HomeLinkCopy.Failure = when (f) {
     HomeLinkFailure.EXPIRED -> HomeLinkCopy.Failure("This code ran out",

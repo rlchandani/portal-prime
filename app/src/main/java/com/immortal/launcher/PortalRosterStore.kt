@@ -51,6 +51,9 @@ internal class PortalRosterStore(private val secure: YtSecureStore, private val 
 
   @Synchronized fun unpin(kid: String): Boolean = store(roster.unpin(kid))
 
+  /** Forgets several Portals in one write (removal markers from another Portal, [PortalRemover.apply]). */
+  @Synchronized fun unpinAll(kids: Set<String>): Boolean = store(kids.fold(roster) { r, kid -> r.unpin(kid) })
+
   private fun store(next: PortalRoster): Boolean {
     if (next == roster) return true
     val ok = runCatching { secure.save(PortalRosterCodec.encode(next)) }.onFailure { warn("portal roster not stored") }.isSuccess

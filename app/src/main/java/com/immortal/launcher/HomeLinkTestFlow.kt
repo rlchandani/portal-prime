@@ -64,8 +64,8 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   val vault by store.vault.collectAsState()
   val selfName = remember { DinnerCall.selfName(context) }
   val rooms = CallingStore.peers.collectAsState().value
-  var households by remember { mutableStateOf(HomeLinkHouseholdsState(vault.book)) }
-  LaunchedEffect(vault) { households = households.withBook(vault.book) }
+  var households by remember { mutableStateOf(HomeLinkHouseholdsState(vault.book, reverify = vault.reverifyIds)) }
+  LaunchedEffect(vault) { households = households.withBook(vault.book, vault.reverifyIds) }
   var stage by remember { mutableStateOf(HomeLinkTestStage.HOUSEHOLDS) }
   var invite by remember { mutableStateOf(HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())) }
   var now by remember { mutableLongStateOf(feature.clock()) }
