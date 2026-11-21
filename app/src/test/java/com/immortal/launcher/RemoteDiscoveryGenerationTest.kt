@@ -218,7 +218,8 @@ class RemoteDiscoveryGenerationTest {
     val session = start()
     val peer = info()
     val first = session.found(peer)
-    session.found(peer)
+    session.discoveries.single().onServiceFound(peer)
+    assertEquals("a duplicate sighting must not start a second concurrent resolve", 1, session.resolutions.size)
 
     first.onServiceResolved(peer)
 
@@ -232,11 +233,12 @@ class RemoteDiscoveryGenerationTest {
     val oldResolve = session.found(oldPeer)
     session.discoveries.single().onServiceLost(oldPeer)
     val replacement = info(addressLastByte = 22)
-    val currentResolve = session.found(replacement)
+    session.discoveries.single().onServiceFound(replacement)
+    assertEquals("the replacement waits for the platform's one resolve slot", 1, session.resolutions.size)
 
     oldResolve.onServiceResolved(oldPeer)
     assertEmpty()
-    currentResolve.onServiceResolved(replacement)
+    session.resolutions.last().onServiceResolved(replacement)
 
     assertPeer("Fixture Peer", "192.0.2.22", 8723)
   }
@@ -257,5 +259,74 @@ class RemoteDiscoveryGenerationTest {
     session.found(current).onServiceResolved(current)
 
     assertPeer("Current Peer", "192.0.2.24", 8723)
+  }
+
+  @Test
+  fun peersFoundTogetherResolveOneAtATimeAndAllAppear() {
+    // Android 10 NsdService rejects a client's second in-flight resolve (FAILURE_ALREADY_ACTIVE),
+    // which silently dropped every peer but the first when two Portals were found at once.
+    val session = start()
+    val kitchen = info("Kitchen Fixture", 31)
+    val office = info("Office Fixture", 32)
+    val first = session.found(kitchen)
+    session.discoveries.single().onServiceFound(office)
+    assertEquals("only one resolve may be in flight", 1, session.resolutions.size)
+
+    first.onServiceResolved(kitchen)
+    assertEquals("the waiting peer starts once the slot frees", 2, session.resolutions.size)
+    session.resolutions.last().onServiceResolved(office)
+
+    assertEquals(setOf("Kitchen Fixture", "Office Fixture"),
+        (0 until RemoteDiscovery.peersJson().length())
+            .map { RemoteDiscovery.peersJson().getJSONObject(it).getString("name") }.toSet())
+  }
+
+  @Test
+  fun alreadyActiveFailureIsRetriedBoundedThenTheQueueMovesOn() {
+    val session = start()
+    val busy = info("Busy Fixture", 33)
+    val next = info("Next Fixture", 34)
+    session.found(busy)
+    session.discoveries.single().onServiceFound(next)
+
+    // A previous session's resolve can still hold the slot: retry, behind the waiting peer.
+    session.resolutions.last().onResolveFailed(busy, NsdManager.FAILURE_ALREADY_ACTIVE)
+    assertEquals(2, session.resolutions.size)
+    session.resolutions.last().onServiceResolved(next)
+    assertEquals("the busy peer is retried after the queue drains", 3, session.resolutions.size)
+    session.resolutions.last().onResolveFailed(busy, NsdManager.FAILURE_ALREADY_ACTIVE)
+    session.resolutions.last().onResolveFailed(busy, NsdManager.FAILURE_ALREADY_ACTIVE)
+    assertEquals("three attempts, then the peer is left for the next sighting", 4, session.resolutions.size)
+
+    assertPeer("Next Fixture", "192.0.2.34", 8723)
+  }
+
+  @Test
+  fun otherResolveFailuresAndRejectionsFreeTheSlot() {
+    val session = start()
+    val broken = info("Broken Fixture", 35)
+    val current = info("Current Fixture", 36)
+    session.found(broken)
+    session.discoveries.single().onServiceFound(current)
+
+    session.resolutions.last().onResolveFailed(broken, NsdManager.FAILURE_INTERNAL_ERROR)
+    assertEquals("a hard failure is not retried", 2, session.resolutions.size)
+    session.resolutions.last().onServiceResolved(current)
+
+    assertPeer("Current Fixture", "192.0.2.36", 8723)
+  }
+
+  @Test
+  fun aLostWaitingPeerIsSkipped() {
+    val session = start()
+    val gone = info("Gone Fixture", 37)
+    val first = session.found(info("Kept Fixture", 38))
+    session.discoveries.single().onServiceFound(gone)
+    session.discoveries.single().onServiceLost(gone)
+
+    first.onServiceResolved(info("Kept Fixture", 38))
+
+    assertEquals("a lost sighting must not be resolved", 1, session.resolutions.size)
+    assertPeer("Kept Fixture", "192.0.2.38", 8723)
   }
 }
