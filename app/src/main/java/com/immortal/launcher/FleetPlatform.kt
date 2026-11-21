@@ -107,6 +107,10 @@ internal interface FleetActions {
   fun settingsSync(op: String)
   fun settingsSyncStatus(): JSONObject
   fun settingsSyncValues(): JSONObject
+  /** Adopt household Portal [from]'s Home Assistant connection (blocking; never exposes the token). */
+  fun haAdopt(from: String, replace: Boolean): HaAdoption.Outcome
+  /** The household Portals connected to Home Assistant: `[{id, name}]` (blocking; no secrets). */
+  fun haPeers(): org.json.JSONArray
   fun openControlCenter(screen: String): Boolean
   fun remoteEnabled(): Boolean
   fun mintTestSession(householdGrant: Boolean): String

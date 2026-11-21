@@ -45,6 +45,40 @@ class FleetActionApiTest {
     assertEquals("not_permitted", reboot.getString("result"))
   }
 
+  @Test fun haAdoptNeedsAPeerAndRepliesWithoutSecrets() {
+    for (bad in listOf<Any>("", "  ", 5, "x".repeat(FleetActionApi.MAX_PEER_REF + 1))) {
+      assertEquals("$bad", "400 bad_from", FleetReq.outcome(act("ha_adopt", "from" to bad)))
+    }
+    assertEquals("400 bad_from", FleetReq.outcome(act("ha_adopt")))
+    assertTrue(host.calls.isEmpty())
+    val o = FleetReq.json(act("ha_adopt", "from" to " Family Area "))
+    assertEquals(listOf("haAdopt:Family Area:false"), host.calls)
+    assertTrue(o.getBoolean("ok"))
+    assertEquals("adopted", o.getString("result"))
+    assertEquals("Family Area", o.getString("from"))
+    assertTrue(o.getBoolean("validated"))
+    assertEquals(setOf("ok", "action", "result", "from", "validated"), o.keys().asSequence().toSet())
+    act("ha_adopt", "from" to "fam-1", "replace" to true)
+    assertEquals("haAdopt:fam-1:true", host.calls.last())
+  }
+
+  @Test fun haAdoptReportsAFailureAsNotOk() {
+    host.haOutcome = HaAdoption.Outcome(HaAdoption.Result.VALIDATION_FAILED, "Family Area")
+    val o = FleetReq.json(act("ha_adopt", "from" to "Family Area"))
+    assertFalse(o.getBoolean("ok"))
+    assertEquals("validation_failed", o.getString("result"))
+    assertFalse(o.getBoolean("validated"))
+    host.haOutcome = HaAdoption.Outcome(HaAdoption.Result.NO_PEER)
+    assertTrue(FleetReq.json(act("ha_adopt", "from" to "Nowhere")).isNull("from"))
+  }
+
+  @Test fun haPeersListsNamesAndIdsOnly() {
+    val o = FleetReq.json(act("ha_peers"))
+    assertTrue(o.getBoolean("ok"))
+    val peer = o.getJSONArray("peers").getJSONObject(0)
+    assertEquals(setOf("id", "name"), peer.keys().asSequence().toSet())
+  }
+
   @Test fun settingsSyncRunsOnlyAllowedOps() {
     for (op in listOf("pause", "resume", "adopt", "keep", "rejoin")) {
       val o = FleetReq.json(act("settings_sync", "op" to op))

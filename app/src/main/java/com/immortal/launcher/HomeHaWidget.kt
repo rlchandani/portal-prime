@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +60,9 @@ internal fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 
     dashboardConfigured = HomeDashboardConfig.configured(context)
     target = haWidgetTarget(context)
   }
+  // A connection adopted while Home is on screen (Settings sync of the connection, fleet ha_adopt).
+  val haRevision by HaConfig.revision.collectAsState()
+  LaunchedEffect(haRevision) { target = haWidgetTarget(context) }
   val controlCenter = target == HomeRefinements.HaWidgetTarget.CONTROL_CENTER
   val openControlCenter: () -> Unit = { ControlCenterActivity.open(context) }
   if (dashboardConfigured) {
@@ -80,6 +85,7 @@ internal fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 
         entities = HaConfig.entities(context)
         configured = HaConfig.isConfigured(context)
   }
+  LaunchedEffect(haRevision) { configured = HaConfig.isConfigured(context) }
   // A local override map lets a tap flip the tile instantly (optimistic) before the poll confirms.
   var optimistic by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
   val ids = remember(entities) { entities.map { it.entityId } }
