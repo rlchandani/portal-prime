@@ -459,3 +459,51 @@ interleaved with the branch); v1: 2 rounds; v2: 3 rounds. simpleperf 4 kHz call 
   RenderThread. Alerts' own composition is now ~6 ms of diffuse work (LazyColumn setup, item derivation).
 - No memory retained: GPU/PSS after leaving match 1.308 (one v2 round read 60 MB graphics, within the official spread
   seen after a dream).
+
+## Control Center screen switch: rail, header, slots, 1.309 vs `cc-rail`
+
+**Device:** Family Portal+. Plain `adb install -r -d` of each build, no force-stop. STREAM_MUSIC 0 during each stint,
+restored to 3. No screenshots. Ended on official 1.309, Home on top and default, dev mode off.
+
+**Builds:** official 1.309 (sha256 `4e1fe789…617d`, matching `hearthpane-latest.json`); branch `cc-rail`
+`assemblePerformance` (`d5d84fce…`). `assembleBenchmark` of unchanged 1.309 and of `cc-rail` for simpleperf.
+
+**Method:** same as the Alerts A/B (Map → Alerts via the read-only "door is open" row, warm-up + 4 measured taps per
+round, `framestats` of the Control Center window). 4 rounds each, interleaved (off, v1, v1, off, v1, off, v1, off).
+simpleperf 4 kHz, 3 taps per build.
+
+**Where the switch frame went on 1.309 (simpleperf, worst frame of 3 taps, main thread):** composition 29–39 ms, of
+which the rail 3–9.5 ms (every `RailItem` re-run; the selected one's chain gained/lost the `ccCard` nodes), the
+header 2.75–6 ms (title/subtitle were in `CcHeaderSlice`, so all the pills re-ran), the map's camera tile stopping
+2.5–6.5 ms, Alerts 3–6 ms; Apply 4.75–9 ms (incl. cancelled camera effects); measure 5–9 ms.
+
+**Changes (`cc-rail`):**
+1. `ControlCenterShell.kt` `CcApp`: the shell no longer reads the screen or floor; rail/header slices exclude them.
+2. `ControlCenterSelection.kt` + `ControlCenterChrome.kt` `RailItem` / `ControlCenterCompactChrome.kt` `NavItem`: each
+   tab is a fixed tree. The selected card is always composed in its own layer (only its alpha follows the
+   selection), icon tint (`CcIcon(ColorProducer)`, Fit/centre like `Icon`) and label colour (`BasicText` colour
+   producer) are read while drawing, and `ccSpeakTab` observes a per-tab `derivedStateOf` to update "selected".
+3. `ControlCenterHeading.kt`: `CcHeadingInputs` (minute resolution) + `rememberCcHeading`; only the title/subtitle
+   composable reads the screen.
+4. `ControlCenterScreenSlots.kt`: each slot derives its own `active` (only the two changing slots recompose);
+   `ccSlotLive` keeps a just-parked screen live (cameras, motion) for 2 + 2 frames, moving the camera stop off the
+   switch frame. Parked screens still leave the semantics tree immediately.
+
+| | official 1.309 (16 taps) | `cc-rail` (16 taps) |
+|---|---|---|
+| Frames over 32 ms per tap | 2 ×12, 3 ×3, 0 ×1 (33) | 2 ×13, 3 ×2, 1 ×1, 0 ×1 (31) |
+| Worst frame, median ms | 57 | 48 |
+| Sum of frames over 32 ms, median ms | 103 | 90 |
+| Frames over 16 ms, total | 99 | 84 |
+| After leaving: PSS MB / Graphics MB | 185 / 47 (r1 after a dream: 222 / 74) | 185–186 / 46–47 |
+
+- simpleperf, worst frames: `CcRail`, `CcHeader` and `CcCameraPicture` no longer appear; `CcHeaderTitle` is 1.5–2 ms;
+  Apply fell to 2.5–2.75 ms. Composition is now mostly Alerts itself (re-composed with fresh state, up to ~10 ms)
+  plus the LazyColumn items.
+- Accessibility (uiautomator dump): same nodes, order and bounds as 1.309; "selected" follows the screen
+  (Home → Alerts), header says "Alerts. Saturday · …".
+- **Still two frames over 32 ms per tap.** What remains: the semantics swap (`checkForSemanticsChanges` →
+  `subtreeSortedByGeometryGrouping`, up to 12.5 ms, inherent to exposing the new screen's tree), Alerts'
+  recomposition (`items` keyed on `entitiesVersion`, so any HA update since parking rebuilds every card),
+  measure 7–8 ms and RenderThread. Next candidates: give Alerts an equality-skipping slice of what its cards
+  show; consider a cheaper semantics shape for the parked/shown swap.

@@ -74,25 +74,20 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
       Box(Modifier.fillMaxSize().background(c.bg).ccObserveTouches(ui)) {
         if (state.settings.bannersOnly) CcBannersOnly(onExit)
         else {
+          // The shell never reads the current screen or floor: a switch recomposes only the slots
+          // and the header title; the rail tabs read their selection while drawing.
+          val rail = CcRailSlice.of(state)
+          val header = CcHeaderSlice.of(state)
+          val heading = CcHeadingInputs.of(state)
           if (layout.compactPortrait) Column(Modifier.fillMaxSize()) {
             // The Mini upright: two-row header on top, the screen, the bottom bar instead of the rail.
-            val screen = ui.screen
-            val floorId = ui.floorId
-            val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
-            val header = CcHeaderSlice.of(state, ccTitle(screen, state.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL), subtitle)
-            CcCompactHeader(header, ui, onJarvis)
+            CcCompactHeader(header, heading, ui, onJarvis)
             Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
-            CcCompactNavBar(CcRailSlice.of(state, screen), ui, onHome = onExit)
+            CcCompactNavBar(rail, ui, onHome = onExit)
           } else Row(Modifier.fillMaxSize()) {
-            val screen = ui.screen
-            val rail = CcRailSlice.of(state, screen)
             CcRail(rail, ui, onHome = onExit)
             Column(Modifier.weight(1f).fillMaxSize()) {
-              val floorId = ui.floorId
-              // Formatted once per minute / screen / floor, not on every HA update.
-              val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
-              val header = CcHeaderSlice.of(state, ccTitle(screen, state.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL), subtitle)
-              CcHeader(header, ui, onJarvis)
+              CcHeader(header, heading, ui, onJarvis)
               Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
             }
           }
@@ -128,32 +123,12 @@ private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {
   }
 }
 
-/** The header title; the Tesla screen is called by the car's HA name ([car]). */
-internal fun ccTitle(screen: CcScreen, car: String = CcTeslaIds.DEFAULT_LABEL): String = when (screen) {
-  CcScreen.MAP -> "Home"
-  CcScreen.CAMERAS -> "Cameras"
-  CcScreen.TESLA -> car
-  CcScreen.ALERTS -> "Alerts"
-  CcScreen.SECURITY -> "Security"
-  CcScreen.EDIT -> "Edit floor plan"
-  CcScreen.SETTINGS -> "Home settings"
-}
-
-private fun subtitleFor(s: CcUiState, screen: CcScreen, floorId: String?): String {
-  if (screen != CcScreen.MAP) return ccSubtitle(s.now).replace(DAY_PART, "")
-  val floor = s.plan?.floor(floorId)?.name
-  val kids = if (s.settings.kids) "Kids mode" else null
-  return ccSubtitle(s.now, listOfNotNull(floor, kids).joinToString(" · ").ifBlank { null })
-}
-
 @Composable
 private fun BoxScope.CcBannersOnly(onExit: () -> Unit) {
   CcCenteredMessage(icon = "bell", title = "Banners only on this Portal",
       body = "This Portal shows Home Assistant alerts as banners. Change it in Settings › Home Assistant › Control Center.",
       primary = "Back" to onExit)
 }
-
-private val DAY_PART = Regex(" (morning|afternoon|evening|night)")
 
 /** Notes every touch (without consuming it) so the prewarm only works while nobody is touching. */
 private fun Modifier.ccObserveTouches(ui: CcUi): Modifier = pointerInput(ui) {

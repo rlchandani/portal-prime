@@ -41,4 +41,12 @@ class ControlCenterSlotDrawTest {
   @Test fun onlyTheMapAndAlertsStayRecorded() {
     assertEquals(setOf(CcScreen.MAP, CcScreen.ALERTS), CC_KEEP_RECORDED)
   }
+
+  /** A shown screen is live at once; a parked one only after it stops lingering; a prewarmed one never. */
+  @Test fun aScreenIsLiveWhileShownOrLingering() {
+    assertEquals(true, ccSlotLive(active = true, lingering = false))
+    assertEquals(true, ccSlotLive(active = true, lingering = true))
+    assertEquals(true, ccSlotLive(active = false, lingering = true))
+    assertEquals(false, ccSlotLive(active = false, lingering = false))
+  }
 }
