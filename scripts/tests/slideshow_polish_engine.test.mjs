@@ -76,8 +76,12 @@ for (const mode of ['kenBurns', 'push', 'memories']) {
       assert.ok(fill.classList.contains('ss-preblur'));
       assert.equal(fill.children[0].tag, 'canvas');
       assert.deepEqual(r.resolutions.filter(n => n.edge === 320).map(n => n.photo.seed), ['a']);
-      // The pair is decoded at its drawn size (with the zoom headroom), never the 2200 px edge.
-      assert.deepEqual(r.resolutions.filter(n => n.edge !== 320).map(n => n.edge), [Math.ceil(h * 1.15), Math.ceil(h * 1.15)]);
+      // The pair is asked for at its drawn size at the top of its motion: Ken Burns stops where
+      // the pair touches the screen (H / h, under its 1.15 cap); the drift reaches 1.04.
+      const top = mode === 'kenBurns' ? Math.min(1.15, H / h) : 1.04;
+      const pair = r.resolutions.filter(n => n.edge !== 320);
+      assert.deepEqual(pair.map(n => n.edge), [2200, 2200]);
+      pair.forEach(n => near(n.drawn, h * top));
       // Motion and dissolve keep the shipped feel.
       if (mode === 'kenBurns') {
         assert.ok(hero.classList.contains('ss-motion'));

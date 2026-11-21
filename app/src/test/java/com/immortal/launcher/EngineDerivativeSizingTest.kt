@@ -12,11 +12,23 @@ import org.junit.Test
 class EngineDerivativeSizingTest {
   @Test fun `tiers round upward without serving an undersized full-screen image`() {
     assertEquals(600,EngineScaledCache.derivativeEdge(320))
-    assertEquals(1200,EngineScaledCache.derivativeEdge(900))
-    assertEquals(1800,EngineScaledCache.derivativeEdge(1400))
-    assertEquals(2400,EngineScaledCache.derivativeEdge(2200))
+    assertEquals(900,EngineScaledCache.derivativeEdge(900))
+    assertEquals(1000,EngineScaledCache.derivativeEdge(901))
+    assertEquals(1500,EngineScaledCache.derivativeEdge(1400))
+    assertEquals(1650,EngineScaledCache.derivativeEdge(1541))
+    assertEquals(2200,EngineScaledCache.derivativeEdge(2200))
+    assertEquals(2400,EngineScaledCache.derivativeEdge(2201))
     assertEquals(2400,EngineScaledCache.derivativeEdge(Int.MAX_VALUE))
     assertEquals(2400,EngineScaledCache.derivativeEdge(-1))
+  }
+  @Test fun `finer steps keep the former tiers and stay within 17 percent`() {
+    for (former in listOf(600,1200,1800,2400)) assertTrue(EngineScaledCache.isTier(former))
+    val tiers=EngineScaledCache.TIERS
+    for (i in 1 until tiers.size) {
+      assertTrue(tiers[i]>tiers[i-1])
+      assertTrue("${tiers[i-1]} -> ${tiers[i]}",tiers[i]<=tiers[i-1]*1.17)
+    }
+    assertFalse(EngineScaledCache.isTier(1541)); assertFalse(EngineScaledCache.isTier(2401))
   }
   @Test fun `variant identities stay distinct and default keys remain compatible`() {
     val full=EngineScaledCache.keyFor("a",123,456)

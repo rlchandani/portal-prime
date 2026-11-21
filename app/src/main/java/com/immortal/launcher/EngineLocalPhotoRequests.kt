@@ -27,7 +27,7 @@ internal class EngineLocalPhotoRequests(private val urls: List<String>, private 
     if (parts.size != 4 || parts[0].isNotEmpty() || parts[1].toLongOrNull() != owner) return@runCatching null
     val index = parts[2].toIntOrNull() ?: return@runCatching null
     val edge = parts[3].toIntOrNull() ?: return@runCatching null
-    if (edge != 600 && edge != 1200 && edge != 1800 && edge != 2400) return@runCatching null
+    if (!EngineScaledCache.isTier(edge)) return@runCatching null
     val source = urls.getOrNull(index)?.takeIf { it.startsWith("file://") } ?: return@runCatching null
     source.removePrefix("file://") to edge
   }.getOrNull()

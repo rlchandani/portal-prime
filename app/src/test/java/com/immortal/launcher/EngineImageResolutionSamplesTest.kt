@@ -12,8 +12,8 @@ import org.junit.Test
 class EngineImageResolutionSamplesTest {
   @Test fun finiteResultsAndTiersAreCountedWithoutPerRequestRecords() {
     val samples = EngineImageResolutionSamples()
-    assertTrue(samples.record(EngineImageResolutionResult.REQUESTED_TIER_READY, 1000, 1200))
-    assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 1000, 2400))
+    assertTrue(samples.record(EngineImageResolutionResult.REQUESTED_TIER_READY, 1101, 1200))
+    assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 1101, 2400))
     assertTrue(samples.record(EngineImageResolutionResult.ORIGINAL_FALLBACK, 1, 0))
     assertTrue(samples.record(EngineImageResolutionResult.MISSING_ORIGINAL, 1800, 0))
     val snapshot = samples.snapshot()
@@ -38,10 +38,12 @@ class EngineImageResolutionSamplesTest {
     }
     val snapshot = samples.snapshot()
     val tiers = snapshot.getJSONObject("deliveredTiers")
-    assertEquals(setOf("600", "1200", "1800", "2400", "custom-maximum"), tiers.keys().asSequence().toSet())
-    assertEquals(2396L, tiers.getLong("custom-maximum"))
-    assertEquals(2L, tiers.getLong("2400")); assertEquals(1L, tiers.getLong("600"))
-    assertEquals(1L, tiers.getLong("1200")); assertEquals(1L, tiers.getLong("1800"))
+    assertEquals(TIER_KEYS, tiers.keys().asSequence().toSet())
+    // Every cache tier below 2400 is its own label; every other device maximum shares one.
+    val smaller = EngineScaledCache.TIERS.filter { it < 2400 }
+    assertEquals(2399L - smaller.size, tiers.getLong("custom-maximum"))
+    assertEquals(2L, tiers.getLong("2400"))
+    for (tier in smaller) assertEquals(1L, tiers.getLong(tier.toString()))
   }
 
   @Test fun untrustedDeliveredIntegersAndInconsistentBranchesAreRejected() {
@@ -63,13 +65,13 @@ class EngineImageResolutionSamplesTest {
     samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 601, 1800)
     val first = samples.snapshot()
     first.getJSONObject("results").put("original-fallback", 999L)
-    first.getJSONObject("requestedTiers").put("1200", 999L)
+    first.getJSONObject("requestedTiers").put("700", 999L)
     samples.record(EngineImageResolutionResult.ORIGINAL_FALLBACK, 600, 0)
     val fresh = samples.snapshot()
     assertEquals(2L, fresh.getLong("records"))
     assertEquals(1L, first.getLong("records"))
     assertEquals(1L, fresh.getJSONObject("results").getLong("original-fallback"))
-    assertEquals(1L, fresh.getJSONObject("requestedTiers").getLong("1200"))
+    assertEquals(1L, fresh.getJSONObject("requestedTiers").getLong("700"))
     val exported = fresh.toString()
     for (forbidden in listOf("file://", "https://", "synthetic-original", "source", "path", "oversized"))
       assertFalse(forbidden, exported.contains(forbidden))
@@ -106,9 +108,9 @@ class EngineImageResolutionSamplesTest {
     repeat(2) { assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 600, 2400)) }
     assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 1000, 1800))
     assertTrue(samples.record(EngineImageResolutionResult.REQUESTED_TIER_READY, 2400, 2400))
-    assertTrue(samples.record(EngineImageResolutionResult.REQUESTED_TIER_READY, Int.MAX_VALUE, 2000, 2000))
+    assertTrue(samples.record(EngineImageResolutionResult.REQUESTED_TIER_READY, Int.MAX_VALUE, 2396, 2396))
     val pairs = samples.snapshot().getJSONObject("deliveryPairs")
-    val keys = setOf("600", "1200", "1800", "2400", "custom-maximum")
+    val keys = TIER_KEYS
     assertEquals(keys, pairs.keys().asSequence().toSet())
     var total = 0L
     for (requested in keys) {
@@ -118,15 +120,15 @@ class EngineImageResolutionSamplesTest {
     }
     assertEquals(5L, total)
     assertEquals(2L, pairs.getJSONObject("600").getLong("2400"))
-    assertEquals(1L, pairs.getJSONObject("1200").getLong("1800"))
+    assertEquals(1L, pairs.getJSONObject("1000").getLong("1800"))
     assertEquals(1L, pairs.getJSONObject("2400").getLong("2400"))
     assertEquals(1L, pairs.getJSONObject("custom-maximum").getLong("custom-maximum"))
-    assertEquals(0L, pairs.getJSONObject("1200").getLong("2400"))
+    assertEquals(0L, pairs.getJSONObject("1000").getLong("2400"))
   }
 
   @Test fun deliveryPairsExcludeFallbacksAndInvalidResultsAndSnapshotsAreDetached() {
     val samples = EngineImageResolutionSamples()
-    assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 1000, 2400))
+    assertTrue(samples.record(EngineImageResolutionResult.LARGER_TIER_READY, 1101, 2400))
     val first = samples.snapshot()
     first.getJSONObject("deliveryPairs").getJSONObject("1200").put("2400", 999L)
     assertTrue(samples.record(EngineImageResolutionResult.ORIGINAL_FALLBACK, 600, 0))
@@ -139,6 +141,10 @@ class EngineImageResolutionSamplesTest {
     assertEquals(1L, pairs.getJSONObject("1200").getLong("2400"))
     assertEquals(0L, pairs.getJSONObject("600").getLong("2400"))
     assertEquals(0L, pairs.getJSONObject("1200").getLong("1200"))
-    assertEquals(5, pairs.length())
+    assertEquals(TIER_KEYS.size, pairs.length())
+  }
+
+  private companion object {
+    val TIER_KEYS = EngineScaledCache.TIERS.map { it.toString() }.toSet() + "custom-maximum"
   }
 }

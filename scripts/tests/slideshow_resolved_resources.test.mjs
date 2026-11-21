@@ -14,10 +14,14 @@ const modes = ['kenBurns', 'diptych', 'framed', 'galleryWall', 'push', 'memories
   'panorama', 'polaroid', 'mosaic', 'filmstrip', 'cinema', 'heroSidebar'];
 const affected = ['diptych', 'galleryWall', 'polaroid', 'mosaic', 'filmstrip'];
 // Ken Burns, Push and Memories open on a portrait (photo 0), paired on the Portal+ with the next
-// portrait at its drawn size (1340 px tall plus the 15 % zoom headroom), over one 320 px backdrop.
-const expectedEdges = { kenBurns: [320, 1541], diptych: [1800], framed: [1800], galleryWall: [1200],
-  push: [320, 1541], memories: [320, 1541], panorama: [2400], polaroid: [1400], mosaic: [1200],
-  filmstrip: [1000, 1400], cinema: [2400], heroSidebar: [1100, 1800] };
+// portrait at its drawn size: 1340 px tall at the top of its motion (Ken Burns stops at 1.075,
+// where the pair touches the screen; the drift of Push and Memories reaches 1.04). Framed asks
+// for its portrait print, Gallery Wall for each tile, Polaroid for its 600 / 480 px print box and
+// Panorama for its strip. Requests without a drawn size get the copy they got before (320 ->
+// 600, 1000 / 1100 -> 1200, 1400 -> 1800; SS.largeEdge).
+const expectedEdges = { kenBurns: [600, 1440], diptych: [1800], framed: [1168],
+  galleryWall: [331, 395, 496, 592, 602], push: [600, 1394], memories: [600, 1394], panorama: [2160],
+  polaroid: [600, 720], mosaic: [1200], filmstrip: [1200, 1800], cinema: [2400], heroSidebar: [1200, 1800] };
 
 // Synthetic DOM, clock and image transport only. Execute the actual photo resolver,
 // preload/decode helper, modes and scheduler; this fixture cannot measure rasterization.
@@ -269,7 +273,7 @@ test('Filmstrip: next and previous freshly prepare the backdrop while retaining 
     let before = r.writes.length;
     r.setGeneration(2); const next = engine.next(); await r.drain(); assert.equal(await next, true);
     r.assertPrepared(before);
-    assert.ok(r.writes.slice(before).every(write => write.url.includes('-1000-g2-')));
+    assert.ok(r.writes.slice(before).every(write => write.url.includes('-1200-g2-')));
     assert.notEqual(r.nodes().find(node => node.classList.contains('center')), first);
     before = r.writes.length;
     r.setGeneration(3); const previous = engine.previous(); await r.drain(); assert.equal(await previous, true);

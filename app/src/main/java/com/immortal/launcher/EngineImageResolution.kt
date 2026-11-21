@@ -21,14 +21,12 @@ internal fun interface EngineImageResolutionMeasurement {
 
 /** Primitive aggregate totals only. Caller serializes access; JSON is built on explicit reads. */
 internal class EngineImageResolutionSamples {
-  private enum class Tier(val key: String) {
-    EDGE_600("600"), EDGE_1200("1200"), EDGE_1800("1800"), EDGE_2400("2400"),
-    CUSTOM_MAXIMUM("custom-maximum")
-  }
+  // One bucket per cache tier (EngineScaledCache.TIERS) plus a device's own smaller maximum.
+  private val tierKeys = EngineScaledCache.TIERS.map { it.toString() } + "custom-maximum"
   private val results = LongArray(EngineImageResolutionResult.entries.size)
-  private val requestedTiers = LongArray(Tier.entries.size)
-  private val deliveredTiers = LongArray(Tier.entries.size)
-  private val deliveryPairs = Array(Tier.entries.size) { LongArray(Tier.entries.size) }
+  private val requestedTiers = LongArray(tierKeys.size)
+  private val deliveredTiers = LongArray(tierKeys.size)
+  private val deliveryPairs = Array(tierKeys.size) { LongArray(tierKeys.size) }
   private var records = 0L
   private var invalidRecords = 0L
 
@@ -49,22 +47,21 @@ internal class EngineImageResolutionSamples {
     if (!valid || requestedTier == null) { invalidRecords++; return false }
     records++
     results[result.ordinal]++
-    requestedTiers[requestedTier.ordinal]++
+    requestedTiers[requestedTier]++
     if (deliveredTier != null) {
-      deliveredTiers[deliveredTier.ordinal]++
-      deliveryPairs[requestedTier.ordinal][deliveredTier.ordinal]++
+      deliveredTiers[deliveredTier]++
+      deliveryPairs[requestedTier][deliveredTier]++
     }
     return true
   }
 
-  private fun tier(edge: Int, maximum: Int): Tier? {
+  /** Index into [tierKeys]: a cache tier, else the device maximum, else null (invalid). */
+  private fun tier(edge: Int, maximum: Int): Int? {
     if (edge !in 1..maximum) return null
-    return when (edge) {
-      600 -> Tier.EDGE_600
-      1200 -> Tier.EDGE_1200
-      1800 -> Tier.EDGE_1800
-      2400 -> Tier.EDGE_2400
-      maximum -> Tier.CUSTOM_MAXIMUM
+    val index = EngineScaledCache.TIERS.indexOf(edge)
+    return when {
+      index >= 0 -> index
+      edge == maximum -> tierKeys.size - 1
       else -> null
     }
   }
@@ -78,11 +75,11 @@ internal class EngineImageResolutionSamples {
         for (result in EngineImageResolutionResult.entries) put(result.key, results[result.ordinal])
       }).put("requestedTiers", tierSnapshot(requestedTiers)).put("deliveredTiers", tierSnapshot(deliveredTiers))
       .put("deliveryPairs", JSONObject().apply {
-        for (tier in Tier.entries) put(tier.key, tierSnapshot(deliveryPairs[tier.ordinal]))
+        tierKeys.forEachIndexed { i, key -> put(key, tierSnapshot(deliveryPairs[i])) }
       })
 
   private fun tierSnapshot(counts: LongArray) = JSONObject().apply {
-    for (tier in Tier.entries) put(tier.key, counts[tier.ordinal])
+    tierKeys.forEachIndexed { i, key -> put(key, counts[i]) }
   }
 }
 

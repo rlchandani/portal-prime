@@ -14,10 +14,14 @@ class EngineLocalPhotoRequestsTest {
   private val resources = EngineLocalPhotoRequests(listOf(source, "https://source.invalid/photo"), 42)
 
   @Test fun missingCopyUsesAnOpaqueBoundedResourceWithoutExportingItsSourcePath() {
-    val url = resources.urlFor(source, 601)!!
+    val url = resources.urlFor(source, 1101)!!
     assertEquals("https://immortal-photo.invalid/42/0/1200", url)
     assertFalse(url.contains("synthetic"))
     assertEquals(source.removePrefix("file://") to 1200, resources.resolve(url))
+    // A finer step is named and resolved as itself.
+    val drawn = resources.urlFor(source, 1541)!!
+    assertEquals("https://immortal-photo.invalid/42/0/1650", drawn)
+    assertEquals(source.removePrefix("file://") to 1650, resources.resolve(drawn))
   }
 
   @Test fun unknownLocalPathsAndRemotePhotosCannotAcquireAResource() {

@@ -42,41 +42,67 @@ class EngineScaledCacheResolutionTest {
 
   @Test fun requestedHitRecordsTheChosenTierAndDoesNotSubmitDecoding() = fixture { f, submitted ->
     val chosen = f.ready(1200)
-    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1000, f.measurement))
+    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.REQUESTED_TIER_READY, 1200, 1200, 2400)), f.observations)
     assertEquals(0, submitted())
   }
 
   @Test fun largerHitRecordsFirstReadyLargerTierAndSubmitsOnlyRequestedWork() = fixture { f, submitted ->
     val chosen = f.ready(1800); f.ready(2400)
-    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 601, f.measurement))
+    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.LARGER_TIER_READY, 1200, 1800, 2400)), f.observations)
     assertEquals(1, submitted())
   }
 
   @Test fun customMaximumHitUsesActualCustomDerivative() = fixture(1600) { f, submitted ->
     val chosen = f.ready(1600)
-    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1000, f.measurement))
+    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.LARGER_TIER_READY, 1200, 1600, 1600)), f.observations)
     assertEquals(1, submitted())
   }
 
   @Test fun originalFallbackIncludesSmallOriginalAndNeverServesSmallerOrEmptyDerivative() = fixture { f, submitted ->
     f.ready(600); f.ready(1200).writeBytes(byteArrayOf())
-    assertNull(f.cache.resolveAndRequest(f.original.path, 1000, f.measurement))
+    assertNull(f.cache.resolveAndRequest(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.ORIGINAL_FALLBACK, 1200, 0, 2400)), f.observations)
     assertEquals(1, submitted())
   }
 
   @Test fun missingOriginalRecordsMissingAndSubmitsNothing() = fixture { f, submitted ->
     f.original.delete()
-    assertNull(f.cache.resolveAndRequest(f.original.path, 1000, f.measurement))
+    assertNull(f.cache.resolveAndRequest(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.MISSING_ORIGINAL, 1200, 0, 2400)), f.observations)
     assertEquals(0, submitted())
   }
 
+  @Test fun drawnSizeLoadUsesNoReadyCopyLargerThanTheFormerStep() = fixture { f, submitted ->
+    f.ready(2400)
+    // 1500 replaces the former 1800: the 2400 copy is too large, so the drawn size is prepared.
+    assertNull(f.cache.resolveForBoundedLoad(f.original.path, 1500, f.measurement))
+    assertEquals(listOf(listOf(EngineImageResolutionResult.BOUNDED_LOAD_PENDING, 1500, 0, 2400)), f.observations)
+    assertEquals(1, submitted())
+    val former = f.ready(1800)
+    assertEquals(former, f.cache.resolveForBoundedLoad(f.original.path, 1500, f.measurement))
+    assertEquals(listOf(EngineImageResolutionResult.LARGER_TIER_READY, 1500, 1800, 2400), f.observations.last())
+  }
+
+  @Test fun formerStepLoadStillUsesAnyReadyLargerCopy() = fixture { f, _ ->
+    val chosen = f.ready(2400)
+    assertEquals(chosen, f.cache.resolveForBoundedLoad(f.original.path, 1200, f.measurement))
+    assertEquals(listOf(listOf(EngineImageResolutionResult.LARGER_TIER_READY, 1200, 2400, 2400)), f.observations)
+  }
+
+  @Test fun largestFallbackKeepsFormerStepsAndCapsFinerOnes() {
+    for (former in listOf(600, 1200, 1800, 2400)) assertEquals(2400, EngineScaledCache.largestFallback(former))
+    assertEquals(1200, EngineScaledCache.largestFallback(700))
+    assertEquals(1800, EngineScaledCache.largestFallback(1500))
+    assertEquals(2400, EngineScaledCache.largestFallback(2200))
+    assertEquals(1600, EngineScaledCache.largestFallback(1500, 1600))
+    assertEquals(1600, EngineScaledCache.largestFallback(1600, 1600))
+  }
+
   @Test fun boundedLoadMissRecordsPendingInsteadOfAnOriginalFallback() = fixture { f, submitted ->
-    assertNull(f.cache.resolveForBoundedLoad(f.original.path, 1000, f.measurement))
+    assertNull(f.cache.resolveForBoundedLoad(f.original.path, 1101, f.measurement))
     assertEquals(listOf(listOf(EngineImageResolutionResult.BOUNDED_LOAD_PENDING, 1200, 0, 2400)), f.observations)
     assertEquals(1, submitted())
   }
@@ -87,7 +113,7 @@ class EngineScaledCacheResolutionTest {
       chosen.delete(); f.ready(2400)
       f.measurement.record(result, requested, delivered, cap)
     }
-    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1000, measurement))
+    assertEquals(chosen, f.cache.resolveAndRequest(f.original.path, 1101, measurement))
     assertEquals(EngineImageResolutionResult.REQUESTED_TIER_READY, f.observations.single()[0])
     assertEquals(1200, f.observations.single()[2]); assertEquals(0, submitted())
   }
@@ -99,11 +125,11 @@ class EngineScaledCacheResolutionTest {
         "larger" -> f.ready(2400)
         "missing" -> f.original.delete()
       }
-      val baseline = f.cache.resolveAndRequest(f.original.path, 1000)
+      val baseline = f.cache.resolveAndRequest(f.original.path, 1101)
       val baselineSubmissions = submitted()
       var calls = 0
       val throwing = EngineImageResolutionMeasurement { _, _, _, _ -> calls++; throw AssertionError("synthetic sink") }
-      val measured = f.cache.resolveAndRequest(f.original.path, 1000, throwing)
+      val measured = f.cache.resolveAndRequest(f.original.path, 1101, throwing)
       assertEquals(branch, baseline, measured)
       assertEquals(branch, 1, calls)
       assertEquals(branch, baselineSubmissions, submitted() - baselineSubmissions)

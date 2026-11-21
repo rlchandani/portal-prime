@@ -14,7 +14,7 @@ class EngineRemotePhotoRequestsTest {
   private val requests = EngineRemotePhotoRequests(listOf(source, "file:///local.jpg"), 7)
 
   @Test fun remoteResourcesHideSourceQueriesAndRetainRequestedTier() {
-    val url = requests.urlFor(source, 1000)!!
+    val url = requests.urlFor(source, 1101)!!
     assertEquals("https://immortal-remote-photo.invalid/7/0/1200", url)
     assertFalse(url.contains("signed"))
     assertEquals(source to 1200, requests.resolve(url))
