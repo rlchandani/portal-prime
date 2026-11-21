@@ -5,6 +5,8 @@
 (function () {
   const SS = window.SS;
   const aspect = window.aspect;
+  // Dissolves in flight (lib-engine.js); photo bands wait for them.
+  const FADES = SS.fades || { begin() {}, end() {}, busy: () => false };
   const EASE = {
     kb: "cubic-bezier(0.33,0,0.15,1)", fade: "cubic-bezier(0.4,0,0.2,1)",
     outExpo: "cubic-bezier(0.16,1,0.3,1)", quart: "cubic-bezier(0.77,0,0.175,1)", quint: "cubic-bezier(0.22,1,0.36,1)",
@@ -193,7 +195,7 @@
       release(request.outgoing);
       request.incoming.ontransitionend = null;
       request.incoming.style.opacity = ""; request.incoming.style.transition = "";
-      t.cancel(request.timer); fading = null;
+      t.cancel(request.timer); fading = null; FADES.end(request);
     }
     function settle(request = fading) {
       if (!request || request !== fading || disposed || paused) return;
@@ -213,7 +215,7 @@
     }
     const cleanup = () => {
       if (disposed) return;
-      disposed = true; t.cleanup(); fading = null;
+      disposed = true; t.cleanup(); if (fading) FADES.end(fading); fading = null;
       roots.forEach(root => {
         root.ontransitionend = null; root.classList.add("retired"); release(root);
       });
@@ -254,7 +256,8 @@
         void incoming.offsetWidth;
         const request = { incoming, outgoing, timer: null, remaining: fadeMs,
           startedAt: now(), held: false };
-        fading = request;
+        if (fading) FADES.end(fading);
+        fading = request; FADES.begin(request);
         incoming.ontransitionend = event => {
           if (event.target === incoming && event.propertyName === "opacity") retire(request);
         };
@@ -570,6 +573,107 @@
   // the copy it got before. Portal+ modes below pass a drawn size only on the Portal+, so a
   // compact screen keeps its own default (the display's long edge).
   const KEN_BURNS_MOTION = { zoom: 1.15, fitCapped: true }, DRIFT_MOTION = { zoom: 1.04, fitCapped: false };
+  // A fill single's photo is copied into an accelerated canvas one band per frame before its
+  // change (SS.paintStrips), so its upload is spread over ~16 frames instead of landing in the
+  // dissolve's first one. The canvas holds the cover crop 1:1 and replaces the hero's CSS
+  // background; the hero, its motion and the dissolve are unchanged. While it is painted the
+  // canvas sits in a 1 px, 0.001-opacity corner (.ss-strip-warm), so each band is composited,
+  // and so flushed to the GPU, in its own frame. Without canvas support, or when a step fails,
+  // the photo is the CSS background as before.
+  let stripOwner = null;
+  function stripsSupported() {
+    return typeof createImageBitmap === "function" && typeof requestAnimationFrame === "function" &&
+      typeof Image === "function" && typeof SS.paintStrips === "function" && !!document.body;
+  }
+  function loadImage(url) {
+    return new Promise(resolve => {
+      const img = new Image();
+      let timer = null;
+      function finish(ok) {
+        if (!img.onload) return;
+        img.onload = img.onerror = null; clearTimeout(timer);
+        if (!ok) img.src = "";
+        resolve(ok ? img : null);
+      }
+      img.onload = () => finish(img.naturalWidth > 0 && img.naturalHeight > 0);
+      img.onerror = () => finish(false);
+      timer = setTimeout(() => finish(false), PREBLUR_TIMEOUT_MS);
+      img.src = url;
+    });
+  }
+  // A finished canvas in its warm corner, or null (the caller then uses the CSS background).
+  async function prepareStrips(t, active, url, plan, W, H) {
+    if (!stripsSupported()) return null;
+    let canvas = null, g = null;
+    try { canvas = document.createElement("canvas"); g = canvas.getContext && canvas.getContext("2d"); } catch (_) { g = null; }
+    if (!g) return null;
+    const began = Date.now();
+    // One diagnostic line per photo (tag ImmortalEngine); never photo data.
+    const report = (ok, what) => { try { console[ok ? "info" : "warn"]("photo_strips " + what); } catch (_) {} };
+    const img = await loadImage(url);
+    if (!img || !active()) { if (img) img.src = ""; else report(false, "load_failed"); return null; }
+    const layout = SS.stripLayout(img.naturalWidth, img.naturalHeight, W, H, plan.position, SS.STRIP_BUDGET_BYTES);
+    let source = null;
+    if (layout) try { source = await createImageBitmap(img); } catch (_) { source = null; }
+    img.src = "";
+    if (!source || !active()) {
+      if (source) source.close(); else report(false, layout ? "bitmap_failed" : "no_layout");
+      return null;
+    }
+    const strips = { canvas, warm: el("ss-strip-warm"), layout, url, lost: false };
+    canvas.className = "ss-strip-canvas";
+    canvas.width = layout.canvas.w; canvas.height = layout.canvas.h;
+    canvas.addEventListener("contextlost", () => { strips.lost = true; });
+    strips.warm.appendChild(canvas); document.body.appendChild(strips.warm);
+    const me = {};
+    let ok = false;
+    try {
+      ok = await SS.paintStrips(g, source, layout, {
+        frame: () => new Promise(resolve => requestAnimationFrame(() => resolve(true)))
+          .then(() => t.publish(() => active())),
+        crop: (s, x, y, w, h) => createImageBitmap(s, x, y, w, h),
+        gate: () => {
+          if (FADES.busy() || (stripOwner && stripOwner !== me)) return false;
+          stripOwner = me; return true;
+        },
+      });
+    } catch (_) { ok = false; }
+    finally { if (stripOwner === me) stripOwner = null; source.close(); }
+    if (!ok || strips.lost || !active()) {
+      releaseStrips(strips);
+      if (active()) report(false, strips.lost ? "context_lost" : "paint_failed");
+      return null;
+    }
+    report(true, layout.slices.length + " bands " + layout.canvas.w + "x" + layout.canvas.h + " " + (Date.now() - began) + " ms");
+    return strips;
+  }
+  // Free a canvas's pixels now (a detached canvas keeps them until collected).
+  function releaseStrips(strips) {
+    if (!strips) return;
+    strips.canvas.width = 0; strips.canvas.height = 0;
+    strips.canvas.remove(); strips.warm.remove();
+  }
+  function releaseHeroStrips(hero) {
+    if (!hero || !hero.classList.contains("ss-strips")) return;
+    hero.classList.remove("ss-strips");
+    Array.from(hero.children).filter(c => c.className === "ss-strip-canvas").forEach(c => {
+      c.width = 0; c.height = 0; c.remove();
+    });
+  }
+  // Move the finished canvas into [hero]. If the GPU context is lost later, the hero falls back
+  // to its CSS background (one ordinary upload) rather than showing an empty canvas.
+  function showStrips(hero, strips, position) {
+    const c = strips.canvas, css = strips.layout.css;
+    hero.style.backgroundImage = "none";
+    hero.classList.add("ss-strips");
+    Object.assign(c.style, { left: css.left + "px", top: css.top + "px", width: css.width + "px", height: css.height + "px" });
+    hero.appendChild(c); strips.warm.remove();
+    c.addEventListener("contextlost", () => {
+      if (c.parentNode !== hero) return;
+      releaseHeroStrips(hero);
+      bg(hero, strips.url, "cover"); if (position) hero.style.backgroundPosition = position;
+    });
+  }
   // [onScreen] are the seeds still visible (the outgoing layer). Resolves null when the scene
   // was disposed or a load failed; a computed backdrop is then released at once.
   async function prepareLarge(ctx, t, active, deck, p, onScreen, edge, motion) {
@@ -583,7 +687,11 @@
     if (!await t.load(urls) || !active()) return null;
     // A shape measured by the load is honoured: plan again now.
     const plan = pair || SS.largeSingle(p, W, H);
-    if (plan.mode !== "whole") return { ps, urls, plan, backdrop: null };
+    if (plan.mode !== "whole") {
+      const strips = plan.mode === "fill" ? await prepareStrips(t, active, urls[0], plan, W, H) : null;
+      if (!active()) { releaseStrips(strips); return null; }
+      return { ps, urls, plan, backdrop: null, strips };
+    }
     const fillUrl = ctx.url(p, 320);
     if (!await t.load(fillUrl) || !active()) return null;
     const canvas = await preblur(fillUrl, W, H);
@@ -593,14 +701,16 @@
   // Publish a prepared beat once playback runs; a beat dropped before it shows frees its backdrop.
   function publishLarge(t, active, prep, render) {
     return t.publish(() => {
-      if (!active()) { releaseCanvas(prep.backdrop && prep.backdrop.canvas); return false; }
+      if (!active()) { releaseCanvas(prep.backdrop && prep.backdrop.canvas); releaseStrips(prep.strips); return false; }
       return render();
     }).then(result => {
       if (result === false && prep.backdrop) releaseCanvas(prep.backdrop.canvas);
+      if (result === false) releaseStrips(prep.strips);
       return result;
     });
   }
   function paintLarge(prep, root, hero) {
+    releaseHeroStrips(hero);
     const plan = prep.plan, size = applyCompact(plan, root, hero, prep.backdrop);
     hero.classList.toggle("ss-whole", plan.mode === "whole" && !plan.pair);
     if (plan.pair) {
@@ -608,7 +718,10 @@
       hero.style.backgroundSize = plan.widths.map(w => `${w}px ${plan.rect.h}px`).join(", ");
       hero.style.backgroundPosition = "left center, right center";
       hero.style.backgroundRepeat = "no-repeat";
+    } else if (prep.strips && !prep.strips.lost && prep.strips.canvas.width > 0) {
+      showStrips(hero, prep.strips, plan.position);
     } else {
+      releaseStrips(prep.strips);
       bg(hero, prep.urls[0], size);
       if (plan.position) hero.style.backgroundPosition = plan.position;
     }
@@ -637,7 +750,7 @@
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto"; hero.classList.remove("ss-motion");
-      hideCompactFill(root);
+      releaseHeroStrips(hero); hideCompactFill(root);
     });
     let onScreen = [];
     async function step() {
@@ -931,7 +1044,7 @@
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto";
-      hideCompactFill(root);
+      releaseHeroStrips(hero); hideCompactFill(root);
     });
     let onScreen = [];
     async function step() {
@@ -963,7 +1076,7 @@
     const dissolve = makeSceneDissolve(ctx, t, scenes, 2000, scene => {
       resources.get(scene).forEach(image => {
         image.style.backgroundImage = "none"; image.style.animation = "none";
-        image.style.willChange = "auto";
+        image.style.willChange = "auto"; releaseHeroStrips(image);
       });
       resources.set(scene, []); collages.delete(scene); hideCompactFill(scene); scene.innerHTML = "";
       scene.style.opacity = ""; scene.style.transition = "";

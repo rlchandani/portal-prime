@@ -133,3 +133,91 @@ window.startClock = function (timeEl, dateEl) {
   }
   tick(); setInterval(tick, 1000);
 };
+
+// ---- Fill photo in bands: spread its GPU upload over frames --------------------
+// Chromium in the WebView rasterises and uploads a CSS-background photo in one go at its first
+// draw (a 2400 px fill copy is ~16.5 MB: 60-136 ms frames on the Portal+'s in-process GPU
+// thread). A fill single is instead copied, before its change, into one accelerated canvas one
+// band per frame. Each band is its own small bitmap, so a frame uploads only that band; the
+// dissolve then composites the finished canvas, with nothing left to raster or upload.
+(function () {
+  const SS = window.SS = window.SS || {};
+  // ~1 MB per band (about 100 rows of a 2400 px copy, 16 frames per photo).
+  SS.STRIP_BUDGET_BYTES = 1 << 20;
+  // Frames a band waits for a dissolve (or another painter) to end before painting anyway.
+  SS.STRIP_MAX_WAIT_FRAMES = 300;
+
+  // A CSS background-position of one or two percentages ("50%", "37.5% 50%"; "center") as
+  // fractions; null for anything else, so the caller keeps the CSS background.
+  SS.parsePosition = function (value) {
+    const text = value == null || value === "" ? "50% 50%" : String(value).trim();
+    const parts = text === "center" ? ["50%", "50%"] : text.split(/\s+/);
+    if (parts.length < 1 || parts.length > 2) return null;
+    const out = parts.map(p => {
+      if (p === "center") return .5;
+      const m = /^(-?\d+(?:\.\d+)?)%$/.exec(p);
+      return m ? Number(m[1]) / 100 : NaN;
+    });
+    if (out.length === 1) out.push(.5);
+    return out.every(v => Number.isFinite(v) && v >= 0 && v <= 1) ? out : null;
+  };
+
+  // Where an [iw] x [ih] photo drawn "cover" at [position] in a [W] x [H] box lands, as the
+  // smallest whole-pixel source crop that covers the box. The canvas holds that crop 1:1
+  // ([canvas], [src]: its top-left in the photo) and is placed at [css] inside the box, so the
+  // compositor scales it exactly as it scaled the background. [slices] are the canvas's row
+  // bands, each at most [budget] bytes (RGBA), covering every row once and in order.
+  SS.stripLayout = function (iw, ih, W, H, position, budget) {
+    const pos = SS.parsePosition(position);
+    if (!pos || ![iw, ih, W, H].every(v => Number.isFinite(v) && v > 0)) return null;
+    const s = Math.max(W / iw, H / ih), dw = iw * s, dh = ih * s;
+    const offX = (W - dw) * pos[0], offY = (H - dh) * pos[1];
+    const x0 = Math.max(0, Math.floor(-offX / s + 1e-6)), x1 = Math.min(iw, Math.ceil((W - offX) / s - 1e-6));
+    const y0 = Math.max(0, Math.floor(-offY / s + 1e-6)), y1 = Math.min(ih, Math.ceil((H - offY) / s - 1e-6));
+    const w = x1 - x0, h = y1 - y0;
+    if (!(w > 0 && h > 0)) return null;
+    const rows = Math.max(1, Math.floor((Number(budget) > 0 ? budget : SS.STRIP_BUDGET_BYTES) / (w * 4)));
+    const slices = [];
+    for (let y = 0; y < h; y += rows) slices.push({ y, h: Math.min(rows, h - y) });
+    return { canvas: { w, h }, src: { x: x0, y: y0 }, slices,
+      css: { left: offX + x0 * s, top: offY + y0 * s, width: w * s, height: h * s } };
+  };
+
+  // Dissolves in flight (whole-scene and in-mode). Bands wait while any runs, so their uploads
+  // never share a frame with a transition.
+  const fades = new Set();
+  SS.fades = {
+    begin: key => { if (key) fades.add(key); },
+    end: key => { fades.delete(key); },
+    busy: () => fades.size > 0,
+  };
+
+  // Copy [layout]'s bands from [source] into [g], one per frame. [hooks]:
+  //   frame()  -> Promise<boolean>: the next frame while playback runs; false = abandoned
+  //   crop(source, x, y, w, h) -> Promise<bitmap|null>: one band as its own bitmap
+  //   gate()   -> boolean: no dissolve or other painter is running
+  // Resolves true once every band is drawn; false (nothing more drawn) when abandoned. The next
+  // band is cropped while the current one waits, and every cropped band is closed.
+  SS.paintStrips = async function (g, source, layout, hooks) {
+    const slices = layout && layout.slices || [];
+    const maxWait = Number.isFinite(hooks.maxWaitFrames) ? hooks.maxWaitFrames : SS.STRIP_MAX_WAIT_FRAMES;
+    const crop = i => Promise.resolve()
+      .then(() => hooks.crop(source, layout.src.x, layout.src.y + slices[i].y, layout.canvas.w, slices[i].h))
+      .catch(() => null);
+    const close = b => { try { if (b && typeof b.close === "function") b.close(); } catch (_) {} };
+    let next = slices.length ? crop(0) : null;
+    try {
+      for (let i = 0; i < slices.length; i++) {
+        for (let waited = 0; ; waited++) {
+          if (!await hooks.frame()) return false;
+          if (waited >= maxWait || hooks.gate()) break;
+        }
+        const band = await next; next = null;
+        if (!band) return false;
+        if (i + 1 < slices.length) next = crop(i + 1);
+        try { g.drawImage(band, 0, slices[i].y); } catch (_) { return false; } finally { close(band); }
+      }
+      return slices.length > 0;
+    } finally { if (next) next.then(close); }
+  };
+})();
