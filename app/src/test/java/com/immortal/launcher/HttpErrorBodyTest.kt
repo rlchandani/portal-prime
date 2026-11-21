@@ -109,7 +109,7 @@ class HttpErrorBodyTest {
   }
 
   private fun expected(detail: String?, method: String = "GET"): String =
-      "$method http://example.invalid/generated -> HTTP 503" +
+      "$method http://example.invalid/… -> HTTP 503" +
           if (detail == null) "" else ": $detail"
 
   private fun assertBounded(body: Body) {

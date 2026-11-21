@@ -29,7 +29,7 @@ import org.json.JSONObject
  *   `/proc/<pid>` of system_server isn't visible. Android samples it about every 25 minutes, so the
  *   last value is kept with its age; without READ_LOGS it reads as unavailable, never as low.
  * - **MemAvailable / SwapTotal / SwapFree**: `/proc/meminfo`.
- * - **own PSS**: [Debug.getPss] for this process.
+ * - **own PSS**: `/proc/self/smaps_rollup` (see [readOwnPssKb]).
  *
  * Logs at most once per [LOG_INTERVAL_MS].
  */
@@ -93,7 +93,7 @@ internal object MemoryHealth {
         memAvailableKb = meminfo["MemAvailable"],
         swapTotalKb = meminfo["SwapTotal"],
         swapFreeKb = meminfo["SwapFree"],
-        ownPssKb = runCatching { Debug.getPss() }.getOrNull()?.takeIf { it > 0 },
+        ownPssKb = readOwnPssKb(),
     )
     val sample = Sample(values, MemoryHealthPolicy.evaluate(values), now,
         if (system != null) SOURCE_EVENTS_LOG else SOURCE_UNAVAILABLE)
@@ -101,6 +101,15 @@ internal object MemoryHealth {
     if (logThrottle.shouldLog(SystemClock.elapsedRealtime())) Log.i(TAG, summary(sample))
     return sample
   }
+
+  /**
+   * Own PSS from `/proc/self/smaps_rollup`. [Debug.getPss] reads the same numbers but also asks
+   * the memtrack HAL, which SELinux denies an app on a Portal, so every call made the framework
+   * log "failed to get memory consumption info: -1". Falls back to it only without a rollup.
+   */
+  private fun readOwnPssKb(): Long? =
+      runCatching { MemoryHealthPolicy.parseOwnPssKb(File("/proc/self/smaps_rollup").readText()) }.getOrNull()
+          ?: runCatching { Debug.getPss() }.getOrNull()?.takeIf { it > 0 }
 
   private fun readEventsLog(): String = runCatching {
     val process = ProcessBuilder("logcat", "-d", "-b", "events", "-v", "epoch", "-s", "am_pss")

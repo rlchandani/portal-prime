@@ -28,6 +28,9 @@ internal object HouseholdBus {
   private const val TAG = "ImmortalHouseholdBus"
   const val PORT = 50122
   private const val SEND_REPEATS = 2 // a dropped Wi-Fi frame should not lose a dinner call
+  /** An unreachable network (Wi-Fi down or roaming) is logged at debug, at most this often. */
+  const val UNREACHABLE_LOG_INTERVAL_MS = 10L * 60 * 1000
+  private val unreachableLog = MemoryHealthPolicy.LogThrottle(UNREACHABLE_LOG_INTERVAL_MS)
   /** Music move messages are logged on arrival, to diagnose "Move to…" / "Bring it back". */
   private const val MUSIC_PREFIX = "music_"
   private val RESTART_MS = longArrayOf(1_000L, 5_000L, 30_000L)
@@ -129,8 +132,26 @@ internal object HouseholdBus {
             Thread.sleep(120)
           }
         }
-      }.onFailure { Log.w(TAG, "household send failed", it) }
+      }.onFailure { logSendFailure(it, unreachableLog, System.nanoTime() / 1_000_000) }
     }
     return true
+  }
+
+  /** True when [error] (or a cause) is a "no route" failure: expected while Wi-Fi is down. */
+  internal fun isNetworkUnreachable(error: Throwable): Boolean =
+      generateSequence(error) { it.cause }.take(8).any { e ->
+        e is java.net.NoRouteToHostException ||
+            e.message?.let { "ENETUNREACH" in it || "EHOSTUNREACH" in it } == true
+      }
+
+  /** Unreachable networks are a rate-limited debug line; any other failure warns with its stack. */
+  internal fun logSendFailure(error: Throwable, throttle: MemoryHealthPolicy.LogThrottle, nowMs: Long) {
+    if (!isNetworkUnreachable(error)) {
+      Log.w(TAG, "household send failed", error)
+      return
+    }
+    if (synchronized(throttle) { throttle.shouldLog(nowMs) }) {
+      Log.d(TAG, "household send skipped: network unreachable")
+    }
   }
 }
