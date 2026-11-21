@@ -61,12 +61,19 @@ class EngineScaledCache(
       measurement: EngineImageResolutionMeasurement?): File? =
       resolveAndRequest(originalPath, requestedEdge, measurement, EngineImageResolutionResult.ORIGINAL_FALLBACK)
 
+  /**
+   * The engine's load path. A copy asked for at its drawn size (a finer step) is never answered
+   * with a ready copy larger than the former step it replaces: the bounded request prepares the
+   * drawn size instead, so a first use never uploads more than it did before.
+   */
   internal fun resolveForBoundedLoad(originalPath: String, requestedEdge: Int,
       measurement: EngineImageResolutionMeasurement?): File? =
-      resolveAndRequest(originalPath, requestedEdge, measurement, EngineImageResolutionResult.BOUNDED_LOAD_PENDING)
+      resolveAndRequest(originalPath, requestedEdge, measurement, EngineImageResolutionResult.BOUNDED_LOAD_PENDING,
+          largestFallback(derivativeEdge(requestedEdge, targetEdge), targetEdge))
 
   private fun resolveAndRequest(originalPath: String, requestedEdge: Int,
-      measurement: EngineImageResolutionMeasurement?, missResult: EngineImageResolutionResult): File? {
+      measurement: EngineImageResolutionMeasurement?, missResult: EngineImageResolutionResult,
+      fallbackCap: Int = targetEdge): File? {
     val original = File(originalPath)
     val edge = derivativeEdge(requestedEdge, targetEdge)
     if (!original.isFile) {
@@ -80,12 +87,12 @@ class EngineScaledCache(
     request(original, edge)
     // A ready larger copy is safe while the smaller one is prepared. Never upscale a smaller copy.
     for (larger in TIERS) {
-      if (larger > edge && larger <= targetEdge) ready(original, larger)?.let {
+      if (larger > edge && larger <= targetEdge && larger <= fallbackCap) ready(original, larger)?.let {
         if (measurement != null) observe(measurement, EngineImageResolutionResult.LARGER_TIER_READY, edge, larger)
         return it
       }
     }
-    if (targetEdge > edge) ready(original, targetEdge)?.let {
+    if (targetEdge > edge && targetEdge <= fallbackCap) ready(original, targetEdge)?.let {
       if (measurement != null) observe(measurement, EngineImageResolutionResult.LARGER_TIER_READY, edge, targetEdge)
       return it
     }
@@ -270,7 +277,22 @@ class EngineScaledCache(
     const val QUALITY = 88
     // At most ~48 MiB of ARGB source pixels plus one <=2400-edge output; one decoder globally.
     const val MAX_SOURCE_PIXELS = 12L * 1024 * 1024
-    private val TIERS = intArrayOf(600, 1200, 1800, TARGET_EDGE)
+    // Copy sizes. The engine asks for a photo at the size it is drawn, so the steps are short
+    // (<= 17 %, <= 12.5 % above 1200): a copy is never much larger than drawn, and Chromium's
+    // first-draw upload of it shrinks with it. The former 600/1200/1800/2400 steps remain, so
+    // existing copies stay valid and a request without a drawn size gets the copy it got before.
+    internal val TIERS = intArrayOf(600, 700, 800, 900, 1000, 1100, 1200, 1350, 1500, 1650, 1800,
+        2000, 2200, TARGET_EDGE)
+    /** True for an edge the cache produces: the only edges a bridge URL may name. */
+    fun isTier(edge: Int): Boolean = edge in TIERS
+    private val FORMER_TIERS = intArrayOf(600, 1200, 1800, TARGET_EDGE)
+    /**
+     * Largest ready copy a bounded load may use for [edge]: any for a former step (unchanged),
+     * else the former step this finer one replaces.
+     */
+    fun largestFallback(edge: Int, maximum: Int = TARGET_EDGE): Int =
+        if (edge in FORMER_TIERS || edge >= maximum) maximum
+        else minOf(maximum, FORMER_TIERS.first { it >= edge })
     private val work = EngineDerivativeWork()
 
     fun derivativeEdge(requested: Int, maximum: Int = TARGET_EDGE): Int {

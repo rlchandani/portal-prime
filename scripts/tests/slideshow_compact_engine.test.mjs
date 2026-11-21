@@ -90,9 +90,10 @@ test('compact decode size follows the drawn size, capped by the request', () => 
   assert.equal(SS.compactEdge(1800, undefined, 1280, 800, 1.5), 1800);
   assert.equal(SS.compactEdge(2200, undefined, 800, 1280, 1.5), 1920);
   assert.equal(SS.compactEdge(2200, 1920, 800, 1280, 1), 1920);
-  assert.equal(SS.compactEdge(2200, 3840, 800, 1280, 1), 2200);
-  assert.equal(SS.compactEdge(2200, null, 800, 1280, 1), 2200, 'unknown shape keeps the request');
-  assert.equal(SS.compactEdge(1100, undefined, 800, 1280, NaN), 1100);
+  // Capped by the copy the request got before (2200 -> 2400, 1100 -> 1200), never below it.
+  assert.equal(SS.compactEdge(2200, 3840, 800, 1280, 1), 2400);
+  assert.equal(SS.compactEdge(2200, null, 800, 1280, 1), 2400, 'unknown shape keeps the copy it got before');
+  assert.equal(SS.compactEdge(1100, undefined, 800, 1280, NaN), 1200);
   assert.equal(SS.compactEdge(1200, 10, 800, 1280, 1), 320);
 });
 
@@ -186,7 +187,10 @@ for (const mode of ['kenBurns', 'push']) {
     const r = createSceneFixture({ mode, photos: landscapes() });
     try {
       assert.equal(await r.cleanup.ready, true);
-      assert.ok(r.resolutions.every(n => n.edge === 2200 && !('drawn' in n)), 'Portal+ requests unchanged');
+      // The Portal+ asks as before (2200) with the drawn cover size at the top of the motion; at
+      // 2160 px wide that is past 2200, so the copy stays the 2400 px it was (SS.largeEdge).
+      const top = mode === 'kenBurns' ? 1.15 : 1.04;
+      assert.ok(r.resolutions.every(n => n.edge === 2200 && Math.abs(n.drawn - 2160 * top) < 1e-6), 'Portal+ requests');
       const hero = shown(r);
       assert.equal(hero.style.backgroundSize, 'cover', 'a 3:2 photo keeps 100 % on the 3:2 screen');
       assert.deepEqual([hero.style.left, hero.style.top, hero.style.width, hero.style.height],
@@ -480,8 +484,9 @@ async function engineEdges(W, H, dpr) {
   return edges;
 }
 
-test('compact screens decode at most the display long edge; the Portal+ keeps its requests', async () => {
+test('compact screens decode at most the display long edge; the Portal+ asks for its drawn print', async () => {
   assert.deepEqual([...new Set(await engineEdges(800, 1280, 1))], [1280]);
   assert.deepEqual([...new Set(await engineEdges(1280, 800, 1.25))], [1600]);
-  assert.deepEqual([...new Set(await engineEdges(2160, 1440, 1))], [1800]);
+  // A 3:2 print fills the reserved area's height: 1752 px wide, under the former 1800.
+  assert.deepEqual([...new Set(await engineEdges(2160, 1440, 1))], [1752]);
 });

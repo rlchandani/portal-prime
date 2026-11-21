@@ -127,15 +127,16 @@ for (const mode of fixed) test(`${mode}: unknown metadata starts with display de
   try {
     await f.flush();
     assert.equal(f.requests.length, 1, 'The first admitted request is the selected display photo');
-    assert.equal(f.requests[0].edge, mode === 'framed' ? 1800 : mode === 'polaroid' ? 1400 : 2200);
+    // An unknown shape has no drawn size yet: the copy the request got before (SS.largeEdge).
+    assert.equal(f.requests[0].edge, mode === 'framed' || mode === 'polaroid' ? 1800 : 2400);
     assert.equal(f.elements.get('stage').children.length, 1);
     assert.deepEqual(f.reports, [], 'Style cannot be reported before decode');
     await f.finishScene();
     assert.deepEqual(f.reports, [mode]);
-    // A portrait on the Portal+ is shown whole over its own pre-blurred 320 px copy (no pair:
-    // the other photos' shapes are still unknown, so none is a known portrait).
+    // A portrait on the Portal+ is shown whole over its own pre-blurred 320 px copy, delivered as
+    // before at 600 (no pair: the other photos' shapes are still unknown, so none is a known portrait).
     const backdrop = ['kenBurns', 'push', 'memories'].includes(mode);
-    assert.equal(f.requests.some(request => request.edge === 320), backdrop);
+    assert.equal(f.requests.some(request => request.edge === 600), backdrop);
     assert.equal(f.requests.length, mode === 'polaroid' ? 6 : backdrop ? 2 : 1);
     assert.ok(f.context.PHOTOS.some(photo => photo.measured && photo.w / photo.h === 2 / 3));
     if (mode === 'framed') {
@@ -234,7 +235,8 @@ test('Diptych receives portrait buckets before selection and prepares a distinct
   try {
     await f.flush();
     for (let i = 0; i < 3; i++) { f.active().forEach(image => image.complete()); await f.flush(); }
-    const display = f.requests.filter(request => request.edge === 1800);
+    // Measured portraits are asked for at their contained size in a cell (1353.6 px tall).
+    const display = f.requests.filter(request => request.edge === 1354);
     assert.equal(display.length, 2);
     assert.notEqual(display[0].url, display[1].url);
     assert.equal(f.context.SS.counts(f.context.PHOTOS).portrait, 6);
@@ -253,7 +255,7 @@ test('Shuffle still sees measured portraits and can select Hero + Sidebar on its
     assert.equal(f.context.SS.counts(f.context.PHOTOS).portrait, 6);
     assert.equal(f.requests.at(-1).edge, 1800, 'The hero is prepared only after the orientation batch');
     f.active()[0].complete(1800, 1200); await f.flush();
-    assert.equal(f.requests.at(-1).edge, 1100);
+    assert.equal(f.requests.at(-1).edge, 1200);
     await f.finishScene();
     assert.deepEqual(f.reports, ['heroSidebar']);
     assert.equal(f.nodes().filter(node => node.classList.contains('ss-cell')).length, 3);
@@ -273,8 +275,13 @@ for (const mode of fixed) test(`${mode}: display-derived dimensions match known 
       await known.finishScene(); await recovered.finishScene();
       assert.deepEqual(known.reports, [mode]); assert.deepEqual(recovered.reports, [mode]);
       const snapshot = f => f.nodes().map(node => ({ classes: node.className, style: { ...node.style } }));
-      assert.deepEqual(snapshot(recovered), snapshot(known));
-      assert.deepEqual(recovered.requests, known.requests);
+      // Known metadata may ask for a photo at its drawn size before the load, where a recovered
+      // shape could not; that copy is never larger, and the scene is otherwise the same.
+      const unsized = n => n.map(x => ({ ...x, style: Object.fromEntries(Object.entries(x.style)
+        .map(([k, v]) => [k, typeof v === 'string' ? v.replace(/scaled-\d+/g, 'scaled') : v])) }));
+      assert.deepEqual(unsized(snapshot(recovered)), unsized(snapshot(known)));
+      assert.deepEqual(recovered.requests.map(r => r.url), known.requests.map(r => r.url));
+      known.requests.forEach((r, i) => assert.ok(r.edge <= recovered.requests[i].edge, `${r.edge} > ${recovered.requests[i].edge}`));
     } finally { known.close(); recovered.close(); }
   }
 });
@@ -294,10 +301,13 @@ test('Memories builds its later collage from display dimensions without adding p
       const width = parseFloat(card.style.width), height = parseFloat(card.style.height);
       assert.ok(Math.abs(width / height - 2 / 3) < .000001);
     }
-    assert.equal(f.requests.filter(request => request.edge === 1100).length, 3);
-    // Probes are never added: every 320 request is a single beat's backdrop, after its photo.
-    const backdrops = f.requests.filter(request => request.edge === 320);
-    assert.ok(backdrops.every(request => f.requests.some(r => r.url === request.url && r.edge === 2200)));
+    // Photos not yet shown have no measured shape: the collage gets the copies it got before.
+    assert.equal(f.requests.filter(request => request.edge === 1200).length, 3);
+    // Probes are never added: every backdrop request (320, delivered as before at 600) is a
+    // single beat's, after its photo.
+    const backdrops = f.requests.filter(request => request.edge === 600);
+    assert.ok(backdrops.length > 0);
+    assert.ok(backdrops.every(request => f.requests.some(r => r.url === request.url && r.edge > 600)));
   } finally { f.close(); }
 });
 
@@ -310,7 +320,7 @@ test('known portraits pair on the Portal+ in Ken Burns, Push and Memories single
       const hero = f.nodes().find(node => node.classList.contains('ss-compact') && node.style.backgroundImage?.startsWith('url('));
       assert.equal(hero.style.backgroundImage.split('url(').length - 1, 2, mode + ' draws two photos');
       assert.equal(hero.style.backgroundPosition, 'left center, right center');
-      assert.equal(f.requests.filter(request => request.edge === 320).length, 1, 'one backdrop for the pair');
+      assert.equal(f.requests.filter(request => request.edge === 600).length, 1, 'one backdrop for the pair');
     } finally { f.close(); }
   }
 });

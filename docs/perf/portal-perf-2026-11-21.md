@@ -559,3 +559,57 @@ plus the LazyColumn), semantics 10–12.5 ms (`checkForSemanticsChanges` → `ge
   draw of the newly shown screen; the second long frame waits on the first's RenderThread. Next: avoid
   re-rendering the region layers on a switch (selection highlight outside the rail layer), and measure what part of
   the window flush is the shown screen versus the whole-window replay.
+
+## Screensaver photo change: decode at the drawn size (branch `engine-upload-2`)
+
+**Question:** the change frame is Chromium rasterising and uploading the incoming photo on its first draw (`Chrome_InProcGpuThread`, 100–300 ms, blocking `WebViewFunctor::drawGl`). Pre-uploading it 4 s early (`engine-upload`, not merged) only moved a 65–147 ms frame onto the still photo. Can each upload be made cheap enough instead, without softening anything?
+
+**Changes** (Portal+ = 2160 × 1440 device px at 180 dpi, so 1920 × 1280 CSS px at dpr 1.125; WebView is Chromium 138):
+1. `modes.js:311–368` (`SS.largeEdge` `:321`): a mode that knows how large it draws a photo passes that size (CSS px of the long edge at the top of its motion). The engine asks for `ceil(drawn × dpr)` device px, capped at the copy the request delivered before (the host's former 600 / 1200 / 1800 / 2400 step). So no photo gets fewer photo px per device px than before, and every photo gets at least 1.0 where it had that before. A request without a drawn size (unknown shape, Mosaic, Hero + Sidebar, Cinema, Filmstrip) still gets exactly its former copy. `SS.compactEdge` (the Mini) uses the same rule. Geometry helpers: `containEdge`, `coverEdge`, `largeDrawnEdge`, `polaroidDrawnEdge`, `diptychDrawnEdges`.
+2. `mode-impls.js` passes drawn sizes on the Portal+. Ken Burns, Push and Memories singles and pairs (`:567–584`): Ken Burns zoom is 1.15, stopping where a whole photo or a pair touches the screen; the drift is 1.04. Also Diptych cells (`:696–699`), the Framed print (`:734–772`), Gallery Wall tiles and swaps (`:878`, `:899`), Memories collage cards (`:1012–1047`), the Panorama strip (`:1104–1151`) and the Polaroid print box (`:1274`). `scheduler.js:248` routes the Portal+ through `SS.largeEdge`.
+3. `EngineScaledCache.kt:64–95, 280–296`: finer copy steps (600, 700 … 1200, 1350, 1500, 1650, 1800, 2000, 2200, 2400; each step ≤ 17 % above the last). The former four steps remain, so existing copies stay valid. A bounded engine load at a finer step never falls back to a ready copy larger than the former step it replaces (`largestFallback`); it prepares the drawn size instead. Before this cap, the first use of a new step could be answered with the 2400 copy. Bridge URL validation and resolution samples follow the same steps (`EngineLocalPhotoRequests.kt:30`, `EngineRemotePhotoRequests.kt:36`, `EngineImageResolution.kt`).
+- **Not changed:** Ken Burns, Push and Memories singles that fill the screen. They are drawn at 2160–2484 device px, more than the 2400 copy, so they keep it; a smaller copy would soften them. Transitions, durations, cadence and pre-decode timing are unchanged.
+
+**Texture per change** (decoded copy, RGBA; Portal+ geometry, phone-shaped 4:3 / 3:4 photos; computed with the shipped layout code):
+
+| Mode | Photos | Edge before | Edge after | MB before | MB after | Saved |
+|---|---|---|---|---|---|---|
+| Ken Burns | 4:3 landscape, fill | 2400 | 2400 | 16.5 | 16.5 | 0 % |
+| Ken Burns | 3:4 portrait, whole | 2400 | 1500 | 16.5 | 6.4 | 61 % |
+| Ken Burns | 3:4 portrait pair | 1800 | 1500 | 18.5 | 12.9 | 31 % |
+| Push / Memories single | 4:3 landscape, fill | 2400 | 2400 | 16.5 | 16.5 | 0 % |
+| Push / Memories single | 3:4 portrait, whole | 2400 | 1500 | 16.5 | 6.4 | 61 % |
+| Push / Memories single | 3:4 portrait pair | 1800 | 1500 | 18.5 | 12.9 | 31 % |
+| Diptych | 3:4 portrait pair | 1800 | 1500 | 18.5 | 12.9 | 31 % |
+| Diptych | 4:3 landscape | 1800 | 1800 | 9.3 | 9.3 | 0 % |
+| Framed | 3:4 portrait | 1800 | 1200 | 9.3 | 4.1 | 56 % |
+| Framed | 4:3 landscape | 1800 | 1650 | 9.3 | 7.8 | 16 % |
+| Gallery Wall | 10 tiles (5 + 5) | 1200 | 600 | 41.2 | 10.3 | 75 % |
+| Memories collage | 4:3 + 2 × 3:4 | 1200 | 1000 / 800 | 12.4 | 6.5 | 47 % |
+| Polaroid | 6 prints (3 + 3) | 1800 | 700 / 800 | 55.6 | 9.7 | 83 % |
+| Panorama | 3:2 landscape strip | 2400 | 2200 | 14.6 | 12.3 | 16 % |
+| Panorama | 4:3 landscape strip | 2400 | 2000 | 16.5 | 11.4 | 31 % |
+
+Mosaic, Hero + Sidebar, Cinema and Filmstrip are unchanged.
+
+**Method:** the same as the sections above. The household's own `shuffle` screensaver, no setting changes, no test source, real dream through `Somnambulator`, framestats polled for 40 s, meminfo at +5 s and +70 s. Every build was installed with plain `adb install -r` (`speed-profile`, `reason=install`). Each build got Home, 60 s idle, one unmeasured warm-up dream, then 3 runs. STREAM_MUSIC was set to 0 and restored to 3. No screenshots of household photos. O = official 1.311 `hearthpane.apk` (sha256 verified). B = the branch before the fallback cap, the first time the finer steps were used. C = the final branch; it ran after B, so the copies B made were already on disk. "Change" counts the frames over 60 ms at 29–35 s from the first frame. Memory is launcher PSS in MB; this round's meminfo gave only the per-process total, so there is no Graphics column.
+
+| Run | Janky % | p90 / p99 ms | Start: frames > 60 ms (max) | Change: frames > 60 ms (ms) | Change max | Home → running → +5 s → +70 s |
+|---|---|---|---|---|---|---|
+| O r1 | 33 | 25 / 150 | 2 (136) | 10 (105, 101, 96, 121, 266, 258, 173, 111, 122, 128) | 266 | 203 → 299 → 187 → 203 |
+| O r2 | 89 | 25 / 150 | 2 (141) | 6 (173, 307, 299, 369, 228, 228) | 369 | 203 → 306 → 185 → 200 |
+| O r3 | 38 | 25 / 81 | 4 (129) | 2 (72, 74) | 74 | 200 → 292 → 191 → 206 |
+| B r1 | 71 | 27 / 150 | 3 (248) | 3 (90, 87, 80) | 90 | 218 → 281 → 192 → 207 |
+| B r2 | 64 | 29 / 105 | 2 (138) | 4 (61, 72, 84, 76) | 84 | 221 → 296 → 192 → 220 |
+| B r3 | 36 | 24 / 81 | 1 (133) | 3 (68, 64, 64) | 68 | 221 → 301 → 205 → 220 |
+| C r1 | 72 | 26 / 121 | 1 (137) | 4 (136, 130, 130, 69) | 136 | 198 → 287 → 187 → 202 |
+| C r2 | 32 | 32 / 121 | 1 (145) | 6 (75, 80, 74, 103, 122, 118) | 122 | 216 → 288 → 184 → 212 |
+| C r3 | 23 | 57 / 150 | 4 (148) | 2 (86, 82) | 86 | 212 → 409 → 226 → 237 |
+
+- **The worst change frames are gone.** On 1.311, 2 of 3 changes had frames of 228–369 ms. None of the 6 branch runs had a change frame over 136 ms (B 68–90, C 86–136). The frames over 60 ms at the change went from 10 / 6 / 2 to 3 / 4 / 3 and 4 / 6 / 2.
+- **It is not gone.** Each branch change still has 2–6 frames of 60–136 ms. The photo on screen differs from run to run (shuffle and deck order are random), so the 3-run ranges overlap: O r3 (74) beat C r1 (136). The remaining cost belongs to fill singles, which keep their 2400 copy, and to the modes without a drawn size.
+- **Trace** (one atrace per branch build, 26–36 s, gfx/view/dalvik/sched, no framestats polling). B: one 410 ms `DrawFrame` (`drawGl` 403 ms), with `Chrome_InProcGpuThread` busy 366 ms and `kswapd0` 110 ms. 0.3 s before it, the launcher's `ss-scaled-cache` thread decoded an original for a new step (`decodeBitmap` 171 ms). In that first-use state a finer step could still be answered with a larger ready copy, which the fallback cap now prevents. C (final): the change's worst frame was 83 ms (`drawGl` 78 ms, GPU thread 75 ms), the next worst 31 ms, with no derivative decode in the window. One trace per build is not enough to separate the cap from the warmed cache.
+- **Memory** is unchanged: running 281–301 MB vs 292–306 MB on 1.311, and back to the Home level at +70 s. The outlier is C r3: 409 MB running and 237 MB at +70 s, the same kind of peak seen on 1.306 (A r2, B r3, D r3 above).
+- **Sharpness** (test source only, generated scenes, `performance` builds of `main` and the branch; scratch screenshots compared at 100 % crop and then deleted). Polaroid prints (1600 px scene before, 700 / 800 px copy now) and the Framed portrait print (1600 px before, 1200 px now) show the same edge and caption-text sharpness. Gallery Wall was captured but not compared at 100 %. The shuffled scene order differs between builds, so the same scene was compared where both builds showed it (Polaroid "TEST SCENE 2").
+- **Device** at the end: official 1.311 (sha256 verified), Home on top, test source off, dev mode off, STREAM_MUSIC 3.
+- **`createImageBitmap`** (Chromium 138 supports resize options and `bitmaprenderer`) was not adopted. An ImageBitmap shown through a canvas is still one full upload at its first composite. Splitting that upload means drawing strips into one accelerated canvas over several frames before the change, which replaces the CSS-background hero (cover crop, face position, pairs) with a canvas. That is a rendering-path change, so it was left out of this round. It is the next step for fill singles, the one case where a large upload cannot be avoided.

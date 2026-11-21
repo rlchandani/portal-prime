@@ -308,16 +308,63 @@
     const w = Math.max(r.w, r.h * a);
     return Math.max(w, w / a) * zoom;
   };
-  // Decode size on a compact screen: never more than the photo is drawn at in device pixels
-  // ([drawn] CSS px; undefined = at most the display's long edge), never more than the mode
-  // asked for. [drawn] null keeps the mode's own request (shape not yet known).
-  window.SS.compactEdge = function (edge, drawn, W, H, dpr) {
+  // ---- Decode size: what is drawn, never softer than before ------------------------------------
+  // The host used to round every request up to 600 / 1200 / 1800 / 2400, so that is the copy a
+  // mode's request delivered (and Chromium uploaded) before. The host now has finer steps; a mode
+  // that knows how large it draws a photo ([drawn]: CSS px of the photo's long edge at its largest
+  // motion scale) asks for exactly that many device pixels, capped at the copy it used to get. A
+  // photo is therefore never drawn with fewer photo pixels per device pixel than before, and
+  // never with less than one where it had at least one. Without a drawn size the request still
+  // delivers the copy it got before.
+  const LEGACY_TIERS = [600, 1200, 1800, 2400];
+  window.SS.LEGACY_TIERS = LEGACY_TIERS;
+  window.SS.largeEdge = function (edge, drawn, dpr) {
+    const asked = Number.isFinite(edge) && edge > 0 ? Math.min(2400, edge) : 2400;
+    const legacy = LEGACY_TIERS.find(t => t >= asked) || 2400;
+    if (!(Number.isFinite(drawn) && drawn > 0)) return legacy;
     const ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
-    const asked = Number.isFinite(edge) && edge > 0 ? edge : 2400;
-    if (drawn === null) return asked;
-    const css = drawn === undefined ? Math.max(W, H) : drawn;
-    if (!(Number.isFinite(css) && css > 0)) return asked;
-    return Math.max(320, Math.min(asked, Math.ceil(css * ratio)));
+    return Math.max(320, Math.min(legacy, Math.ceil(drawn * ratio)));
+  };
+  // Compact screens (the Mini): [drawn] undefined = the display's long edge; null = shape not
+  // yet known, so the mode's request (as delivered before).
+  window.SS.compactEdge = function (edge, drawn, W, H, dpr) {
+    return window.SS.largeEdge(edge, drawn === undefined ? Math.max(W, H) : drawn, dpr);
+  };
+  const ratioOf = a => Number.isFinite(a) && a > 0 ? a : 1;
+  // Long edge (CSS px) of a photo of aspect [a] drawn "contain" in a w x h box, and "cover".
+  window.SS.containEdge = function (a, w, h) {
+    const r = ratioOf(a), dw = Math.min(w, h * r), dh = dw / r;
+    return Math.max(dw, dh);
+  };
+  window.SS.coverEdge = function (a, w, h) {
+    const r = ratioOf(a), dw = Math.max(w, h * r), dh = dw / r;
+    return Math.max(dw, dh);
+  };
+  // A Portal+ single or pair (SS.largeSingle / SS.pairPlan): the drawn long edge of photo [i]
+  // at the largest scale its motion reaches. [zoom] is the motion's top scale; a whole photo
+  // (or pair) under Ken Burns stops where it touches the screen ([fitCapped]: SS.largeFit).
+  window.SS.largeDrawnEdge = function (plan, a, i, W, H, zoom, fitCapped) {
+    if (!plan || !plan.rect) return null;
+    let top = Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+    if (plan.mode === "whole" && fitCapped) {
+      const r = plan.rect, fit = Math.min(W / r.w, H / r.h);
+      top = Math.max(1, Math.min(top, fit));
+    }
+    if (plan.pair) return Math.max(plan.widths[i], plan.rect.h) * top;
+    if (plan.mode === "fill") return window.SS.coverEdge(a, W, H) * top;
+    return Math.max(plan.rect.w, plan.rect.h) * top;
+  };
+  // Polaroid print: the image box is at most 600 CSS px wide (landscape) or 480 wide (portrait)
+  // and the card only scales from 0.9 up to 1 (mode-impls polaroid layout).
+  window.SS.polaroidDrawnEdge = function (a) {
+    const r = ratioOf(a), baseW = r >= 1 ? 600 : 480;
+    return Math.max(baseW, baseW / r);
+  };
+  // Diptych frame (styles.css .ss-frame): 3vmin padding, 2vmin between cells, photos contained.
+  window.SS.diptychDrawnEdges = function (aspects, W, H) {
+    const vmin = Math.min(W, H) / 100, n = Math.max(1, aspects.length);
+    const cellW = (W - 6 * vmin - (n - 1) * 2 * vmin) / n, cellH = H - 6 * vmin;
+    return aspects.map(a => window.SS.containEdge(a, cellW, cellH));
   };
   // Gallery wall on a compact screen (mock AB.galleryWall): the tile count follows the area.
   // Upright 7 tiles in rows of ~0.2 H above the clock; turned 6 tiles in rows of >= 0.42 H.

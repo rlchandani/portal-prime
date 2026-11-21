@@ -243,10 +243,16 @@
     }
     // Compact screens (the Mini) decode at most what is drawn: the display's long edge in device
     // pixels, or the size a mode says it draws (a pan or a cover crop runs past the screen). The
-    // Portal+ ("L") keeps the shipped requests exactly.
+    // Portal+ ("L") decodes what a mode says it draws, never more than its request used to
+    // deliver (SS.largeEdge); a request without a drawn size is unchanged.
     function photoSizer(cls) {
-      if (cls === "L" || typeof SS.compactEdge !== "function") return (photo, edge) => window.photoUrl(photo, edge);
-      const W = innerWidth, H = innerHeight, dpr = Number(window.devicePixelRatio);
+      const dpr = Number(window.devicePixelRatio);
+      if (cls === "L") {
+        if (typeof SS.largeEdge !== "function") return (photo, edge) => window.photoUrl(photo, edge);
+        return (photo, edge, drawn) => window.photoUrl(photo, SS.largeEdge(edge, drawn, dpr));
+      }
+      if (typeof SS.compactEdge !== "function") return (photo, edge) => window.photoUrl(photo, edge);
+      const W = innerWidth, H = innerHeight;
       return (photo, edge, drawn) => window.photoUrl(photo, SS.compactEdge(edge, drawn, W, H, dpr));
     }
     // The window turned: re-lay the visible beat for the new screen once the dim has landed.

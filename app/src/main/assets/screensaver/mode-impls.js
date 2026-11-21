@@ -564,20 +564,22 @@
   // (SS.largeSingle), else the whole photo over its own pre-blurred backdrop (the Mini's preblur,
   // no live filter). A portrait is paired with the next portrait of the deck (SS.takePartner)
   // at one height (SS.pairPlan). Everything is decoded and drawn before the dissolve starts.
-  const PAIR_ZOOM = 1.15; // the Ken Burns zoom's upper bound: decode headroom for a pair
-  function pairEdge(ctx, plan, i, edge) {
-    const drawn = Math.max(plan.widths[i], plan.rect.h) * PAIR_ZOOM;
-    const dpr = Number(window.devicePixelRatio), ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
-    return Math.max(320, Math.min(edge, Math.ceil(drawn * ratio)));
-  }
+  // Each photo is asked for at its drawn size (SS.largeDrawnEdge) at the top of its motion:
+  // Ken Burns zooms to 1.15, stopping where a whole photo or pair touches the screen; the
+  // drift of Push and Memories reaches 1.04. An unknown shape (no drawn size, undefined) gets
+  // the copy it got before. Portal+ modes below pass a drawn size only on the Portal+, so a
+  // compact screen keeps its own default (the display's long edge).
+  const KEN_BURNS_MOTION = { zoom: 1.15, fitCapped: true }, DRIFT_MOTION = { zoom: 1.04, fitCapped: false };
   // [onScreen] are the seeds still visible (the outgoing layer). Resolves null when the scene
   // was disposed or a load failed; a computed backdrop is then released at once.
-  async function prepareLarge(ctx, t, active, deck, p, onScreen, edge) {
+  async function prepareLarge(ctx, t, active, deck, p, onScreen, edge, motion) {
     const { W, H } = compactSize(ctx);
     const partner = SS.takePartner(deck, ctx.cursor, p, onScreen);
     const ps = partner ? [p, partner] : [p];
     const pair = partner ? SS.pairPlan(ps.map(aspect), W, H) : null;
-    const urls = ps.map((x, i) => ctx.url(x, pair ? pairEdge(ctx, pair, i, edge) : edge));
+    const asked = pair || (knownShape(p) ? SS.largeSingle(p, W, H) : null);
+    const urls = ps.map((x, i) => ctx.url(x, edge, asked && knownShape(x) ?
+      SS.largeDrawnEdge(asked, aspect(x), i, W, H, motion.zoom, motion.fitCapped) : undefined));
     if (!await t.load(urls) || !active()) return null;
     // A shape measured by the load is honoured: plan again now.
     const plan = pair || SS.largeSingle(p, W, H);
@@ -641,7 +643,7 @@
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       if (compactClass(ctx)) return compactStep(p);
-      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200, KEN_BURNS_MOTION);
       if (!prep) return false;
       return publishLarge(t, dissolve.active, prep, () => {
         const root = dissolve.next(), L = layers.find(l => l.root === root);
@@ -691,7 +693,10 @@
       else if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
       else if (roll < 0.6 && c.landscape) ps = SS.take(deck, ctx.cursor, ["landscape"]);
       else ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]);
-      const resources = ps.map(p => ctx.url(p, 1800));
+      // The Portal+ asks for each photo at its contained size in its cell (SS.diptychDrawnEdges).
+      const { W, H } = compactSize(ctx), shaped = !compactClass(ctx) && ps.every(knownShape);
+      const drawn = shaped ? SS.diptychDrawnEdges(ps.map(aspect), W, H) : [];
+      const resources = ps.map((p, i) => ctx.url(p, 1800, shaped ? drawn[i] : undefined));
       if (!await t.load(resources) || !dissolve.active()) return false;
       const f = dissolve.next();
       f.innerHTML = "";
@@ -726,11 +731,17 @@
       const decoration = Math.min(6, area.w * .08, area.h * .08);
       return { area, decoration, maxW: area.w - decoration * 2, maxH: area.h - decoration * 2 };
     }
-    function resizePrint(art, { area, decoration, maxW, maxH } = printLimits()) {
-      if (!art.source) return;
-      const ar = aspect(art.source);
+    function printSize(p, { maxW, maxH } = printLimits()) {
+      const ar = aspect(p);
       let w = maxW, h = w / ar;
       if (h > maxH) { h = maxH; w = h * ar; }
+      return { w, h };
+    }
+    // The print only lifts (translateY), so its drawn long edge is its laid-out size.
+    function printEdge(p) { const { w, h } = printSize(p); return Math.max(w, h); }
+    function resizePrint(art, limits = printLimits()) {
+      if (!art.source) return;
+      const { area, decoration } = limits, { w, h } = printSize(art.source, limits);
       const width = w + "px", height = h + "px";
       if (art.photo.style.width !== width) art.photo.style.width = width;
       if (art.photo.style.height !== height) art.photo.style.height = height;
@@ -757,7 +768,8 @@
     }
     if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
-      const p = SS.take(deck, ctx.cursor, ["any"])[0]; const u = ctx.url(p, 1800);
+      const p = SS.take(deck, ctx.cursor, ["any"])[0];
+      const u = ctx.url(p, 1800, !compactClass(ctx) && knownShape(p) ? printEdge(p) : undefined);
       if (!await t.load(u) || !dissolve.active()) return false;
       const root = dissolve.next(), A = arts.find(a => a.root === root);
       A.source = p; resizePrint(A);
@@ -861,7 +873,11 @@
       });
     }
     async function rebuild() {
-      const slots = layout().map(s => ({ ...s, url: ctx.url(s.photo, 1200) }));
+      // The Portal+ asks for each tile at its laid-out size when every shape is known (a
+      // measured shape could re-justify the rows), else the mode's request.
+      const planned = layout(), sized = !compact && planned.every(s => knownShape(s.photo));
+      const slots = planned.map(s => ({ ...s,
+        url: ctx.url(s.photo, 1200, sized ? SS.containEdge(aspect(s.photo), s.width, s.height) : undefined) }));
       if (!await t.load(slots.map(s => s.url)) || disposed) return false;
       const prepared = new Map(slots.map(s => [s.photo, s.url]));
       render(layout(slots.map(s => s.photo)).map(s => ({ ...s, url: prepared.get(s.photo) })));
@@ -879,7 +895,9 @@
         }
       }
       if (!photo) photo = SS.take(deck, ctx.cursor, ["any"], onWall)[0];
-      const url = ctx.url(photo, 1200);
+      // A swap is contained in the cell already on the wall: never larger than that cell.
+      const w = parseFloat(cell.el.style.width), h = parseFloat(cell.el.style.height);
+      const url = ctx.url(photo, 1200, !compact && w > 0 && h > 0 ? Math.max(w, h) : undefined);
       if (!await t.load(url) || disposed) return false;
       replace(cell, photo, url);
     }
@@ -919,7 +937,7 @@
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       if (compactClass(ctx)) return compactStep(p);
-      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200, DRIFT_MOTION);
       if (!prep) return false;
       return publishLarge(t, dissolve.active, prep, () => {
         const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
@@ -977,9 +995,7 @@
           width: width + "px", height: height + "px" });
         return;
       }
-      const area = SS.photoLayoutArea(ctx), gap = compactClass(ctx) ? SS.TRIO_GAP.compact : SS.TRIO_GAP.L;
-      const grid = { x: area.x, y: area.y + CAPTION, w: area.w, h: Math.max(1, area.h - CAPTION) };
-      const boxes = SS.trioLayout(ps.map(aspect), grid, gap);
+      const boxes = collageBoxes(ps);
       // Each card has its photo's exact aspect: cover only absorbs sub-pixel rounding.
       boxes.forEach((b, i) => {
         Object.assign(images[i].parentNode.style, { left: b.x + "px", top: b.y + "px",
@@ -992,6 +1008,16 @@
       if (caption && boxes.length) Object.assign(caption.style, {
         left: Math.min(...boxes.map(b => b.x)) + "px",
         top: Math.max(8, Math.min(...boxes.map(b => b.y)) - CAPTION_LIFT) + "px" });
+    }
+    function collageBoxes(ps) {
+      const area = SS.photoLayoutArea(ctx), gap = compactClass(ctx) ? SS.TRIO_GAP.compact : SS.TRIO_GAP.L;
+      const grid = { x: area.x, y: area.y + CAPTION, w: area.w, h: Math.max(1, area.h - CAPTION) };
+      return SS.trioLayout(ps.map(aspect), grid, gap);
+    }
+    // A Portal+ collage card has its photo's exact aspect and no motion: ask for the card's size.
+    function collageEdges(ps) {
+      if (compactClass(ctx) || ps.length < 2 || !ps.every(knownShape)) return ps.map(() => undefined);
+      return collageBoxes(ps).map(b => Math.max(b.w, b.h));
     }
     function renderCollage(scene, ps, urls) {
       const title = el("ss-memory-caption", scene);
@@ -1017,8 +1043,11 @@
       const nextBeat = beat + 1, collage = nextBeat % 6 === 0;
       const ps = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, collage ? 3 : 1)).fill("any"));
       if (!collage && !compactClass(ctx)) return largeStep(ps[0], nextBeat);
-      const urls = await t.publish(() => ps.map(p => collage ? ctx.url(p, 1100) :
-        compactUrl(ctx, p, 2200, compactPlan(ctx, p))));
+      const urls = await t.publish(() => {
+        const drawn = collage ? collageEdges(ps) : null;
+        return ps.map((p, i) => collage ? ctx.url(p, 1100, drawn[i]) :
+          compactUrl(ctx, p, 2200, compactPlan(ctx, p)));
+      });
       if (urls === false || !await t.load(urls) || !dissolve.active()) return false;
       const compact = collage ? null : await loadCompact(ctx, t, ps[0], urls[0], true);
       if (!collage && !compact || !dissolve.active()) {
@@ -1035,7 +1064,7 @@
     // A Portal+ single (or portrait pair) keeps the shipped gentle push and its 2 s dissolve.
     let onScreen = [];
     async function largeStep(p, nextBeat) {
-      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200);
+      const prep = await prepareLarge(ctx, t, dissolve.active, deck, p, onScreen, 2200, DRIFT_MOTION);
       if (!prep) return false;
       return publishLarge(t, dissolve.active, prep, () => {
         const scene = dissolve.next(), image = el("ss-hero memory-photo", scene);
@@ -1072,8 +1101,7 @@
       pan.style.animation = "none"; pan.style.willChange = "auto";
       return { root, pan, photo: null };
     }
-    function layout(layer, url) {
-      const p = layer.photo, pan = layer.pan;
+    function strip(p) {
       const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
       const rawAspect = aspect(p), ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : W / H;
       // Bound the moving strip instead of making an extreme panorama many screens wide.
@@ -1081,7 +1109,16 @@
       const baseWidth = Math.min(W * 2, Math.max(W, H * ratio));
       const faceCrop = SS.faceCrop(p, baseWidth, W);
       const width = faceCrop ? faceCrop.size : baseWidth;
-      const height = Math.min(H, width / ratio), travel = (W - width) / width * 100;
+      return { W, H, ratio, faceCrop, width, height: Math.min(H, width / ratio) };
+    }
+    // The strip only translates: the Portal+ asks for its photo at the strip's contained size.
+    function stripEdge(p) {
+      const { ratio, width, height } = strip(p);
+      return SS.containEdge(ratio, width, height);
+    }
+    function layout(layer, url) {
+      const p = layer.photo, pan = layer.pan;
+      const { W, H, faceCrop, width, height } = strip(p), travel = (W - width) / width * 100;
       pan.style.width = width + "px"; pan.style.height = height + "px";
       pan.style.top = (H - height) / 2 + "px";
       if (url !== undefined) bg(pan, url, "contain");
@@ -1110,7 +1147,8 @@
     async function step() {
       if (!dissolve.active()) return false;
       const p = SS.take(deck, ctx.cursor, [SS.counts(deck).pano ? "pano" : "landscape"])[0];
-      const url = await t.publish(() => ctx.url(p, 2400));
+      const url = await t.publish(() => ctx.url(p, 2400,
+        !compactClass(ctx) && knownShape(p) ? stripEdge(p) : undefined));
       if (url === false || !await t.load(url) || !dissolve.active()) return false;
       return t.publish(() => {
         if (!dissolve.active()) return false;
@@ -1232,7 +1270,8 @@
     async function drop(initial = false) {
       const excluded = live.length >= MAX ? live.slice(1) : live;
       const p = SS.take(deck, ctx.cursor, ["any"], excluded.map(x => x.photo.seed))[0];
-      const url = await t.publish(() => ctx.url(p, 1400));
+      const url = await t.publish(() => ctx.url(p, 1400,
+        !compactClass(ctx) && knownShape(p) ? SS.polaroidDrawnEdge(aspect(p)) : undefined));
       if (url === false || !await t.load(url) || disposed) return false;
       return t.publish(() => {
         if (disposed) return false;
