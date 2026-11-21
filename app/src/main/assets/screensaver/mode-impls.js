@@ -376,6 +376,69 @@
     return cleanup;
   }
 
+  // ---- Compact windows (the Portal Mini) -------------------------------------
+  // One photo per beat follows the screen (SS.compactSingle): full-bleed when the crop keeps
+  // >= 80 %, a full-height sweep for a panorama, else whole over its own blurred backdrop in the
+  // zone above the clock. The Portal+ ("L") never reaches these helpers.
+  const COMPACT_GEOMETRY = ["left", "top", "width", "height", "right", "bottom", "inset"];
+  function compactPlan(ctx, p) {
+    if (!ctx.cls || ctx.cls === "L") return null;
+    const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
+    return SS.compactSingle(aspect(p), W, H, ctx.cls);
+  }
+  // The backdrop is the photo's own small (320 px) copy under a static blur: rasterized once
+  // per photo, then only composited. It is the first child of the layer, under the photo.
+  function compactFillOf(root) {
+    const first = root.firstChild;
+    return first && first.classList && first.classList.contains("ss-compact-fill") ? first : null;
+  }
+  function compactFill(root) {
+    let fill = compactFillOf(root);
+    if (!fill) { fill = el("ss-fill ss-compact-fill"); root.insertBefore(fill, root.firstChild); }
+    return fill;
+  }
+  // Release the backdrop's pixels with its layer; a shipped (non-compact) photo has none.
+  function hideCompactFill(root) {
+    const fill = compactFillOf(root);
+    if (fill) { fill.style.backgroundImage = "none"; fill.style.display = "none"; }
+  }
+  // Only a layer that was laid out compact has anything to undo; the Portal+ DOM is untouched.
+  function clearCompact(root, hero) {
+    if (hero.classList.contains("ss-compact")) {
+      COMPACT_GEOMETRY.forEach(k => { hero.style[k] = ""; });
+      hero.classList.remove("ss-compact");
+    }
+    hideCompactFill(root);
+  }
+  // Lay out [hero] for [plan] and return the background size the photo needs.
+  function applyCompact(plan, root, hero, p, fillUrl) {
+    const r = plan.rect;
+    hero.classList.add("ss-compact");
+    Object.assign(hero.style, { inset: "auto", right: "auto", bottom: "auto",
+      left: r.x + "px", top: r.y + "px", width: r.w + "px", height: r.h + "px" });
+    if (plan.mode === "whole" && fillUrl) {
+      const fill = compactFill(root);
+      fill.style.display = ""; bg(fill, fillUrl, "cover");
+    } else hideCompactFill(root);
+    return plan.mode === "fill" ? "cover" : plan.mode === "sweep" ? "100% 100%" : "contain";
+  }
+  // A sweep travels the panorama across the screen at full height over the photo's dwell.
+  function compactSweep(ctx, hero, plan) {
+    hero.style.setProperty("--sweep", plan.travel + "px");
+    hero.style.willChange = "transform"; void hero.offsetWidth;
+    hero.style.animation = `compactSweep ${ctx.motionMs}ms ease-in-out forwards`;
+  }
+  // Load the photo, then (now that its shape is known) the backdrop copy a whole photo needs.
+  async function loadCompact(ctx, t, p, url, loaded = false) {
+    if (!loaded && !await t.load(url)) return null;
+    const plan = compactPlan(ctx, p);
+    if (!plan) return { plan: null };
+    if (plan.mode !== "whole") return { plan };
+    const fillUrl = ctx.url(p, 320);
+    if (!await t.load(fillUrl)) return null;
+    return { plan, fillUrl };
+  }
+
   const MODES = {};
 
   // ---- 01 Ken Burns (single, quiet matte, keeps moving through fade) --------
@@ -393,13 +456,18 @@
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto"; hero.classList.remove("ss-motion");
       layers.find(l => l.root === root).border.style.backgroundImage = "none";
+      hideCompactFill(root);
     });
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
-      const u = ctx.url(p, 2200); if (!await t.load(u) || !dissolve.active()) return false;
+      const u = ctx.url(p, 2200);
+      const compact = await loadCompact(ctx, t, p, u);
+      if (!compact || !dissolve.active()) return false;
+      if (compact.plan) return compactStep(p, u, compact);
       const borderUrl = photoBorderUrl(p);
       if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
       const root = dissolve.next(), L = layers.find(l => l.root === root);
+      clearCompact(root, L.hero);
       bg(L.hero, u, "contain");
       if (borderUrl) bg(L.border, borderUrl, "contain");
       else L.border.style.backgroundImage = "none";
@@ -412,6 +480,28 @@
         if (ctx.photoMotion !== false) {
           L.hero.style.willChange = "transform";
           void L.hero.offsetWidth; L.hero.style.animation = "";
+        }
+      }
+      dissolve.present(root);
+    }
+    // Compact: the same Ken Burns drift on a full-bleed photo; a whole photo keeps its border
+    // and a gentle push; a panorama sweeps. Motion preference and face anchors still apply.
+    async function compactStep(p, u, compact) {
+      const plan = compact.plan, borderUrl = plan.mode === "whole" ? photoBorderUrl(p) : null;
+      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
+      const root = dissolve.next(), L = layers.find(l => l.root === root);
+      bg(L.hero, u, applyCompact(plan, root, L.hero, p, compact.fillUrl));
+      if (borderUrl) bg(L.border, borderUrl, "contain"); else L.border.style.backgroundImage = "none";
+      L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
+      if (plan.mode === "fill") faceBg(L.hero, p);
+      if (ctx.photoMotion !== false && !hasFace(p)) {
+        if (plan.mode === "sweep") compactSweep(ctx, L.hero, plan);
+        else if (plan.mode === "fill") {
+          kbVars(L.hero, p); L.hero.style.willChange = "transform";
+          void L.hero.offsetWidth; L.hero.style.animation = "";
+        } else {
+          L.hero.style.willChange = "transform"; void L.hero.offsetWidth;
+          L.hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
         }
       }
       dissolve.present(root);
@@ -432,16 +522,25 @@
       if (ctx.photoMotion === false) { im.style.animation = "none"; im.style.willChange = "auto"; }
       return c;
     }
+    // Upright (the Mini): a column. Two landscapes stack, each the full width; otherwise one
+    // photo stands alone (a portrait fills the tall frame). Never two narrow side-by-side bands.
+    function uprightSet(c, roll) {
+      if (roll < 0.6 && c.landscape >= 2) return SS.take(deck, ctx.cursor, ["landscape", "landscape"]);
+      if (c.portrait) return SS.take(deck, ctx.cursor, ["portrait"]);
+      return SS.take(deck, ctx.cursor, ["any"]);
+    }
     async function step() {
-      const c = SS.counts(deck); const roll = Math.random();
+      const c = SS.counts(deck); const roll = Math.random(), upright = ctx.cls === "CP";
       let ps;
-      if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
+      if (upright) ps = uprightSet(c, roll);
+      else if (roll < 0.28 && c.pano) ps = SS.take(deck, ctx.cursor, ["pano"]);
       else if (roll < 0.6 && c.landscape) ps = SS.take(deck, ctx.cursor, ["landscape"]);
       else ps = SS.take(deck, ctx.cursor, ["portrait", "portrait"]);
       const resources = ps.map(p => ctx.url(p, 1800));
       if (!await t.load(resources) || !dissolve.active()) return false;
       const f = dissolve.next();
       f.innerHTML = "";
+      f.classList.toggle("column", upright);
       resources.forEach(url => f.appendChild(containCell(url)));
       dissolve.present(f);
     }
@@ -651,14 +750,26 @@
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto";
       layers.find(l => l.root === root).border.style.backgroundImage = "none";
+      hideCompactFill(root);
     });
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0], u = ctx.url(p, 2200);
-      if (!await t.load(u) || !dissolve.active()) return false;
-      const borderUrl = photoBorderUrl(p);
+      const compact = await loadCompact(ctx, t, p, u);
+      if (!compact || !dissolve.active()) return false;
+      const plan = compact.plan;
+      const borderUrl = !plan || plan.mode === "whole" ? photoBorderUrl(p) : null;
       if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
       const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
-      bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
+      if (plan) bg(hero, u, applyCompact(plan, root, hero, p, compact.fillUrl));
+      else { clearCompact(root, hero); bg(hero, u, "contain"); }
+      if (plan && plan.mode === "fill") faceBg(hero, p);
+      hero.style.animation = "none"; hero.style.willChange = "auto";
+      if (plan && plan.mode === "sweep") {
+        layer.border.style.backgroundImage = "none";
+        if (ctx.photoMotion !== false) compactSweep(ctx, hero, plan);
+        dissolve.present(root);
+        return;
+      }
       if (borderUrl) bg(layer.border, borderUrl, "contain");
       else layer.border.style.backgroundImage = "none";
       if (ctx.photoMotion !== false && !hasFace(p)) {
@@ -685,10 +796,14 @@
       scene.style.opacity = ""; scene.style.transition = "";
     });
     let beat = 0;
-    function photo(parent, p, url, single) {
+    function photo(parent, p, url, single, compact) {
       const image = el((single ? "ss-hero" : "ss-img") + " memory-photo", parent);
-      bg(image, url, "contain"); image.style.animation = "none"; image.style.willChange = "auto";
-      if (single && ctx.photoMotion !== false && !hasFace(p)) {
+      const plan = single && compact && compact.plan;
+      bg(image, url, plan ? applyCompact(plan, parent, image, p, compact.fillUrl) : "contain");
+      image.style.animation = "none"; image.style.willChange = "auto";
+      if (plan && plan.mode === "fill") faceBg(image, p);
+      if (plan && plan.mode === "sweep") { if (ctx.photoMotion !== false) compactSweep(ctx, image, plan); }
+      else if (single && ctx.photoMotion !== false && !hasFace(p)) {
         image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
         image.style.willChange = "transform";
       }
@@ -732,10 +847,12 @@
       const ps = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, collage ? 3 : 1)).fill("any"));
       const urls = await t.publish(() => ps.map(p => ctx.url(p, collage ? 1100 : 2200)));
       if (urls === false || !await t.load(urls) || !dissolve.active()) return false;
+      const compact = collage ? null : await loadCompact(ctx, t, ps[0], urls[0], true);
+      if (!collage && !compact || !dissolve.active()) return false;
       return t.publish(() => {
         if (!dissolve.active()) return false;
         const scene = dissolve.next();
-        const images = collage ? renderCollage(scene, ps, urls) : [photo(scene, ps[0], urls[0], true)];
+        const images = collage ? renderCollage(scene, ps, urls) : [photo(scene, ps[0], urls[0], true, compact)];
         resources.set(scene, images); beat = nextBeat; dissolve.present(scene);
       });
     }
@@ -1111,6 +1228,10 @@
   }};
   function runSelectedFilmstrip(ctx, set) {
     const t = makeTimers(ctx); const bdA = el("ss-bd", ctx.root), bdB = el("ss-bd", ctx.root); bdB.style.opacity = "0"; const track = el("ss-track", ctx.root);
+    // Upright (the Mini): a vertical strip of width-sized cards (SS.verticalCard). Its geometry is
+    // not the bounded horizontal one, so it keeps the original full admission.
+    const vertical = ctx.cls === "CP";
+    if (vertical) track.classList.add("vertical");
     const items = [];
     let center = 0, top = false, admitted = false, bounded = false, disposed = false, preparation = null, viewportBound = 0;
     // The unchanged CSS scales at most 1.12 and has a 70px black shadow blur.
@@ -1118,6 +1239,7 @@
     // and offset; 2px additionally cover flex/subpixel rounding over twelve slots.
     const MAX_SCALE = 1.12, SHADOW_PAD = 512, ROUNDING_PAD = 2;
     function knownGeometry() {
+      if (vertical) return false;
       try {
         if (!(Number.isFinite(ctx.W) && ctx.W > 0 && Number.isFinite(ctx.H) && ctx.H > 0) ||
             items.some(s => !(Number.isFinite(s.w) && s.w > 0 && Number.isFinite(s.off) &&
@@ -1180,7 +1302,14 @@
         .map(s => ({ item: s, url: ctx.url(s.photo, 1400) }));
       const u = ctx.url(items[i].photo, 1000);
       if (!await prepare(batch.map(s => s.url).concat(u)) || disposed) return false;
-      if (!admitted) {
+      if (!admitted && vertical) {
+        let top = 0;
+        items.forEach(s => {
+          const c = SS.verticalCard(aspect(s.photo), ctx.W, ctx.H);
+          s.el.style.width = c.w + "px"; s.el.style.height = c.h + "px";
+          s.img.style.width = c.w + "px"; s.w = c.w; s.off = top + c.h / 2; top += c.h + 60;
+        });
+      } else if (!admitted) {
         // Unknown geometry uses full admission above. Recover ratios from those
         // same display decodes before publishing the strip, not in a later jump.
         let left = 0;
@@ -1196,7 +1325,7 @@
       // re-resolve at publication, or replace/clear an already-live image.
       batch.forEach(({ item, url }) => { bg(item.img, url); item.prepared = true; });
       items.forEach((s, k) => s.el.classList.toggle("center", k === i));
-      track.style.transform = `translateX(${-to}px)`;
+      track.style.transform = vertical ? `translateY(${-to}px)` : `translateX(${-to}px)`;
       const b = top ? bdA : bdB, o = top ? bdB : bdA;
       bg(b, u); b.style.opacity = "1"; o.style.opacity = "0";
       top = !top; center = i; admitted = true;
@@ -1205,12 +1334,14 @@
     t.start(async () => {
       let left = 0;
       set.forEach(p => {
-        const s = el("ss-slide", track), h = ctx.H * .62, w = h * aspect(p);
+        const card = vertical ? SS.verticalCard(aspect(p), ctx.W, ctx.H) : null;
+        const s = el("ss-slide", track), h = card ? card.h : ctx.H * .62, w = card ? card.w : h * aspect(p);
         s.style.width = w + "px";
+        if (card) s.style.height = h + "px";
         const im = el("ss-img", s); im.style.width = w + "px"; im.style.height = "100%";
         im.style.backgroundSize = "cover"; im.style.backgroundPosition = "center"; im.style.backgroundRepeat = "no-repeat";
-        items.push({ el: s, img: im, w, off: left + w / 2, photo: p, prepared: false });
-        left += w + 60;
+        items.push({ el: s, img: im, w, off: left + (card ? h : w) / 2, photo: p, prepared: false });
+        left += (card ? h : w) + 60;
       });
       bounded = knownGeometry();
       return go(0);
@@ -1321,7 +1452,13 @@
     const t = makeTimers(ctx), backdrop = el("ss-hero-sidebar", ctx.root);
     const stage = el("ss-hs", backdrop), heroCol = el("ss-col", stage), cells = [];
     const count = SS.slots(deck, 3);
-    heroCol.style.flex = count > 1 ? "1.9" : "1";
+    // Upright (the Mini): the 3:2 hero spans the width on top, the two portraits share the rest.
+    const upright = ctx.cls === "CP";
+    if (upright) {
+      stage.classList.add("upright");
+      const W = ctx.root.clientWidth || ctx.W;
+      heroCol.style.flex = count > 1 ? `0 0 ${Math.max(1, (W - 48) / 1.5)}px` : "1";
+    } else heroCol.style.flex = count > 1 ? "1.9" : "1";
     let disposed = false;
     function makeCell(column, edge) {
       const root = el("ss-cell contain", column);

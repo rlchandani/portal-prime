@@ -86,8 +86,17 @@ class FaceRenderer(
       // Let text shadows overflow their tight boxes instead of being clipped into hard rectangles.
       clipChildren = false
       clipToPadding = false
+      // A turn of the Mini changes the compact grid (upright top stack vs turned corners).
+      addOnLayoutChangeListener { _, l, t, r, b, ol, ot, orr, ob ->
+        if (r - l != orr - ol || b - t != ob - ot) post { if (!work.isStopped) applyGrid() }
+      }
     }
   }
+
+  /** The window class the overlay grid was last laid out for (null before the first build). */
+  private var gridClass: LayoutClass? = null
+  /** The timer, now playing and calendar stack under the top margin upright; see [topStackBottom]. */
+  var onTopStackChanged: (() -> Unit)? = null
 
   // Position buckets (a vertical stack per used grid cell), created on demand.
   private val buckets = HashMap<GridPosition, LinearLayout>()
@@ -356,6 +365,102 @@ class FaceRenderer(
     // A running countdown timer is face-independent: it surfaces top-center on every face and
     // self-hides when no timer is active (see [tick]).
     buildTimer()
+    gridClass = null
+    applyGrid()
+  }
+
+  /**
+   * Lay the buckets out for the window's [LayoutClass]. LARGE keeps the shipped buckets (40 dp,
+   * 80 dp under the bottom row) and is a no-op after the first pass. Compact windows get the Mini
+   * grid: its margins, the clock and caption width caps, and upright the timer and now playing
+   * move into one top stack above the calendar card.
+   */
+  private fun applyGrid() {
+    val cls = ScreensaverLayout.of(context)
+    if (cls == gridClass) return
+    gridClass = cls
+    val grid = ScreensaverLayout.grid(cls)
+    // Now playing joins the upright top stack, after the timer; turned it returns to its corner.
+    val card = nowPlayingCard
+    if (card != null) {
+      val target = bucket(nowPlayingPosition(cls))
+      if (card.parent !== target) {
+        (card.parent as? ViewGroup)?.removeView(card)
+        val index = if (target === timerView?.parent) target.indexOfChild(timerView) + 1 else 0
+        target.addView(card, index.coerceIn(0, target.childCount), LinearLayout.LayoutParams(
+            if (grid?.topStack == true) MATCH else WRAP, WRAP).apply {
+          if (grid?.topStack == true && index > 0) topMargin = dp(grid.stackGapDp)
+        })
+      }
+    }
+    buckets.forEach { (pos, col) -> placeBucket(pos, col, cls) }
+    val compactMeta = grid != null
+    listOfNotNull(dateView, batteryView, weatherView).forEach {
+      it.maxLines = if (compactMeta) 1 else Int.MAX_VALUE
+      it.ellipsize = if (compactMeta) TextUtils.TruncateAt.END else null
+    }
+    timerView?.let { t ->
+      if (grid?.topStack == true) {
+        t.background = GradientDrawable().apply { cornerRadius = dp(99).toFloat(); setColor(0x8C141210.toInt()) }
+        t.setPadding(dp(16), dp(8), dp(16), dp(8))
+      } else if (t.background != null) {
+        t.background = null
+        t.setPadding(0, 0, 0, 0)
+      }
+    }
+    photoScrim?.let { scrim ->
+      val h = when {
+        grid == null -> (context.resources.displayMetrics.heightPixels * 0.45f).toInt()
+        grid.topStack -> dp(COMPACT_SCRIM_DP)
+        else -> (context.resources.displayMetrics.heightPixels * 0.42f).toInt()
+      }
+      val lp = scrim.layoutParams
+      if (lp != null && lp.height != h) { lp.height = h; scrim.layoutParams = lp }
+    }
+    onTopStackChanged?.invoke()
+  }
+
+  /** Where the now-playing card lives: the upright top stack, else its configured corner. */
+  private fun nowPlayingPosition(cls: LayoutClass): GridPosition =
+      if (ScreensaverLayout.grid(cls)?.topStack == true) GridPosition.TOP_CENTER else face.nowPlaying.position
+
+  private fun placeBucket(pos: GridPosition, col: LinearLayout, cls: LayoutClass) {
+    val grid = ScreensaverLayout.grid(cls)
+    val column = when (horizontalGravity(pos)) {
+      Gravity.END -> ScreensaverLayout.Column.END
+      Gravity.CENTER_HORIZONTAL -> ScreensaverLayout.Column.CENTER
+      else -> ScreensaverLayout.Column.START
+    }
+    val bottomRow = pos == GridPosition.BOTTOM_LEFT || pos == GridPosition.BOTTOM_CENTER ||
+        pos == GridPosition.BOTTOM_RIGHT
+    val topStack = grid?.topStack == true && pos == GridPosition.TOP_CENTER
+    val cap = when {
+      grid == null || topStack -> null
+      pos == face.clock.position -> grid.clockMaxFraction
+      pos == face.caption.position -> grid.captionMaxFraction
+      else -> null
+    }
+    val width = context.resources.displayMetrics.widthPixels
+    val m = ScreensaverLayout.bucketMargins(cls, column, bottomRow, width, context.resources.displayMetrics.density, cap)
+    val lp = (col.layoutParams as? FrameLayout.LayoutParams) ?: return
+    lp.width = if (topStack) MATCH else WRAP
+    lp.gravity = if (topStack) Gravity.TOP or Gravity.START else gravityFor(pos)
+    lp.setMargins(m[0], m[1], m[2], m[3])
+    col.layoutParams = lp
+    col.gravity = if (topStack) Gravity.START else horizontalGravity(pos)
+  }
+
+  /**
+   * The bottom edge (px, in this overlay's parent) of the upright top stack while it shows
+   * something, else 0: the calendar card sits under it. Always 0 outside the upright grid.
+   */
+  fun topStackBottom(): Int {
+    if (ScreensaverLayout.grid(gridClass ?: return 0)?.topStack != true) return 0
+    val top = buckets[GridPosition.TOP_CENTER] ?: return 0
+    val visible = (0 until top.childCount).any { top.getChildAt(it).visibility == View.VISIBLE }
+    // The overlay is offset by its (negative) burn-in margin inside the shared root.
+    val offset = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
+    return if (!visible || top.height <= 0) 0 else top.bottom + offset
   }
 
   /** Top-center countdown readout, hidden until a timer is running (driven by [tick]). */
@@ -567,6 +672,7 @@ class FaceRenderer(
     // Explicit WRAP width: a vertical LinearLayout (the bucket) otherwise hands children
     // MATCH_PARENT by default, which would squeeze the card to a narrower cell-mate's width
     // (e.g. the photo caption now sharing this cell) and truncate the track title.
+    // Built in its corner; [applyGrid] moves it into the upright Mini's top stack.
     bucket(spec.position).addView(card.root, LinearLayout.LayoutParams(WRAP, WRAP))
     musicCard = AmbientMusicCardController(card, ui, elapsedRealtime, { work.isActive },
         ::clearNowPlayingArtwork)
@@ -846,6 +952,13 @@ class FaceRenderer(
         }
         lp.setMargins(dp(40), dp(40), dp(40), bottomInset)
         view.addView(col, lp)
+        if (pos == GridPosition.TOP_CENTER) {
+          col.addOnLayoutChangeListener { _, _, t, _, b, _, ot, _, ob ->
+            if (t != ot || b != ob) onTopStackChanged?.invoke()
+          }
+        }
+        // Buckets made after the first grid pass (rare) still get the compact grid.
+        gridClass?.let { if (it != LayoutClass.LARGE) placeBucket(pos, col, it) }
         col
       }
 
@@ -914,5 +1027,7 @@ class FaceRenderer(
 
   private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
   private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT
+  /** The upright Mini's bottom scrim height (mock 420 dp). */
+  private val COMPACT_SCRIM_DP = 420
   private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
 }

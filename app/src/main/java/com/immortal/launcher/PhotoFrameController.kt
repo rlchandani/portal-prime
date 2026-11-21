@@ -240,7 +240,9 @@ class PhotoFrameController(
 
   // The overlay (clock / date / weather / battery / now-playing) is built and driven by the
   // FaceRenderer from a Face descriptor; this controller owns only the photo/video layer.
-  private val faceRendererDelegate = lazy { FaceRenderer(context, weatherRefreshMs) }
+  private val faceRendererDelegate: Lazy<FaceRenderer> = lazy {
+    FaceRenderer(context, weatherRefreshMs).also { it.onTopStackChanged = { calendar.relayout() } }
+  }
   private val faceRenderer get() = faceRendererDelegate.value
 
   // New modes: Split glance's clock panel and the Night photo veil + clock; null until used.
@@ -259,8 +261,9 @@ class PhotoFrameController(
 
   // The frame's panels over the photos: calendar widget, ambient dashboard, welcome-back overlay.
   private val views = PhotoFrameViews(context)
-  private val calendar = PhotoFrameCalendarPanel(context, views, clock, settings = { settings },
-      testSource = { testSourceOn }, featureOwnsScreen = { splitGlance || nightPhotoOn }, splitPanel = { splitPanel })
+  private val calendar: PhotoFrameCalendarPanel = PhotoFrameCalendarPanel(context, views, clock, settings = { settings },
+      testSource = { testSourceOn }, featureOwnsScreen = { splitGlance || nightPhotoOn }, splitPanel = { splitPanel },
+      topStackBottom = { if (faceRendererDelegate.isInitialized()) faceRenderer.topStackBottom() else 0 })
   private val dashboard = PhotoFrameDashboard(context, views, io = { io }, post = { r, d -> ui.postDelayed(r, d) },
       enabled = { settings.ambientDashboard }, nightPhoto = { nightPhotoOn })
   private val welcome = PhotoFrameWelcome(context, views, post = { r, d -> ui.postDelayed(r, d) },
@@ -1626,7 +1629,9 @@ class PhotoFrameController(
     val panel = splitPanel ?: return
     val w = if (width > 0) width else context.resources.displayMetrics.widthPixels
     val h = if (height > 0) height else context.resources.displayMetrics.heightPixels
-    val area = SplitGlancePanel.layout(w, h, context.resources.displayMetrics.density).second
+    val cls = ScreensaverLayout.of(context)
+    panel.applyLayoutClass(cls)
+    val area = SplitGlancePanel.layout(w, h, context.resources.displayMetrics.density, cls).second
     val lp = (panel.view.layoutParams as? FrameLayout.LayoutParams) ?: FrameLayout.LayoutParams(WRAP, WRAP)
     if (lp.width == area.width && lp.height == area.height && lp.leftMargin == area.left && lp.topMargin == area.top) return
     lp.width = area.width; lp.height = area.height; lp.leftMargin = area.left; lp.topMargin = area.top

@@ -86,17 +86,17 @@ internal class NightPhotoOverlay(context: Context) : View(context) {
     if (width <= 0 || height <= 0) return
     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), veil)
     if (shown.isEmpty()) return
-    // Mock units ([HearthMockUnit]): the approved clock is 92 units = 122.7 dp on a Portal+.
-    val unit = HearthMockUnit.boost(width, height, density)
-    val type = (minOf(width, height) / density / 1219f).coerceIn(.72f, 1f) * unit
-    time.textSize = 92f * density * type
-    date.textSize = 22f * density * type
+    // Mock units ([HearthMockUnit]): the approved clock is 92 units = 122.7 dp on a Portal+. A
+    // compact window (the Mini) uses the Mini mock's 1 unit = 1 dp type: 96 / 92 dp, never 0.72x.
+    val type = ScreensaverLayout.nightType(ScreensaverLayout.of(context), width, height, density)
+    time.textSize = type.clock * density * type.factor
+    date.textSize = type.date * density * type.factor
     val now = System.currentTimeMillis()
-    val dx = HearthOrbit.x(now, 10f * density * unit, DRIFT_X_MS)
-    val dy = HearthOrbit.y(now, 6f * density * unit, DRIFT_Y_MS)
-    val dateBaseline = height - 70f * density * type - date.descent() + dy
+    val dx = HearthOrbit.x(now, 10f * density * type.driftUnit, DRIFT_X_MS)
+    val dy = HearthOrbit.y(now, 6f * density * type.driftUnit, DRIFT_Y_MS)
+    val dateBaseline = height - type.bottom * density * type.factor - date.descent() + dy
     canvas.drawText(dateText, width / 2f + dx, dateBaseline, date)
-    canvas.drawText(shown, width / 2f + dx, dateBaseline + date.ascent() - 8f * density * type - time.descent(), time)
+    canvas.drawText(shown, width / 2f + dx, dateBaseline + date.ascent() - type.gap * density * type.factor - time.descent(), time)
   }
 
   companion object {

@@ -279,8 +279,10 @@ internal class FilmstripEngine(
 
   private fun relayout(initial: Boolean = false) {
     val images = scene?.images ?: return
+    // Upright compact (the Portal Mini): a vertical strip; every other window as shipped.
+    val vertical = ScreensaverLayout.of(context).compactPortrait
     val geometry = FilmstripGeometry.layout(width/density,height/density,
-        images.map { it.photo.width.toFloat()/it.photo.height }) ?: return
+        images.map { it.photo.width.toFloat()/it.photo.height }, vertical) ?: return
     layout = geometry
     // Calculate against the viewport before entering LayoutParams.apply: that receiver's
     // width/height are the child dimensions, not this engine's screen dimensions.
@@ -291,7 +293,9 @@ internal class FilmstripEngine(
         topMargin = bounds.top
       }
     }
-    track.translationX = if (initial) 0f else -geometry.cards[center].offset*density
+    val travel = if (initial) 0f else -geometry.cards[center].offset*density
+    if (geometry.vertical) { track.translationX = 0f; track.translationY = travel }
+    else { track.translationY = 0f; track.translationX = travel }
     val backdrop = checkNotNull(FilmstripGeometry.backdropPixelBounds(geometry,density))
     backgrounds.forEach {
       it.layoutParams = LayoutParams(backdrop.width,backdrop.height).apply {
@@ -316,7 +320,8 @@ internal class FilmstripEngine(
         interpolator = if (transform) transformCurve else fadeCurve
       })
     }
-    property(track,"translationX",track.translationX,-geometry.cards[index].offset*density)
+    if (geometry.vertical) property(track,"translationY",track.translationY,-geometry.cards[index].offset*density)
+    else property(track,"translationX",track.translationX,-geometry.cards[index].offset*density)
     cards.forEachIndexed { ordinal, card ->
       val selected = ordinal == index
       val scale = if (selected) 1.12f else .7f

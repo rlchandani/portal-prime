@@ -35,10 +35,14 @@ internal class SplitGlancePanel(private val context: Context) {
    * Type scale from the panel's short side (0.72 on a Portal Mini), times the mock unit on a
    * Portal+ ([HearthMockUnit]: 1.33, so the clock is the approved 234.7 dp, not 176 dp).
    */
-  private val scale = run {
+  private var scale = scaleFor(ScreensaverLayout.of(context))
+  /** The window class the type was last applied for; see [applyLayoutClass]. */
+  private var typeClass: LayoutClass? = null
+
+  /** Compact windows: 1 mock unit = 1 dp (the Mini no longer shrinks to 0.72x). Else as shipped. */
+  private fun scaleFor(cls: LayoutClass): Float {
     val m = context.resources.displayMetrics
-    (minOf(m.widthPixels, m.heightPixels) / density / 1219f).coerceIn(.72f, 1f) *
-        HearthMockUnit.boost(m.widthPixels, m.heightPixels, density)
+    return ScreensaverLayout.faceScale(cls, m.widthPixels, m.heightPixels, density)
   }
   val view = LinearLayout(context).apply {
     orientation = LinearLayout.VERTICAL
@@ -97,9 +101,39 @@ internal class SplitGlancePanel(private val context: Context) {
         LinearLayout.LayoutParams.WRAP_CONTENT).apply { marginEnd = dp(36f) })
     facts.addView(nextColumn, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
     view.addView(facts)
+    applyLayoutClass(ScreensaverLayout.of(context))
     applyInk()
     setWeather("")
     setNext(null, null)
+  }
+
+  /**
+   * Type for the window's class (mock "ty"). The Portal+ values equal the views' built sizes; the
+   * Mini gets its compact type upright and turned. Re-applied only when the class changes.
+   */
+  fun applyLayoutClass(cls: LayoutClass) {
+    if (typeClass == cls) return
+    typeClass = cls
+    scale = scaleFor(cls)
+    val t = ScreensaverLayout.splitType(cls)
+    fun size(v: TextView, dp: Float) = v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, dp * scale)
+    size(brand, t.brand); size(clock, t.clock); size(date, t.date)
+    size(temperature, t.temperature); size(nextTitle, t.next); size(nextTime, t.nextTime)
+    faintLabels.forEach { size(it, t.label) }
+    (ember.layoutParams as? LinearLayout.LayoutParams)?.let {
+      it.width = dp(10f); it.height = dp(12f); it.marginEnd = dp(10f); ember.layoutParams = it
+    }
+    (clock.layoutParams as? LinearLayout.LayoutParams)?.let { it.topMargin = dp(14f); clock.layoutParams = it }
+    (date.layoutParams as? LinearLayout.LayoutParams)?.let { it.topMargin = dp(8f); date.layoutParams = it }
+    (rule.layoutParams as? LinearLayout.LayoutParams)?.let {
+      it.topMargin = dp(t.ruleTop); it.bottomMargin = dp(t.ruleBottom); rule.layoutParams = it
+    }
+    (glyph.layoutParams as? LinearLayout.LayoutParams)?.let {
+      it.width = dp(30f); it.height = dp(30f); it.marginEnd = dp(8f); glyph.layoutParams = it
+    }
+    (weatherColumn.layoutParams as? LinearLayout.LayoutParams)?.let {
+      it.marginEnd = dp(t.factsGap); weatherColumn.layoutParams = it
+    }
   }
 
   fun start() {
@@ -276,8 +310,15 @@ internal class SplitGlancePanel(private val context: Context) {
     fun nextEvent(events: List<CalendarFeed.Event>, now: Long): CalendarFeed.Event? =
         events.filter { !it.allDay && it.endMillis > now }.minByOrNull { it.startMillis }
 
-    /** Card and panel rectangles for a viewport, in px: landscape side by side, portrait stacked. */
-    fun layout(width: Int, height: Int, density: Float): Pair<Box, Box> {
+    /**
+     * Card and panel rectangles for a viewport, in px: landscape side by side, portrait stacked.
+     * A compact window ([cls]) uses the Mini mock's boxes; LARGE is the shipped layout.
+     */
+    fun layout(width: Int, height: Int, density: Float, cls: LayoutClass = LayoutClass.LARGE): Pair<Box, Box> {
+      ScreensaverLayout.splitBoxes(cls, width, height, density)?.let { (card, panel) ->
+        return Box(card.left, card.top, card.right, card.bottom) to
+            Box(panel.left, panel.top, panel.right, panel.bottom)
+      }
       // Margins are mock units too (44 / 64 / 48 / 24), so the card keeps the mock's proportions.
       val unit = density * HearthMockUnit.boost(width, height, density)
       val m = (44 * unit).toInt()

@@ -37,6 +37,8 @@ internal class PhotoFrameCalendarPanel(
     /** Split glance or the night photo owns the screen. */
     private val featureOwnsScreen: () -> Boolean,
     private val splitPanel: () -> SplitGlancePanel?,
+    /** Bottom of the face overlay's upright top stack (timer, now playing), px; 0 when none. */
+    private val topStackBottom: () -> Int = { 0 },
 ) {
   private lateinit var panel: LinearLayout
   private lateinit var header: TextView
@@ -136,7 +138,12 @@ internal class PhotoFrameCalendarPanel(
 
     val agenda = settings.calendarRange == CalendarFeed.RANGE_AGENDA
     var lastDayKey = ""
-    for (ev in shown) {
+    // The Mini's card holds 3 rows upright (4 turned) and says how many more there are.
+    val cls = ScreensaverLayout.of(context)
+    renderedClass = cls
+    val grid = ScreensaverLayout.grid(cls)
+    val (visible, more) = if (grid == null) shown.size to 0 else ScreensaverLayout.calendarVisible(grid, shown.size)
+    for (ev in shown.take(visible)) {
       // Day header whenever the day changes (and always in agenda mode, which spans
       // arbitrary dates). A single-day range needs no per-day header.
       val key = dayKey(ev.startMillis)
@@ -151,7 +158,22 @@ internal class PhotoFrameCalendarPanel(
       lastDayKey = key
       rows.addView(buildEventRow(ev))
     }
+    if (more > 0) {
+      val extra = views.text(15f * scale, 0x99FFFFFF.toInt(), false)
+      extra.text = "+$more more"
+      rows.addView(extra, LinearLayout.LayoutParams(WRAP, WRAP).apply { topMargin = views.dp(6) })
+    }
   }
+
+  /** Re-anchor the card (a turn of the Mini, or the top stack above it changed). */
+  fun relayout() {
+    if (!built || panel.visibility != View.VISIBLE || featureOwnsScreen()) return
+    // A turn changes the row budget (3 upright, 4 turned): rebuild the rows from the cache.
+    if (ScreensaverLayout.of(context) != renderedClass) render() else applyChrome(settings())
+  }
+
+  /** The window class the rows were last built for. */
+  private var renderedClass: LayoutClass? = null
 
   /** Position the panel against the chosen edge and scale its padding to the size. */
   private fun applyChrome(settings: ScreensaverConfig.Settings) {
@@ -159,11 +181,35 @@ internal class PhotoFrameCalendarPanel(
     val padV = (18 * scale).toInt()
     panel.setPadding(views.dp(pad), views.dp(padV), views.dp(pad), views.dp(padV))
     val left = settings.calendarSide == ScreensaverConfig.CAL_SIDE_LEFT
+    val grid = ScreensaverLayout.grid(ScreensaverLayout.of(context))
+    if (grid != null) { applyCompactChrome(grid, left); return }
     val lp = FrameLayout.LayoutParams(WRAP, WRAP, Gravity.TOP or (if (left) Gravity.START else Gravity.END))
     val side = views.dp(40)
     if (left) lp.setMargins(side, views.dp(40), 0, 0) else lp.setMargins(0, views.dp(40), side, 0)
     panel.layoutParams = lp
   }
+
+  /**
+   * The Mini: upright, a full-width top card under the timer / now-playing stack; turned, the
+   * Portal+ corner at 380 dp (capped by the viewport, [HearthLayout.calendarWidthDp]).
+   */
+  private fun applyCompactChrome(grid: ScreensaverLayout.Grid, left: Boolean) {
+    val density = context.resources.displayMetrics.density
+    val width = ScreensaverLayout.calendarWidthPx(grid, context.resources.displayMetrics.widthPixels, density)
+    val side = views.dp(grid.sideDp)
+    val stack = topStackBottom()
+    val top = if (grid.topStack && stack > 0) stack + views.dp(grid.stackGapDp) else views.dp(grid.topDp)
+    val lp = FrameLayout.LayoutParams(width, WRAP, Gravity.TOP or
+        (if (grid.topStack || left) Gravity.START else Gravity.END))
+    if (grid.topStack || left) lp.setMargins(side, top, 0, 0) else lp.setMargins(0, top, side, 0)
+    val old = panel.layoutParams as? FrameLayout.LayoutParams
+    if (old == null || old.width != lp.width || old.gravity != lp.gravity || old.topMargin != lp.topMargin ||
+        old.leftMargin != lp.leftMargin || old.rightMargin != lp.rightMargin) panel.layoutParams = lp
+    compactTitleMax = (width - panel.paddingLeft - panel.paddingRight - views.dp((96 * scale).toInt())).coerceAtLeast(0)
+  }
+
+  /** Title width cap inside a compact card (px); 0 = the shipped 360-unit cap. */
+  private var compactTitleMax = 0
 
   private fun buildEventRow(ev: CalendarFeed.Event): View {
     val row = LinearLayout(context)
@@ -181,7 +227,8 @@ internal class PhotoFrameCalendarPanel(
     title.text = ev.title
     title.maxLines = 1
     title.ellipsize = TextUtils.TruncateAt.END
-    title.maxWidth = views.dp((360 * scale).toInt())
+    title.maxWidth = if (ScreensaverLayout.grid(ScreensaverLayout.of(context)) != null && compactTitleMax > 0)
+      compactTitleMax else views.dp((360 * scale).toInt())
 
     row.addView(time)
     row.addView(title)

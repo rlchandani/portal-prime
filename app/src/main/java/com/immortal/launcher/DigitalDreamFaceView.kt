@@ -124,7 +124,8 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     // Build the flip card art now, not inside the first card turn (which janked on the Mini).
     if (face == Face.FLIP && w > 0 && h > 0)
-      cardArt(DigitalClockFaceSpec.flip(h * DigitalClockFaceSpec.flipHeightFraction(settings.size), w * .9f))
+      cardArt(if (stacked()) stackedFlip(w.toFloat(), h.toFloat())
+          else DigitalClockFaceSpec.flip(h * DigitalClockFaceSpec.flipHeightFraction(settings.size), w * .9f))
     val b = DigitalClockFaceSpec.backdrop(face, settings.background)
     backdrop.shader = if (b.radial) RadialGradient(w * .5f, h * .42f, maxOf(w, h) * .62f, b.inner, b.outer, Shader.TileMode.CLAMP)
     else LinearGradient(0f, 0f, w * .35f, h.toFloat(), b.inner, b.outer, Shader.TileMode.CLAMP)
@@ -141,10 +142,14 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
       DigitalClockConfig.LAYOUT_BOTTOM -> h * .64f
       else -> h * .5f
     }
-    when (face) {
-      Face.ANALOG -> drawAnalog(canvas, w, h, cy)
-      Face.FLIP -> drawFlip(canvas, w, h, cy)
-      Face.LED -> drawLed(canvas, w, cy)
+    val stacked = stacked()
+    when {
+      face == Face.ANALOG -> drawAnalog(canvas, w, h, cy)
+      stacked && face == Face.FLIP -> drawStackedFlip(canvas, w, h, cy)
+      stacked && face == Face.LED -> drawStackedLed(canvas, w, h, cy)
+      stacked -> drawStackedNumerals(canvas, w, h, cy)
+      face == Face.FLIP -> drawFlip(canvas, w, h, cy)
+      face == Face.LED -> drawLed(canvas, w, cy)
       else -> drawNumerals(canvas, w, cy)
     }
     if (sweepOn) postInvalidateDelayed(DigitalClockFaceSpec.SWEEP_FRAME_MS)
@@ -183,6 +188,118 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     canvas.drawText(shown, w / 2f, baseline, time)
     if (dateText.isNotEmpty()) canvas.drawText(dateText, w / 2f,
         baseline + time.descent() + DATE_GAP * density * unit - date.ascent(), date)
+  }
+
+  /**
+   * The upright Mini at Large and XL (mock): hours over minutes, so the numerals use the tall
+   * screen (420 dp at Large) instead of one 250 dp line in its middle third. Turned: one line.
+   */
+  private fun stacked(): Boolean =
+      settings.layout != DigitalClockConfig.LAYOUT_MINIMAL &&
+          ScreensaverLayout.stackedDigits(ScreensaverLayout.of(context), settings.size)
+
+  /** "4:38" -> ("04", "38"); seconds, if shown, stay off the stacked face. */
+  private fun stackedParts(): Pair<String, String> {
+    val parts = shown.split(':')
+    return parts.getOrElse(0) { "" }.padStart(2, '0') to parts.getOrElse(1) { "" }
+  }
+
+  private fun stackedDateSize(w: Float): Float {
+    if (dateText.isEmpty()) return 0f
+    date.textSize = STACKED_DATE_DP * density
+    date.textSize = DigitalClockFaceSpec.fit(date.textSize, date.measureText(dateText), w * .86f)
+    return date.descent() - date.ascent() + STACKED_DATE_GAP_DP * density
+  }
+
+  private fun drawStackedNumerals(canvas: Canvas, w: Float, h: Float, cy: Float) {
+    val (hours, minutes) = stackedParts()
+    val dateH = stackedDateSize(w)
+    time.textSize = ScreensaverLayout.stackedDigitsDp(settings.size) * density
+    val widest = maxOf(time.measureText(hours), time.measureText(minutes))
+    time.textSize = DigitalClockFaceSpec.fit(time.textSize, widest, w * .86f)
+    // Mock line-height .86: the two rows overlap their font padding, not their digits.
+    val line = time.textSize * STACKED_LINE
+    time.textSize = DigitalClockFaceSpec.fit(time.textSize, 2 * line + dateH, h * .9f)
+    val row = time.textSize * STACKED_LINE
+    val top = (cy - (2 * row + dateH) / 2f).coerceAtLeast(0f)
+    val digitsH = time.descent() - time.ascent()
+    if (face == Face.BOLD) time.setShadowLayer(10f * density, 0f, 4f * density, 0x99000000.toInt())
+    listOf(hours, minutes).forEachIndexed { i, text ->
+      val baseline = top + i * row + (row - digitsH) / 2f - time.ascent()
+      if (face == Face.NEON) {
+        glow.set(time)
+        glow.color = 0
+        for ((radius, colour) in NEON_GLOW) {
+          glow.setShadowLayer(radius * density, 0f, 0f, colour)
+          canvas.drawText(text, w / 2f, baseline, glow)
+        }
+      }
+      canvas.drawText(text, w / 2f, baseline, time)
+    }
+    if (dateText.isNotEmpty()) canvas.drawText(dateText, w / 2f,
+        top + 2 * row + STACKED_DATE_GAP_DP * density - date.ascent(), date)
+  }
+
+  private fun drawStackedLed(canvas: Canvas, w: Float, h: Float, cy: Float) {
+    val (hours, minutes) = stackedParts()
+    val dateH = stackedDateSize(w)
+    val units = 2 * 60f + 14f
+    val gap = STACKED_LED_GAP_DP * density
+    // Mock: 360 dp rows at Large, scaled with the size setting, then fitted to the screen.
+    var cell = STACKED_LED_DP * DigitalClockFaceSpec.timeSizeDp(settings.size) / 250f * density / 100f
+    cell = DigitalClockFaceSpec.fit(cell, units * cell, w * .86f)
+    cell = DigitalClockFaceSpec.fit(cell, 200f * cell + gap + dateH, h * .9f)
+    val top = cy - (200f * cell + gap + dateH) / 2f
+    fill.setShadowLayer(10f * density, 0f, 0f, LED_GLOW)
+    listOf(hours, minutes).forEachIndexed { row, digits ->
+      var x = (w - units * cell) / 2f
+      val y = top + row * (100f * cell + gap)
+      for (c in digits) {
+        val lit = DigitalClockFaceSpec.segments(c)
+        segmentMatrix.setScale(cell, cell)
+        segmentMatrix.postTranslate(x, y)
+        for ((key, path) in segments) {
+          scratch.reset()
+          path.transform(segmentMatrix, scratch)
+          val on = lit.indexOf(key) >= 0
+          fill.color = if (on) LED_ON else LED_GHOST
+          if (!on) fill.clearShadowLayer()
+          canvas.drawPath(scratch, fill)
+          if (!on) fill.setShadowLayer(10f * density, 0f, 0f, LED_GLOW)
+        }
+        x += (60f + 14f) * cell
+      }
+    }
+    fill.clearShadowLayer()
+    if (dateText.isNotEmpty())
+      canvas.drawText(dateText, w / 2f, top + 200f * cell + gap + STACKED_DATE_GAP_DP * density - date.ascent(), date)
+  }
+
+  /** Stacked flip cards: 420 dp tall at Large (W = .74 H, gap .1 W), fitted to the screen. */
+  private fun stackedFlip(w: Float, h: Float): DigitalClockFaceSpec.Flip {
+    val rowGap = STACKED_FLIP_ROW_GAP_DP * density
+    var cardH = STACKED_FLIP_DP * DigitalClockFaceSpec.timeSizeDp(settings.size) / 250f * density
+    cardH = minOf(cardH, (h * .82f - rowGap) / 2f)
+    cardH = minOf(cardH, w * .9f / (2 * .74f + .074f))
+    return DigitalClockFaceSpec.Flip(cardH, cardH * .74f, cardH * .074f, cardH * .074f, 0f)
+  }
+
+  private fun drawStackedFlip(canvas: Canvas, w: Float, h: Float, cy: Float) {
+    val f = stackedFlip(w, h)
+    val rowGap = STACKED_FLIP_ROW_GAP_DP * density
+    val elapsed = if (flipAnimator?.isRunning == true) System.currentTimeMillis() - changedAt else Long.MAX_VALUE / 4
+    val now = shown.replace(":", "")
+    val old = previous.replace(":", "")
+    val top = cy - (2 * f.cardH + rowGap) / 2f
+    time.textSize = f.cardH * .7f
+    for (i in 0 until 4) {
+      val row = i / 2
+      val x = (w - (2 * f.cardW + f.gap)) / 2f + (i % 2) * (f.cardW + f.gap)
+      val nv = now.getOrElse(i) { ' ' }.toString()
+      val ov = old.getOrElse(i) { ' ' }.toString()
+      val p = if (nv != ov) DigitalClockFaceSpec.flipProgress(i, elapsed) else 1f
+      drawCard(canvas, x, top + row * (f.cardH + rowGap), f, nv, ov, p)
+    }
   }
 
   private fun drawLed(canvas: Canvas, w: Float, cy: Float) {
@@ -406,6 +523,14 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     const val DATE_RATIO = 38f / 250f
     const val DATE_GAP = 18f
     const val LED_RATIO = 230f / 250f
+    /** Stacked upright faces (mock): numerals line-height .86, 44 dp date 30 dp below. */
+    const val STACKED_LINE = .86f
+    const val STACKED_DATE_DP = 44f
+    const val STACKED_DATE_GAP_DP = 30f
+    const val STACKED_LED_DP = 360f
+    const val STACKED_LED_GAP_DP = 36f
+    const val STACKED_FLIP_DP = 420f
+    const val STACKED_FLIP_ROW_GAP_DP = 40f
     const val ANALOG_RADIUS = 280f
     const val INK = 0xFFF6EEE4.toInt()
     const val INK_FLIP = 0xFFF4EEE6.toInt()

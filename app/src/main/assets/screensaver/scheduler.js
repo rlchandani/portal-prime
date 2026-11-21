@@ -13,10 +13,23 @@
     const stage = opts.stage, deck = window.shuffled(window.PHOTOS.slice()), cursor = { i: 0 };
     const intervalMs = Math.min(600, Math.max(5, Number(opts.intervalSec) || 30)) * 1000;
     const XFADE_MS = 1600, MOTION_OVERLAP_MS = 2400;
+    // Rotation mid-show (mock): hold the beat, dim to 20 %, wait 400 ms, re-lay the same beat for
+    // the new screen, then reveal over 500 ms. ScreensaverLayout.ROTATION_* holds the native values.
+    const ROTATION_DIM = 0.2, ROTATION_DIM_MS = 400, ROTATION_REVEAL_MS = 500;
+    let relayPending = false, dimmed = false;
+    const windowClass = () => typeof SS.layoutClass === "function" ? SS.layoutClass(innerWidth, innerHeight) : "L";
     let current = null, incoming = null, outgoing = null, prev = null;
     let stopped = false, paused = false, queued = null, promotionFrame = null, handoff = null;
     let history = [], historyIndex = -1;
-    const clocks = { beat: null, fade: null, resize: null, handoff: null };
+    const clocks = { beat: null, fade: null, resize: null, handoff: null, relay: null };
+    // The dim lands at once, under the system's own rotation animation, so the old layout is
+    // never seen stretched to the new window; the re-laid beat then reveals over 500 ms.
+    function dim(on) {
+      if (dimmed === on) return;
+      dimmed = on;
+      stage.style.transition = on ? "none" : "opacity " + ROTATION_REVEAL_MS + "ms ease";
+      stage.style.opacity = on ? String(ROTATION_DIM) : "";
+    }
     const pausedAnimations = new Set();
     function arm(key, fn, ms) {
       disarm(key);
@@ -57,7 +70,10 @@
         outgoing.cleanup.pause();
       }
       // The first decoded composition has no predecessor to dissolve over.
-      if (!outgoing) scene.layer.classList.add("first-scene");
+      // A rotation re-lay replaces the same beat under the dimmed stage without a dissolve.
+      if (!outgoing || scene.relay) scene.layer.classList.add("first-scene");
+      // Any scene laid out after a turn (the re-lay, or a navigation that replaced it) reveals.
+      dim(false);
       scene.layer.classList.remove("freeze");
       scene.layer.classList.add("on");
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
@@ -68,6 +84,8 @@
         arm("beat", () => advance("auto"), Math.max(SS.BEAT[scene.modeId] || intervalMs, intervalMs));
       }
       if (!outgoing && queued) { const direction = queued; queued = null; navigate(direction); }
+      // A turn that landed while this beat was loading: it was laid out for the old screen.
+      else if (stale(scene)) { if (paused) relayPending = true; else startRelay(); }
     }
     function cancelHandoff() {
       if (!handoff) return;
@@ -175,8 +193,13 @@
       else if (direction === "next" && navigationIndex >= 0 && navigationIndex + 1 < history.length) targetIndex = navigationIndex + 1;
       if (targetIndex != null) target = history[targetIndex];
       if (direction === "previous" && !target && current) target = { modeId: current.modeId, start: Math.max(0, current.start - 1) };
+      const relay = direction === "relay" && !!current;
+      if (relay) { target = { modeId: current.modeId, start: current.start }; targetIndex = historyIndex; }
+      // A host page without the layout helpers keeps the shipped ("L") behaviour.
+      const cls = typeof SS.layoutClass === "function" ? SS.layoutClass(innerWidth, innerHeight) : "L";
       let modeId = target ? target.modeId : opts.mode && opts.mode !== "shuffle" ?
-          opts.mode : SS.pickNextMode(opts.enabledModes || SS.MODE_IDS, deck, prev);
+          opts.mode : SS.pickNextMode(opts.enabledModes || SS.MODE_IDS, deck, prev, cls);
+      if (typeof SS.modeFor === "function") modeId = SS.modeFor(cls, modeId);
       if (!SS.MODES[modeId]) modeId = "kenBurns";
       if (target) cursor.i = target.start;
       const layer = document.createElement("div");
@@ -184,10 +207,10 @@
       layer.style.setProperty("--motion-duration", (intervalMs + MOTION_OVERLAP_MS) + "ms");
       stage.appendChild(layer);
       const scene = { layer, modeId, start: cursor.i, historyIndex: targetIndex, live: true, ready: false,
-        nativeToken: "ss-" + (++sceneSequence) };
+        nativeToken: "ss-" + (++sceneSequence), relay, cls, landscape: innerWidth > innerHeight };
       incoming = scene;
       const ctx = {
-        root: layer, deck, cursor, W: innerWidth, H: innerHeight, nativeToken: scene.nativeToken,
+        root: layer, deck, cursor, W: innerWidth, H: innerHeight, cls, nativeToken: scene.nativeToken,
         url: (photo, edge) => window.photoUrl(photo, edge),
         photoMs: intervalMs, microMs: intervalMs, motionMs: intervalMs + MOTION_OVERLAP_MS,
         photoMotion: opts.photoMotion !== false,
@@ -201,6 +224,7 @@
         Promise.resolve(scene.cleanup.ready).then(ok => {
           if (!scene.live || stopped || incoming !== scene) return;
           if (!ok) {
+            if (scene.relay) dim(false);
             dispose(scene); incoming = null;
             // Keep the last decoded scene while a source fails; retry without a tight loop.
             arm("beat", () => advance("auto"), Math.min(intervalMs, 5000));
@@ -210,10 +234,30 @@
           if (!paused) present(scene);
         });
       } catch (_) {
+        if (scene.relay) dim(false);
         dispose(scene); incoming = null;
         arm("beat", () => advance("auto"), Math.min(intervalMs, 5000));
       }
       return true;
+    }
+    // The window turned: re-lay the visible beat for the new screen once the dim has landed.
+    // The native Filmstrip lays itself out again in place, so it is left alone.
+    // A beat is stale when the window's class or orientation is no longer the one it was laid
+    // out for. The boot-time degenerate window keeps its own recovery (onResize) instead.
+    function stale(scene) {
+      if (!scene || !(innerWidth > 0 && innerHeight > 0) || (bootDegenerate && !recovered)) return false;
+      if (scene.cleanup && scene.cleanup.nativeToken) return false;
+      return scene.cls !== windowClass() || scene.landscape !== (innerWidth > innerHeight);
+    }
+    function onRotate() {
+      if (stopped || !current || clocks.relay || !stale(current)) return;
+      if (paused) { relayPending = true; return; }
+      startRelay();
+    }
+    function startRelay() {
+      relayPending = false;
+      dim(true);
+      arm("relay", () => { if (!stopped) advance("relay"); }, ROTATION_DIM_MS);
     }
     function pause() {
       if (paused || stopped) return;
@@ -251,6 +295,8 @@
         if (clock) arm(key, clock.fn, clock.remaining);
       });
       if (incoming && incoming.ready) present(incoming);
+      if (relayPending && current && stale(current)) startRelay();
+      relayPending = false;
     }
     let recovered = false;
     const bootDegenerate = innerWidth < screen.width * .6 || innerHeight < screen.height * .6;
@@ -263,6 +309,7 @@
       }, 300);
     }
     addEventListener("resize", onResize);
+    addEventListener("resize", onRotate);
     advance();
     function navigate(direction) {
       if (stopped) return false;
@@ -275,9 +322,11 @@
       stop() {
         if (stopped) return;
         stopped = true; queued = null; cancelHandoff();
+        // A turn that lands just before the frame closes must not leave the stage dimmed.
+        relayPending = false; dimmed = false; stage.style.transition = "none"; stage.style.opacity = "";
         Object.keys(clocks).forEach(disarm);
         if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
-        removeEventListener("resize", onResize);
+        removeEventListener("resize", onResize); removeEventListener("resize", onRotate);
         [incoming, current, outgoing].forEach(dispose); incoming = current = outgoing = null;
         pausedAnimations.clear(); stage.innerHTML = "";
       },
