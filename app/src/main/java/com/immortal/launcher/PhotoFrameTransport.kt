@@ -28,6 +28,8 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
   }
   /** The video prefetch's open download, so suspending the host can cut it. */
   @Volatile private var videoPrefetch: HttpURLConnection? = null
+  /** The prefetch download [cancelVideoPrefetch] cut: its stream may end in a clean EOF, which is not a whole file. */
+  @Volatile private var cutPrefetch: HttpURLConnection? = null
 
   /** A request of [generation] is still wanted: not stopped, not cancelled, not interrupted. */
   fun current(generation: Long): Boolean =
@@ -57,6 +59,7 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
 
   fun cancelVideoPrefetch() {
     videoPrefetch?.let { connection ->
+      cutPrefetch = connection
       cancelIo.execute { runCatching { connection.disconnect() } }
     }
   }
@@ -140,7 +143,7 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
                   val buffer = ByteArray(32 * 1024)
                   while (keepGoing() && !Thread.currentThread().isInterrupted) {
                     val count = input.read(buffer)
-                    if (count < 0) return@runCatching dst.length() > 0L
+                    if (count < 0) return@runCatching dst.length() > 0L && cutPrefetch !== c && keepGoing()
                     output.write(buffer, 0, count)
                   }
                 }
@@ -148,6 +151,7 @@ internal class PhotoFrameTransport(private val stopped: () -> Boolean) {
               false
             } finally {
               if (videoPrefetch === c) videoPrefetch = null
+              if (cutPrefetch === c) cutPrefetch = null
               c.disconnect()
             }
           }
