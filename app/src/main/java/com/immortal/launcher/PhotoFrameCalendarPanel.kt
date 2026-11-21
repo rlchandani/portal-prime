@@ -51,6 +51,12 @@ internal class PhotoFrameCalendarPanel(
 
   val built: Boolean get() = this::panel.isInitialized
 
+  /** The panel moved or resized (the upright Mini centres its Big / Bold / Flip face below it). */
+  var onBoundsChanged: (() -> Unit)? = null
+
+  /** The panel's bottom edge in the root while it shows, else 0. */
+  fun shownBottom(): Int = if (built && showing && panel.height > 0) panel.bottom else 0
+
   /** A clean upcoming-events panel top-right, over the photo. Its own translucent
    *  rounded backing keeps it legible without a full-screen scrim. Hidden until a
    *  calendar link is set and there's something to show. */
@@ -58,6 +64,7 @@ internal class PhotoFrameCalendarPanel(
     panel = LinearLayout(context)
     panel.orientation = LinearLayout.VERTICAL
     panel.visibility = View.GONE
+    panel.addOnLayoutChangeListener { _, _, t, _, b, _, ot, _, ob -> if (t != ot || b != ob) onBoundsChanged?.invoke() }
     val bg = GradientDrawable()
     bg.setColor(0x66000000)
     bg.cornerRadius = views.dp(18).toFloat()

@@ -51,6 +51,16 @@ internal class SlideshowLoader(
       onReady: (List<SlideshowPhoto>, String?) -> Unit,
       onFailure: () -> Unit,
       nextAfterPartner: ((String) -> SlideshowAsset?)? = null,
+      /**
+       * Which partner to look for. The default is the shipped portrait pair; a compact window
+       * (the Portal Mini) may ask for a stackable landscape instead ([CompactStagePlan.pairing]).
+       */
+      pairing: CompactStagePlan.Pairing = if (pair) CompactStagePlan.Pairing.PORTRAIT else CompactStagePlan.Pairing.NONE,
+      /**
+       * Compact pairs decode the anchor at the full edge (it may be shown alone after a rotation)
+       * and give the pair's first photo a backdrop look. False keeps the shipped behaviour.
+       */
+      compact: Boolean = false,
   ) {
     onCancelTransports()
     val ticket = ++generation
@@ -110,18 +120,26 @@ internal class SlideshowLoader(
             return bitmap
           } finally { budget.release(token) }
         }
-        val first = acquire(asset, decodeEdge, shrinkPortrait = pair)
+        val portraits = pairing == CompactStagePlan.Pairing.PORTRAIT
+        val first = acquire(asset, decodeEdge, shrinkPortrait = portraits && !compact)
         if (first == null) {
           ui.post { if (!closed && ticket == generation) onFailure() }
           return@submit
         }
         owned.add(asset to first)
-        if (pair && first.height > first.width && current()) {
+        val landscapes = pairing == CompactStagePlan.Pairing.LANDSCAPE
+        val anchorPairs = if (landscapes) ScreensaverLayout.stackable(first.width, first.height)
+            else portraits && first.height > first.width
+        if (anchorPairs && current()) {
           for (partner in partners.take(4)) {
-            if (partner.key == asset.key || partner.portrait?.invoke() == false) continue
+            if (partner.key == asset.key) continue
+            val hint = partner.portrait?.invoke()
+            if ((portraits && hint == false) || (landscapes && hint == true)) continue
             val bitmap = acquire(partner, partnerEdge) ?: continue
             val duplicate = identities[asset.key]?.let { it == identities[partner.key] } == true
-            if (bitmap.height > bitmap.width && !duplicate) { owned.add(partner to bitmap); break }
+            val fits = if (landscapes) ScreensaverLayout.stackable(bitmap.width, bitmap.height)
+                else bitmap.height > bitmap.width
+            if (fits && !duplicate) { owned.add(partner to bitmap); break }
             bitmap.recycle()
             budget.setOwner("preparation", entries())
           }
@@ -138,7 +156,8 @@ internal class SlideshowLoader(
             faceDelegate.value.regionsFor(revisionKey).orEmpty() else emptyList()
           val identity = if (item.contentIdentity) revisionKey ?: item.key else item.key
           // Single photos get a small pre-blurred backdrop + analysis (a few hundred KB).
-          val look = if (owned.size == 1) PhotoLook.derive(bitmap, displayLongEdge) else null
+          val look = if (owned.size == 1 || (compact && item === owned[0].first))
+            PhotoLook.derive(bitmap, displayLongEdge) else null
           SlideshowPhoto(identity, bitmap, regions, positions.get(identity), item.key, look)
         }
         // Copy analysis derivatives before publishing: an obsolete UI runnable can recycle

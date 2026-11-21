@@ -29,6 +29,7 @@ internal object ScreensaverTestSource {
   private const val KEY_UNTIL = "until"
   private const val KEY_NIGHT_UNTIL = "night_until"
   private const val KEY_PIN_MODE = "pin_mode"
+  private const val KEY_PIN_FACE = "pin_face"
   private const val KEY_PIN_INTERVAL = "pin_interval_sec"
   const val MAX_MINUTES = 240
   /** A forced dark room arrives after the day frame has drawn, as when the lights go out. */
@@ -86,26 +87,36 @@ internal object ScreensaverTestSource {
     if (pin != null) {
       edit.putString(KEY_PIN_MODE, pin.mode)
       edit.putInt(KEY_PIN_INTERVAL, pin.intervalSec)
+      if (pin.face != null) edit.putString(KEY_PIN_FACE, pin.face) else edit.remove(KEY_PIN_FACE)
     } else {
       edit.remove(KEY_PIN_MODE)
       edit.remove(KEY_PIN_INTERVAL)
+      edit.remove(KEY_PIN_FACE)
     }
     return edit.commit()
   }
 
   fun disable(context: Context): Boolean {
     val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-    listOf(KEY_UNTIL, KEY_NIGHT_UNTIL, KEY_PIN_MODE, KEY_PIN_INTERVAL).forEach { edit.remove(it) }
+    listOf(KEY_UNTIL, KEY_NIGHT_UNTIL, KEY_PIN_MODE, KEY_PIN_INTERVAL, KEY_PIN_FACE).forEach { edit.remove(it) }
     return edit.commit()
   }
 
-  /** One screensaver mode held at a fixed photo interval (operator performance runs only). */
-  data class Pin(val mode: String, val intervalSec: Int) {
+  /**
+   * One screensaver mode held at a fixed photo interval (operator performance runs only). [face]
+   * optionally shows one photo-frame clock face for the same span instead of the household's, so
+   * a face can be verified without changing a synced setting.
+   */
+  data class Pin(val mode: String, val intervalSec: Int, val face: String? = null) {
     companion object {
-      /** A valid pin, or null when [mode] isn't a known mode or [intervalSec] is outside 5..600 s. */
-      fun of(mode: String, intervalSec: Int): Pin? =
-          if (mode in ScreensaverConfig.MODES && intervalSec == ScreensaverConfig.clampInterval(intervalSec))
-            Pin(mode, intervalSec) else null
+      /**
+       * A valid pin, or null when [mode] isn't a known mode, [intervalSec] is outside 5..600 s, or
+       * [face] is given but isn't a catalog face.
+       */
+      fun of(mode: String, intervalSec: Int, face: String? = null): Pin? =
+          if (mode in ScreensaverConfig.MODES && intervalSec == ScreensaverConfig.clampInterval(intervalSec) &&
+              (face == null || FaceCatalog.entries.any { it.id == face }))
+            Pin(mode, intervalSec, face) else null
     }
   }
 
@@ -114,7 +125,7 @@ internal object ScreensaverTestSource {
     if (!active(context, nowMs)) return null
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     val mode = prefs.getString(KEY_PIN_MODE, null) ?: return null
-    return Pin.of(mode, prefs.getInt(KEY_PIN_INTERVAL, 0))
+    return Pin.of(mode, prefs.getInt(KEY_PIN_INTERVAL, 0), prefs.getString(KEY_PIN_FACE, null))
   }
 
   /** [settings] with [pin]'s mode and interval in place of the household's, or unchanged. */

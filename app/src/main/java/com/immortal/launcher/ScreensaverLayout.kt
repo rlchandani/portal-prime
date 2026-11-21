@@ -26,8 +26,8 @@ internal object ScreensaverLayout {
   }
 
   /** The window's class; previews inside a Portal+ window stay LARGE whatever their own size. */
-  fun of(context: Context): LayoutClass {
-    val configuration: android.content.res.Configuration? = context.resources?.configuration
+  fun of(context: Context?): LayoutClass {
+    val configuration: android.content.res.Configuration? = context?.resources?.configuration
     return if (configuration == null) LayoutClass.LARGE else LayoutClass.of(configuration)
   }
 
@@ -171,6 +171,48 @@ internal object ScreensaverLayout {
     if (pw <= 0 || ph <= 0) return false
     val a = pw.toDouble() / ph
     return a >= 1.2 && a <= PANORAMA_ASPECT
+  }
+
+  // ---- Classic -------------------------------------------------------------------------------
+
+  /**
+   * Compact Classic's motion for a FIT_CENTER photo view scaled about its centre: a pose is the
+   * view scale and translation. Start and end are the beat's two ends.
+   */
+  data class ClassicPan(
+      val scale0: Float, val scale1: Float, val x0: Float, val x1: Float, val y0: Float, val y1: Float,
+      /** True for a long-axis pan (eased), false for the gentle cover zoom. */
+      val pan: Boolean,
+  )
+
+  /** The cover zoom's growth over a beat for a photo that already matches the screen (mock 1.09). */
+  const val CLASSIC_ZOOM = 1.09f
+  /** The zoom's sideways drift as a fraction of the view width (mock 2 %). */
+  const val CLASSIC_DRIFT = .02f
+
+  /**
+   * Compact Classic (mock): a photo whose cover crop keeps 80 % covers the screen and zooms
+   * gently; anything else fills the screen's short side and pans along its long axis over the beat,
+   * so the whole photo is seen (a landscape upright, a portrait turned). [beat] alternates the
+   * direction. Null for an empty photo or view (the caller leaves the view at rest).
+   */
+  fun classicPan(pw: Int, ph: Int, vw: Int, vh: Int, beat: Int): ClassicPan? {
+    if (pw <= 0 || ph <= 0 || vw <= 0 || vh <= 0) return null
+    val contain = minOf(vw.toFloat() / pw, vh.toFloat() / ph)
+    val cw = pw * contain
+    val ch = ph * contain
+    val cover = maxOf(vw / cw, vh / ch)
+    val forward = beat % 2 == 0
+    if (keep(pw, ph, vw, vh) >= FILL_KEEP) {
+      val drift = (if (forward) -CLASSIC_DRIFT else CLASSIC_DRIFT) * vw
+      // Every third beat zooms out instead, as the shipped Ken Burns alternates.
+      return if (beat % 3 == 2) ClassicPan(cover * CLASSIC_ZOOM, cover, drift, 0f, 0f, 0f, false)
+      else ClassicPan(cover, cover * CLASSIC_ZOOM, 0f, drift, 0f, 0f, false)
+    }
+    val ox = (cw * cover - vw).coerceAtLeast(0f) / 2f
+    val oy = (ch * cover - vh).coerceAtLeast(0f) / 2f
+    val sign = if (forward) 1f else -1f
+    return ClassicPan(cover, cover, sign * ox, -sign * ox, sign * oy, -sign * oy, true)
   }
 
   // ---- Night photo ---------------------------------------------------------------------------

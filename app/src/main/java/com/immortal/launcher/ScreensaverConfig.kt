@@ -75,6 +75,13 @@ object ScreensaverConfig {
       "cinema", "heroSidebar")
   fun supportsPhotoMotion(mode: String): Boolean = mode in PHOTO_MOTION_MODES
 
+  /** Cinema letterbox is drawn for a wide screen: upright it is replaced by Panorama drift. */
+  const val MODE_CINEMA = "cinema"
+  const val BEST_TURNED = "Best turned · upright shows Panorama drift"
+
+  /** A picker hint for [m] on this screen: on a compact window (the Portal Mini) Cinema is best turned. */
+  fun modeHint(m: String, compact: Boolean): String = if (compact && m == MODE_CINEMA) BEST_TURNED else ""
+
   fun modeLabel(m: String): String = when (m) {
     MODE_SMART -> "Smart frame"
     MODE_PORTRAITS -> "Portrait pair"

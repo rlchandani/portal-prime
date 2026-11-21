@@ -352,7 +352,11 @@ internal fun NavRow(
 // ---------------------------------------------------------------------------
 
 /** One choice in a [PickerRow]: the persisted [value] and the [label] shown to the user. */
-internal data class PickerOption<T>(val value: T, val label: String)
+internal data class PickerOption<T>(
+    val value: T, val label: String,
+    /** A secondary line under the option (e.g. "Best turned"); empty for none. */
+    val subtitle: String = "",
+)
 
 /**
  * A macOS/iPad-style "popup button" row: title on the left, the current value + a ⌄ affordance
@@ -391,7 +395,7 @@ internal fun <T> PickerRow(
                     .coerceAtLeast(300).dp)) {
                     itemsIndexed(options, key = { _, option -> option.value.toString() }) { index, option ->
                         if (index > 0) Divider()
-                        SelectableRow(option.label, "", option.value == selected) {
+                        SelectableRow(option.label, option.subtitle, option.value == selected) {
                             expanded = false
                             if (enabledNow && (applyCurrentSelectionNow || option.value != selectedNow)) {
                                 selectNow(option.value)

@@ -241,7 +241,10 @@ class PhotoFrameController(
   // The overlay (clock / date / weather / battery / now-playing) is built and driven by the
   // FaceRenderer from a Face descriptor; this controller owns only the photo/video layer.
   private val faceRendererDelegate: Lazy<FaceRenderer> = lazy {
-    FaceRenderer(context, weatherRefreshMs).also { it.onTopStackChanged = { calendar.relayout() } }
+    FaceRenderer(context, weatherRefreshMs).also {
+      it.onTopStackChanged = { calendar.relayout() }
+      it.reservedTop = { calendar.shownBottom() }
+    }
   }
   private val faceRenderer get() = faceRendererDelegate.value
 
@@ -1458,6 +1461,9 @@ class PhotoFrameController(
     photo = ImageView(context)
     photo.scaleType = ImageView.ScaleType.CENTER_CROP
     root.addView(photo, FrameLayout.LayoutParams(MATCH, MATCH))
+    root.addOnLayoutChangeListener { v, l, t, r, b, ol, ot, or, ob ->
+      if (ScreensaverLayout.rotated(or - ol, ob - ot, r - l, b - t)) v.post { relayCompactClassic() }
+    }
 
     videoView = SlideshowVideoView(context)
     videoView.visibility = View.GONE
@@ -1466,6 +1472,8 @@ class PhotoFrameController(
     // Draw the ready photograph above the SurfaceView's transparent hole until video renders.
     nativeStage = SlideshowStage(context, pixelBudget).apply {
       visibility = View.GONE
+      // Re-pair on rotation: the dropped companion becomes the next scene's anchor.
+      onCompanionDropped = { anchor, _ -> nativeNavigation.commit(anchor, null) }
       onPresented = {
         finishNativeStartup()
         // Split glance's wordmark follows the photo's accent with the dissolve.
@@ -1488,6 +1496,7 @@ class PhotoFrameController(
     if (!photosOnly) {
       root.addView(faceRenderer.view)
       calendar.build(root)
+      calendar.onBoundsChanged = { faceRenderer.view.post { faceRenderer.refreshReservedTop() } }
     }
 
     // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.
@@ -1562,8 +1571,9 @@ class PhotoFrameController(
 
   private fun applyFit() {
     // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
+    // Compact Classic pans the contained frame itself (see [startCompactPan]), whatever the fit.
     val scaleType =
-        if (settings.fit == ScreensaverConfig.FIT_FIT) ImageView.ScaleType.FIT_CENTER
+        if (settings.fit == ScreensaverConfig.FIT_FIT || compactClassic()) ImageView.ScaleType.FIT_CENTER
         else ImageView.ScaleType.CENTER_CROP
     photo.scaleType = scaleType
     if (this::photoBack.isInitialized) photoBack.scaleType = scaleType
@@ -1824,7 +1834,7 @@ class PhotoFrameController(
     val look = PhotoFrameStagePolicy.presentation(settings, nightPhotoOn, splitGlance, splitNightOn)
     nativeStage.show(photos, look.fill, look.motion, intervalMs(), measuredNativeOcclusions(),
         galleryPrint = look.galleryPrint, gallerySpread = look.gallerySpread, automatic = automatic,
-        feature = look.feature, keepPeople = look.keepPeople)
+        feature = look.feature, keepPeople = look.keepPeople, style = CompactStagePlan.style(settings.mode))
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
   }
@@ -2011,7 +2021,7 @@ class PhotoFrameController(
             val nextAt = PhotoFrameDeck.after(at, playlist.size)
             playlist.getOrNull(nextAt)?.takeUnless { it.isVideo }
                 ?.let { localAsset(it.path, localDeckKeys[nextAt]) }
-          })
+          }, pairing = nativePairing(), compact = ScreensaverLayout.of(context).compact)
       return
     }
     stopVideo()
@@ -2321,7 +2331,7 @@ class PhotoFrameController(
           }, { nativeNavigation.skipFailed(); remoteFailStreak++; advanceRemote(+1, automatic) }, nextAfterPartner = { key ->
             val at = deck.indexOfFirst { remoteKey(it) == key }
             deck.getOrNull(PhotoFrameDeck.after(at, deck.size))?.takeUnless { it in remoteVideos }?.let(::remoteAsset)
-          })
+          }, pairing = nativePairing(), compact = ScreensaverLayout.of(context).compact)
       return
     }
     stopVideo()
@@ -2525,6 +2535,10 @@ class PhotoFrameController(
     }
   }
 
+  /** The partner the native loader looks for on this window ([CompactStagePlan.pairing]). */
+  private fun nativePairing(): CompactStagePlan.Pairing =
+      CompactStagePlan.pairing(settings.mode, ScreensaverLayout.of(context), singleFeature = splitGlance || nightPhotoOn)
+
   private fun presentNativeHistory(photo: SlideshowPhoto, automatic: Boolean) {
     val regions = if (analyzePeople()) nativeLoader.cachedRegions(photo.key).orEmpty() else emptyList()
     presentNative(listOf(photo.copy(regions = regions)), automatic)
@@ -2535,9 +2549,17 @@ class PhotoFrameController(
       val g = ++gen
       trimNativeHistoryForFreshLoad()
       photoPause.requested(automatic)
+      // The feed is a stream, so a compact pair takes its partner from the next feed photo (the
+      // Portal+ never pairs the feed, exactly as before).
+      val compact = ScreensaverLayout.of(context).compact
+      // The Portal+ never pairs the feed (the shipped pair=false), whatever the style.
+      val pairing = if (compact) nativePairing() else CompactStagePlan.Pairing.NONE
+      val feedPartners = if (!compact || pairing == CompactStagePlan.Pairing.NONE) emptyList()
+          else listOf(SlideshowAsset("feed-partner", { fetchWebPhoto() }, contentIdentity = true,
+              identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }))
       nativeLoader.load(SlideshowAsset("feed", { fetchWebPhoto() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
-          emptyList(), null, false, analyzePeople(),
+          feedPartners, null, false, analyzePeople(),
           { photos, _ ->
             if (g != gen || stopped) return@load
             photoPause.deliver(photos) { ready ->
@@ -2547,7 +2569,8 @@ class PhotoFrameController(
               publishTestCaption(ready.first())
               armHold(rotate)
             }
-          }, { if (g == gen && !stopped) { photoPause.cancel(); armHold(rotate) } })
+          }, { if (g == gen && !stopped) { photoPause.cancel(); armHold(rotate) } },
+          pairing = pairing, compact = compact)
       return
     }
     io.execute {
@@ -2674,6 +2697,7 @@ class PhotoFrameController(
     target.scaleY = 1f
     target.translationX = 0f
     target.translationY = 0f
+    if (compactClassic()) { startCompactPan(target, storeFront); return }
     if (settings.fit != ScreensaverConfig.FIT_FILL) return
 
     val w = (if (target.width > 0) target.width else context.resources.displayMetrics.widthPixels)
@@ -2711,6 +2735,45 @@ class PhotoFrameController(
     set.start()
     if (!hostActive) set.pause()
     if (storeFront) kenBurns = set else kenBurnsBack = set
+  }
+
+  /** Classic on a compact window (the Portal Mini): the long-axis pan instead of the 1.12 overscan. */
+  private fun compactClassic(): Boolean =
+      settings.mode == ScreensaverConfig.MODE_CLASSIC && ScreensaverLayout.of(context).compact
+
+  /**
+   * Compact Classic (mock): a landscape upright (a portrait turned) fills the short side and pans
+   * along its long axis over the beat, so all of it is seen; a photo that already fits covers and
+   * zooms gently. Only RenderNode scale/translation animate; the view stays FIT_CENTER.
+   */
+  private fun startCompactPan(target: ImageView, storeFront: Boolean) {
+    val drawable = target.drawable ?: return
+    val w = if (target.width > 0) target.width else context.resources.displayMetrics.widthPixels
+    val h = if (target.height > 0) target.height else context.resources.displayMetrics.heightPixels
+    val pan = ScreensaverLayout.classicPan(drawable.intrinsicWidth, drawable.intrinsicHeight, w, h,
+        kenBurnsStyle++) ?: return
+    target.pivotX = w / 2f
+    target.pivotY = h / 2f
+    target.scaleX = pan.scale0; target.scaleY = pan.scale0
+    target.translationX = pan.x0; target.translationY = pan.y0
+    val set = AnimatorSet()
+    set.playTogether(
+        ObjectAnimator.ofFloat(target, View.SCALE_X, pan.scale0, pan.scale1),
+        ObjectAnimator.ofFloat(target, View.SCALE_Y, pan.scale0, pan.scale1),
+        ObjectAnimator.ofFloat(target, View.TRANSLATION_X, pan.x0, pan.x1),
+        ObjectAnimator.ofFloat(target, View.TRANSLATION_Y, pan.y0, pan.y1))
+    set.duration = intervalMs() + PhotoFrameSchedule.KEN_BURNS_TAIL_MS
+    set.interpolator = if (pan.pan) HearthEasing.SINE_IN_OUT else LinearInterpolator()
+    set.start()
+    if (!hostActive) set.pause()
+    if (storeFront) kenBurns = set else kenBurnsBack = set
+  }
+
+  /** A turned Mini re-lays Classic's pan for the new screen (the old pivot and travel are stale). */
+  private fun relayCompactClassic() {
+    if (stopped || !compactClassic() || !this::photo.isInitialized) return
+    if (photo.drawable != null) startKenBurns(photo, storeFront = true)
+    if (photoBack.drawable != null) startKenBurns(photoBack, storeFront = false)
   }
 
   private fun cancelKenBurns() {

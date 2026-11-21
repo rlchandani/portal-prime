@@ -175,6 +175,71 @@
     if (h > maxH) { h = maxH; w = h * a; }
     return { w, h };
   };
+  // Ken Burns and Cinematic push on a compact screen (mock AB.kenBurns): pan along the long axis
+  // so the whole photo is seen. Upright a landscape fills the height and travels its full width
+  // (the direction alternates per beat); turned a portrait fills the width and travels top to
+  // bottom; a panorama (> 2:1) sweeps at full height; a photo that already matches the screen
+  // covers it with a gentle zoom (1 -> 1.09 and a 2 % drift; every third beat zooms out). Push
+  // keeps its own 1 -> 1.06 push. [from]/[to] are px offsets along [axis].
+  window.SS.compactPan = function (photoAspect, W, H, cls, beat, push) {
+    const a = Number.isFinite(photoAspect) && photoAspect > 0 ? photoAspect : 1, k = Math.abs(beat | 0);
+    if (a > 2 || (cls === "CP" && a > 1)) {
+      const w = H * a, travel = Math.min(0, W - w), back = a <= 2 && k % 2 === 1;
+      return { mode: "pan", axis: "x", rect: { x: 0, y: 0, w, h: H },
+        from: back ? travel : 0, to: back ? 0 : travel };
+    }
+    if (cls === "CL" && a < 1) {
+      const h = W / a;
+      return { mode: "pan", axis: "y", rect: { x: 0, y: 0, w: W, h }, from: 0, to: Math.min(0, H - h) };
+    }
+    const out = !push && k % 3 === 2;
+    return { mode: "fill", rect: { x: 0, y: 0, w: W, h: H },
+      zoom: push ? [1, 1.06] : out ? [1.09, 1] : [1, 1.09], drift: push || out ? 0 : k % 2 ? 2 : -2 };
+  };
+  // The longest edge (CSS px) a compact single photo is drawn at: a cover crop renders the
+  // photo past the screen on one axis, a pan or sweep draws the whole strip, a zoom adds its scale.
+  window.SS.compactDrawnEdge = function (plan, photoAspect) {
+    if (!plan || !plan.rect) return null;
+    const a = Number.isFinite(photoAspect) && photoAspect > 0 ? photoAspect : 1, r = plan.rect;
+    const zoom = plan.zoom ? Math.max(plan.zoom[0], plan.zoom[1]) : 1;
+    if (plan.mode !== "fill") return Math.max(r.w, r.h) * zoom;
+    const w = Math.max(r.w, r.h * a);
+    return Math.max(w, w / a) * zoom;
+  };
+  // Decode size on a compact screen: never more than the photo is drawn at in device pixels
+  // ([drawn] CSS px; undefined = at most the display's long edge), never more than the mode
+  // asked for. [drawn] null keeps the mode's own request (shape not yet known).
+  window.SS.compactEdge = function (edge, drawn, W, H, dpr) {
+    const ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
+    const asked = Number.isFinite(edge) && edge > 0 ? edge : 2400;
+    if (drawn === null) return asked;
+    const css = drawn === undefined ? Math.max(W, H) : drawn;
+    if (!(Number.isFinite(css) && css > 0)) return asked;
+    return Math.max(320, Math.min(asked, Math.ceil(css * ratio)));
+  };
+  // Gallery wall on a compact screen (mock AB.galleryWall): the tile count follows the area.
+  // Upright 7 tiles in rows of ~0.2 H above the clock; turned 6 tiles in rows of >= 0.42 H.
+  // The Portal+ ("L") keeps its measured layout (null).
+  window.SS.galleryPlan = function (cls, W, H) {
+    if (cls === "CP") {
+      return { count: 7, area: { x: 28, y: 28, w: Math.max(1, W - 56), h: Math.max(1, H - 300) },
+        target: H * .2, gutter: 12, maxRows: 5 };
+    }
+    if (cls === "CL") {
+      const area = { x: 28, y: 28, w: Math.max(1, W - 56), h: Math.max(1, H - 56) };
+      return { count: 6, area, target: Math.max(H * .42, area.h * .46), gutter: 14, maxRows: 3 };
+    }
+    return null;
+  };
+  // Polaroid grid for [count] prints in a W x H area: the same rule the shipped boot uses.
+  window.SS.polaroidGrid = function (count, W, H) {
+    const n = Math.max(1, count | 0), cols = Math.max(1, Math.min(n, Math.ceil(Math.sqrt(n * W / H)) || 1));
+    return { cols, rows: Math.ceil(n / cols) };
+  };
+  // Memories collage upright (mock AB.memories): a tall slot table, three cards staggered down
+  // the screen with a slight tilt each.
+  window.SS.MEMORY_SLOTS_UPRIGHT = [[.06, .09, .7, .3], [.42, .3, .52, .42], [.08, .55, .62, .26]];
+  window.SS.MEMORY_TILT_UPRIGHT = [-2, 1.5, -1];
 
   window.SS.bucket = bucket;
   window.SS.counts = counts;

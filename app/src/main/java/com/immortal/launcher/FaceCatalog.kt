@@ -73,8 +73,10 @@ object FaceCatalog {
   /** The face the user has selected, with their size variant applied. */
   fun active(context: Context): Face {
     val cfg = ScreensaverConfig.load(context)
-    if (!cfg.facesEnabled) return noClock()
-    val entry = entryFor(cfg.faceId)
+    // An operator test-source pin may show one face for its span (never a household change).
+    val pinned = ScreensaverTestSource.pin(context)?.face
+    if (!cfg.facesEnabled && pinned == null) return noClock()
+    val entry = entryFor(pinned ?: cfg.faceId)
     val face = entry.build(context)
     if (entry.sizes.isEmpty()) return face
     val scale = entry.sizes[cfg.faceSizeIndex.coerceIn(0, entry.sizes.size - 1)]

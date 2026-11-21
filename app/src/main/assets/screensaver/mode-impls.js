@@ -377,17 +377,76 @@
   }
 
   // ---- Compact windows (the Portal Mini) -------------------------------------
-  // One photo per beat follows the screen (SS.compactSingle): full-bleed when the crop keeps
-  // >= 80 %, a full-height sweep for a panorama, else whole over its own blurred backdrop in the
-  // zone above the clock. The Portal+ ("L") never reaches these helpers.
-  const COMPACT_GEOMETRY = ["left", "top", "width", "height", "right", "bottom", "inset"];
+  // One photo per beat follows the screen. Memories singles use SS.compactSingle: full-bleed when
+  // the crop keeps >= 80 %, a full-height sweep for a panorama, else whole over its own blurred
+  // backdrop in the zone above the clock. Ken Burns and Push pan along the long axis
+  // (SS.compactPan). The Portal+ ("L") never reaches these helpers.
+  const COMPACT_GEOMETRY = ["left", "top", "width", "height", "right", "bottom", "inset", "transform"];
+  const compactClass = ctx => !!ctx.cls && ctx.cls !== "L";
+  const knownShape = p => !!p && p.w > 0 && p.h > 0;
+  function compactSize(ctx) {
+    return { W: ctx.root.clientWidth || ctx.W, H: ctx.root.clientHeight || ctx.H };
+  }
   function compactPlan(ctx, p) {
-    if (!ctx.cls || ctx.cls === "L") return null;
-    const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
+    if (!compactClass(ctx)) return null;
+    const { W, H } = compactSize(ctx);
     return SS.compactSingle(aspect(p), W, H, ctx.cls);
   }
-  // The backdrop is the photo's own small (320 px) copy under a static blur: rasterized once
-  // per photo, then only composited. It is the first child of the layer, under the photo.
+  function compactPanPlan(ctx, p, beat, push) {
+    if (!compactClass(ctx)) return null;
+    const { W, H } = compactSize(ctx);
+    return SS.compactPan(aspect(p), W, H, ctx.cls, beat, push);
+  }
+  // Ask for the photo at the size it is drawn on a compact screen (shape known before the load),
+  // else the mode's own request; the Portal+ request is untouched.
+  function compactUrl(ctx, p, edge, plan) {
+    if (!compactClass(ctx)) return ctx.url(p, edge);
+    return ctx.url(p, edge, plan && knownShape(p) ? SS.compactDrawnEdge(plan, aspect(p)) : null);
+  }
+  // The backdrop is the photo's own small (320 px) copy, drawn once into a tiny canvas (the
+  // downscale itself is the blur; the dimming is painted in) and only composited afterwards. A
+  // live CSS blur on a full-screen layer is re-applied by the compositor on every frame.
+  const PREBLUR_EDGE = 48, PREBLUR_DIM = "rgba(0,0,0,0.45)", PREBLUR_TIMEOUT_MS = 4000;
+  function preblur(url, W, H) {
+    let canvas = null, g = null;
+    try {
+      canvas = document.createElement("canvas");
+      g = canvas && typeof canvas.getContext === "function" ? canvas.getContext("2d") : null;
+    } catch (_) { g = null; }
+    if (!g || typeof Image !== "function") return Promise.resolve(null);
+    return new Promise(resolve => {
+      const img = new Image();
+      let timer = null;
+      function finish(ok) {
+        if (!img.onload) return;
+        img.onload = img.onerror = null; clearTimeout(timer);
+        let drawn = null;
+        if (ok) try { drawn = drawPreblur(canvas, g, img, W, H); } catch (_) { drawn = null; }
+        img.src = ""; resolve(drawn);
+      }
+      img.onload = () => finish(img.naturalWidth > 0 && img.naturalHeight > 0);
+      img.onerror = () => finish(false);
+      timer = setTimeout(() => finish(false), PREBLUR_TIMEOUT_MS);
+      img.src = url;
+    });
+  }
+  function drawPreblur(canvas, g, img, W, H) {
+    const s = PREBLUR_EDGE / Math.max(W, H, 1);
+    const cw = Math.max(2, Math.round(W * s)), ch = Math.max(2, Math.round(H * s));
+    canvas.width = cw; canvas.height = ch;
+    // Cover-crop the copy into the canvas, overscanned so the soft edge stays off-screen.
+    const ia = img.naturalWidth / img.naturalHeight, over = 2;
+    let dw = cw + over * 2, dh = dw / ia;
+    if (dh < ch + over * 2) { dh = ch + over * 2; dw = dh * ia; }
+    g.imageSmoothingEnabled = true;
+    if ("imageSmoothingQuality" in g) g.imageSmoothingQuality = "high";
+    if ("filter" in g) g.filter = "blur(1.5px) saturate(1.1)";
+    g.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    if ("filter" in g) g.filter = "none";
+    g.fillStyle = PREBLUR_DIM; g.fillRect(0, 0, cw, ch);
+    canvas.className = "ss-preblur-canvas";
+    return canvas;
+  }
   function compactFillOf(root) {
     const first = root.firstChild;
     return first && first.classList && first.classList.contains("ss-compact-fill") ? first : null;
@@ -400,7 +459,9 @@
   // Release the backdrop's pixels with its layer; a shipped (non-compact) photo has none.
   function hideCompactFill(root) {
     const fill = compactFillOf(root);
-    if (fill) { fill.style.backgroundImage = "none"; fill.style.display = "none"; }
+    if (!fill) return;
+    fill.style.backgroundImage = "none"; fill.style.display = "none";
+    if (fill.children && fill.children.length) fill.innerHTML = "";
   }
   // Only a layer that was laid out compact has anything to undo; the Portal+ DOM is untouched.
   function clearCompact(root, hero) {
@@ -410,17 +471,23 @@
     }
     hideCompactFill(root);
   }
-  // Lay out [hero] for [plan] and return the background size the photo needs.
-  function applyCompact(plan, root, hero, p, fillUrl) {
+  // Lay out [hero] for [plan] and return the background size the photo needs. [backdrop] is
+  // { url, canvas } for a whole photo: the pre-blurred canvas, else the CSS-blurred copy.
+  function applyCompact(plan, root, hero, backdrop) {
     const r = plan.rect;
     hero.classList.add("ss-compact");
-    Object.assign(hero.style, { inset: "auto", right: "auto", bottom: "auto",
+    Object.assign(hero.style, { inset: "auto", right: "auto", bottom: "auto", transform: "none",
       left: r.x + "px", top: r.y + "px", width: r.w + "px", height: r.h + "px" });
-    if (plan.mode === "whole" && fillUrl) {
+    if (plan.mode === "whole" && backdrop && backdrop.url) {
       const fill = compactFill(root);
-      fill.style.display = ""; bg(fill, fillUrl, "cover");
+      fill.style.display = "";
+      if (fill.children && fill.children.length) fill.innerHTML = "";
+      if (backdrop.canvas) {
+        fill.classList.add("ss-preblur"); fill.style.backgroundImage = "none";
+        fill.appendChild(backdrop.canvas);
+      } else { fill.classList.remove("ss-preblur"); bg(fill, backdrop.url, "cover"); }
     } else hideCompactFill(root);
-    return plan.mode === "fill" ? "cover" : plan.mode === "sweep" ? "100% 100%" : "contain";
+    return plan.mode === "fill" ? "cover" : plan.mode === "whole" ? "contain" : "100% 100%";
   }
   // A sweep travels the panorama across the screen at full height over the photo's dwell.
   function compactSweep(ctx, hero, plan) {
@@ -428,15 +495,64 @@
     hero.style.willChange = "transform"; void hero.offsetWidth;
     hero.style.animation = `compactSweep ${ctx.motionMs}ms ease-in-out forwards`;
   }
-  // Load the photo, then (now that its shape is known) the backdrop copy a whole photo needs.
-  async function loadCompact(ctx, t, p, url, loaded = false) {
+  // Ken Burns / Push motion for a compact plan: a long-axis pan (or the matched photo's zoom).
+  // A cached face, or motion turned off, holds a still frame: the pan rests on the face (or the
+  // middle) and the cover crop is anchored on the face.
+  function compactMotion(ctx, hero, plan, p) {
+    hero.style.animation = "none"; hero.style.willChange = "auto";
+    const still = ctx.photoMotion === false || hasFace(p);
+    if (plan.mode === "fill") {
+      faceBg(hero, p);
+      if (still) return;
+      hero.style.setProperty("--z0", plan.zoom[0]); hero.style.setProperty("--z1", plan.zoom[1]);
+      hero.style.setProperty("--zx", plan.drift + "%");
+      hero.style.willChange = "transform"; void hero.offsetWidth;
+      hero.style.animation = `compactZoom ${ctx.motionMs}ms linear forwards`;
+      return;
+    }
+    const axis = plan.axis === "y" ? "Y" : "X", travel = Math.min(plan.from, plan.to);
+    if (still) {
+      const { W, H } = compactSize(ctx);
+      const focal = hasFace(p) ? (axis === "X" ? p.fx : p.fy) : .5;
+      const view = axis === "X" ? W : H, size = axis === "X" ? plan.rect.w : plan.rect.h;
+      const at = Math.min(0, Math.max(travel, view / 2 - focal * size));
+      hero.style.transform = `translate${axis}(${at}px)`;
+      return;
+    }
+    hero.style.setProperty("--pan-from", plan.from + "px"); hero.style.setProperty("--pan-to", plan.to + "px");
+    hero.style.willChange = "transform"; void hero.offsetWidth;
+    hero.style.animation = `compactPan${axis} ${ctx.motionMs}ms ease-in-out forwards`;
+  }
+  // Load the photo, then (now that its shape is known) the backdrop a whole photo needs.
+  async function loadCompact(ctx, t, p, url, loaded = false, planner = compactPlan) {
     if (!loaded && !await t.load(url)) return null;
-    const plan = compactPlan(ctx, p);
+    const plan = planner(ctx, p);
     if (!plan) return { plan: null };
     if (plan.mode !== "whole") return { plan };
     const fillUrl = ctx.url(p, 320);
     if (!await t.load(fillUrl)) return null;
-    return { plan, fillUrl };
+    const { W, H } = compactSize(ctx);
+    const canvas = await preblur(fillUrl, W, H);
+    return { plan, fillUrl, backdrop: { url: fillUrl, canvas } };
+  }
+
+  // Ken Burns / Push on a compact screen: one photo per beat panned along its long axis (or a
+  // matched photo zoomed), full-bleed with no border or backdrop. The plan is drawn up again
+  // once the photo is loaded, when an unknown shape has been measured.
+  function compactPanStep(ctx, t, dissolve, layers, push) {
+    let beat = 0;
+    return async function (p) {
+      const k = beat, u = compactUrl(ctx, p, 2200, compactPanPlan(ctx, p, k, push));
+      if (!await t.load(u) || !dissolve.active()) return false;
+      const plan = compactPanPlan(ctx, p, k, push);
+      const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
+      hero.classList.remove("ss-motion");
+      bg(hero, u, applyCompact(plan, root, hero, null));
+      layer.border.style.backgroundImage = "none";
+      compactMotion(ctx, hero, plan, p);
+      beat = k + 1;
+      dissolve.present(root);
+    };
   }
 
   const MODES = {};
@@ -460,14 +576,12 @@
     });
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
+      if (compactClass(ctx)) return compactStep(p);
       const u = ctx.url(p, 2200);
-      const compact = await loadCompact(ctx, t, p, u);
-      if (!compact || !dissolve.active()) return false;
-      if (compact.plan) return compactStep(p, u, compact);
+      if (!await t.load(u) || !dissolve.active()) return false;
       const borderUrl = photoBorderUrl(p);
       if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
       const root = dissolve.next(), L = layers.find(l => l.root === root);
-      clearCompact(root, L.hero);
       bg(L.hero, u, "contain");
       if (borderUrl) bg(L.border, borderUrl, "contain");
       else L.border.style.backgroundImage = "none";
@@ -484,28 +598,7 @@
       }
       dissolve.present(root);
     }
-    // Compact: the same Ken Burns drift on a full-bleed photo; a whole photo keeps its border
-    // and a gentle push; a panorama sweeps. Motion preference and face anchors still apply.
-    async function compactStep(p, u, compact) {
-      const plan = compact.plan, borderUrl = plan.mode === "whole" ? photoBorderUrl(p) : null;
-      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
-      const root = dissolve.next(), L = layers.find(l => l.root === root);
-      bg(L.hero, u, applyCompact(plan, root, L.hero, p, compact.fillUrl));
-      if (borderUrl) bg(L.border, borderUrl, "contain"); else L.border.style.backgroundImage = "none";
-      L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
-      if (plan.mode === "fill") faceBg(L.hero, p);
-      if (ctx.photoMotion !== false && !hasFace(p)) {
-        if (plan.mode === "sweep") compactSweep(ctx, L.hero, plan);
-        else if (plan.mode === "fill") {
-          kbVars(L.hero, p); L.hero.style.willChange = "transform";
-          void L.hero.offsetWidth; L.hero.style.animation = "";
-        } else {
-          L.hero.style.willChange = "transform"; void L.hero.offsetWidth;
-          L.hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
-        }
-      }
-      dissolve.present(root);
-    }
+    const compactStep = compactPanStep(ctx, t, dissolve, layers, false);
     t.start(step); t.every(step, ctx.photoMs);
     return dissolve.cleanup;
   }};
@@ -643,15 +736,25 @@
       img.style.backgroundRepeat = "no-repeat, repeat";
       cell.photo = photo; cell.dissolve.present(img);
     }
+    // Compact screens (the Mini) scale the tile count, rows and area to the screen (SS.galleryPlan)
+    // and never animate the cells' layout properties; the Portal+ keeps its measured layout.
+    const compact = compactClass(ctx);
+    if (compact) wall.classList.add("compact");
+    function geometry() {
+      const { W, H } = compactSize(ctx), plan = compact ? SS.galleryPlan(ctx.cls, W, H) : null;
+      if (plan) return { area: plan.area, pad: 0, gutter: plan.gutter, targetH: plan.target,
+        count: plan.count, maxRows: plan.maxRows };
+      const area = SS.photoLayoutArea(ctx);
+      return { area, pad: Math.min(16, area.w * .1, area.h * .1), gutter: 12,
+        targetH: Math.max(240, area.h * .4), count: 10, maxRows: 10 };
+    }
     function layout(preparedPhotos) {
-      const area = SS.photoLayoutArea(ctx), W = area.w, H = area.h;
-      const pad = Math.min(16, W * .1, H * .1), gutter = 12;
-      const targetH = Math.max(240, H * .4);
+      const { area, pad, gutter, targetH, count, maxRows } = geometry(), W = area.w, H = area.h;
       const pick = preparedPhotos || []; const seen = new Set(); let g = 0;
       if (!preparedPhotos) {
-        while (pick.length < 10 && g < deck.length * 2) { const p = deck[ctx.cursor.i++ % deck.length]; g++; if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); } }
+        while (pick.length < count && g < deck.length * 2) { const p = deck[ctx.cursor.i++ % deck.length]; g++; if (!seen.has(p.seed)) { seen.add(p.seed); pick.push(p); } }
       }
-      const res = window.justifiedLayout(pick, W - pad * 2, { targetRowHeight: targetH, gutter, maxRows: 10 });
+      const res = window.justifiedLayout(pick, W - pad * 2, { targetRowHeight: targetH, gutter, maxRows });
       // Fit both dimensions. Filling height alone pushes complete outer photos
       // off-screen; quiet matte space is preferable to clipping the gallery.
       const sy = Math.min(1, (H - pad * 2) / Math.max(res.height, 1));
@@ -753,23 +856,14 @@
       hideCompactFill(root);
     });
     async function step() {
-      const p = SS.take(deck, ctx.cursor, ["any"])[0], u = ctx.url(p, 2200);
-      const compact = await loadCompact(ctx, t, p, u);
-      if (!compact || !dissolve.active()) return false;
-      const plan = compact.plan;
-      const borderUrl = !plan || plan.mode === "whole" ? photoBorderUrl(p) : null;
+      const p = SS.take(deck, ctx.cursor, ["any"])[0];
+      if (compactClass(ctx)) return compactStep(p);
+      const u = ctx.url(p, 2200);
+      if (!await t.load(u) || !dissolve.active()) return false;
+      const borderUrl = photoBorderUrl(p);
       if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
       const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
-      if (plan) bg(hero, u, applyCompact(plan, root, hero, p, compact.fillUrl));
-      else { clearCompact(root, hero); bg(hero, u, "contain"); }
-      if (plan && plan.mode === "fill") faceBg(hero, p);
-      hero.style.animation = "none"; hero.style.willChange = "auto";
-      if (plan && plan.mode === "sweep") {
-        layer.border.style.backgroundImage = "none";
-        if (ctx.photoMotion !== false) compactSweep(ctx, hero, plan);
-        dissolve.present(root);
-        return;
-      }
+      bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
       if (borderUrl) bg(layer.border, borderUrl, "contain");
       else layer.border.style.backgroundImage = "none";
       if (ctx.photoMotion !== false && !hasFace(p)) {
@@ -778,6 +872,7 @@
       }
       dissolve.present(root);
     }
+    const compactStep = compactPanStep(ctx, t, dissolve, layers, true);
     t.start(step); t.every(step, ctx.photoMs);
     return dissolve.cleanup;
   }};
@@ -799,7 +894,7 @@
     function photo(parent, p, url, single, compact) {
       const image = el((single ? "ss-hero" : "ss-img") + " memory-photo", parent);
       const plan = single && compact && compact.plan;
-      bg(image, url, plan ? applyCompact(plan, parent, image, p, compact.fillUrl) : "contain");
+      bg(image, url, plan ? applyCompact(plan, parent, image, compact.backdrop) : "contain");
       image.style.animation = "none"; image.style.willChange = "auto";
       if (plan && plan.mode === "fill") faceBg(image, p);
       if (plan && plan.mode === "sweep") { if (ctx.photoMotion !== false) compactSweep(ctx, image, plan); }
@@ -809,9 +904,12 @@
       }
       return image;
     }
+    // Upright (the Mini) the collage uses the tall slot table, each card slightly tilted.
+    const upright = ctx.cls === "CP";
     function layoutCollage(ps, images) {
       const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
-      const slots = ps.length === 1 ? [[.16, .14, .68, .72]] :
+      const slots = upright && ps.length > 1 ? SS.MEMORY_SLOTS_UPRIGHT :
+        ps.length === 1 ? [[.16, .14, .68, .72]] :
         ps.length === 2 ? [[.07, .14, .40, .72], [.53, .14, .40, .72]] :
         [[.08, .16, .42, .5], [.53, .1, .36, .42], [.5, .56, .4, .3]];
       ps.forEach((p, i) => {
@@ -822,10 +920,13 @@
         tile.style.left = (W * x + (boxW - width) / 2) + "px";
         tile.style.top = (H * y + (boxH - height) / 2) + "px";
         tile.style.width = width + "px"; tile.style.height = height + "px";
+        if (upright && ps.length > 1) tile.style.transform = `rotate(${SS.MEMORY_TILT_UPRIGHT[i]}deg)`;
       });
     }
     function renderCollage(scene, ps, urls) {
-      const title = el("ss-memory-caption", scene); title.textContent = "Photo memories";
+      const title = el("ss-memory-caption", scene);
+      title.textContent = upright ? "On this day" : "Photo memories";
+      if (upright) title.classList.add("upright");
       const images = ps.map((p, i) => photo(el("ss-memory-card", scene), p, urls[i], false));
       layoutCollage(ps, images); collages.set(scene, { ps, images });
       return images;
@@ -845,7 +946,8 @@
       if (!dissolve.active()) return false;
       const nextBeat = beat + 1, collage = nextBeat % 6 === 0;
       const ps = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, collage ? 3 : 1)).fill("any"));
-      const urls = await t.publish(() => ps.map(p => ctx.url(p, collage ? 1100 : 2200)));
+      const urls = await t.publish(() => ps.map(p => collage ? ctx.url(p, 1100) :
+        compactUrl(ctx, p, 2200, compactPlan(ctx, p))));
       if (urls === false || !await t.load(urls) || !dissolve.active()) return false;
       const compact = collage ? null : await loadCompact(ctx, t, ps[0], urls[0], true);
       if (!collage && !compact || !dissolve.active()) return false;
@@ -943,8 +1045,8 @@
     let live = [], disposed = false, paused = false, fading = null;
     let area = SS.photoLayoutArea(ctx), resizePending = false;
     const now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
-    const COLS = Math.min(MAX, Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H))), ROWS = Math.ceil(MAX / COLS);
-    const freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
+    let COLS = Math.min(MAX, Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H))), ROWS = Math.ceil(MAX / COLS);
+    let freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
     // Six live prints and one reusable incoming owner. Resting paper never asks
     // for permanent promotion; no guessed date, event or place belongs on it.
     const pool = Array.from({ length: MAX + 1 }, () => {
@@ -992,8 +1094,22 @@
         resizePending = false;
         if (disposed) return;
         area = SS.photoLayoutArea(ctx);
+        if (compactClass(ctx)) regrid();
         pool.forEach(print => { if (print.photo) layout(print, print.photo, print.cell, true); });
       });
+    }
+    // Compact (the Mini turns): the grid follows the window instead of staying the boot one. The
+    // prints keep their photos, tilt and in-cell bias; they are dealt into the new grid in order.
+    function regrid() {
+      const { W, H } = compactSize(ctx), grid = SS.polaroidGrid(MAX, W, H);
+      if (grid.cols === COLS && grid.rows === ROWS) return;
+      COLS = grid.cols; ROWS = grid.rows;
+      const cells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i));
+      live.forEach(print => { print.cell = cells.shift(); });
+      pool.forEach(print => {
+        if (print.photo && !live.includes(print)) print.cell = print.cell % (COLS * ROWS);
+      });
+      freeCells = cells.slice(0, Math.max(0, MAX - live.length));
     }
     if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     function settle(request = fading) {

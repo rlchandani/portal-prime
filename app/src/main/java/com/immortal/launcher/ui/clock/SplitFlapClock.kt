@@ -18,6 +18,8 @@ import android.view.animation.DecelerateInterpolator
 import androidx.compose.ui.graphics.toArgb
 import com.immortal.launcher.ClockFaceView
 import com.immortal.launcher.ClockSpec
+import com.immortal.launcher.ScreensaverFaceLayout
+import com.immortal.launcher.ScreensaverLayout
 import com.immortal.launcher.ui.theme.CardDeep
 import com.immortal.launcher.ui.theme.CardDivider
 import com.immortal.launcher.ui.theme.CardMid
@@ -77,6 +79,17 @@ class SplitFlapClockFaceView(
             val w = width.toFloat()
             val h = height.toFloat()
 
+            // The Mini (compact) lays the cards out per orientation; LARGE keeps the shipped row.
+            val metrics = context.resources.displayMetrics
+            val compact = ScreensaverFaceLayout.flip(
+                ScreensaverLayout.of(context), w, h, metrics.widthPixels.toFloat(),
+                metrics.heightPixels.toFloat(), metrics.density, spec.sizeScale,
+            )
+            if (compact != null) {
+                drawCompact(canvas, compact)
+                return
+            }
+
             val fit = SplitFlapGeometry.fit(w, h)
             val cardW = fit.cardWidth
             val cardH = fit.cardHeight
@@ -100,47 +113,61 @@ class SplitFlapClockFaceView(
                     canvas.drawText(":", x + colonW / 2f, startY + cardH * 0.65f, colonPaint)
                     x += colonW + gap
                 }
+                drawCard(canvas, i, x, startY, cardW, cardH, radius)
+                x += cardW + gap
+            }
+        }
 
-                val rect = RectF(x, startY, x + cardW, startY + cardH)
+        /** Compact cards: hours over minutes upright, one proportioned row turned. */
+        private fun drawCompact(canvas: Canvas, cards: ScreensaverFaceLayout.FlipCards) {
+            textPaint.textSize = cards.digit
+            colonPaint.textSize = cards.digit * (0.5f / 0.7f)
+            val radius = cards.cardW * 0.12f
+            if (cards.rows == 1) {
+                colonPaint.alpha = 255
+                canvas.drawText(":", cards.colonLeft + cards.colonW / 2f, cards.tops[0] + cards.cardH * 0.65f, colonPaint)
+            }
+            for (i in 0..3) drawCard(canvas, i, cards.lefts[i], cards.tops[i], cards.cardW, cards.cardH, radius)
+        }
 
-                // Draw card background
-                canvas.drawRoundRect(rect, radius, radius, cardPaint)
+        private fun drawCard(canvas: Canvas, i: Int, x: Float, startY: Float, cardW: Float, cardH: Float, radius: Float) {
+            val rect = RectF(x, startY, x + cardW, startY + cardH)
 
-                // Draw top half with current digit
-                val topRect = RectF(x, startY, x + cardW, startY + cardH / 2f)
-                canvas.drawRoundRect(topRect, radius, radius, topCardPaint)
+            // Draw card background
+            canvas.drawRoundRect(rect, radius, radius, cardPaint)
 
-                // Draw digit text
+            // Draw top half with current digit
+            val topRect = RectF(x, startY, x + cardW, startY + cardH / 2f)
+            canvas.drawRoundRect(topRect, radius, radius, topCardPaint)
+
+            // Draw digit text
+            canvas.drawText(
+                displayedDigits[i].toString(),
+                x + cardW / 2f,
+                startY + cardH * 0.63f,
+                textPaint,
+            )
+
+            // Draw divider line
+            canvas.drawLine(x, startY + cardH / 2f, x + cardW, startY + cardH / 2f, dividerPaint)
+
+            // Draw flip card if animating
+            val progress = flipProgress[i]
+            if (progress > 0f) {
+                val flipRect = RectF(x, startY, x + cardW, startY + cardH / 2f)
+                canvas.save()
+                canvas.scale(1f, progress, x + cardW / 2f, startY + cardH / 2f)
+                canvas.drawRoundRect(flipRect, radius, radius, topCardPaint)
+                // Draw the pending digit on the flipping card
+                textPaint.alpha = (progress * 255).toInt()
                 canvas.drawText(
-                    displayedDigits[i].toString(),
+                    pendingDigits[i].toString(),
                     x + cardW / 2f,
                     startY + cardH * 0.63f,
                     textPaint,
                 )
-
-                // Draw divider line
-                canvas.drawLine(x, startY + cardH / 2f, x + cardW, startY + cardH / 2f, dividerPaint)
-
-                // Draw flip card if animating
-                val progress = flipProgress[i]
-                if (progress > 0f) {
-                    val flipRect = RectF(x, startY, x + cardW, startY + cardH / 2f)
-                    canvas.save()
-                    canvas.scale(1f, progress, x + cardW / 2f, startY + cardH / 2f)
-                    canvas.drawRoundRect(flipRect, radius, radius, topCardPaint)
-                    // Draw the pending digit on the flipping card
-                    textPaint.alpha = (progress * 255).toInt()
-                    canvas.drawText(
-                        pendingDigits[i].toString(),
-                        x + cardW / 2f,
-                        startY + cardH * 0.63f,
-                        textPaint,
-                    )
-                    textPaint.alpha = 255
-                    canvas.restore()
-                }
-
-                x += cardW + gap
+                textPaint.alpha = 255
+                canvas.restore()
             }
         }
     }

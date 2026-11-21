@@ -138,7 +138,7 @@ internal class FleetActionApi(private val actions: FleetActions) {
   /**
    * Verification only: swap every photo source for generated scenes (expires on its own), or
    * switch back. {"enabled":true|false, "minutes":1..240, "night":false|true, "mode":"<mode>",
-   * "intervalSec":5..600}. Any frame already on
+   * "intervalSec":5..600, "face":"<photo face id>"}. Any frame already on
    * screen is retired first so household photos are never on screen while the switch is on;
    * enabling then opens a fresh frame on the generated scenes. Release builds report unavailable.
    */
@@ -152,7 +152,8 @@ internal class FleetActionApi(private val actions: FleetActions) {
     // beat for the same span instead of the household's mode and interval.
     val pinMode = body.optString("mode", "")
     val pin = if (enable && pinMode.isNotEmpty()) {
-      ScreensaverTestSource.Pin.of(pinMode, body.optInt("intervalSec", DEFAULT_PIN_INTERVAL_SEC))
+      ScreensaverTestSource.Pin.of(pinMode, body.optInt("intervalSec", DEFAULT_PIN_INTERVAL_SEC),
+          body.optString("face", "").takeIf { it.isNotEmpty() })
           ?: return json(400, err("bad_pin"))
     } else null
     val applied = if (enable) actions.enableTestSource(minutes, night = night, pin = pin) else actions.disableTestSource()
