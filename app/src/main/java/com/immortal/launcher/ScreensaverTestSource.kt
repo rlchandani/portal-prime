@@ -66,7 +66,7 @@ internal object ScreensaverTestSource {
       available() && until(context) > nowMs
 
   fun until(context: Context): Long =
-      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_UNTIL, 0L)
+      processPrefs(context, PREFS).getLong(KEY_UNTIL, 0L)
 
   /**
    * Enable for [minutes] (clamped to 1..[MAX_MINUTES]); false when this build has no test source.
@@ -81,7 +81,7 @@ internal object ScreensaverTestSource {
   ): Boolean {
     if (!available()) return false
     val until = nowMs + minutes.coerceIn(1, MAX_MINUTES) * 60_000L
-    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+    val edit = processPrefs(context, PREFS).edit()
     edit.putLong(KEY_UNTIL, until)
     if (night) edit.putLong(KEY_NIGHT_UNTIL, until) else edit.remove(KEY_NIGHT_UNTIL)
     if (pin != null) {
@@ -97,7 +97,7 @@ internal object ScreensaverTestSource {
   }
 
   fun disable(context: Context): Boolean {
-    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+    val edit = processPrefs(context, PREFS).edit()
     listOf(KEY_UNTIL, KEY_NIGHT_UNTIL, KEY_PIN_MODE, KEY_PIN_INTERVAL, KEY_PIN_FACE).forEach { edit.remove(it) }
     return edit.commit()
   }
@@ -123,7 +123,7 @@ internal object ScreensaverTestSource {
   /** The operator pin while the test source is active, else null. */
   fun pin(context: Context, nowMs: Long = System.currentTimeMillis()): Pin? {
     if (!active(context, nowMs)) return null
-    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    val prefs = processPrefs(context, PREFS)
     val mode = prefs.getString(KEY_PIN_MODE, null) ?: return null
     return Pin.of(mode, prefs.getInt(KEY_PIN_INTERVAL, 0), prefs.getString(KEY_PIN_FACE, null))
   }
@@ -135,7 +135,7 @@ internal object ScreensaverTestSource {
   /** True while an operator forced the dark room on together with an active test source. */
   fun forcedNight(context: Context, nowMs: Long = System.currentTimeMillis()): Boolean =
       active(context, nowMs) &&
-          context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_NIGHT_UNTIL, 0L) > nowMs
+          processPrefs(context, PREFS).getLong(KEY_NIGHT_UNTIL, 0L) > nowMs
 
   fun scene(index: Int): Scene = scenes[Math.floorMod(index, scenes.size)]
 

@@ -174,6 +174,8 @@ class ImmortalApp : Application() {
       StartupStep("Mqtt") { MqttService.sync(this) },
       // Baseline profile for OTA installs, well after startup (replaces androidx's initializer).
       StartupStep("ProfileInstall") { BackgroundProfileInstall.schedule(this) },
+      // First Music/Calls open and screensaver start: their one-time store loads, off main.
+      StartupStep("FirstOpenWarmup") { FirstOpenWarmup.start(this) },
   )
 
   /** Shrinks the decoded-image caches under memory pressure or once our UI is hidden. */

@@ -316,7 +316,7 @@ object ScreensaverConfig {
   /** Keep the album refresh sane (15 min … 24h). Floor matches the settings stepper. */
   fun clampAlbumRefresh(min: Int): Int = min.coerceIn(15, 24 * 60)
 
-  private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+  private fun prefs(c: Context) = processPrefs(c, PREFS)
 
   /** Calendar rows share this snapshot without observing slideshow cache and playback writes. */
   fun observeCalendarSnapshot(c: Context, changed: () -> Unit): () -> Unit =
