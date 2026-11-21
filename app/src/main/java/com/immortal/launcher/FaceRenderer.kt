@@ -19,7 +19,9 @@ import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.text.TextPaint
 import android.text.TextUtils
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -95,6 +97,8 @@ class FaceRenderer(
 
   /** The window class the overlay grid was last laid out for (null before the first build). */
   private var gridClass: LayoutClass? = null
+  /** The compact Bold date's wanted size in px (null = the shipped meta text size). */
+  private var centreDatePx: Float? = null
   /** The timer, now playing and calendar stack under the top margin upright; see [topStackBottom]. */
   var onTopStackChanged: (() -> Unit)? = null
 
@@ -399,6 +403,7 @@ class FaceRenderer(
       it.maxLines = if (compactMeta) 1 else Int.MAX_VALUE
       it.ellipsize = if (compactMeta) TextUtils.TruncateAt.END else null
     }
+    applyCentreDate(cls)
     timerView?.let { t ->
       if (grid?.topStack == true) {
         t.background = GradientDrawable().apply { cornerRadius = dp(99).toFloat(); setColor(0x8C141210.toInt()) }
@@ -420,6 +425,34 @@ class FaceRenderer(
     onTopStackChanged?.invoke()
   }
 
+  /**
+   * Bold on the Mini: its date is one line at the mock size (58 dp upright, 64 dp turned, scaled
+   * with the size setting) that shrinks to the grid's width instead of wrapping or ellipsizing.
+   * LARGE (and every other face) keeps the shipped `22 sp x scale` meta text.
+   */
+  private fun applyCentreDate(cls: LayoutClass) {
+    val type = ScreensaverFaceLayout.centreType(cls, ScreensaverFaceLayout.centreKind(face.clock), face.clock.sizeScale)
+    val wanted = type?.dateDp?.takeIf { it > 0f }?.let { it * context.resources.displayMetrics.density }
+    val date = dateView
+    if (wanted == null && centreDatePx != null && date != null) {
+      date.textSize = 22f * face.clock.sizeScale / 100f
+    }
+    centreDatePx = wanted
+    if (wanted != null) date?.ellipsize = null
+    fitCentreDate()
+  }
+
+  /** Re-fit the Bold date to one line; a no-op unless [applyCentreDate] set a compact size. */
+  private fun fitCentreDate() {
+    val date = dateView ?: return
+    val wanted = centreDatePx ?: return
+    val grid = ScreensaverLayout.grid(gridClass ?: return) ?: return
+    // A 2 dp slack keeps sub-pixel rounding from wrapping the single line.
+    val available = context.resources.displayMetrics.widthPixels - 2f * dp(grid.sideDp) - dp(2)
+    val measured = TextPaint(date.paint).apply { textSize = wanted }.measureText(date.text?.toString() ?: "")
+    date.setTextSize(TypedValue.COMPLEX_UNIT_PX, ScreensaverFaceLayout.fitTextSize(wanted, measured, available))
+  }
+
   /** Where the now-playing card lives: the upright top stack, else its configured corner. */
   private fun nowPlayingPosition(cls: LayoutClass): GridPosition =
       if (ScreensaverLayout.grid(cls)?.topStack == true) GridPosition.TOP_CENTER else face.nowPlaying.position
@@ -436,7 +469,8 @@ class FaceRenderer(
     val topStack = grid?.topStack == true && pos == GridPosition.TOP_CENTER
     val cap = when {
       grid == null || topStack -> null
-      pos == face.clock.position -> grid.clockMaxFraction
+      // A centred clock (Big / Bold) sizes itself from the mock, not the corner clock's cap.
+      pos == face.clock.position && pos != GridPosition.MIDDLE_CENTER -> grid.clockMaxFraction
       pos == face.caption.position -> grid.captionMaxFraction
       else -> null
     }
@@ -822,7 +856,9 @@ class FaceRenderer(
 
   /** Metadata has plain text; unchanged content does not need another layout/invalidation. */
   private fun TextView.setMetadataText(value: String) {
-    if (text?.toString() != value) text = value
+    if (text?.toString() == value) return
+    text = value
+    if (this === dateView) fitCentreDate()
   }
 
   // --- periodic loops ---------------------------------------------------------
