@@ -27,7 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
@@ -47,11 +49,13 @@ fun Modifier.tvFocusable(
     ringColor: Color = Color.White,
     enabled: Boolean = true,
     onLongClick: (() -> Unit)? = null,
+    /** What the element is to an accessibility service; a wrapper's outer `semantics` role wins. */
+    role: Role? = Role.Button,
     onClick: () -> Unit,
 ): Modifier {
   // Keep disabled actions inert while exposing their label and state together.
   // Independently clickable children (such as Manage-mode badges) keep their own nodes.
-  if (!enabled) return semantics(mergeDescendants = true) { disabled() }
+  if (!enabled) return disabledSemantics(role)
   val gate = LocalApprovedLauncherInputGate.current
   // Legacy screens retain disabled semantics; retained tabs keep their click nodes
   // stable and reject inactive actions at invocation.
@@ -76,7 +80,7 @@ fun Modifier.tvFocusable(
   val haptics = if (gate != null && onLongClick != null) LocalHapticFeedback.current else null
   return if (onLongClick != null) {
     base.combinedClickable(
-        interactionSource = source, indication = null, enabled = clickEnabled,
+        interactionSource = source, indication = null, enabled = clickEnabled, role = role,
         hapticFeedbackEnabled = gate == null,
         onClick = click, onLongClick = {
           if (gate?.acceptsAction() ?: clickEnabled) {
@@ -86,7 +90,7 @@ fun Modifier.tvFocusable(
           }
         })
   } else {
-    base.clickable(interactionSource = source, indication = null, enabled = clickEnabled, onClick = click)
+    base.clickable(interactionSource = source, indication = null, enabled = clickEnabled, role = role, onClick = click)
   }
 }
 
@@ -98,9 +102,10 @@ fun Modifier.tvFocusable(
 fun Modifier.tvFocusableRow(
     focusFill: Color = Color(0x402E6BE6),
     enabled: Boolean = true,
+    role: Role? = Role.Button,
     onClick: () -> Unit,
 ): Modifier {
-  if (!enabled) return semantics(mergeDescendants = true) { disabled() }
+  if (!enabled) return disabledSemantics(role)
   val gate = LocalApprovedLauncherInputGate.current
   val clickEnabled = if (gate == null) LocalApprovedLauncherPageActive.current else true
   val source = remember { MutableInteractionSource() }
@@ -108,7 +113,13 @@ fun Modifier.tvFocusableRow(
   val showFocus = focused && (gate?.active ?: clickEnabled)
   val base = this.background(if (showFocus) focusFill else Color.Transparent)
   val focusable = if (gate == null) base else base.focusProperties { if (!gate.active) canFocus = false }
-  return focusable.clickable(interactionSource = source, indication = null, enabled = clickEnabled) {
+  return focusable.clickable(interactionSource = source, indication = null, enabled = clickEnabled, role = role) {
     if (gate?.acceptsAction() ?: clickEnabled) onClick()
   }
+}
+
+/** A disabled control stays one node that still says what it is. */
+private fun Modifier.disabledSemantics(role: Role?): Modifier = semantics(mergeDescendants = true) {
+  disabled()
+  if (role != null) this.role = role
 }

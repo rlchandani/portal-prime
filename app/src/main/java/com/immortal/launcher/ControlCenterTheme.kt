@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -44,7 +45,7 @@ internal data class CcColors(
 internal val CcDark = CcColors(
     dark = true,
     bg = Color(0xFF14161B), rail = Color(0xFF101216), surface = Color(0xFF24262B), surface2 = Color(0xFF31343A),
-    text = Color.White, sec = Color(0xFFB8B8B8), faint = Color(0xFF7D8189), div = Color(0xFF3A3D44),
+    text = Color.White, sec = Color(0xFFB8B8B8), faint = Color(0xFF979AA1), div = Color(0xFF3A3D44),
     accent = Color.White, accentInk = Color(0xFF14161B), sel = Color(0xFF414141),
     green = Color(0xFF66C49E), red = Color(0xFFFF747D), amber = Color(0xFFF0A65A),
     amberBg = Color(0xFF3B2A15), redBg = Color(0xFF43191E), greenBg = Color(0xFF173328),
@@ -56,7 +57,7 @@ internal val CcDark = CcColors(
 internal val CcLight = CcColors(
     dark = false,
     bg = Color(0xFFF2F3F7), rail = Color(0xFFE9EDF3), surface = Color.White, surface2 = Color(0xFFE5EBF2),
-    text = Color(0xFF182C39), sec = Color(0xFF536674), faint = Color(0xFF8797A5), div = Color(0xFFDCE3EB),
+    text = Color(0xFF182C39), sec = Color(0xFF536674), faint = Color(0xFF5D6D7B), div = Color(0xFFDCE3EB),
     accent = Color(0xFF176ABB), accentInk = Color.White, sel = Color(0xFFD7E7F8),
     green = Color(0xFF288B61), red = Color(0xFFD33D4C), amber = Color(0xFFB9741A),
     amberBg = Color(0xFFFBEBD3), redBg = Color(0xFFFBE1E4), greenBg = Color(0xFFDDF1E7),
@@ -105,5 +106,8 @@ internal fun CcTheme(dark: Boolean, content: @Composable () -> Unit) {
   // LARGE keeps the width-only rule; compact (the Mini) also reads the height (see CcCompactScale).
   val scale = CcCompactScale.of(currentLayoutClass(), config.screenWidthDp)
   val scaled = if (scale != 1f) Density(density.density * scale, density.fontScale) else density
-  CompositionLocalProvider(LocalCc provides if (dark) CcDark else CcLight, LocalDensity provides scaled, content = content)
+  CompositionLocalProvider(LocalCc provides if (dark) CcDark else CcLight, LocalDensity provides scaled) {
+    // Re-derived inside the compact scale so the hit-area floor stays 64 real dp.
+    ProvideHearthpaneTouchTargets(content)
+  }
 }

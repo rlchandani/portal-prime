@@ -86,8 +86,8 @@ class LampNumberStepTest {
 
   private companion object {
     const val MINUS_CALLBACK =
-        "LampControlDialog\$lambda\$106\$lambda\$105\$lambda\$104\$lambda\$100\$lambda\$97\$lambda\$96"
+        "LampControlDialog\$lambda\$107\$lambda\$106\$lambda\$105\$lambda\$104\$lambda\$100\$lambda\$97\$lambda\$96"
     const val PLUS_CALLBACK =
-        "LampControlDialog\$lambda\$106\$lambda\$105\$lambda\$104\$lambda\$100\$lambda\$99\$lambda\$98"
+        "LampControlDialog\$lambda\$107\$lambda\$106\$lambda\$105\$lambda\$104\$lambda\$100\$lambda\$99\$lambda\$98"
   }
 }

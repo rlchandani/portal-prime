@@ -8,6 +8,8 @@
 package com.immortal.launcher
 
 import android.os.Bundle
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -81,7 +83,8 @@ internal fun CloseCircle(onClick: () -> Unit) {
   Surface(
       color = IosDivider,
       shape = CircleShape,
-      modifier = Modifier.size(68.dp).tvFocusable(CircleShape, focusScale = 1f) { onClick() },
+      modifier = Modifier.size(68.dp).semantics { contentDescription = "Close" }
+          .tvFocusable(CircleShape, focusScale = 1f) { onClick() },
   ) {
     Box(contentAlignment = Alignment.Center) {
       Text("✕", color = IosSecondary, fontSize = 18.sp, fontWeight = FontWeight.Bold)

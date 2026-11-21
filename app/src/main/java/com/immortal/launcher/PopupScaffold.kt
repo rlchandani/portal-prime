@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,14 +75,14 @@ internal fun PopupScaffold(
               // Outside-tap does NOT dismiss (swallowed) — closing is via the ‹ Back pill or Back
               // key only, so an accidental tap can't lose your place.
               .background(Color(0xA6081822))
-              .tvFocusable(RoundedCornerShape(0.dp), focusScale = 1f) { /* swallow */ },
+              .focusable().blockScrimTaps(),
   ) {
     Surface(
         color = IosBackground,
         shape = RoundedCornerShape(28.dp),
         // Swallow taps on the card so they don't fall through to the scrim's dismiss.
         modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
-            .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume */ },
+            .blockScrimTaps(),
     ) {
       Column(
           modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(38.dp),

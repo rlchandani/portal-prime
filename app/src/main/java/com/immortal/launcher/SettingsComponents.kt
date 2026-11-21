@@ -260,7 +260,7 @@ internal fun ToggleRow(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = Sizes.rowMinHeight)
-            .then(if (enabled) Modifier.tvFocusableRow(focusFill = IosFocusTint) { onChange(!checked) }
+            .then(if (enabled) Modifier.tvFocusableRow(focusFill = IosFocusTint, role = null) { onChange(!checked) }
                 else Modifier.semantics { disabled() })
             .semantics { role = Role.Switch; toggleableState = ToggleableState(checked) }
             .padding(horizontal = 28.dp, vertical = 22.dp),
@@ -548,7 +548,7 @@ private fun StepperButton(glyph: String, rowFocused: Boolean, enabled: Boolean, 
             .clip(RoundedCornerShape(9.dp))
             .background(if (rowFocused) IosFocusTint else IosBackground)
             .focusProperties { canFocus = false }
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier.semantics { disabled() }),
+            .then(if (enabled) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier.semantics { disabled() }),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -575,7 +575,7 @@ internal fun ArrowButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit
             .size(68.dp)
             .clip(RoundedCornerShape(12.dp))
             .focusProperties { canFocus = false }
-            .clickable(onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(

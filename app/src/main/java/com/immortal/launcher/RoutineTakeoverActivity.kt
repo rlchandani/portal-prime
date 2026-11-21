@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Intent
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -54,7 +55,7 @@ class RoutineTakeoverActivity : ComponentActivity() {
       systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) { override fun handleOnBackPressed() {} })
-    setContent { TakeoverRoot(onFinished = ::returnHome) }
+    setContent { ProvideHearthpaneTouchTargets { TakeoverRoot(onFinished = ::returnHome) } }
   }
 
   override fun onStart() {

@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,7 +66,7 @@ internal fun HomeHeaderOverflowButton(size: Dp, status: String, onRemote: () -> 
     if (open) {
       val gap = with(LocalDensity.current) { (size + 10.dp).roundToPx() }
       Popup(alignment = Alignment.TopEnd, offset = IntOffset(0, gap), onDismissRequest = { open = false },
-          properties = PopupProperties(focusable = true)) {
+          properties = PopupProperties(focusable = true)) { ProvideHearthpaneTouchTargets {
         ApprovedHomeSurface(Modifier.width(MenuWidth), radius = 22.dp) {
           Column(Modifier.padding(vertical = 8.dp)) {
             Row(Modifier.fillMaxWidth().height(MenuRowHeight).padding(horizontal = 22.dp),
@@ -84,7 +85,7 @@ internal fun HomeHeaderOverflowButton(size: Dp, status: String, onRemote: () -> 
             }
           }
         }
-      }
+      }}
     }
   }
 }

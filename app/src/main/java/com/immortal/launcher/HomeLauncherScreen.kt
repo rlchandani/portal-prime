@@ -8,6 +8,8 @@
 package com.immortal.launcher
 
 import android.app.Activity
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.CollectionInfo
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -545,7 +547,8 @@ internal fun LauncherScreen(
             }
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
-            Row(Modifier.fillMaxWidth().height(favoriteTileHeight(homeLayout)),
+            Row(Modifier.fillMaxWidth().height(favoriteTileHeight(homeLayout))
+                .semantics { collectionInfo = CollectionInfo(1, favorites.size) },
                 horizontalArrangement = Arrangement.spacedBy(if (homeLayout.compactPortrait) 10.dp else 16.dp)) {
               favorites.forEach { app ->
                 ApprovedFavoriteTile(app, Modifier.weight(1f), { onLaunch(app.component) }, { appMenu = app },

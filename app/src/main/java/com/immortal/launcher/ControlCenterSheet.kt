@@ -77,7 +77,7 @@ private fun SheetFrame(ui: CcUi, open: Boolean, slide: CcPresence, scrim: CcPres
   val widthPx = with(LocalDensity.current) { (CcStyle.SheetWidth + SHEET_INSET).toPx() }
   Box(Modifier.fillMaxSize()) {
     Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
-        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, onClick = ui::closeSheets)
+        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, role = Role.Button, onClick = ui::closeSheets)
             .semantics { contentDescription = "Close" } else Modifier))
     // The Mini upright: a full-width sheet rising from the bottom (a side sheet would leave a sliver of map).
     val frame = if (currentLayoutClass().compactPortrait)
@@ -89,7 +89,7 @@ private fun SheetFrame(ui: CcUi, open: Boolean, slide: CcPresence, scrim: CcPres
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Sheet, ambientColor = Color.Black, spotColor = Color.Black)
         // The page rasterizes once into a texture; sliding then moves the texture, not every tile.
         .graphicsLayer { shape = CcStyle.Sheet; clip = true; compositingStrategy = CompositingStrategy.Offscreen }.background(c.bg)
-        .clickable(remember { MutableInteractionSource() }, indication = null) {}, content = content)
+        .blockScrimTaps(), content = content)
   }
 }
 

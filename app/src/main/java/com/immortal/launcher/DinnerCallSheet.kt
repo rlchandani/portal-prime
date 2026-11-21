@@ -7,6 +7,9 @@
 package com.immortal.launcher
 
 import android.content.Context
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.compose.foundation.background
@@ -129,11 +132,12 @@ private fun isOnline(context: Context): Boolean = runCatching {
 @Composable
 private fun Sheet(onScrim: (() -> Unit)?, content: @Composable BoxScope.() -> Unit) {
   Box(Modifier.fillMaxSize().background(DinnerColors.Scrim).then(
-      if (onScrim != null) Modifier.clickable(remember { MutableInteractionSource() }, null, onClick = onScrim) else Modifier))
+      if (onScrim != null) Modifier.clickable(remember { MutableInteractionSource() }, null, role = Role.Button, onClick = onScrim)
+          .semantics { contentDescription = "Close" } else Modifier))
   Box(Modifier.fillMaxSize().padding(start = 24.dp, end = 24.dp, top = 108.dp, bottom = 24.dp)) {
     val shape = RoundedCornerShape(36.dp)
     Box(Modifier.fillMaxSize().clip(shape).background(ApprovedHomePalette.Background).border(1.dp, ApprovedHomePalette.Border, shape)
-        .clickable(remember { MutableInteractionSource() }, null) {}.padding(40.dp), content = content)
+        .blockScrimTaps().padding(40.dp), content = content)
   }
 }
 

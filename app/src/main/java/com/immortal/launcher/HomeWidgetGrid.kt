@@ -103,7 +103,9 @@ private fun ApprovedWidgetCell(
           .onSizeChanged { widthPx = it.width; heightPx = it.height }
           .semantics { contentDescription = "${if (widget.isAppWidget) "App" else customWidgetLabel(widget.kind)} widget" }) {
         ApprovedHomeSurface(Modifier.fillMaxSize().combinedClickable(
-            enabled = !editMode, onClick = {}, onLongClick = onEnterEdit)
+            // A container, not a button: its only action is the long press into Customize.
+            enabled = !editMode, role = null, onClickLabel = null, onLongClickLabel = "Customize Home",
+            onClick = {}, onLongClick = onEnterEdit)
             .then(if (editMode) Modifier.clearAndSetSemantics { } else Modifier)) {
           if (widget.isAppWidget) {
             ApprovedHostedWidget(widget, host, manager, editMode)

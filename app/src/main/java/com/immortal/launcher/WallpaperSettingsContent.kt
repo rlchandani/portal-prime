@@ -175,7 +175,7 @@ private fun WallpaperSwatch(
     preview: @Composable () -> Unit,
 ) {
   Column(horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = modifier.tvFocusable(RoundedCornerShape(16.dp), enabled = enabled) { onClick() }
+      modifier = modifier.tvFocusable(RoundedCornerShape(16.dp), enabled = enabled, role = null) { onClick() }
           .semantics {
             role = Role.RadioButton
             this.selected = selected

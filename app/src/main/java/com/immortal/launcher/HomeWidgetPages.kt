@@ -8,6 +8,8 @@
 package com.immortal.launcher
 
 import android.appwidget.AppWidgetHost
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.Role
 import android.appwidget.AppWidgetManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -149,7 +151,8 @@ private fun ApprovedWidgetPageIndicator(
         val active = dot == index
         Box(Modifier.height(8.dp).width(if (active) 22.dp else 8.dp).clip(RoundedCornerShape(4.dp))
             .background(if (active) ApprovedHomePalette.Text else ApprovedHomePalette.Secondary.copy(alpha = .45f))
-            .clickable(onClickLabel = "Widget page ${dot + 1}") { changePage(dot) })
+            .semantics { contentDescription = "Widget page ${dot + 1}"; selected = active }
+            .clickable(role = Role.Tab, onClickLabel = "Show widget page ${dot + 1}") { changePage(dot) })
       }
       Spacer(Modifier.width(6.dp))
       Text("${index + 1} of $count", color = ApprovedHomePalette.Secondary, fontSize = 20.sp,

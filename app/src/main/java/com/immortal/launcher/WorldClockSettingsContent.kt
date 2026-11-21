@@ -85,7 +85,7 @@ internal fun WorldClockContent() {
               modifier =
                   Modifier.fillMaxWidth()
                       .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                      .tvFocusableRow(focusFill = IosFocusTint) {
+                      .tvFocusableRow(focusFill = IosFocusTint, role = null) {
                         selected = if (on) selected - zone else selected + zone
                         ImmortalSettings.setWorldClockZones(context, selected)
                       }

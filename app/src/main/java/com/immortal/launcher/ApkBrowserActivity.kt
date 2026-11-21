@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.app.Activity
+import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -159,7 +160,7 @@ private fun ApkBrowserScreen() {
   }
   selected?.let { selection ->
     val apk = selection.metadata
-    Dialog(onDismissRequest = { selected = null; selection.close() }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = { selected = null; selection.close() }, properties = DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
       val compact = currentLayoutClass().compact
       // Compact: fits the 800 dp width and scrolls within the 740 dp landscape height.
       val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp)
@@ -194,7 +195,7 @@ private fun ApkBrowserScreen() {
           }
         }
       }
-    }
+    }}
   }
 }
 

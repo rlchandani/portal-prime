@@ -98,7 +98,6 @@ fun PortalPrimeTheme(
             LocalAdvancedSettings provides advanced,
             LocalTextStyle provides LocalTextStyle.current.copy(
                 fontFamily = InterFontFamily, letterSpacing = 0.sp),
-            content = content,
-        )
+        ) { ProvideHearthpaneTouchTargets(content) }
     }
 }

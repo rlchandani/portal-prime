@@ -7,6 +7,11 @@
 package com.immortal.launcher
 
 import android.content.res.Configuration
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import android.graphics.SurfaceTexture
 import android.view.Surface
 import android.view.TextureView
@@ -79,6 +84,7 @@ internal fun WhosThereEnrolForm(draft: WhosTherePerson, others: List<String>, on
         Box(Modifier.size(64.dp).clip(CircleShape)
             .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(c.from.argb(), c.to.argb())))
             .then(if (selected) Modifier.border(4.dp, IosLabel, CircleShape) else Modifier)
+            .semantics { contentDescription = "Colour ${i + 1}"; this.selected = selected; this.role = Role.RadioButton }
             .tvFocusable(CircleShape, focusScale = 1f, ringColor = IosBlue) { onChange(draft.copy(colorIndex = i)) })
       }
     }
