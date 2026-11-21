@@ -10,7 +10,7 @@ import androidx.compose.runtime.Immutable
 
 /** The code being typed on Join a household (mock `joinScr`). Immutable: each key returns a new entry. */
 @Immutable
-internal data class HomeLinkCodeEntry(val symbols: String = "") {
+internal data class HomeLinkCodeEntry(val symbols: String = "", val domain: HomeLinkDomain = HomeLinkDomain.HOME) {
   val complete: Boolean get() = symbols.length == HomeLinkCode.LENGTH
 
   /** The slot the next symbol goes in, or -1 when full. */
@@ -18,7 +18,8 @@ internal data class HomeLinkCodeEntry(val symbols: String = "") {
 
   val slots: List<Char?> get() = List(HomeLinkCode.LENGTH) { symbols.getOrNull(it) }
 
-  val code: HomeLinkCode? get() = if (complete) HomeLinkCode.parse(symbols) else null
+  /** The typed code once complete and of this screen's [domain] (a pinning code on the home screen stays null). */
+  val code: HomeLinkCode? get() = if (complete) HomeLinkCode.parse(symbols, domain) else null
 
   /** Adds [c] (normalised like [HomeLinkCode.parse]); anything else, or a full code, is ignored. */
   fun type(c: Char): HomeLinkCodeEntry {

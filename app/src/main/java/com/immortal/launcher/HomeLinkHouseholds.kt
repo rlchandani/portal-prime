@@ -91,6 +91,7 @@ internal object HomeLinkHouseholdsCopy {
   const val ADD = "Add a household"
   const val JOIN = "Join with a code"
   const val THIS_HOME = "This home"
+  const val PORTALS = "Pair Portals"
   const val SIDE_NOTE = "Each household has its own keys. Removing one deletes its keys from every Portal here."
   const val CHECK_AGAIN = "Check again"
   const val DEVICES = "Devices"

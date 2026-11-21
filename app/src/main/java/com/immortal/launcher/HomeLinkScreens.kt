@@ -126,13 +126,14 @@ private fun InviteCodeDetails(invite: HomeLinkInvite, now: Long, onNewCode: () -
 /** Mock `verifyScr`: four pictures (2 × 2 on a Mini), twelve digits, and the two answers. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun HomeLinkVerifyScreen(theirName: String, safety: HomeLinkSafetyNumber, onMatch: () -> Unit, onMismatch: () -> Unit) {
+internal fun HomeLinkVerifyScreen(theirName: String, safety: HomeLinkSafetyNumber, onMatch: () -> Unit, onMismatch: () -> Unit,
+                                  lede: String = HomeLinkCopy.VERIFY_LEDE) {
   val p = LocalApprovedPalette.current
   Column(Modifier.fillMaxSize().background(p.background)) {
     HomeLinkHeader(HomeLinkCopy.verifyTitle(theirName))
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 56.dp, end = 56.dp, bottom = 56.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(36.dp, Alignment.CenterVertically)) {
-      Text(HomeLinkCopy.VERIFY_LEDE, color = p.secondary, fontSize = 30.sp, textAlign = TextAlign.Center,
+      Text(lede, color = p.secondary, fontSize = 30.sp, textAlign = TextAlign.Center,
           lineHeight = 42.sp, modifier = Modifier.widthIn(max = 1500.dp))
       HomeLinkSafetyGrid(safety)
       Text(safety.displayDigits, color = p.text, fontSize = if (currentLayoutClass().compact) 36.sp else 44.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
@@ -170,9 +171,9 @@ internal fun HomeLinkSafetyGrid(safety: HomeLinkSafetyNumber) {
 
 /** Mock `mismatchScr` (and the expired / tampered variants): nothing kept, start again. */
 @Composable
-internal fun HomeLinkFailureScreen(failure: HomeLinkFailure, onStartAgain: () -> Unit, onClose: () -> Unit) {
+internal fun HomeLinkFailureScreen(failure: HomeLinkFailure, onStartAgain: () -> Unit, onClose: () -> Unit,
+                                   words: HomeLinkCopy.Failure = HomeLinkCopy.failure(failure)) {
   val p = LocalApprovedPalette.current
-  val words = HomeLinkCopy.failure(failure)
   val icon = if (failure == HomeLinkFailure.EXPIRED) "clock" else "shield"
   Box(Modifier.fillMaxSize().background(p.background).padding(horizontal = 56.dp), contentAlignment = Alignment.Center) {
     Column(Modifier.widthIn(max = 1300.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(30.dp)) {

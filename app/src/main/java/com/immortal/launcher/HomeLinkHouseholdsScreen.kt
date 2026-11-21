@@ -42,6 +42,8 @@ internal class HomeLinkHouseholdsActions(
     val onRooms: (HomeLink) -> Unit,
     val onCheckAgain: (HomeLink) -> Unit,
     val onBack: () -> Unit,
+    /** "Pair Portals" on This home (measurement builds: [PortalPinFlowScreen]); null hides it. */
+    val onPortals: (() -> Unit)? = null,
 )
 
 /**
@@ -141,7 +143,10 @@ private fun HeroCard(name: String, sub: String, chip: String?, action: @Composab
 @Composable
 private fun ThisHomeDetail(selfName: String, devices: List<HomeLinkDevice>, actions: HomeLinkHouseholdsActions) = DetailColumn {
   HeroCard(selfName, HomeLinkHouseholdsCopy.THIS_HOME, chip = null) {
-    CallPill(HomeLinkHouseholdsCopy.ADD, actions.onInvite, icon = "plus", surface = callsSurface())
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      CallPill(HomeLinkHouseholdsCopy.ADD, actions.onInvite, icon = "plus", surface = callsSurface())
+      actions.onPortals?.let { CallPill(HomeLinkHouseholdsCopy.PORTALS, it, icon = "key", surface = callsSurface()) }
+    }
   }
   if (devices.isNotEmpty()) DeviceList(devices)
 }
