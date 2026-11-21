@@ -16,21 +16,24 @@ import java.security.SecureRandom
 internal object HomeLinkLoopback {
   data class Result(val inviter: HomeLinkInviterState, val joiner: HomeLinkJoinerState)
 
+  /** One join against a fresh invite (tests). */
   fun exchange(invite: HomeLinkInvite, typed: HomeLinkCode, inviter: HomeLinkSelf, joiner: HomeLinkSelf, random: SecureRandom,
-               now: Long): Result {
-    val hello = HomeLinkInviter.start(invite, random)
-    var i = hello.state
+               now: Long): Result = exchange(HomeLinkInviterSession.start(invite, inviter, random), typed, joiner, random, now)
+
+  /**
+   * One join against the invite's live [session], so wrong codes add up across joins and the
+   * third one burns the invite, as it would with a real relay.
+   */
+  fun exchange(session: HomeLinkInviterSession, typed: HomeLinkCode, joiner: HomeLinkSelf, random: SecureRandom, now: Long): Result {
     var j = HomeLinkJoiner.start(typed, random)
-    var toJoiner: HomeLinkMessage? = hello.outgoing
+    var toJoiner: HomeLinkMessage? = session.hello
     while (toJoiner != null) {
       val jStep = HomeLinkJoiner.receive(j, joiner, relay(toJoiner) ?: break, random)
       j = jStep.state
       val toInviter = jStep.outgoing?.let(::relay) ?: break
-      val iStep = HomeLinkInviter.receive(i, inviter, toInviter, now)
-      i = iStep.state
-      toJoiner = iStep.outgoing
+      toJoiner = session.receive(toInviter, now).outgoing
     }
-    return Result(i, j)
+    return Result(session.state, j)
   }
 
   private fun relay(m: HomeLinkMessage): HomeLinkMessage? = HomeLinkWire.parse(HomeLinkWire.encode(m))

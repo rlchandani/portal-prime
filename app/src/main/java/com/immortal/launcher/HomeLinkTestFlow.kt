@@ -61,6 +61,8 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   var now by remember { mutableLongStateOf(feature.clock()) }
   var entry by remember { mutableStateOf(HomeLinkCodeEntry()) }
   var result by remember { mutableStateOf<HomeLinkLoopback.Result?>(null) }
+  // The invite's one live inviter: wrong codes add up across joins until the third burns it.
+  var inviter by remember { mutableStateOf<HomeLinkInviterSession?>(null) }
   var failure by remember { mutableStateOf(HomeLinkFailure.MISMATCH) }
   var typed by remember { mutableStateOf<HomeLinkCode?>(null) }
   var qr by remember { mutableStateOf<Bitmap?>(null) }
@@ -75,11 +77,14 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   }
   LaunchedEffect(typed) {
     val code = typed ?: return@LaunchedEffect
-    val r = withContext(Dispatchers.IO) {
-      val me = store.identity() ?: return@withContext null
-      HomeLinkLoopback.exchange(invite, code, HomeLinkSelf(me, selfName), HomeLinkSelf(HomeLinkIdentity.generate(random), TEST_PEER),
-          random, feature.clock())
+    val live = inviter
+    val (session, r) = withContext(Dispatchers.IO) {
+      val me = store.identity() ?: return@withContext live to null
+      val session = live ?: HomeLinkInviterSession.start(invite, HomeLinkSelf(me, selfName), random)
+      session to HomeLinkLoopback.exchange(session, code, HomeLinkSelf(HomeLinkIdentity.generate(random), TEST_PEER), random,
+          feature.clock())
     }
+    inviter = session
     typed = null
     result = r
     when (val i = r?.inviter) {
@@ -90,7 +95,7 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
   }
   fun newInvite() {
     invite = HomeLinkInvite(HomeLinkCode.generate(random), feature.clock())
-    entry = HomeLinkCodeEntry(); result = null; noAnswer = false; stage = HomeLinkTestStage.INVITE
+    entry = HomeLinkCodeEntry(); result = null; inviter = null; noAnswer = false; stage = HomeLinkTestStage.INVITE
   }
   Box(Modifier.fillMaxSize().background(p.background)) {
     when (stage) {

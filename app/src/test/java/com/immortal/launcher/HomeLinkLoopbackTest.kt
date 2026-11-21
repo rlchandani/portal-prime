@@ -34,6 +34,20 @@ class HomeLinkLoopbackTest {
     assertTrue(r.joiner is HomeLinkJoinerState.Committing)
   }
 
+  /** The test screen keeps one inviter per invite, so wrong codes add up and the third burns it. */
+  @Test fun wrongCodesAddUpAcrossJoinsOfOneInvite() {
+    val session = HomeLinkInviterSession.start(invite, maple, random)
+    val wrong = HomeLinkCode.parse("MPT7Q4K2PB")!!
+    repeat(HomeLinkInviter.MAX_TRIES - 1) { n ->
+      val r = HomeLinkLoopback.exchange(session, wrong, lake, random, now = 1_000L)
+      assertEquals(n + 1, (r.inviter as HomeLinkInviterState.Waiting).failedTries)
+    }
+    val burned = HomeLinkLoopback.exchange(session, wrong, lake, random, now = 1_000L)
+    assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.TOO_MANY_TRIES), burned.inviter)
+    val late = HomeLinkLoopback.exchange(session, invite.code, lake, random, now = 1_000L)
+    assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.TOO_MANY_TRIES), late.inviter)
+  }
+
   @Test fun anExpiredInviteFails() {
     val r = HomeLinkLoopback.exchange(invite, invite.code, maple, lake, random, now = invite.expiresAt)
     assertEquals(HomeLinkInviterState.Failed(HomeLinkFailure.EXPIRED), r.inviter)
