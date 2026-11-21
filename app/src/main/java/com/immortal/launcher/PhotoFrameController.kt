@@ -2547,8 +2547,9 @@ class PhotoFrameController(
       photoPause.requested(automatic)
       // The feed is a stream, so a compact pair takes its partner from the next feed photo (the
       // Portal+ never pairs the feed, exactly as before).
-      val pairing = nativePairing()
       val compact = ScreensaverLayout.of(context).compact
+      // The Portal+ never pairs the feed (the shipped pair=false), whatever the style.
+      val pairing = if (compact) nativePairing() else CompactStagePlan.Pairing.NONE
       val feedPartners = if (!compact || pairing == CompactStagePlan.Pairing.NONE) emptyList()
           else listOf(SlideshowAsset("feed-partner", { fetchWebPhoto() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }))
