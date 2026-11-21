@@ -24,9 +24,10 @@ import javax.crypto.spec.SecretKeySpec
  * - `POST /remote/homelinkpeer`, a **pull**: `{v, kid, eph, n, ts, d, back, sig}` — a fresh in-memory
  *   ECDH key `eph` signed by the requester's device key `kid` (plus the household `home_link_sync`
  *   header as an outer, replay-guarded filter that pins the body's SHA-256);
- * - the answer `{v, kid, eph, s, sig}`: the responder's fresh ECDH key and
+ * - the answer `{v, kid, dev, eph, s, sig}`: the responder's household device id, fresh ECDH key and
  *   `s = hex(iv ‖ AES-256-GCM(vault))` under a key from ECDH(eph, eph) salted with both keys and
- *   the nonce, all signed by the responder's pinned device key over the request it answers.
+ *   the nonce, all signed by the responder's pinned device key over the request it answers. The
+ *   requester accepts it only from the pin bound to the device id it asked.
  *
  * Signed Diffie–Hellman (station-to-station style) because Keystore ECDH needs API 31: device
  * keys only sign. A phone with the household key can't sign as a pinned Portal, so it can neither
@@ -44,7 +45,7 @@ internal object HomeLinkSyncWire {
   private const val VERSION = 2
   private const val LABEL = "hearthpane-homelink-sync|v2"
   private const val PULL = "hearthpane-homelink-pull-v2"
-  private const val GIVE = "hearthpane-homelink-give-v2"
+  private const val GIVE = "hearthpane-homelink-give-v3"
   private const val DIGEST_LABEL = "hearthpane-homelink-sync|v1"
   private const val NONCE_HEX = 24
   private const val DIGEST_HEX = 32
@@ -105,8 +106,11 @@ internal object HomeLinkSyncWire {
     return pin.takeIf { HomeLinkIdentity.verify(it.publicKey, text, pull.sig) }
   }
 
-  /** Our answer to an admitted [pull]: [vault] sealed to its ephemeral key, signed by [device]. Null if sealing failed. */
-  fun give(device: HomeLinkSigner, pull: Pull, vault: HomeLinkVault, random: SecureRandom): String? {
+  /**
+   * Our answer to an admitted [pull]: [vault] sealed to its ephemeral key, signed by [device] together with [selfDevice]
+   * (our household device id), so the requester can check it reached the Portal it asked. Null if sealing failed.
+   */
+  fun give(device: HomeLinkSigner, selfDevice: String, pull: Pull, vault: HomeLinkVault, random: SecureRandom): String? {
     val eph = HomeLinkEphemeral.generate(random)
     val kid = HomeLinkIdentity.fingerprint(device.publicKey)
     val shared = eph.agree(pull.eph) ?: return null
@@ -116,20 +120,26 @@ internal object HomeLinkSyncWire {
           .doFinal(HomeLinkVaultCodec.encode(vault).toByteArray(Charsets.UTF_8))
     } catch (e: GeneralSecurityException) { return null } finally { shared.fill(0) }
     val s = HouseholdKey.toHex(iv + sealed)
-    val sig = device.sign(giveText(pull.kid, pull.eph, pull.nonce, kid, eph.publicKey, s))
-    return JSONObject().put("v", VERSION).put("kid", kid).put("eph", eph.publicKey).put("s", s).put("sig", sig).toString()
+    val sig = device.sign(giveText(pull.kid, pull.eph, pull.nonce, kid, selfDevice, eph.publicKey, s))
+    return JSONObject().put("v", VERSION).put("kid", kid).put("dev", selfDevice).put("eph", eph.publicKey).put("s", s).put("sig", sig)
+        .toString()
   }
 
-  /** The vault in [answer] if a pinned Portal other than us ([selfKid]) signed it for exactly [asking]. */
-  fun receive(asking: Asking, answer: String?, roster: PortalRoster, selfKid: String): HomeLinkVault? {
+  /**
+   * The vault in [answer] if a pinned Portal other than us ([selfKid]) signed it for exactly [asking], and that pin is
+   * the Portal we asked: the signed `dev` and the pin's device id must both be [peerDevice] (the household id whose
+   * signal or route call made us ask). A Portal pinned under another id answering in its place gets nowhere.
+   */
+  fun receive(asking: Asking, answer: String?, roster: PortalRoster, selfKid: String, peerDevice: String): HomeLinkVault? {
     val o = obj(answer) ?: return null
     val kid = (o.opt("kid") as? String)?.takeIf { it != selfKid } ?: return null
-    val key = roster.keyFor(kid) ?: return null
+    val pin = roster.pins[kid]?.takeIf { it.deviceId == peerDevice } ?: return null
+    val dev = (o.opt("dev") as? String)?.takeIf { it == peerDevice } ?: return null
     val eph = o.opt("eph") as? String ?: return null
     val s = o.opt("s") as? String ?: return null
     val sig = o.opt("sig") as? String ?: return null
     val pull = asking.pull
-    if (!HomeLinkIdentity.verify(key, giveText(pull.kid, pull.eph, pull.nonce, kid, eph, s), sig)) return null
+    if (!HomeLinkIdentity.verify(pin.publicKey, giveText(pull.kid, pull.eph, pull.nonce, kid, dev, eph, s), sig)) return null
     val bytes = HouseholdKey.fromHex(s)?.takeIf { it.size > IV_BYTES + TAG_BITS / 8 } ?: return null
     val shared = asking.ephemeral.agree(eph) ?: return null
     val plain = try {
@@ -147,8 +157,8 @@ internal object HomeLinkSyncWire {
   private fun pullText(kid: String, eph: String, nonce: String, ts: Long, digest: String, back: Boolean): ByteArray =
       HomeLinkHash.join(*listOf(PULL, kid, eph, nonce, ts.toString(), digest, back.toString()).map(HomeLinkHash::utf8).toTypedArray())
 
-  private fun giveText(reqKid: String, reqEph: String, nonce: String, kid: String, eph: String, sealed: String): ByteArray =
-      HomeLinkHash.join(*listOf(GIVE, reqKid, reqEph, nonce, kid, eph, sealed).map(HomeLinkHash::utf8).toTypedArray())
+  private fun giveText(reqKid: String, reqEph: String, nonce: String, kid: String, dev: String, eph: String, sealed: String): ByteArray =
+      HomeLinkHash.join(*listOf(GIVE, reqKid, reqEph, nonce, kid, dev, eph, sealed).map(HomeLinkHash::utf8).toTypedArray())
 
   /** HKDF-style: extract with a salt over both ephemeral keys and the nonce, then expand with the label. */
   internal fun sealKey(shared: ByteArray, reqEph: String, resEph: String, nonce: String): ByteArray {

@@ -82,7 +82,7 @@ internal object HomeLinkSync {
     val key = HouseholdKey.get(context) ?: return
     if (signal.digest == HomeLinkSyncWire.digest(HomeLinkRepository.get(context).vault.value, key)) return
     retryStep = 0
-    exchangeLater(context.applicationContext, signal)
+    exchangeLater(context.applicationContext, message.from, signal)
   }
 
   /** The caller of our route has a different vault: pull theirs once (never pulled back again). */
@@ -91,21 +91,21 @@ internal object HomeLinkSync {
     val host = peer.host ?: return
     val port = peer.port.takeIf { it > 0 } ?: FleetConfig.port(context)
     net.execute {
-      runCatching { exchange(context, host, port, back = true) }
+      runCatching { exchange(context, from, host, port, back = true) }
           .onFailure { Log.i(TAG, "home-link pull-back failed: ${it.javaClass.simpleName}") }
     }
   }
 
-  private fun exchangeLater(context: Context, signal: HouseholdListPeerAuth.Signal) {
+  private fun exchangeLater(context: Context, peer: String, signal: HouseholdListPeerAuth.Signal) {
     net.execute {
-      val ok = runCatching { exchange(context, signal.host, signal.port, back = false) }
+      val ok = runCatching { exchange(context, peer, signal.host, signal.port, back = false) }
           .onFailure { Log.i(TAG, "home-link exchange failed: ${it.javaClass.simpleName}") }.getOrDefault(false)
-      if (ok) clearRetry() else scheduleRetry(context, signal)
+      if (ok) clearRetry() else scheduleRetry(context, peer, signal)
     }
   }
 
-  /** One pull from the Portal at [host]: true once its answer, signed by a pinned device key, is merged. */
-  private fun exchange(context: Context, host: String, port: Int, back: Boolean): Boolean {
+  /** One pull from Portal [peer] at [host]: true once its answer, signed by the device key pinned for [peer], is merged. */
+  private fun exchange(context: Context, peer: String, host: String, port: Int, back: Boolean): Boolean {
     val key = HouseholdKey.get(context) ?: return false
     val self = selfId(context) ?: return false
     val device = PortalDeviceKey.get() ?: return false
@@ -131,7 +131,7 @@ internal object HomeLinkSync {
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return false
       val answer = BoundedRead.reply(conn, HomeLinkSyncWire.MAX_BODY * 2) ?: return false
-      val theirs = HomeLinkSyncWire.receive(asking, answer, roster, device.kid) ?: return false
+      val theirs = HomeLinkSyncWire.receive(asking, answer, roster, device.kid, peer) ?: return false
       repo.merge(theirs)
       return true
     } finally {
@@ -149,11 +149,11 @@ internal object HomeLinkSync {
     pending = null
   }
 
-  private fun scheduleRetry(context: Context, signal: HouseholdListPeerAuth.Signal) {
+  private fun scheduleRetry(context: Context, peer: String, signal: HouseholdListPeerAuth.Signal) {
     val step = retryStep
     if (step >= RETRY_MS.size) return
     retryStep = step + 1
-    val retry = Runnable { exchangeLater(context, signal) }
+    val retry = Runnable { exchangeLater(context, peer, signal) }
     pending?.let(main::removeCallbacks)
     pending = retry
     main.postDelayed(retry, RETRY_MS[step])
