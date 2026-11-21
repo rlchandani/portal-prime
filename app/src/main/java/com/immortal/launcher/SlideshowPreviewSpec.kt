@@ -92,7 +92,9 @@ internal object SlideshowPreview {
         else "$seconds s"
 
     fun spec(settings: ScreensaverConfig.Settings): SlideshowPreviewSpec {
-        val motion = settings.photoMotion && ScreensaverConfig.supportsPhotoMotion(settings.mode)
+        // A photo held whole (fit) is drawn still by the real stage, so the preview says "still".
+        val motion = settings.photoMotion && ScreensaverConfig.supportsPhotoMotion(settings.mode) &&
+            fills(settings.mode, settings.fit)
         val style = ScreensaverConfig.modeLabel(settings.mode).removeSuffix(EXISTING_SUFFIX)
         val caption = if (!settings.enabled) "Photo frame is off"
             else "$style · ${if (motion) "motion" else "still"} · every ${intervalLabel(settings.intervalSec)} (preview: ${SLIDE_MS / 1_000} s)"

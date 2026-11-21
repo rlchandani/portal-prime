@@ -71,4 +71,14 @@ class SlideshowPreviewFitTest {
         assertEquals(ScreensaverLayout.Box(0, 0, 400, 500), SlideshowPreview.pairCard(0, 0, 400, 500))
         assertEquals(ScreensaverLayout.Box(0, 0, 0, 0), SlideshowPreview.pairCard(981, 1472, 0, 0))
     }
+
+    @Test fun aWholePhotoIsCaptionedStillEvenWithMotionOn() {
+        fun spec(fitValue: String) = SlideshowPreview.spec(ScreensaverConfig.Settings(
+            enabled = true, mode = ScreensaverConfig.MODE_SMART, fit = fitValue, photoMotion = true))
+        val whole = spec(fit)
+        assertEquals(false, whole.motion)
+        assertTrue(whole.caption.contains("still"))
+        val filled = spec(fill)
+        assertEquals(ScreensaverConfig.supportsPhotoMotion(ScreensaverConfig.MODE_SMART), filled.motion)
+    }
 }
