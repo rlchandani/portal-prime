@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,6 +54,7 @@ internal fun PortalPinFlowScreen(feature: HomeLinkFeature, onClose: () -> Unit) 
   }
   val d = deps
   if (d == null) {
+    BackHandler(onBack = onClose)
     Box(Modifier.fillMaxSize().background(p.background)) {
       if (notReady) Text(PortalPinCopy.NOT_READY, color = p.error, fontSize = 28.sp, modifier = Modifier.align(Alignment.Center).padding(56.dp))
     }
@@ -78,6 +80,15 @@ internal fun PortalPinFlowScreen(feature: HomeLinkFeature, onClose: () -> Unit) 
     io {
       val outcome = d.ceremony.confirm(side, repair)
       scope.launch { state = state.pinned(outcome); roster = d.store.roster }
+    }
+  }
+  // Back steps back one screen ([PortalPinFlowState.back]); from the list it leaves Pair Portals.
+  BackHandler {
+    val next = state.back()
+    when {
+      next == null -> onClose()
+      next.stage == PortalPinStage.LIST && state.stage != PortalPinStage.LIST -> back()
+      else -> state = next
     }
   }
   Box(Modifier.fillMaxSize().background(p.background)) {

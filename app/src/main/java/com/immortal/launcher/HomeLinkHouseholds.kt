@@ -50,6 +50,13 @@ internal data class HomeLinkHouseholdsState(
 
   fun back(): HomeLinkHouseholdsState = copy(detailOpen = false, confirmingRemove = false)
 
+  /** The system Back key: closes the remove confirm, then a Mini's open detail; null means leave Households. */
+  fun backOrNull(compact: Boolean): HomeLinkHouseholdsState? = when {
+    confirmingRemove -> cancelRemove()
+    compact && detailOpen -> back()
+    else -> null
+  }
+
   fun askRemove(): HomeLinkHouseholdsState = if (link == null) this else copy(confirmingRemove = true)
 
   fun cancelRemove(): HomeLinkHouseholdsState = copy(confirmingRemove = false)
