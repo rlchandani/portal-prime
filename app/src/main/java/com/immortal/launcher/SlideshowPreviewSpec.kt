@@ -6,8 +6,11 @@
  */
 package com.immortal.launcher
 
-/** How one preview slide frames its photos, after the photo-frame style it stands for. */
-internal enum class SlideLayout { FILL, PAIR, WHOLE, PRINT }
+/**
+ * How one preview slide frames its photos, after the photo-frame style it stands for. [PAIR] covers
+ * two cards; [PAIR_WHOLE] (Portrait pair at fit) shrinks each card to its whole photo.
+ */
+internal enum class SlideLayout { FILL, PAIR, PAIR_WHOLE, WHOLE, PRINT }
 
 /** How the preview changes slides: the native styles crossfade; the push styles slide across. */
 internal enum class SlideTransition { CROSSFADE, PUSH }
@@ -48,12 +51,35 @@ internal object SlideshowPreview {
         "framed", "polaroid", "galleryWall")
     private val PUSHED = setOf("push", "filmstrip")
 
-    fun layoutFor(mode: String, fit: String): SlideLayout = when {
-        mode in PAIRED -> SlideLayout.PAIR
-        mode in PRINTED -> SlideLayout.PRINT
-        mode == ScreensaverConfig.MODE_WHOLE -> SlideLayout.WHOLE
-        mode == ScreensaverConfig.MODE_CLASSIC && fit == ScreensaverConfig.FIT_FIT -> SlideLayout.WHOLE
-        else -> SlideLayout.FILL
+    /**
+     * The slide for [mode] at [fit]. A style that honours fit ([PhotoFitPolicy.honoursFit]) fills
+     * exactly when the real stage does ([PhotoFrameStagePolicy.presentation]); otherwise it shows
+     * each photo whole. Every other style ignores the setting.
+     */
+    fun layoutFor(mode: String, fit: String): SlideLayout {
+        val fills = fills(mode, fit)
+        return when {
+            mode in PAIRED -> if (fills) SlideLayout.PAIR else SlideLayout.PAIR_WHOLE
+            mode in PRINTED -> SlideLayout.PRINT
+            mode == ScreensaverConfig.MODE_WHOLE -> SlideLayout.WHOLE
+            fills -> SlideLayout.FILL
+            else -> SlideLayout.WHOLE
+        }
+    }
+
+    private fun fills(mode: String, fit: String): Boolean =
+        !PhotoFitPolicy.honoursFit(mode) || PhotoFrameStagePolicy.presentation(
+            ScreensaverConfig.Settings(mode = mode, fit = fit), nightPhoto = false, splitGlance = false).fill
+
+    /**
+     * A [PAIR_WHOLE][SlideLayout.PAIR_WHOLE] card: the [photoWidth] x [photoHeight] photo held whole
+     * and centred in its [slotWidth] x [slotHeight] slot, as the compact stage's fit cards
+     * ([CompactStagePlan.contain]). An unknown photo size keeps the whole slot.
+     */
+    fun pairCard(photoWidth: Int, photoHeight: Int, slotWidth: Int, slotHeight: Int): ScreensaverLayout.Box {
+        val slot = ScreensaverLayout.Box(0, 0, slotWidth.coerceAtLeast(0), slotHeight.coerceAtLeast(0))
+        return if (photoWidth <= 0 || photoHeight <= 0 || slot.width <= 0 || slot.height <= 0) slot
+            else CompactStagePlan.contain(photoWidth, photoHeight, slot)
     }
 
     fun slidesFor(mode: String, fit: String): List<SlideLayout> =

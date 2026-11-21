@@ -13,11 +13,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,6 +51,9 @@ private const val NO_SLIDE = -1
 private const val OFF_DIM = .5f
 private const val PAIR_WIDTH = .8f
 private const val PAIR_HEIGHT = .92f
+/** A pair card before its photo decodes holds the 2:3 portrait the pair asks the loader for. */
+private const val PAIR_PLACEHOLDER_WIDTH = 2
+private const val PAIR_PLACEHOLDER_HEIGHT = 3
 private const val WHOLE_WIDTH = .68f
 private const val WHOLE_HEIGHT = .88f
 private const val PRINT_WIDTH = .56f
@@ -150,6 +157,13 @@ private fun PreviewSlide(
                     }
                 }
             }
+            SlideLayout.PAIR_WHOLE -> Box(Modifier.fillMaxSize().background(StageDark), contentAlignment = Alignment.Center) {
+                Row(Modifier.fillMaxWidth(PAIR_WIDTH).fillMaxHeight(PAIR_HEIGHT), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    listOf(slide * 2 + 1, slide * 2 + 2).forEach { photo ->
+                        WholePairCard(photos.wrapped(photo), grayscale, Modifier.weight(1f).fillMaxHeight())
+                    }
+                }
+            }
             SlideLayout.WHOLE -> Box(Modifier.fillMaxSize().background(StageDark), contentAlignment = Alignment.Center) {
                 PreviewPhoto(photos.wrapped(slide), ContentScale.Fit, grayscale,
                     Modifier.fillMaxWidth(WHOLE_WIDTH).fillMaxHeight(WHOLE_HEIGHT))
@@ -158,6 +172,22 @@ private fun PreviewSlide(
                 Box(Modifier.fillMaxWidth(PRINT_WIDTH).fillMaxHeight(PRINT_HEIGHT).background(PrintMatte).padding(14.dp)) {
                     PreviewPhoto(photos.wrapped(slide), ContentScale.Crop, grayscale, Modifier.fillMaxSize())
                 }
+            }
+        }
+    }
+}
+
+/** Portrait pair at fit: the card shrinks to its whole, still photo, centred in its slot. */
+@Composable
+private fun WholePairCard(photo: ImageBitmap?, grayscale: Boolean, modifier: Modifier) {
+    BoxWithConstraints(modifier) {
+        val card = SlideshowPreview.pairCard(photo?.width ?: PAIR_PLACEHOLDER_WIDTH,
+            photo?.height ?: PAIR_PLACEHOLDER_HEIGHT, constraints.maxWidth, constraints.maxHeight)
+        val density = LocalDensity.current
+        with(density) {
+            Box(Modifier.offset(card.left.toDp(), card.top.toDp()).size(card.width.toDp(), card.height.toDp())
+                .clip(RoundedCornerShape(6.dp))) {
+                PreviewPhoto(photo, ContentScale.Crop, grayscale, Modifier.fillMaxSize())
             }
         }
     }
