@@ -177,7 +177,9 @@ internal class FleetAndroidHost(private val context: Context) :
   override fun testSourceActive() = ScreensaverTestSource.active(context)
   override fun testSourceNight() = ScreensaverTestSource.forcedNight(context)
   override fun testSourceUntil() = ScreensaverTestSource.until(context)
-  override fun testSourcePin() = ScreensaverTestSource.pin(context)?.let { "${it.mode}@${it.intervalSec}s" }
+  override fun testSourcePin() = ScreensaverTestSource.pin(context)?.let {
+    "${it.mode}@${it.intervalSec}s" + (it.face?.let { face -> "+$face" } ?: "")
+  }
 
   override fun reopenFrame(enabled: Boolean) {
     main.post { runCatching { ImmortalDreamNavigation.dismissForNavigation() } }

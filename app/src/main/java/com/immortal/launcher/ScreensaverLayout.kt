@@ -26,8 +26,8 @@ internal object ScreensaverLayout {
   }
 
   /** The window's class; previews inside a Portal+ window stay LARGE whatever their own size. */
-  fun of(context: Context): LayoutClass {
-    val configuration: android.content.res.Configuration? = context.resources?.configuration
+  fun of(context: Context?): LayoutClass {
+    val configuration: android.content.res.Configuration? = context?.resources?.configuration
     return if (configuration == null) LayoutClass.LARGE else LayoutClass.of(configuration)
   }
 
