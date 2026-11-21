@@ -371,3 +371,35 @@ owner trade-off:
 - **Memory after leaving is fixed on real photos too.** All 3 runs were back at the Home level 5 s after leaving and stayed there at +70 s (graphics 61–63 MB vs 144 MB in Phase A run A). The log showed `surface closed: renderer caches trimmed` about 4.3 s after each exit.
 - **The photo change is not better; it is worse.** Each run had 4–6 frames of 124–355 ms in a ~0.4 s burst at t ≈ 31 s, against Phase A's 64–108 ms. The 2 s lookahead deferral did not remove the change-time cost on household photos. The work that remains at the change (decode, upload or the dissolve's first composite) still needs a trace.
 - Between changes all 3 faces drew about 1 frame/s, so none of these shuffle draws had the ~30 fps photo motion seen in Phase A run B.
+
+## Screensaver photo change, 1.306 vs reverts (branch `ss-bisect`)
+
+**Question:** is the slower first photo change on household photos (1.306: 124–355 ms frames) a regression from the 1.306 lookahead deferral or GPU trim?
+
+**Method:** the same as the section above (same script). Real dream through `Somnambulator`, household settings unchanged, no test source, framestats polled for 40 s, meminfo at +5 s and +70 s. No screenshots. STREAM_MUSIC was set to 0 and restored to 3. Every build: install, Home, 60 s idle, one unmeasured warm-up dream, then 3 runs back to back.
+- **A**: `main` 1.306 performance build plus `.dm` (`install-dm`).
+- **B**: A with only the `SlideshowLookahead.awaitSettle` call removed (plus `.dm`).
+- **C**: B with the 1.306 GPU-trim changes reverted too, so it runs the 1.305 screensaver code. Built at versionCode 300 so it installs in place (plus `.dm`).
+- **D**: official 1.306 `hearthpane.apk`, plain `adb install -r` (`speed-profile`, `reason=install`, the same state as the OTA install).
+- "Change" counts the frames over 60 ms at 29–35 s from the first frame.
+
+| Run | Janky % | p90 / p99 ms | Start: frames > 60 ms (max) | Change: frames > 60 ms (ms) | Change max | Home → running → +5 s → +70 s |
+|---|---|---|---|---|---|---|
+| A r1 | 68 | 29 / 133 | 2 (142) | 6 (95, 70, 66, 139, 154, 148) | 154 | 200/62 → 273/130 → 190/48 → 203/60 |
+| A r2 | 55 | 27 / 121 | 1 (124) | 6 (69, 69, 63, 233, 110, 68) | 233 | 201/60 → 413/213 → 223/71 → 233/80 |
+| A r3 | 70 | 29 / 93 | 1 (122) | 5 (95, 90, 96, 62, 64) | 96 | 231/80 → 304/148 → 206/55 → 221/67 |
+| B r1 | 68 | 30 / 81 | 2 (117) | 7 (84, 83, 79, 77, 69, 64, 61) | 84 | 197/60 → 277/133 → 189/49 → 202/61 |
+| B r2 | 64 | 29 / 150 | 3 (192) | 8 (93, 72, 96, 103, 95, 141, 116, 131) | 141 | 200/61 → 279/133 → 190/50 → 206/62 |
+| B r3 | 66 | 28 / 150 | 1 (120) | 7 (105, 104, 101, 174, 216, 124, 95) | 216 | 203/62 → 413/214 → 243/86 → 254/95 |
+| C r1 | 69 | 31 / 113 | 2 (150) | 7 (116, 149, 152, 74, 79, 73, 97) | 152 | 200/63 → 282/140 → 190/51 → 204/63 |
+| C r2 | 44 | 27 / 97 | 2 (169) | 9 (82, 64, 84, 73, 163, 182, 175, 84, 65) | 182 | 202/63 → 312/169 → 189/48 → 203/60 |
+| C r3 | 32 | 26 / 150 | 3 (160) | 7 (160, 200, 191, 64, 160, 150, 181) | 200 | 200/60 → 293/148 → 193/51 → 207/63 |
+| D r1 | 67 | 28 / 150 | 2 (213) | 4 (154, 157, 148, 101) | 157 | 200/63 → 291/145 → 190/50 → 204/63 |
+| D r2 | 64 | 30 / 109 | 2 (127) | 3 (109, 106, 107) | 109 | 202/63 → 288/143 → 193/52 → 207/64 |
+| D r3 | 24 | 69 / 200 | 4 (209) | 1 (232) | 232 | 205/64 → 407/223 → 227/82 → 238/91 |
+
+- **Not a regression.** The change maximum was 96–233 ms on 1.306 (A, D), 84–216 ms with the deferral reverted (B) and 152–200 ms on the 1.305 code (C). The ranges overlap, and C is no better than A. The 124–355 ms in the section above is the same behaviour on different photos and faces. Most runs have a second burst about 1.5–2.5 s after the change on every build, including C.
+- **The deferral cannot reach these frames.** The household mode is `shuffle`, and `ScreensaverConfig.usesEngine("shuffle")` is true, so the screensaver is the WebView engine (`assets/screensaver/*.js`). `SlideshowLoader` and `SlideshowLookahead` are only used by Classic and the native stages. The trace has no `slideshow-images` thread.
+- **What the trace shows** (one atrace, 26–36 s, gfx/view/dalvik/sched, on B): the change's long frames are `DrawFrame` → `WebViewFunctor::drawGl` on the RenderThread (100, 334 and 107 ms). The main thread's `doFrame` → `draw` waits on it (100 / 322 / 81 ms). During the 334 ms frame, `Chrome_InProcGpuThread` ran 294 ms, which is WebView's own raster and texture upload of the incoming photo. In the 1 s around the change, the renderer's image threads (`CrRendererMain` 221 ms, `ThreadPoolForeground` 199 ms) and `kswapd0` (205 ms, memory reclaim) were busy too. There was no launcher GC or bitmap work in these frames.
+- **Memory after leaving** is at the Home level on every build, C included, because the engine's WebView is destroyed when the dream ends. Two runs (A r2, B r3) showed a 413/214 MB running peak with a slower return; D r3 showed the same.
+- **Recommendation: keep 1.306.** The deferral is harmless and still applies to the native stages. The GPU trim made no measurable difference to the change. The change cost belongs to the WebView engine: Chromium uploads the next photo at its first draw, even though `preloadDecoded` decodes it beforehand. A fix there (draw the next photo once, off the transition, or smaller derivatives than the 2400 px edge for this panel) needs its own trace and A/B. No code change was kept on this branch.
