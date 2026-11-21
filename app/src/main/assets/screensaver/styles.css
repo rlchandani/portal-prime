@@ -223,3 +223,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .photo-paper #chrome-scrim, .photo-paper #chrome-vignette { display: none; }
 .photo-paper #chrome-clock { color: #343a30; text-shadow: none; }
 .photo-paper #chrome-clock { padding: 12px; background: rgba(237,233,223,.92); border-radius: 12px; }
+/* A fill photo copied into a canvas in bands before its change (mode-impls prepareStrips): the
+   canvas holds the cover crop 1:1 at the background's place, clipped to the hero as the
+   background was. While painted it sits in a 1 px, 0.001-opacity corner, below one 8-bit step,
+   so each band is composited (and uploaded) in its own frame without being seen. */
+.ss-hero.ss-strips { overflow: hidden; }
+.ss-hero > .ss-strip-canvas { position: absolute; display: block; max-width: none; pointer-events: none; }
+.ss-strip-warm { position: fixed; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: .001;
+  pointer-events: none; z-index: 2147483647; contain: strict; }
+.ss-strip-warm > .ss-strip-canvas { position: absolute; left: 0; top: 0; width: 1px; height: 1px; display: block; }

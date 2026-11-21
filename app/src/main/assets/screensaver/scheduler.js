@@ -53,6 +53,7 @@
       historyIndex = history.length - 1;
     }
     function finishFade() {
+      if (SS.fades) SS.fades.end(outgoing);
       dispose(outgoing); outgoing = null;
       if (current && opts.onSettled) opts.onSettled(current.modeId);
       if (queued && !stopped && !paused) {
@@ -76,9 +77,11 @@
       dim(false);
       scene.layer.classList.remove("freeze");
       scene.layer.classList.add("on");
+      try { console.info("photo_beat " + scene.modeId); } catch (_) {}
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
       if (opts.onReady) opts.onReady();
-      if (outgoing) arm("fade", finishFade, XFADE_MS + 100);
+      // Photo bands (SS.paintStrips) wait for this dissolve to end.
+      if (outgoing) { if (SS.fades) SS.fades.begin(outgoing); arm("fade", finishFade, XFADE_MS + 100); }
       else if (opts.onSettled) opts.onSettled(scene.modeId);
       if (!opts.mode || opts.mode === "shuffle") {
         arm("beat", () => advance("auto"), Math.max(SS.BEAT[scene.modeId] || intervalMs, intervalMs));
@@ -342,6 +345,7 @@
         Object.keys(clocks).forEach(disarm);
         if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
         removeEventListener("resize", onResize); removeEventListener("resize", onRotate);
+        if (SS.fades) SS.fades.end(outgoing);
         [incoming, current, outgoing].forEach(dispose); incoming = current = outgoing = null;
         pausedAnimations.clear(); stage.innerHTML = "";
       },
