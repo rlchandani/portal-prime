@@ -192,7 +192,7 @@
   };
   window.SS.largeSingle = function (photo, W, H) {
     const crop = window.SS.coverCrop(photo, W, H);
-    if (crop.visible >= LARGE_KEEP && crop.faces)
+    if (crop.visible >= LARGE_KEEP - 1e-9 && crop.faces) // the tolerance absorbs float division
       return { mode: "fill", rect: { x: 0, y: 0, w: W, h: H }, position: crop.position };
     const raw = photo && photo.w / photo.h, a = Number.isFinite(raw) && raw > 0 ? raw : 1;
     const zone = window.SS.largeMargin(W, H), s = Math.min(zone.w / a, zone.h), w = s * a;
