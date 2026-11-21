@@ -71,6 +71,28 @@ class PortalAttestationTest {
     assertArrayEquals(byteArrayOf(9), Der(byteArrayOf(0x04, 0x81.toByte(), 1, 9)).next(Der.OCTET_STRING))
   }
 
+  private fun x509(der: ByteArray) =
+      java.security.cert.CertificateFactory.getInstance("X.509").generateCertificate(der.inputStream()) as java.security.cert.X509Certificate
+
+  /** Validity dates are checked leniently: an out-of-date certificate is flagged, the level stays what the chain proves. */
+  @Test fun outOfDateCertificatesAreFlaggedButNeverChangeTheLevel() {
+    val certs = tee.map(::x509)
+    val inside = certs.maxOf { it.notBefore.time } + 1
+    val fine = PortalAttestation.check(tee, leafKey(tee), now = inside)
+    assertEquals(PortalAttestationCheck(PortalAttestationLevel.TEE, outOfDate = false), fine)
+    val afterAll = certs.maxOf { it.notAfter.time } + 1
+    assertEquals(PortalAttestationCheck(PortalAttestationLevel.TEE, outOfDate = true), PortalAttestation.check(tee, leafKey(tee), now = afterAll))
+    val beforeAll = certs.minOf { it.notBefore.time } - 1
+    assertTrue(PortalAttestation.check(tee, leafKey(tee), now = beforeAll).outOfDate)
+    // verify() is the level alone, whatever the date.
+    assertEquals(PortalAttestationLevel.TEE, PortalAttestation.verify(tee, leafKey(tee)))
+  }
+
+  @Test fun noChainHasNoDatesToFlag() {
+    assertEquals(PortalAttestationCheck(PortalAttestationLevel.ABSENT, outOfDate = false),
+        PortalAttestation.check(emptyList(), leafKey(tee), now = Long.MAX_VALUE))
+  }
+
   /** Google's roots are pinned as public keys; the list holds the RSA root and the 2025 EC root. */
   @Test fun theGoogleRootsAreRealPublicKeys() {
     assertEquals(2, PortalAttestation.GOOGLE_ROOTS.size)

@@ -25,7 +25,10 @@ internal class PortalRosterStore(private val secure: YtSecureStore, private val 
   private fun load(): PortalRoster {
     val text = runCatching { secure.load() }.onFailure { warn("portal roster unreadable (key lost?), starting empty") }.getOrNull()
         ?: return PortalRoster()
-    return PortalRosterCodec.parse(text) ?: PortalRoster().also { warn("portal roster corrupt, starting empty") }
+    val decoded = PortalRosterCodec.decode(text) ?: return PortalRoster().also { warn("portal roster corrupt, starting empty") }
+    // Once per load (one store per process): a count only, never keys, names or ids.
+    if (decoded.withoutDevice > 0) warn("portal roster: dropped ${decoded.withoutDevice} pin(s) saved without a device id; pair them again")
+    return decoded.roster
   }
 
   /**
@@ -43,7 +46,8 @@ internal class PortalRosterStore(private val secure: YtSecureStore, private val 
   }
 
   /** Records what a pinned Portal's attestation chain showed. */
-  @Synchronized fun attested(kid: String, level: PortalAttestationLevel): Boolean = store(roster.attested(kid, level))
+  @Synchronized fun attested(kid: String, level: PortalAttestationLevel, outOfDate: Boolean = false): Boolean =
+      store(roster.attested(kid, level, outOfDate))
 
   @Synchronized fun unpin(kid: String): Boolean = store(roster.unpin(kid))
 
