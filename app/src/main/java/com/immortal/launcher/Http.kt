@@ -130,7 +130,7 @@ object Http {
     } catch (e: Throwable) {
       ToolsWork.checkpoint()
       if (ToolsWork.ownsCurrentRequest() && e is CancellationException) throw e
-      Log.w(TAG, "$method $url -> ${e.javaClass.simpleName}: ${e.message}")
+      Log.w(TAG, "$method ${logSafeUrl(url)} -> ${e.javaClass.simpleName}: ${logSafeMessage(e.message, url)}")
       null
     } finally {
       runCatching { connection?.let(ToolsWork::disconnect) }
@@ -154,6 +154,24 @@ object Http {
           }
         }
             .getOrNull()
-    Log.w(TAG, "$method $url -> HTTP ${c.responseCode}${detail?.let { ": $it" } ?: ""}")
+    Log.w(TAG, "$method ${logSafeUrl(url)} -> HTTP ${c.responseCode}${detail?.let { ": $it" } ?: ""}")
   }
+
+  /**
+   * [url] as `scheme://host[:port]/…` for logs. Paths and queries carry secrets here (private
+   * calendar feeds, shared-album tokens, a household's coordinates); user info never survives.
+   */
+  internal fun logSafeUrl(url: String): String {
+    val parsed = runCatching { java.net.URI(url) }.getOrNull()
+    val scheme = parsed?.scheme
+    val host = parsed?.host
+    if (scheme == null || host == null) return "<url>"
+    val port = if (parsed.port >= 0) ":${parsed.port}" else ""
+    val rest = listOf(parsed.rawPath?.trimStart('/'), parsed.rawQuery, parsed.rawFragment).any { !it.isNullOrEmpty() }
+    return "$scheme://$host$port${if (rest) "/…" else ""}"
+  }
+
+  /** An exception [message] with any echo of [url] (e.g. FileNotFoundException) redacted. */
+  internal fun logSafeMessage(message: String?, url: String): String =
+      message?.replace(url, logSafeUrl(url)) ?: "null"
 }

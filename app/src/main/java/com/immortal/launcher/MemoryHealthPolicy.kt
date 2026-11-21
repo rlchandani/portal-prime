@@ -117,6 +117,9 @@ internal object MemoryHealthPolicy {
     return out
   }
 
+  /** This process's PSS in kB from `/proc/self/smaps_rollup`, or null when absent or zero. */
+  fun parseOwnPssKb(rollup: String): Long? = parseMeminfo(rollup)["Pss"]?.takeIf { it > 0 }
+
   /** The newest system_server PSS ActivityManager wrote to the events log. */
   data class SystemServerSample(val pssKb: Long, val atEpochMs: Long)
 

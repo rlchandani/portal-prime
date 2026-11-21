@@ -292,7 +292,7 @@ object NotificationOverlay {
             conn.instanceFollowRedirects = true
             conn.inputStream.use { it.readBytes() }.also { conn.disconnect() }
           }
-          .onFailure { Log.w(TAG, "image fetch failed: $url", it) }
+          .onFailure { Log.w(TAG, "image fetch failed: ${Http.logSafeUrl(url)} (${it.javaClass.simpleName})") }
           .getOrNull()
           ?.let { decodeSampled(it) }
 

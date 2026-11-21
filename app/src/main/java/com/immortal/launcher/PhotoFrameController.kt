@@ -2960,7 +2960,7 @@ class PhotoFrameController(
                   if (!downloadToFile(url, headers, srcTmp)) {
                     if (!hostActive || stopped) break
                     failed++
-                    Log.w(TAG, "prefetch: download failed for $url")
+                    Log.w(TAG, "prefetch: download failed for ${Http.logSafeUrl(url)}")
                     continue
                   }
                   if (runCatching { tc.transcode(srcTmp, outTmp) { hostActive && !stopped } }.getOrDefault(false) &&

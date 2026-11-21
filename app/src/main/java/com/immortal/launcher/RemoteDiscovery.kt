@@ -29,6 +29,8 @@ import org.json.JSONObject
 object RemoteDiscovery {
   private const val TAG = "ImmortalRemote"
   private const val TYPE = "_immortal-remote._tcp."
+  /** Attempts per sighting when the platform reports its one resolve slot busy. */
+  private const val MAX_RESOLVE_ATTEMPTS = 3
 
   private val lock = Any()
   private var session: Any? = null
@@ -38,6 +40,14 @@ object RemoteDiscovery {
   private var regListener: NsdManager.RegistrationListener? = null
   private var discListener: NsdManager.DiscoveryListener? = null
   private var selfName: String = ""
+  /**
+   * Android 10's NsdService allows one in-flight resolve per client and fails a second with
+   * FAILURE_ALREADY_ACTIVE, so sightings resolve one at a time. Guarded by [lock]; per session.
+   */
+  private val waiting = ArrayDeque<Pending>()
+  private var resolving: Pending? = null
+
+  private class Pending(val service: NsdServiceInfo, val owner: Any, val occurrence: Any, val attempt: Int = 1)
 
   /** Resolved peers, keyed by their advertised service name (self excluded). */
   private val peers = ConcurrentHashMap<String, Peer>()
@@ -66,6 +76,8 @@ object RemoteDiscovery {
           session = null
           sightings.clear()
           peers.clear()
+          waiting.clear()
+          resolving = null
           val state = Triple(nsd, regListener, discListener)
           regListener = null
           discListener = null
@@ -127,7 +139,7 @@ object RemoteDiscovery {
                   if (session !== owner || s.serviceName == selfName) return
                   sightings.getOrPut(s.serviceName) { Any() }
                 }
-            resolve(mgr, s, owner, occurrence)
+            enqueue(mgr, Pending(s, owner, occurrence))
           }
           override fun onServiceLost(s: NsdServiceInfo) {
             synchronized(lock) {
@@ -147,24 +159,67 @@ object RemoteDiscovery {
         .onFailure { Log.w(TAG, "NSD discoverServices threw", it) }
   }
 
-  private fun resolve(mgr: NsdManager, service: NsdServiceInfo, owner: Any, occurrence: Any) {
-    val name = service.serviceName
+  private fun enqueue(mgr: NsdManager, pending: Pending) {
+    val now =
+        synchronized(lock) {
+          if (session !== pending.owner) return
+          // A duplicate Found shares its sighting's identity, so it rides the queued/in-flight attempt.
+          val occurrence = pending.occurrence
+          if (resolving?.occurrence === occurrence || waiting.any { it.occurrence === occurrence }) return
+          if (resolving != null) {
+            waiting.addLast(pending)
+            return
+          }
+          resolving = pending
+          pending
+        }
+    resolve(mgr, now)
+  }
+
+  /** [done] freed the slot: queue its [retry], then start the next sighting still current. */
+  private fun finish(mgr: NsdManager, done: Pending, retry: Pending? = null) {
+    val next =
+        synchronized(lock) {
+          if (session !== done.owner || resolving !== done) return
+          retry?.let { waiting.addLast(it) }
+          var candidate = waiting.removeFirstOrNull()
+          while (candidate != null && sightings[candidate.service.serviceName] !== candidate.occurrence) {
+            candidate = waiting.removeFirstOrNull()
+          }
+          resolving = candidate
+          candidate
+        } ?: return
+    resolve(mgr, next)
+  }
+
+  private fun resolve(mgr: NsdManager, pending: Pending) {
+    val name = pending.service.serviceName
     // A fresh ResolveListener per resolve — NsdManager rejects a reused/in-flight listener.
     val listener =
         object : NsdManager.ResolveListener {
           override fun onServiceResolved(s: NsdServiceInfo) {
             synchronized(lock) {
-              if (session !== owner || sightings[name] !== occurrence || s.serviceName == selfName)
-                  return
-              val host = s.host?.hostAddress ?: return
-              peers[s.serviceName] = Peer(s.serviceName, host, s.port)
+              val host = s.host?.hostAddress
+              if (session === pending.owner && sightings[name] === pending.occurrence &&
+                  s.serviceName != selfName && host != null) {
+                peers[s.serviceName] = Peer(s.serviceName, host, s.port)
+              }
             }
+            finish(mgr, pending)
           }
           override fun onResolveFailed(s: NsdServiceInfo, code: Int) {
-            Log.w(TAG, "NSD resolve failed for ${s.serviceName}: $code")
+            val retry =
+                if (code == NsdManager.FAILURE_ALREADY_ACTIVE && pending.attempt < MAX_RESOLVE_ATTEMPTS)
+                    Pending(pending.service, pending.owner, pending.occurrence, pending.attempt + 1)
+                else null
+            if (retry == null) Log.w(TAG, "NSD resolve failed for ${s.serviceName}: $code")
+            finish(mgr, pending, retry)
           }
         }
-    runCatching { mgr.resolveService(service, listener) }
-        .onFailure { Log.w(TAG, "NSD resolveService threw", it) }
+    runCatching { mgr.resolveService(pending.service, listener) }
+        .onFailure {
+          Log.w(TAG, "NSD resolveService threw", it)
+          finish(mgr, pending)
+        }
   }
 }
