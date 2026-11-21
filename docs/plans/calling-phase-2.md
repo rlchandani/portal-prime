@@ -153,8 +153,8 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 | # | Slice | Needs | Status |
 |---|---|---|---|
 | S1 | **Household pairing core**: identity key, invite code (public nameplate + PAKE secret, 3 tries), commit/reveal protocol with typed+sequenced MAC'd messages, SAS (4 pictures + 12 digits), link + permissions model and codec | nothing | **built**, protocol v2 after security review (`HomeLink*.kt`, `HomeLinkPake.kt`) |
-| S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired, Connected — **built**, reachable only from the measurement-build "Link homes test" (both homes on one Portal, `HomeLinkLoopback`). Still to do: Households & devices list, Permissions screen, compact (Mini) layouts | nothing (flag off) | **partly built** |
-| S3 | Link store on device (encrypted at rest with `CallMessageKeys`), identity key shared to household Portals over the existing household channel, remove-household wipes keys everywhere | nothing | after S2 |
+| S2 | Households UI: Invite (code + QR), Join with a code (keypad), Verify (pictures), Mismatch/Expired/Too many tries, Connected, **Households & devices** (`HomeLinkHouseholdsScreen`), **Permissions** (`HomeLinkPermissionsScreen`), **Mini 800×1280 layouts** for all of them (`HomeLinkDims`/`HomeLinkLayout`, ≥ 64 dp). Reachable only from the measurement-build "Link homes test" (`HomeLinkTestFlow`) until S4 | nothing (flag off) | **built** |
+| S3 | Vault (`HomeLinkVault`: identity + revisioned entries, key-less tombstones) sealed at rest (`HomeLinkRepository`: own Keystore alias, `no_backup/hearthpane_homelinks`; not `CallMessageKeys`, whose delete-all forgets its alias), shared with this home's Portals (`HomeLinkSync`, `/remote/homelinkpeer`, sealed per requester/nonce/direction; phones refused), Remove wipes the home's key on every Portal | nothing | **built** |
 | S4 | Relay mailbox client + Worker/DO + TURN credentials. **Security-critical relay rules**: a nameplate is claimed by one inviter `hello` (a nameplate in use is refused; the inviter makes a new code); the mailbox accepts **at most 3 joiner commits per nameplate**, then closes; mailboxes and their messages are deleted at 10 minutes or on the first completed `open`; one message ≤ 4 KB; per-IP rate limit on nameplate claims and commits. The Portal's own 3-try limit stands even if the relay is hostile — the relay limit protects against third parties who see the nameplate. | **D1 relay choice, D2 account** | blocked |
 | S5 | Cross-home 1:1 call: STUN/TURN candidates, trickle, identity-signed offer/answer, honest route chip ("Direct" / "Relay") | S4 | blocked |
 | S6 | Cross-home video messages (R2 blob, delete on delivery, 7-day expiry) | S4, **D3 storage** | blocked |
@@ -185,3 +185,10 @@ Each slice ships alone. **No-decision slices can be built now**; the rest wait f
 - TURN adds latency; Portal mic AEC behaviour over 150 ms+ RTT is untested.
 - Identity key distribution inside a home relies on the household key being present on every
   Portal (the Mini re-pair issue from 2a shows this can lag).
+- The household key is the trust root inside a home and paired phones hold it too. The vault
+  route refuses phone ids and addresses a Portal didn't announce, but a phone holding the key could
+  in principle impersonate a Portal on the LAN and receive the sealed identity. Closing that needs
+  Portal-only key material (a Portal↔Portal pairing), not yet designed.
+- If two Portals each make an identity before they first sync, the older one wins and the other
+  Portal's links (pinned to the newer key by the other home) stop verifying. The identity is only
+  made at first link and syncs at once, so this needs two first-links within seconds.

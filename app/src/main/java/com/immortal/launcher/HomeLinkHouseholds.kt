@@ -16,6 +16,16 @@ import java.util.Locale
 @Immutable
 internal data class HomeLinkDevice(val name: String, val detail: String, val phone: Boolean, val presence: CallPresence)
 
+/** This home's Devices card from the rooms heard on the bus: this Portal first, then the others by name. Pure. */
+internal object HomeLinkDevices {
+  const val THIS_ONE = "Portal · this one"
+  const val PORTAL = "Portal"
+
+  fun ofThisHome(selfName: String, peers: List<CallPeer>, now: Long): List<HomeLinkDevice> =
+      listOf(HomeLinkDevice(selfName, THIS_ONE, phone = false, presence = CallPresence.AVAILABLE)) +
+          peers.sortedBy { it.name.lowercase() }.map { HomeLinkDevice(it.name, PORTAL, phone = false, presence = CallPolicy.presence(it, now)) }
+}
+
 /** Which pane(s) Households & devices shows: side list + detail on a Portal, one at a time on a Mini. */
 internal enum class HomeLinkPane { LIST, DETAIL, BOTH }
 

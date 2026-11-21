@@ -136,4 +136,14 @@ class HomeLinkHouseholdsTest {
     assertEquals(2, HomeLinkLayout.safetyColumns(compact = true))
     assertEquals(4, HomeLinkLayout.safetyColumns(compact = false))
   }
+
+  @Test fun thisHomesDevicesListThisPortalFirstThenRoomsByNameWithPresence() {
+    val now = 1_000_000L
+    val peers = listOf(CallPeer("k-1", "Kitchen", seenMs = now), CallPeer("a-1", "Attic", seenMs = 0L))
+    val devices = HomeLinkDevices.ofThisHome("Living room", peers, now)
+    assertEquals(listOf("Living room", "Attic", "Kitchen"), devices.map { it.name })
+    assertEquals(HomeLinkDevices.THIS_ONE, devices[0].detail)
+    assertEquals(CallPresence.OFFLINE, devices[1].presence)
+    assertEquals(CallPresence.AVAILABLE, devices[2].presence)
+  }
 }
