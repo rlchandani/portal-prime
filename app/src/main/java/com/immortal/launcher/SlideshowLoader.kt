@@ -28,6 +28,8 @@ internal class SlideshowLoader(
     private val onCancelTransports: () -> Unit = {},
     // Share the host queue so late decoded scenes remain budgeted until the host returns.
     private val ui: PausableFrameCallbacks = PausableFrameCallbacks(),
+    /** The next photo is decoded and uploaded only after the published scene's dissolve. */
+    private val lookaheadSettleMs: Long = SlideshowLookahead.SETTLE_MS,
 ) : AutoCloseable {
   private val work = SlideshowWork()
   private val faceDelegate = lazy { SlideshowFaceStore(context) }
@@ -172,7 +174,8 @@ internal class SlideshowLoader(
         budget.setOwner("preparation", emptyList())
         val used = owned.map { it.first.key }.toSet()
         val upcoming = owned.getOrNull(1)?.first?.key?.let { nextAfterPartner?.invoke(it) } ?: next
-        if (upcoming != null && upcoming.key !in used && current()) {
+        if (upcoming != null && upcoming.key !in used && current() &&
+            SlideshowLookahead.awaitSettle(lookaheadSettleMs, current)) {
           val token = budget.reserve(24L * 1024 * 1024) { current() && !closed }
               ?: return@submit
           try {
