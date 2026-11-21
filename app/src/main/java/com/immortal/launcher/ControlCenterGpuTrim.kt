@@ -12,17 +12,13 @@ import android.os.Looper
 import android.util.Log
 
 /**
- * Shared by the Control Center and the photo screensaver (each window counts in [started]/[stopped]).
  * When the Control Center has been off screen for [delayMs] (Back to Home, the screensaver), asks
  * the renderer to drop what its frames left in the process-wide GPU cache: the plan layers, the
  * sheet's offscreen texture and their scratch targets stay cached after the window is gone, and
  * the platform never sends UI_HIDDEN while Home is in front. Opening again within [delayMs] keeps
  * everything (a quick re-open pays nothing). On Family Portal+ (2026-11-21) the cache fell from
  * 15.5-17.3 MB to Home's own 10.1 MB, and an open after the trim had the same frames as any other.
- * The screensaver leaves more behind: its decoded photos are unreachable once its window goes, but
- * nothing collects them until the next screensaver allocates, and their textures stay cached with
- * them (Family Portal+, 2026-11-21: +55 MB graphics held 70 s after leaving). So the trim first
- * collects off the main thread, then runs the renderer trim. Main thread only.
+ * Main thread only.
  */
 internal class CcGpuTrim(
     private val delayMs: Long,
@@ -30,7 +26,7 @@ internal class CcGpuTrim(
     private val unschedule: (Runnable) -> Unit,
     private val trim: () -> Unit,
 ) {
-  /** Control Center / screensaver windows on screen now (a new one starts before the old one stops). */
+  /** Control Center windows on screen now (a new one starts before the old one stops). */
   private var shown = 0
   private var pending = false
   private val run = Runnable {
@@ -39,8 +35,6 @@ internal class CcGpuTrim(
   }
 
   val trimPending: Boolean get() = pending
-  /** A Control Center or screensaver window is on screen (a trim queued before it came is moot). */
-  val anyShown: Boolean get() = shown > 0
 
   fun started() {
     shown++
@@ -69,18 +63,7 @@ internal class CcGpuTrim(
     private val main by lazy { Handler(Looper.getMainLooper()) }
 
     val instance: CcGpuTrim by lazy {
-      CcGpuTrim(DELAY_MS, { ms, r -> main.postDelayed(r, ms) }, { r -> main.removeCallbacks(r) }, ::collectThenTrim)
-    }
-
-    /** One collection on a short-lived thread (never the main one), then the trim back on main. */
-    private fun collectThenTrim() {
-      runCatching {
-        Thread({
-          runCatching { Runtime.getRuntime().gc(); System.runFinalization() }
-              .onFailure { Log.w(TAG, "surface closed: collection failed", it) }
-          main.post { if (!instance.anyShown) trimRenderer() }
-        }, "gpu-trim").apply { isDaemon = true; priority = Thread.MIN_PRIORITY }.start()
-      }.onFailure { Log.w(TAG, "surface closed: collection thread unavailable", it); trimRenderer() }
+      CcGpuTrim(DELAY_MS, { ms, r -> main.postDelayed(r, ms) }, { r -> main.removeCallbacks(r) }, ::trimRenderer)
     }
 
     /**
@@ -93,8 +76,8 @@ internal class CcGpuTrim(
         val global = Class.forName("android.view.WindowManagerGlobal")
         val instance = global.getMethod("getInstance").invoke(null)
         global.getMethod("trimMemory", Int::class.javaPrimitiveType).invoke(instance, ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN)
-      }.onSuccess { Log.i(TAG, "surface closed: renderer caches trimmed") }
-          .onFailure { Log.w(TAG, "surface closed: renderer trim unavailable", it) }
+      }.onSuccess { Log.i(TAG, "control center closed: renderer caches trimmed") }
+          .onFailure { Log.w(TAG, "control center closed: renderer trim unavailable", it) }
     }
   }
 }

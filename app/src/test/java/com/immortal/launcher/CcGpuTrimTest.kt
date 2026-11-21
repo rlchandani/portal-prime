@@ -71,18 +71,5 @@ class CcGpuTrimTest {
     assertEquals(0, trims)
   }
 
-  @Test fun theScreensaverAndControlCenterShareOneCount() {
-    val m = FakeMain()
-    m.gpu.started() // Control Center
-    m.gpu.started() // the screensaver comes over it
-    m.gpu.stopped() // Control Center stops under the dream
-    assertTrue(m.gpu.anyShown)
-    assertTrue(m.queued.isEmpty())
-    m.gpu.stopped() // the dream ends on Home
-    assertFalse(m.gpu.anyShown)
-    m.runQueued()
-    assertEquals(1, m.trims)
-  }
-
   private companion object { const val DELAY = 4_000L }
 }
