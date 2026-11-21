@@ -7,12 +7,9 @@
 package com.immortal.launcher
 
 import java.math.BigInteger
-import java.security.AlgorithmParameters
 import java.security.GeneralSecurityException
 import java.security.KeyFactory
 import java.security.SecureRandom
-import java.security.spec.ECFieldFp
-import java.security.spec.ECGenParameterSpec
 import java.security.spec.ECParameterSpec
 import java.security.spec.ECPoint
 import java.security.spec.ECPrivateKeySpec
@@ -31,27 +28,28 @@ internal class HomeLinkPakeHalf internal constructor(internal val scalar: BigInt
  * A balanced PAKE over P-256 in the style of CPace (draft-irtf-cfrg-cpace), so the code's secret
  * part can't be guessed offline by anyone who records the relay's traffic:
  *
- * 1. Both sides map (secret, mailbox) to a curve point `G` whose discrete log nobody knows.
+ * 1. Both sides map (secret, mailbox) to a curve point `G` whose discrete log nobody knows, with
+ *    RFC 9380 hash_to_curve (P256_XMD:SHA-256_SSWU_RO_, [HomeLinkHashToCurve]) under [DST].
  * 2. Each picks a random scalar `y` and sends the x-coordinate of `y·G` (its share). A share is
  *    a uniformly random point whatever the secret, so it tells an eavesdropper nothing.
  * 3. Each computes `K = x(y_mine · Y_theirs)`; both get `x(y_i·y_j·G)` only if both used the same
  *    secret. Checking a guess against a recorded transcript needs `y_i` or `y_j` (Diffie–Hellman
  *    hardness), so the only way to test a guess is to take part, once per join attempt.
  *
- * x-only shares work because `x(k·P) = x(k·(−P))`. The secret-scalar multiplications go through
- * the platform's ECDH ([KeyAgreement]), never through [BigInteger]. The map to the curve is
- * try-and-increment, always over [CANDIDATES] candidates so its running time doesn't depend on
- * which one works. Pure apart from the [SecureRandom] the caller injects.
+ * x-only shares work because `x(k·P) = x(k·(−P))`. A received share is validated before use
+ * ([decodeShare], [finish]): exactly 32 bytes in canonical Base64, an x below p that lifts to a
+ * finite point on the curve (an x-only share can't spell infinity, and P-256's cofactor is 1, so
+ * that point is in the group). The secret-scalar multiplications go through the platform's ECDH
+ * ([KeyAgreement]), never through [BigInteger]; the hash to the curve is BigInteger arithmetic
+ * (timing caveat in [HomeLinkHashToCurve]). Pure apart from the [SecureRandom] the caller injects.
  */
 internal object HomeLinkPake {
   const val SHARE_BYTES = 32
-  /** Chance all 64 candidates miss the curve: 2^-64. */
-  private const val CANDIDATES = 64
-  private val MAP_DOMAIN = HomeLinkHash.utf8("hearthpane-homelink-cpace-map-v1")
-  private val CURVE: ECParameterSpec by lazy {
-    AlgorithmParameters.getInstance("EC").apply { init(ECGenParameterSpec("secp256r1")) }.getParameterSpec(ECParameterSpec::class.java)
-  }
-  private val PRIME: BigInteger by lazy { (CURVE.curve.field as ECFieldFp).p }
+  /** RFC 9380 domain separation tag: this protocol, its version, and the suite. */
+  val DST: ByteArray get() = DST_BYTES.copyOf()
+  private val DST_BYTES = HomeLinkHash.utf8("hearthpane-homelink-cpace-v2-P256_XMD:SHA-256_SSWU_RO_")
+  private val CURVE: ECParameterSpec get() = HomeLinkP256.CURVE
+  private val PRIME: BigInteger get() = HomeLinkP256.PRIME
   private val SQRT_EXP: BigInteger by lazy { PRIME.add(BigInteger.ONE).shiftRight(2) }
 
   /** This side's half for a pairing in [mailbox] with [secret] (the code's secret part). */
@@ -67,33 +65,34 @@ internal object HomeLinkPake {
 
   /** The shared point's x-coordinate, or null for a share that isn't a curve point (or is ours reflected back). */
   fun finish(mine: HomeLinkPakeHalf, theirShare: String): ByteArray? {
-    if (theirShare == mine.share) return null
     val point = decodeShare(theirShare) ?: return null
-    return multiply(mine.scalar, point)
+    if (point.affineX == decodeShare(mine.share)?.affineX) return null
+    return finish(mine, point)
   }
 
-  /** A share on the wire: exactly 32 bytes of Base64 naming the x-coordinate of a curve point. */
+  /** [finish] for an already-decoded point: refuses infinity and anything off the curve or out of range. */
+  fun finish(mine: HomeLinkPakeHalf, point: ECPoint): ByteArray? =
+      if (HomeLinkP256.isValidPoint(point)) multiply(mine.scalar, point) else null
+
+  /** A share on the wire: the canonical Base64 of exactly 32 bytes naming the x-coordinate of a curve point. */
   fun decodeShare(share: String): ECPoint? {
     val bytes = HomeLinkHash.unb64(share)?.takeIf { it.size == SHARE_BYTES } ?: return null
-    return lift(BigInteger(1, bytes))
+    if (HomeLinkHash.b64(bytes) != share) return null
+    return lift(BigInteger(1, bytes))?.takeIf(HomeLinkP256::isValidPoint)
   }
 
   /** The password-derived base point. Visible for tests (it is not secret-free: never send it). */
   internal fun generator(secret: String, mailbox: String): ECPoint {
-    val seed = HomeLinkHash.sha256(MAP_DOMAIN, HomeLinkHash.utf8(secret), HomeLinkHash.utf8(mailbox))
-    var found: ECPoint? = null
-    for (i in 0 until CANDIDATES) {
-      val x = BigInteger(1, HomeLinkHash.hmac(seed, byteArrayOf(i.toByte()))).mod(PRIME)
-      val point = lift(x)
-      if (found == null) found = point
-    }
-    return checkNotNull(found) { "no curve point in $CANDIDATES candidates" }
+    val g = HomeLinkHashToCurve.hashToCurve(HomeLinkHash.join(HomeLinkHash.utf8(secret), HomeLinkHash.utf8(mailbox)), DST_BYTES)
+    // Q0 + Q1 = infinity has probability about 2^-256.
+    check(HomeLinkP256.isValidPoint(g)) { "hash_to_curve gave no usable point" }
+    return g
   }
 
-  /** The curve point with this x (either y; x-only arithmetic doesn't care), or null if none. */
+  /** The curve point with this x (either y; x-only arithmetic doesn't care), or null if none. Public input only. */
   private fun lift(x: BigInteger): ECPoint? {
     if (x >= PRIME) return null
-    val rhs = x.pow(3).add(CURVE.curve.a.multiply(x)).add(CURVE.curve.b).mod(PRIME)
+    val rhs = HomeLinkP256.rhs(x)
     if (rhs.signum() == 0) return null
     val y = rhs.modPow(SQRT_EXP, PRIME)
     return if (y.multiply(y).mod(PRIME) == rhs) ECPoint(x, y) else null

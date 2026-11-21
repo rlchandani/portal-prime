@@ -77,6 +77,45 @@ class HomeLinkPakeTest {
     assertNull(HomeLinkPake.finish(a, offCurve))
   }
 
+  /** The base point is RFC 9380 hash_to_curve (P256_XMD:SHA-256_SSWU_RO_) of (secret, mailbox) under the PAKE's own DST. */
+  @Test fun theGeneratorIsRfc9380HashToCurveOfSecretAndMailbox() {
+    val g = HomeLinkPake.generator("7Q4K2PA", mailbox)
+    val msg = HomeLinkHash.join(HomeLinkHash.utf8("7Q4K2PA"), HomeLinkHash.utf8(mailbox))
+    assertEquals(HomeLinkHashToCurve.hashToCurve(msg, HomeLinkPake.DST), g)
+    assertTrue(HomeLinkP256.isValidPoint(g))
+    assertTrue(HomeLinkPake.DST.size in 16..255)
+    assertTrue(String(HomeLinkPake.DST, Charsets.UTF_8).endsWith("P256_XMD:SHA-256_SSWU_RO_"))
+  }
+
+  /** x-only shares can't spell infinity; every other encoding of it (and of real points) is refused. */
+  @Test fun rejectsInfinityAndOtherPointEncodings() {
+    val a = HomeLinkPake.start("7Q4K2PA", mailbox, random)
+    val b = HomeLinkPake.start("7Q4K2PA", mailbox, random)
+    assertNull(HomeLinkPake.finish(a, HomeLinkHash.b64(byteArrayOf(0))))          // SEC1 infinity
+    assertNull(HomeLinkPake.finish(a, HomeLinkHash.b64(ByteArray(0))))
+    val x = HomeLinkHash.unb64(b.share)!!
+    assertNull(HomeLinkPake.finish(a, HomeLinkHash.b64(byteArrayOf(2) + x)))      // SEC1 compressed
+    assertNull(HomeLinkPake.finish(a, HomeLinkHash.b64(byteArrayOf(4) + x + x)))  // SEC1 uncompressed
+    assertNull(HomeLinkPake.finish(a, b.share + "="))
+    assertNull(HomeLinkPake.finish(a, " " + b.share))
+    // The point checks behind decoding: infinity, off the curve, coordinates out of range.
+    val p = HomeLinkPake.decodeShare(b.share)!!
+    assertNull(HomeLinkPake.finish(a, java.security.spec.ECPoint.POINT_INFINITY))
+    assertNull(HomeLinkPake.finish(a, java.security.spec.ECPoint(p.affineX, p.affineY.add(BigInteger.ONE))))
+    assertNull(HomeLinkPake.finish(a, java.security.spec.ECPoint(p.affineX.add(HomeLinkP256.PRIME), p.affineY)))
+    assertArrayEquals(HomeLinkPake.finish(a, b.share), HomeLinkPake.finish(a, p))
+  }
+
+  /** A share must be the one canonical Base64 of its 32 bytes, so our own share can't come back in disguise. */
+  @Test fun refusesANonCanonicalSpellingOfItsOwnShare() {
+    val a = HomeLinkPake.start("7Q4K2PA", mailbox, random)
+    val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    val last = a.share[42]
+    val disguised = a.share.substring(0, 42) + alphabet[alphabet.indexOf(last) xor 1] + a.share.substring(43)
+    assertNotEquals(a.share, disguised)
+    assertNull(HomeLinkPake.finish(a, disguised))
+  }
+
   @Test fun refusesItsOwnShareReflectedBack() {
     val a = HomeLinkPake.start("7Q4K2PA", mailbox, random)
     assertNull(HomeLinkPake.finish(a, a.share))
