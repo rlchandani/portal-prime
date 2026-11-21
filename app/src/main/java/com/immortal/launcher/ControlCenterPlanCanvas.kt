@@ -47,12 +47,16 @@ internal class CcWalkView(val rooms: List<String>, val progress: State<Float>)
 /**
  * The floor plan, drawn as separately invalidated layers (each its own RenderNode):
  *  1. base floors + 3. walls — static: redraw only on floor / size / theme change;
- *  2. under (lens tints, light washes, glows), 4. over (openings, focus veil, badges, chips,
- *     markers) and 6. top (names + captions) — redraw only when the derived
- *     [CcPlanModel] / lens / focus change (equal models skip);
- *  5. animation (pulses, focus edge, scene walk) — the only layer read per frame,
+ *  2. under (lens tints, light washes, glows), 4. over (openings, then badges, chips, markers)
+ *     and 6. top (names + captions) — redraw only when the derived [CcPlanModel] / lens change
+ *     (equal models skip);
+ *  5. animation (pulses, highlight edge, scene walk) — the only layer read per frame,
  *     and it only exists while [LocalCcMotion] is on and something visibly animates
- *     ([CcPlanDraw.animates]). With motion off the same marks are drawn once, still, in the over layer.
+ *     ([CcPlanDraw.animates], [CcPlanFocus.shows]). With motion off the same marks are drawn once, still.
+ * The room highlight ([CcPlanFocus]: a sheet open, or Jarvis pointing) is its own small layers in
+ * the same order as before — its tint between 1 and 2, its veil between the openings and the
+ * markers — so opening a room's sheet re-records only those (and the labels, which fade), never
+ * the floor's other passes.
  * Layers 1-4 and 6 keep their pixels in offscreen textures (see the comments at each).
  *
  * 3D ([iso] = 1, the mock's isometric view): the flat passes (floors, under, openings and the
@@ -110,13 +114,15 @@ internal fun CcPlanCanvas(
   val fade = rememberLightFade(model, motion && !parked)
   val skipLit = fade?.first?.rooms ?: emptySet()
   val draws = remember { CcLru<CcDrawKey, CcPlanDraw>(DRAW_CACHE) }
-  val ctx = remember(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit, skipLit, pulse) {
-    draws.getOrPut(CcDrawKey(CcSame(model), CcSame(px), CcSame(paint), c, CcSame(labels), CcSame(chipText), lens, focus, stale,
-        fahrenheit, density.density, skipLit, pulse)) {
-      ccTrace("cc:drawCtx") { CcPlanDraw(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit, density.density, skipLit, pulse) }
+  val ctx = remember(model, px, paint, c, labels, chipText, lens, stale, fahrenheit, skipLit) {
+    draws.getOrPut(CcDrawKey(CcSame(model), CcSame(px), CcSame(paint), c, CcSame(labels), CcSame(chipText), lens, stale,
+        fahrenheit, density.density, skipLit)) {
+      ccTrace("cc:drawCtx") { CcPlanDraw(model, px, paint, c, labels, chipText, lens, stale, fahrenheit, density.density, skipLit) }
     }
   }
-  // Each pass recorded once per floor/model/lens/focus into a retained GraphicsLayer (display list).
+  // The highlight alone: a sheet opening changes only this (and the layers that capture it).
+  val hl = remember(px, c, focus, pulse, density) { CcPlanFocus(px, c, focus, pulse, density.density) }
+  // Each pass recorded once per floor/model/lens into a retained GraphicsLayer (display list).
   val graphics = LocalGraphicsContext.current
   val layers = remember(graphics) { CcPlanLayers(graphics) }
   DisposableEffect(layers) { onDispose { layers.release() } }
@@ -155,8 +161,9 @@ internal fun CcPlanCanvas(
         }
       }) {
     if (!ready) return@Box
-    val loops = ctx.animates
-    val still = !motion && loops
+    val loops = ctx.animates || hl.shows
+    // Motion off: the pulses' still frame is recorded with the markers, the edge's in its own layer.
+    val still = !motion && ctx.animates
     // Layers 1-4 rasterize once into one GPU texture: an animation frame (or the sheet sliding
     // over the plan) then blits it instead of replaying every fill, glow and wall path.
     val strategy = if (parked) CompositingStrategy.Auto else CompositingStrategy.Offscreen
@@ -172,24 +179,25 @@ internal fun CcPlanCanvas(
         .graphicsLayer { isoOuter(iso3, iso.value) }
         .graphicsLayer { isoInner(iso3, iso.value); compositingStrategy = strategy }) {
       PlanLayer { flatAtRest(iso3, rest3d) { layers.draw(this, CcPassKey(CcPlanPass.FLOORS, CcSame(base))) { base.drawFloors(this) } } }
+      PlanLayer { flatAtRest(iso3, rest3d) { hl.drawTint(this) } }
       PlanLayer { flatAtRest(iso3, rest3d) { layers.draw(this, CcPassKey(CcPlanPass.UNDER, CcSame(ctx))) { ctx.drawUnder(this) } } }
       fade?.let { (f, t) -> PlanLayer { flatAtRest(iso3, rest3d) { ctx.drawFade(this, f, t.value) } } }
       PlanLayer { if (!raised) layers.draw(this, CcPassKey(CcPlanPass.WALLS, CcSame(base))) { base.drawWalls(this) } }
+      PlanLayer { flatAtRest(iso3, rest3d) { layers.draw(this, CcPassKey(CcPlanPass.OPENINGS, CcSame(ctx))) { ctx.drawOpenings(this) } } }
+      PlanLayer { flatAtRest(iso3, rest3d) { hl.drawVeil(this) } }
       PlanLayer {
         if (!raised) {
-          layers.draw(this, CcPassKey(if (still) CcPlanPass.OVER_STILL else CcPlanPass.OVER, CcSame(ctx))) {
-            ctx.drawOver(this)
+          layers.draw(this, CcPassKey(if (still) CcPlanPass.MARKS_STILL else CcPlanPass.MARKS, CcSame(ctx))) {
+            ctx.drawMarks(this, CcAffine.IDENTITY)
             if (still) ctx.drawAnimated(this, STILL_T)
           }
-        } else flatAtRest(iso3, rest3d) {
-          layers.draw(this, CcPassKey(if (still) CcPlanPass.FLAT_STILL else CcPlanPass.FLAT, CcSame(ctx))) {
-            ctx.drawOverFlat(this)
-            if (still) ctx.drawAnimated(this, STILL_T)
-          }
+        } else if (still) flatAtRest(iso3, rest3d) {
+          layers.draw(this, CcPassKey(CcPlanPass.PULSES_STILL, CcSame(ctx))) { ctx.drawAnimated(this, STILL_T) }
         }
       }
+      if (!motion) PlanLayer { flatAtRest(iso3, rest3d) { hl.drawEdge(this, STILL_T) } }
     }
-    if (motion && (loops || walk != null)) CcPlanAnimLayer(ctx, walk, model.floor, loops, iso, iso3)
+    if (motion && (loops || walk != null)) CcPlanAnimLayer(ctx, hl, walk, model.floor, loops, iso, iso3)
     if (raised || shown3d.value) {
       // 3D: the standing walls cover the animation behind them; the markers stay upright on top.
       // Composed from the first 3D frame on (no nodes inserted when a switch starts); a texture only at rest in 3D.
@@ -212,9 +220,9 @@ internal fun CcPlanCanvas(
     PlanLayer(cached = { !parked && !moving.value }) {
       val e = iso.value
       when {
-        e <= 0f -> layers.draw(this, CcPassKey(CcPlanPass.TOP, CcSame(ctx))) { ctx.drawTop(this) }
-        e >= 1f -> layers.draw(this, CcPassKey(CcPlanPass.TOP3D, CcSame(ctx))) { ctx.drawTop(this, iso3.value.view) }
-        else -> ctx.drawTop(this, iso3.value.blend(e))
+        e <= 0f -> layers.draw(this, CcPassKey(CcPlanPass.TOP, CcSame(ctx), hl.focus)) { ctx.drawTop(this, hl) }
+        e >= 1f -> layers.draw(this, CcPassKey(CcPlanPass.TOP3D, CcSame(ctx), hl.focus)) { ctx.drawTop(this, hl, iso3.value.view) }
+        else -> ctx.drawTop(this, hl, iso3.value.blend(e))
       }
     }
   }
@@ -282,7 +290,8 @@ private fun PlanLayer(cached: (() -> Boolean)? = null, draw: DrawScope.() -> Uni
  * (through the projection in 3D).
  */
 @Composable
-private fun CcPlanAnimLayer(ctx: CcPlanDraw, walk: CcWalkView?, floor: CcFloor, loops: Boolean, iso: State<Float>, iso3: Lazy<CcIsoPx>) {
+private fun CcPlanAnimLayer(ctx: CcPlanDraw, hl: CcPlanFocus, walk: CcWalkView?, floor: CcFloor, loops: Boolean, iso: State<Float>,
+                            iso3: Lazy<CcIsoPx>) {
   val clock: State<Float>? = if (loops) {
     rememberInfiniteTransition(label = "plan").animateFloat(0f, 1f, infiniteRepeatable(tween(CLOCK_MS, easing = LinearEasing)), label = "planClock")
   } else null
@@ -291,7 +300,7 @@ private fun CcPlanAnimLayer(ctx: CcPlanDraw, walk: CcWalkView?, floor: CcFloor, 
     // Screen space: pulses and edges are placed through the view, never drawn under a moving matrix.
     val e = iso.value
     val view = if (e > 0f) iso3.value.blend(e) else CcAffine.IDENTITY
-    clock?.let { ctx.drawAnimated(this, it.value, view) }
+    clock?.let { ctx.drawAnimated(this, it.value, view); hl.drawEdge(this, it.value, view) }
     if (walk != null && centres != null) ctx.drawWalk(this, walk.rooms, centres, walk.progress.value, view)
   })
 }
@@ -311,7 +320,7 @@ private const val DRAW_CACHE = 8
 /** Plan sizes from the mock (dp; geometry itself is in cells). */
 internal const val MAX_CELL_DP = 34f
 private const val TAP_DP = 36f
-/** Loop period: pulses (÷3 = 2.2 s) and the highlight (÷4 = 1.65 s) both divide it. */
+/** Loop period: pulses (÷3 = 2.2 s) and the highlight edge (÷4 = 1.65 s) both divide it. */
 private const val CLOCK_MS = 6_600
 /** Floors whose geometry stays cached (a Portal home rarely has more). */
 private const val FLOOR_CACHE = 4

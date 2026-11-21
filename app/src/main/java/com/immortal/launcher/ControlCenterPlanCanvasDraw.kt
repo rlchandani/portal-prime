@@ -20,7 +20,8 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 /**
  * Everything one plan frame needs, assembled at composition (strokes, dash effects and colours
  * are created here, never per frame). The draw passes live in this file (floor, openings,
- * pulses, walk, focus) and in ControlCenterPlanCanvasMarks.kt (markers, labels).
+ * pulses, walk) and in ControlCenterPlanCanvasMarks.kt (markers, labels). The room highlight is
+ * not in here ([CcPlanFocus]), so a sheet opening keeps this object and its recorded passes.
  * Which pass belongs to which cached layer is documented on [CcPlanCanvas].
  */
 @androidx.compose.runtime.Immutable
@@ -32,14 +33,11 @@ internal class CcPlanDraw(
     val labels: Map<String, CcRoomText>,
     val chips: CcMapChipText,
     val lens: CcLens,
-    val focus: String?,
     val stale: Boolean,
     val fahrenheit: Boolean,
     val dp: Float,
     /** Rooms whose light a running [CcLightFade] draws instead of the cached floor layer. */
     val skipLit: Set<String> = emptySet(),
-    /** Jarvis is pointing at [focus]: its edge pulses like the mock's `.hl.on` instead of breathing. */
-    val pulse: Boolean = false,
 ) {
   /** Per-room light wash (colour, alpha) and glow placements, resolved once per state. */
   private class Lit(val wash: Color, val washAlpha: Float, val centers: List<Offset>, val radii: FloatArray, val tints: List<androidx.compose.ui.graphics.ColorFilter>)
@@ -62,26 +60,21 @@ internal class CcPlanDraw(
 
   private val glowAlpha = when (lens) { CcLens.CLIMATE -> GLOW_CLIMATE; CcLens.LIVE -> if (c.dark) 1f else GLOW_LIGHT } * lightFactor
 
-  /** Layer 2: the focused room's ember tint, lens tints, light washes and glows. */
+  /** Layer 2: lens tints, light washes and glows (over the highlight's tint). */
   fun drawUnder(s: DrawScope) {
-    focus?.let(px.rects::get)?.let { s.drawRect(CcStyle.EmberLight, it.topLeft, it.size, alpha = SEL_MIX) }
     for (v in model.views) px.rects[v.room.id]?.let { roomFill(s, v, it) }
   }
 
-  /** Layer 4: openings over the walls, the focus veil, then badges / dots / chips. */
-  fun drawOver(s: DrawScope) {
-    drawOverFlat(s)
-    drawMarks(s, CcAffine.IDENTITY)
-  }
-
-  /** The part of layer 4 that lies on the floor (3D draws it through the projection, the markers upright). */
-  fun drawOverFlat(s: DrawScope) {
+  /**
+   * Layer 4, the part that lies on the floor: openings over the walls (3D draws it through the
+   * projection). The highlight's veil goes over it, then the markers ([drawMarks]).
+   */
+  fun drawOpenings(s: DrawScope) {
     for (i in model.openings.indices) drawOpening(s, model.openings[i], px.openings[i])
-    focusVeil(s)
   }
 
-  /** Layer 6: names + captions, above everything that moves, placed through [view] (upright in 3D). */
-  fun drawTop(s: DrawScope, view: CcAffine = CcAffine.IDENTITY) = drawLabels(s, view)
+  /** Layer 6: names + captions, above everything that moves, placed through [view] (upright in 3D); [focus] fades the others. */
+  fun drawTop(s: DrawScope, focus: CcPlanFocus, view: CcAffine = CcAffine.IDENTITY) = drawLabels(s, view, focus)
 
   /**
    * A running light change at [t] (0..1): the rooms in [CcLightFade.rooms] get their wash and
@@ -120,14 +113,11 @@ internal class CcPlanDraw(
   }
 
   /**
-   * Layer 5 at clock [t]: pulses and the focus edge, placed through [view] in screen space. In 3D
-   * a pulse is an axis-aligned oval and the edge four lines — never a circle or a stroked rect
-   * under a matrix, which the GPU would mask afresh every frame.
+   * Layer 5 at clock [t]: the pulses, placed through [view] in screen space (the highlight's edge
+   * follows them, [CcPlanFocus.drawEdge]). In 3D a pulse is an axis-aligned oval and the edge four
+   * lines — never a circle or a stroked rect under a matrix, which the GPU would mask afresh every frame.
    */
-  fun drawAnimated(s: DrawScope, t: Float, view: CcAffine = CcAffine.IDENTITY) {
-    drawPulses(s, t, view)
-    focusEdge(s, t, view)
-  }
+  fun drawAnimated(s: DrawScope, t: Float, view: CcAffine = CcAffine.IDENTITY) = drawPulses(s, t, view)
 
   private fun roomFill(s: DrawScope, v: CcRoomView, r: Rect) {
     when (lens) {
@@ -179,22 +169,6 @@ internal class CcPlanDraw(
     }
   }
 
-  /** [r]'s outline through [view]: a plain rect flat, four round-capped lines once tilted. */
-  private fun edge(s: DrawScope, r: Rect, view: CcAffine, alpha: Float, width: Float) {
-    if (view.isIdentity) {
-      s.drawRect(CcStyle.EmberLight, r.topLeft, r.size, alpha = alpha, style = Stroke(width, join = StrokeJoin.Round))
-      return
-    }
-    val a = view.at(r.topLeft)
-    val b = view.at(r.topRight)
-    val c2 = view.at(r.bottomRight)
-    val d = view.at(r.bottomLeft)
-    s.drawLine(CcStyle.EmberLight, a, b, width, StrokeCap.Round, alpha = alpha)
-    s.drawLine(CcStyle.EmberLight, b, c2, width, StrokeCap.Round, alpha = alpha)
-    s.drawLine(CcStyle.EmberLight, c2, d, width, StrokeCap.Round, alpha = alpha)
-    s.drawLine(CcStyle.EmberLight, d, a, width, StrokeCap.Round, alpha = alpha)
-  }
-
   /** Visited rooms rest dimmer; the soft light sits on (or glides to) the current room. */
   fun drawWalk(s: DrawScope, rooms: List<String>, centres: List<CcMapPt?>, progress: Float, view: CcAffine = CcAffine.IDENTITY) {
     val i = CcPlanGeo.walkIndex(rooms.size, progress)
@@ -204,37 +178,15 @@ internal class CcPlanDraw(
     val veil: DrawScope.() -> Unit = { for (k in 0 until done) px.rects[rooms[k]]?.let { drawRect(c.planBg, it.topLeft, it.size, alpha = WALK_VEIL) } }
     if (view.isIdentity) s.veil() else s.withTransform({ transform(view.toMatrix()) }, veil)
     if (progress >= 1f) return
-    px.rects[rooms[i]]?.let { edge(s, it, view, 1f, FOCUS_DP * dp) }
+    px.rects[rooms[i]]?.let { ccPlanEdge(s, it, view, 1f, CcPlanFocus.FOCUS_DP * dp) }
     CcPlanGeo.walkPoint(centres, progress)?.let { p ->
       val r = WALK_CELLS * px.fit.scale
       s.ccGlowOval(paint, view.at(px.pt(p)), r * view.rowX, r * view.rowY, 1f, paint.tint(WALK_RGB))
     }
   }
 
-  /** While a room's sheet is open the rest of the floor dims… */
-  private fun focusVeil(s: DrawScope) {
-    val f = focus ?: return
-    for ((id, other) in px.rects) if (id != f) s.drawRect(c.planBg, other.topLeft, other.size, alpha = FOCUS_VEIL)
-  }
-
-  /** …and the room gets a breathing ember edge. */
-  private fun focusEdge(s: DrawScope, t: Float, view: CcAffine) {
-    val r = focus?.let(px.rects::get) ?: return
-    val k = frac(t * FOCUS_CYCLES)
-    val wave = 1f - kotlin.math.abs(k * 2f - 1f)
-    val inset = FOCUS_INSET_CELLS * px.fit.scale
-    val inner = Rect(r.left + inset, r.top + inset, r.right - inset, r.bottom - inset)
-    if (pulse) {
-      // The mock's `hlp`: the ember edge swells to twice its width and softens, then settles.
-      val swell = 1f - wave
-      edge(s, inner, view, 1f - PULSE_SOFTEN * swell, FOCUS_DP * dp * (1f + swell))
-      return
-    }
-    edge(s, inner, view, FOCUS_ALPHA_MIN + (1f - FOCUS_ALPHA_MIN) * wave, FOCUS_DP * dp)
-  }
-
-  /** True when [drawAnimated] draws anything at all (no pulses and no focused room: nothing moves). */
-  val animates: Boolean get() = model.pulses.isNotEmpty() || (focus != null && focus in px.rects)
+  /** True when [drawAnimated] draws anything at all (no pulses: nothing of the plan's own moves). */
+  val animates: Boolean get() = model.pulses.isNotEmpty()
 
   private fun frac(v: Float): Float = v - kotlin.math.floor(v)
 
@@ -248,10 +200,8 @@ internal class CcPlanDraw(
     private const val WINDOW_DP = 6f
     private const val DOOR_DP = 7f
     private const val GARAGE_DP = 12f
-    private const val FOCUS_DP = 6f
     private const val ARC_ALPHA = 0.8f
     private const val STALE_FACTOR = 0.45f
-    private const val SEL_MIX = 0.2f
     private const val CLIMATE_DARK = 0.5f
     private const val CLIMATE_LIGHT = 0.55f
     private const val WASH_DARK = 0.16f
@@ -265,12 +215,6 @@ internal class CcPlanDraw(
     private const val PULSE_FROM = 0.35f
     private const val PULSE_GROW = 1.25f
     private const val PULSE_ALPHA = 0.55f
-    private const val FOCUS_CYCLES = 4f
-    private const val FOCUS_ALPHA_MIN = 0.55f
-    /** The mock's `hlp` keyframe: opacity .6 at the widest. */
-    private const val PULSE_SOFTEN = 0.4f
-    private const val FOCUS_INSET_CELLS = 0.2f
-    private const val FOCUS_VEIL = 0.6f
     private const val WALK_VEIL = 0.45f
     /** The mock's 150-unit sweep light, in cells. */
     private const val WALK_CELLS = 7.5f

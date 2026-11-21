@@ -52,16 +52,24 @@ internal class CcEvictingLru<K : Any, V : Any>(private val max: Int, private val
 
 /** Which plan pass a recorded layer holds (see [CcPlanCanvas]). */
 internal enum class CcPlanPass {
-  FLOORS, UNDER, WALLS, OVER, OVER_STILL, TOP,
-  /** 3D ([CcIsoPx]): the slab, the floor-lying part of OVER, the standing walls, the upright markers and labels. */
-  SLAB3D, FLAT, FLAT_STILL, WALLS3D, MARKS3D, TOP3D,
+  FLOORS, UNDER, WALLS,
+  /** The openings: flat, and replayed through the projection in 3D. */
+  OPENINGS,
+  /** 2D markers (with the pulses' still frame while motion is off). */
+  MARKS, MARKS_STILL,
+  TOP,
+  /** 3D ([CcIsoPx]): the slab, the pulses' still frame on the floor, the standing walls, the upright markers and labels. */
+  SLAB3D, PULSES_STILL, WALLS3D, MARKS3D, TOP3D,
 }
 
-/** One recorded pass: the pass and the identity of the object that draws it. */
-internal data class CcPassKey(val pass: CcPlanPass, val source: CcSame)
+/**
+ * One recorded pass: the pass, the identity of the object that draws it and, for the labels only
+ * (other rooms' names fade while one is highlighted), the highlighted room.
+ */
+internal data class CcPassKey(val pass: CcPlanPass, val source: CcSame, val focus: String? = null)
 
 /**
- * The plan's draw passes recorded once per floor (and per model, lens and focus) into retained
+ * The plan's draw passes recorded once per floor (and per model and lens) into retained
  * [GraphicsLayer]s, so a floor switch — or switching back — replays an existing display list
  * instead of recording every fill, glow, wall, badge and label again inside the frame. Display
  * lists only (no pixels are kept per floor), a few hundred KB at most; evicted layers are released.
@@ -89,10 +97,10 @@ internal class CcPlanLayers(private val graphics: GraphicsContext, max: Int = MA
 
   companion object {
     /**
-     * One canvas per floor ([CcFloorParking]): five 2D passes and, once shown in 3D, five more,
-     * plus room for the ones an HA update just replaced.
+     * One canvas per floor ([CcFloorParking]): six 2D passes plus the labels of a highlighted room
+     * and, once shown in 3D, five more (and those labels), plus room for the ones an HA update just replaced.
      */
-    const val MAX_LAYERS = 16
+    const val MAX_LAYERS = 20
     private val RECORD_SECTIONS = CcPlanPass.entries.map { "cc:record:${it.name}" }
   }
 }
@@ -100,8 +108,8 @@ internal class CcPlanLayers(private val graphics: GraphicsContext, max: Int = MA
 /** What a [CcPlanDraw] is built from; equal keys reuse the same draw object (and its recorded passes). */
 internal data class CcDrawKey(
     val model: CcSame, val px: CcSame, val paint: CcSame, val c: CcColors, val labels: CcSame, val chips: CcSame,
-    val lens: CcLens, val focus: String?, val stale: Boolean, val fahrenheit: Boolean, val dp: Float,
-    val skipLit: Set<String> = emptySet(), val pulse: Boolean = false,
+    val lens: CcLens, val stale: Boolean, val fahrenheit: Boolean, val dp: Float,
+    val skipLit: Set<String> = emptySet(),
 )
 
 /** What a [CcPlanBase] is built from. */
