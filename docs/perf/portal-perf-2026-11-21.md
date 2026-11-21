@@ -156,3 +156,118 @@ The branch columns are build `5daab363`: the final changes plus the sheet experi
 1. Sheet: make the plan's room highlight cheap. Draw it as its own layer, so the plan's other layers keep their recordings when `highlightRoom` changes. To attribute first, trace the `cc:*` sections with a profileable (benchmark) build. They don't appear in performance builds, because Android 10 enables app tracing only for profileable apps.
 2. Open: the first frame is one composition of the whole map (~45 ms of main-thread work). Making it smaller needs either a lighter first composition or keeping CC alive behind Home, which trades against the memory result above.
 3. The +230 ms redraw happens because the background subscription drops the plan's non-alert entities. Keeping their last states would avoid the redraw, but would show stale states for ~200 ms. That is an owner decision.
+
+---
+
+# Phase B: Settings open (settings-open, 2026-11-21)
+
+No code change kept. Two candidates were measured on the device and neither met the bar; the attribution below
+replaces the Phase A hypothesis.
+
+**Device and builds:**
+- Family Portal+ (`<family-serial>`), last Settings page Display & Brightness. Lock held 00:33–00:46, 00:50–00:56 and
+  01:10–01:21 PST. STREAM_MUSIC 0 during each stint, restored to 3. No screenshots; the tap target came from
+  `uiautomator dump`.
+- A/B builds are `assemblePerformance` from main 1.303 plus its `.dm` (`reason=install-dm` checked every install).
+  Each install waits 25 s and discards one warm-up open.
+- At the end the official 1.303 APK (sha256 `2e058554…a365`, matching `hearthpane-latest.json`) was reinstalled.
+  Home was on top and dev mode was off.
+
+**Method:** the survey's: `gfxinfo reset`, tap Settings in Home's header, 2.5 s, `gfxinfo framestats`, Back, 4 s.
+Medians per build. "Settings frames" counts framestats rows of the Settings window (flags 0 and 1).
+
+| Build | n | Janky (of total) | Settings frames, janky | p90 ms | p99 ms | frames > 32 ms | max ms |
+|---|---|---|---|---|---|---|---|
+| Official 1.303, installed by OTA (long-running process) | 5 | 15 of 18 (83 %) | 13 of 16 | 48 | 53 | 5 | 54 |
+| **Before:** performance build of main | 6 | 11.5 of 18 (64 %) | 9.5 of 16 | 52.5 | 61 | 4 | 63 |
+| Candidate 1: the page's deferred entries shown as one wave | 8 | 11.5 of 18 (64 %) | 9.5 of 16 | 53 | 61 | 3.5 | 63 |
+| Control: unobfuscated, profileable (for the next row) | 8 | 11.5 of 18 (65 %) | 9.5 of 16 | 45 | 55 | 3.5 | 56 |
+| Candidate 2: Compose accessibility diffing off (reflection, not shippable) | 8 | 9 of 17 (56 %) | 7.5 of 15 | 53 | 59 | 3 | 60 |
+
+- The official build runs about 2 janky frames worse than a fresh performance install of the same code. That is
+  a property of the long-running process, not of the build: the A/B compares fresh installs only.
+
+## Where an open goes
+
+**Frame structure.** One open draws 15–16 Settings frames over about 350 ms. Every vsync gets a frame:
+1. The first frame (window layout, flags 1): 26–57 ms.
+2. About 6 frames build the hidden master column (`SettingsMasterReveal`, 3 entries per frame): 7–31 ms each.
+3. The page frame: doFrame about 25 ms, 15 ms of it in measure.
+4. About 7 tail frames: the deferred page entries, the Display snapshot, then a run of RenderThread-only redraws
+   (record 0.1 ms) as the page's controls settle. 9–36 ms each.
+
+**Why p90 and p99 don't move.** They are set by 3 frames that are not Settings content:
+- Home's press-feedback frame: 26–44 ms.
+- Home's hide frame (flags 1, a relayout as Settings covers it): 63–68 ms.
+- Settings' first frame: about 57 ms.
+
+The last two share one vsync. The launch transaction delays it by 31–33 ms. This matches round 7's Home-under-Settings
+finding.
+
+**Why a cheap frame is still janky.** The pipeline is main thread, then RenderThread, then GPU. In atrace the
+RenderThread spends about 5 ms per frame in `waiting for GPU completion`, and 7 ms in each of 8 `waiting for HWC release`
+(dequeueBuffer). So a frame with 8 ms of main-thread work still lands at 17–25 ms of latency.
+
+**Main-thread CPU per open** (simpleperf, 4 kHz, 5 opens on the profileable control):
+
+| Work | ms per open |
+|---|---|
+| Activity launch (`handleLaunchActivity` and resume, including `installDecor` 8, `setTheme` 3, binder `getActivityDisplayId`) | 33–40 |
+| **Compose accessibility diff** (`checkForSemanticsChanges` → `sendAccessibilitySemanticsStructureChangeEvents` → `getAllUncoveredSemanticsNodes` / `subtreeSortedByGeometryGrouping`) | **33–50** |
+| Text layout (`TextStringSimpleNode.measure`) | 18–28 |
+| Vector icons (`VectorPainter.onDraw`, plus `painterResource`) | 6–14 |
+| The search field (`BasicTextField` / `CoreTextField`) | 3–8 |
+| Code running interpreted (`art_quick_to_interpreter_bridge`, callers in Compose runtime and lifecycle) | about 10 |
+
+**The accessibility diff is the largest Settings-side cost, and it is new.**
+- Compose diffs the whole semantics tree after every frame whose semantics change. The check is posted between frames,
+  so it delays the next frame's start.
+- Compose turns this on whenever any accessibility service is enabled. On the Portal four are always on: Meta's
+  KeyEvent and Presence services, plus Hearthpane's BarWatchService and InstallConfirmService. None of them is a
+  screen reader.
+- Staged opening multiplies the cost. The largest checks come once the page is composed (17 ms in one run).
+- Turning the diff off saved about 2 janky frames per open (candidate 2). Compose has no supported switch for this.
+  The reflection used for the measurement depends on a private field (`_enabledServices` in Compose UI 1.10.4) and
+  stops Compose's semantics events for every consumer, so it is not shippable.
+
+**Ruled out:**
+- `SettingsLastPage.write` in `onCreate`: a no-op for an unchanged id, and the preferences are already in memory.
+- `trackForJarvis()`: a lifecycle observer. `SettingsJarvisContext.build` runs only when Jarvis asks.
+- Baseline profile: the `.dm` holds 5,229 classes, 537 of them Settings, and the status is `speed-profile`. The
+  interpreted residue (about 10 ms) sits in callees that simpleperf can't name on Android 10.
+
+## Tried, not kept
+
+1. **The page's deferred entries shown as one wave** (`SettingsCompositionScheduler` holds measured slots until the
+   queue drains, at most 5 frames).
+   - Hypothesis: frames that only precompose would draw nothing, and one accessibility pass would replace several.
+   - Result: no change. Frames stayed 16, janky 64 % → 64 %.
+   - The tail frames are driven by the page's own settling redraws, not by the reveals. The change also altered
+     transitional visuals, so it was reverted.
+2. **Compose accessibility diffing off** (scratch reflection): 65 % → 56 % janky, Settings janky 9.5 → 7.5. Not
+   shippable (see above).
+3. **Sharing VectorPainters across openings:** not tried.
+   - It would save about 6–14 ms of main-thread time per open, but it contradicts the documented `SettingsIconCache`
+     contract ("values are immutable icon data, never UI owners"; "each composition owns its painter").
+   - It needs an owner decision first.
+
+## Against the targets
+
+The targets (≤ 1 janky frame, p90 < 16 ms, p99 < 32 ms) cannot be reached without an architectural change or an
+owner trade-off:
+- p90 and p99 are set by Home's own frames and by the launch frame.
+- With every vsync producing a frame, each one is at least 17 ms of pipeline latency on this device.
+- A one-frame open would be a single 150 ms frame. That is the stall the staged opening (`af1fb81c`) replaced.
+
+## Next (needs owner decisions)
+
+1. **Keep Settings composed between opens:** retain the activity and its window rather than finishing it.
+   - This is the only route to about 1–2 frames per open.
+   - Costs: it retains the Settings tree in memory, a reopen needs an explicit reset hook (as the calendar panel
+     has), and task/Back semantics change.
+2. **Accessibility diff:** decide whether a shippable way to scope Compose's semantics diffing is acceptable, given
+   that the Portal's always-on services include no screen reader. Or watch for a Compose release that throttles
+   `checkForSemanticsChanges`.
+3. **Shared Settings tile painters:** a contract change to `SettingsIconCache`.
+4. **Interpreted residue:** name the roughly 10 ms of interpreted callees with a debuggable build and extend
+   `baseline-prof.txt`.
