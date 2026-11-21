@@ -502,7 +502,10 @@ internal fun ApprovedHomeWidgetHeading(
       val color = if (action == HomeRefinements.HeaderAction.OPEN) ApprovedHomePalette.Accent
           else ApprovedHomePalette.Secondary
       // The negative vertical margin in the approved CSS gives this action a 68dp minimum target.
+      // Every card says "Settings"/"Open": the spoken name says whose ("Weather settings").
+      val spoken = HomeRefinements.headerActionSpoken(action, title)
       Box(Modifier.widthIn(min = 68.dp).height(32.dp)
+          .semantics { contentDescription = spoken }
           .tvFocusable(RoundedCornerShape(9.dp), ringColor = ApprovedHomePalette.Accent, onClick = onOpen)
           .padding(horizontal = 6.dp),
           contentAlignment = Alignment.Center) {

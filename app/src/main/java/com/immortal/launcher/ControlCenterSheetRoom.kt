@@ -111,7 +111,8 @@ private fun RoomAlert(ui: CcUi, ra: CcRoomAlert, canControl: Boolean) {
       Text(a.body, color = c.sec, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
     val e = ra.closable
-    if (e != null) CcButton("Close…", { ui.act(e, CcCalls.coverClose(e)) }, icon = "garage", height = 64, enabled = canControl)
+    if (e != null) CcButton("Close…", { ui.act(e, CcCalls.coverClose(e)) }, icon = "garage", height = 64, enabled = canControl,
+        spoken = CcSpeech.alertAction(a.title, "Close…"))
     else CcIcon("chev", c.faint, 28.dp)
   }
 }

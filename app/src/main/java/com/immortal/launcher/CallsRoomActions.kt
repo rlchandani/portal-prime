@@ -24,6 +24,19 @@ internal object CallRoomActions {
   /** The drop-in button's words for an allowed policy. */
   fun dropInLabel(drop: DropInPolicy): String = if (drop == DropInPolicy.ASK) "Ask to join" else "Drop in"
 
+  /**
+   * A card action's screen-reader name. Every room and phone card has the same buttons, so the name says
+   * which card it is on: "Video call Living Area", "Drop in Kitchen". The visible words come first.
+   */
+  fun spoken(label: String, name: String): String = "$label $name"
+
+  /** The star button (icon only): "Show Kitchen on Home" / "Remove Kitchen from Home". */
+  fun favouriteSpoken(favourite: Boolean, name: String): String =
+      if (favourite) "Remove $name from Home" else "Show $name on Home"
+
+  /** A phone card's message button: "Leave a message for Priya". */
+  fun leaveMessageSpoken(name: String): String = "${CallMessageCopy.LEAVE} for $name"
+
   /** The card's status note under the presence line. */
   enum class Note(val text: String) { CALLS_OFF("Calls off"), DROP_INS_ON("Drop-ins on"), ASKS_FIRST("Asks first"), DROP_INS_OFF("Drop-ins off") }
 

@@ -103,4 +103,11 @@ internal object CcSpeech {
 
   /** An attention row: "Garage door open. Open for 12 min". */
   fun row(title: String, body: String): String = if (body.isBlank()) title else "$title. $body"
+
+  /**
+   * An alert's own button, named for its alert: "Office door is open · Close". The same alert shows on
+   * the overview, its room sheet and the Alerts screen, and several alerts share one action word.
+   * A trailing "…" (the visible confirm hint) is not spoken.
+   */
+  fun alertAction(title: String, action: String): String = "$title · ${action.removeSuffix("…")}"
 }

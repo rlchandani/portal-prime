@@ -81,7 +81,8 @@ private fun AttentionRow(row: CcAttentionRow, canControl: Boolean, ui: CcUi) {
       Text(a.title, color = c.text, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
       Text(a.body, color = c.sec, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 26.sp)
     }
-    if (closes && e != null) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = canControl)
+    if (closes && e != null) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = canControl,
+        spoken = CcSpeech.alertAction(a.title, "Close"))
     else CcIcon("chev", c.sec, 30.dp)
   }
 }

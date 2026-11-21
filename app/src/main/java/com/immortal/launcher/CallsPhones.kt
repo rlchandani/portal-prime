@@ -48,9 +48,11 @@ internal fun CallPhoneCard(phone: CallPhone, now: Long, compact: Boolean) {
     }
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       CallPill("Video call", { Calling.dial(context, phone.id, CallKind.CALL, video = true) }, icon = "video",
-          style = CallButtonStyle.OK, enabled = open, surface = surface)
-      CallRoundButton("phone", "Audio call", { if (open) Calling.dial(context, phone.id, CallKind.CALL, video = false) }, surface = surface)
-      CallRoundButton("msg", CallMessageCopy.LEAVE, { CallMessages.compose(context, phone.contact()) }, surface = surface)
+          style = CallButtonStyle.OK, enabled = open, surface = surface, spoken = CallRoomActions.spoken("Video call", phone.name))
+      CallRoundButton("phone", "Audio call", { if (open) Calling.dial(context, phone.id, CallKind.CALL, video = false) }, surface = surface,
+          spoken = CallRoomActions.spoken("Audio call", phone.name))
+      CallRoundButton("msg", CallMessageCopy.LEAVE, { CallMessages.compose(context, phone.contact()) }, surface = surface,
+          spoken = CallRoomActions.leaveMessageSpoken(phone.name))
     }
   }
 }
