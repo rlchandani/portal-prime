@@ -37,6 +37,8 @@ internal object FleetSecretPaths {
       listOf("no_backup", AutoAnswerRepository.DIR),
       // Calls between homes: the household identity key and linked homes (sealed).
       listOf("no_backup", HomeLinkRepository.DIR),
+      // The Portals pinned in person, whose device keys may fetch that vault.
+      listOf("no_backup", PortalRosterStore.DIR),
       // Video messages (sealed, with their wrapped key) and the sender's temp take.
       listOf("no_backup", CallMessageStore.DIR), listOf("no_backup", CallMessageStore.OUT_DIR),
       // Messages waiting for a paired phone to collect them (transit-sealed).

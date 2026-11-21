@@ -105,9 +105,11 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
           onInvite = ::newInvite, onJoin = ::newInvite, onRooms = { editing = it; stage = HomeLinkTestStage.ROOMS },
           onCheckAgain = { newInvite() }, onBack = onClose))
       HomeLinkTestStage.INVITE -> {
-        HomeLinkInviteScreen(invite, now, qr, onNewCode = ::newInvite, onCancel = { stage = HomeLinkTestStage.HOUSEHOLDS })
-        CallPill("Type it as the other home", { stage = HomeLinkTestStage.JOIN }, icon = "house", style = CallButtonStyle.PRIMARY,
-            surface = callsSurface(), modifier = Modifier.align(Alignment.BottomEnd).padding(40.dp))
+        // In the invite's own scroll, so it never covers New code / Cancel (it floated over them on the Mini).
+        HomeLinkInviteScreen(invite, now, qr, onNewCode = ::newInvite, onCancel = { stage = HomeLinkTestStage.HOUSEHOLDS }) {
+          CallPill("Type it as the other home", { stage = HomeLinkTestStage.JOIN }, icon = "house", style = CallButtonStyle.PRIMARY,
+              surface = callsSurface())
+        }
       }
       HomeLinkTestStage.JOIN -> {
         HomeLinkJoinScreen(entry, onEntry = { entry = it; noAnswer = false }, onJoin = { typed = it },
@@ -131,7 +133,7 @@ internal fun HomeLinkLoopbackScreen(feature: HomeLinkFeature, onClose: () -> Uni
             onDone = { stage = if (stage == HomeLinkTestStage.PERMS) HomeLinkTestStage.CONNECTED else HomeLinkTestStage.HOUSEHOLDS },
             onBack = if (stage == HomeLinkTestStage.ROOMS) ({ stage = HomeLinkTestStage.HOUSEHOLDS }) else null)
       }
-      HomeLinkTestStage.CONNECTED -> HomeLinkConnectedScreen(editing?.name ?: TEST_PEER, onDone = {
+      HomeLinkTestStage.CONNECTED -> HomeLinkConnectedScreen(selfName, editing?.name ?: TEST_PEER, onDone = {
         households = households.withBook(vault.book).select(editing?.id); stage = HomeLinkTestStage.HOUSEHOLDS
       })
       HomeLinkTestStage.FAILED -> HomeLinkFailureScreen(failure, onStartAgain = ::newInvite, onClose = { stage = HomeLinkTestStage.HOUSEHOLDS })

@@ -16,9 +16,9 @@ import java.io.File
 
 /**
  * The vault route hands out the household identity's private key, and a phone holding the
- * household key could pose as a Portal to get it. Until Portal-only key material exists the route
- * and vault sync are measurement-only ([HomeLinkGate]): ordinary builds (unit tests use one) don't
- * register `/remote/homelinkpeer` at all.
+ * household key could pose as a Portal to get it. The vault now moves only to pinned Portal device
+ * keys ([HomeLinkGate.syncs]); until that is reviewed the route and sync also stay measurement-only:
+ * ordinary builds (unit tests use one) don't register `/remote/homelinkpeer` at all.
  */
 class HomeLinkGateTest {
   private fun post(path: String) = FleetHttpServer.Request("POST", path, "",
@@ -29,6 +29,17 @@ class HomeLinkGateTest {
   @Test fun theFlagIsOffInOrdinaryBuilds() {
     assertFalse(BuildConfig.PORTAL_CALL_LOOPBACK)
     assertFalse(HomeLinkGate.VAULT_SYNC)
+  }
+
+  /** The security condition: nothing syncs until a Portal's device key is pinned, whatever the build. */
+  @Test fun syncNeedsAPinnedPortalEvenWithTheBuildSwitchOn() {
+    val random = java.security.SecureRandom()
+    val me = HomeLinkIdentity.generate(random).publicKey
+    val pinned = PortalRoster().pin(HomeLinkPeer("Kitchen", HomeLinkIdentity.generate(random).publicKey), me, 1L)!!
+    assertFalse(HomeLinkGate.syncs(PortalRoster(), buildSwitch = true))
+    assertTrue(HomeLinkGate.syncs(pinned, buildSwitch = true))
+    assertFalse(HomeLinkGate.syncs(pinned, buildSwitch = false))
+    assertFalse(HomeLinkGate.syncs(pinned))
   }
 
   @Test fun theVaultRouteIsNotRegisteredWhenTheFlagIsOff() {

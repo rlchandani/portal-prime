@@ -72,7 +72,9 @@ internal fun HomeLinkHeader(title: String, sub: String? = null, onBack: (() -> U
 
 /** Mock `inviteScr`: the QR on the left; the code, its limits and the why on the right. On a Mini, stacked. */
 @Composable
-internal fun HomeLinkInviteScreen(invite: HomeLinkInvite, now: Long, qr: Bitmap?, onNewCode: () -> Unit, onCancel: () -> Unit) {
+internal fun HomeLinkInviteScreen(invite: HomeLinkInvite, now: Long, qr: Bitmap?, onNewCode: () -> Unit, onCancel: () -> Unit,
+                                  /** Below the code, in the same scroll (the measurement build's test hand-off). */
+                                  extra: @Composable () -> Unit = {}) {
   val p = LocalApprovedPalette.current
   val compact = currentLayoutClass().compact
   Column(Modifier.fillMaxSize().background(p.background)) {
@@ -83,6 +85,7 @@ internal fun HomeLinkInviteScreen(invite: HomeLinkInvite, now: Long, qr: Bitmap?
         HomeLinkQr(qr, HomeLinkCopy.qrText(invite.code), COMPACT_QR)
         HomeLinkLockedNote(HomeLinkCopy.INVITE_SCAN)
         InviteCodeDetails(invite, now, onNewCode, onCancel)
+        extra()
       }
     } else {
       Row(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 24.dp), verticalAlignment = Alignment.CenterVertically,
@@ -93,6 +96,7 @@ internal fun HomeLinkInviteScreen(invite: HomeLinkInvite, now: Long, qr: Bitmap?
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(32.dp)) {
           InviteCodeDetails(invite, now, onNewCode, onCancel)
+          extra()
         }
       }
     }
@@ -189,12 +193,12 @@ internal fun HomeLinkFailureScreen(failure: HomeLinkFailure, onStartAgain: () ->
 
 /** Mock `inviteDoneScr`: both homes joined by a locked dashed line. */
 @Composable
-internal fun HomeLinkConnectedScreen(theirName: String, onDone: () -> Unit) {
+internal fun HomeLinkConnectedScreen(ourName: String, theirName: String, onDone: () -> Unit) {
   val p = LocalApprovedPalette.current
   Box(Modifier.fillMaxSize().background(p.background).padding(horizontal = 56.dp), contentAlignment = Alignment.Center) {
     Column(Modifier.widthIn(max = 1400.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(32.dp)) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(30.dp)) {
-        CallRoomAvatar("This home", 200.dp)
+        CallRoomAvatar(ourName, 200.dp)
         Box(Modifier.size(240.dp, 80.dp), contentAlignment = Alignment.Center) {
           Box(Modifier.fillMaxWidth().height(4.dp).background(CallColors.Ok.copy(alpha = 0.6f)))
           Box(Modifier.size(80.dp).background(CallColors.Ok, CircleShape), contentAlignment = Alignment.Center) {

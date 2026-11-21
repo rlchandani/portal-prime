@@ -31,10 +31,10 @@ import javax.crypto.KeyAgreement
  *
  * Public keys travel as Base64 X.509 (SubjectPublicKeyInfo). Holds the private key: never log it.
  */
-internal class HomeLinkIdentity private constructor(private val pair: KeyPair) {
-  val publicKey: String = encodePublic(pair.public)
+internal class HomeLinkIdentity private constructor(private val pair: KeyPair) : HomeLinkSigner {
+  override val publicKey: String = encodePublic(pair.public)
 
-  fun sign(data: ByteArray): String =
+  override fun sign(data: ByteArray): String =
       HomeLinkHash.b64(Signature.getInstance(SIGNATURE).run { initSign(pair.private); update(data); sign() })
 
   /** PKCS#8, Base64, for the encrypted on-device store only. */

@@ -308,8 +308,8 @@ class HomeLinkPairingTest {
 
   @Test fun bothSidesDeriveTheSameLinkKeyFromThePinnedKeys() {
     val (i, j) = run()
-    val atMaple = maple.identity.linkKey((i as HomeLinkInviterState.Comparing).peer.publicKey, maple.identity.publicKey)
-    val atLake = lake.identity.linkKey((j as HomeLinkJoinerState.Comparing).peer.publicKey, maple.identity.publicKey)
+    val atMaple = (maple.identity as HomeLinkIdentity).linkKey((i as HomeLinkInviterState.Comparing).peer.publicKey, maple.identity.publicKey)
+    val atLake = (lake.identity as HomeLinkIdentity).linkKey((j as HomeLinkJoinerState.Comparing).peer.publicKey, maple.identity.publicKey)
     assertArrayEquals(atMaple, atLake)
   }
 

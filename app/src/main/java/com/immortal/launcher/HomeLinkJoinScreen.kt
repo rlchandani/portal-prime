@@ -78,7 +78,10 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
           Text(HomeLinkCopy.JOIN_HOW, color = p.secondary, fontSize = 24.sp, textAlign = TextAlign.Center)
           join()
         }
-        HomeLinkKeys(letters, compact = false, modifier = Modifier.width(if (letters) LETTER_PAD else DIGIT_PAD), onKey = onKey)
+        // One fixed slot for both pads (the wider one), so toggling ABC/123 doesn't slide the code across.
+        Box(Modifier.width(LETTER_PAD), contentAlignment = Alignment.CenterEnd) {
+          HomeLinkKeys(letters, compact = false, modifier = Modifier.width(if (letters) LETTER_PAD else DIGIT_PAD), onKey = onKey)
+        }
       }
     }
   }
