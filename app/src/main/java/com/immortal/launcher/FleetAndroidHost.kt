@@ -147,6 +147,12 @@ internal class FleetAndroidHost(private val context: Context) :
   override fun settingsSyncStatus(): JSONObject = SettingsSync.statusJson()
   override fun settingsSyncValues(): JSONObject = SettingsSync.valuesJson()
 
+  override fun haAdopt(from: String, replace: Boolean): HaAdoption.Outcome = HaShare.adoption(context).adopt(from, replace)
+
+  override fun haPeers(): org.json.JSONArray = org.json.JSONArray().also { list ->
+    HaShare.adoption(context).offers().forEach { list.put(JSONObject().put("id", it.peer.id).put("name", it.name)) }
+  }
+
   override fun openControlCenter(screen: String): Boolean {
     val intent = ControlCenterActivity.intent(context).putExtra(ControlCenterActivity.EXTRA_SCREEN, screen)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

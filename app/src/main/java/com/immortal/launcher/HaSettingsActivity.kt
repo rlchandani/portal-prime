@@ -54,6 +54,8 @@ internal fun HaSettingsContent() { ApprovedEditorsHaContent(entitiesOnly = false
 @Composable
 private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
     val context = LocalContext.current
+    // Not connected yet and a household Portal is: offer its connection first (both Settings levels).
+    if (!entitiesOnly) HaPeerAdoptSection()
     if (!entitiesOnly && HomeDashboardSettings()) return
     val back = rememberApprovedSettingsBack()
     val scope = rememberCoroutineScope()
@@ -65,6 +67,9 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
     var status by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    // A connection adopted from another Portal on this page shows its address in the form.
+    val haRevision by HaConfig.revision.collectAsState()
+    LaunchedEffect(haRevision) { if (!busy) url = HaConfig.baseUrl(context) }
     var discovered by remember { mutableStateOf<List<ApprovedEditorsEntity>>(emptyList()) }
     var pinned by remember { mutableStateOf(HaConfig.entities(context)) }
     var query by remember { mutableStateOf("") }
@@ -103,6 +108,7 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
                         HaConfig.setConnection(context, candidateUrl, candidateToken)
                         DoorbellListener.restart(context) // the doorbell watches the new connection
                         ControlCenter.restart(context) // so does the Control Center
+                        invalidateApprovedDashboardInventory() // the Home Control tile appears at once
                         url = HaConfig.baseUrl(context); token = ""
                     }
                     discovered = result

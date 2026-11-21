@@ -119,6 +119,9 @@ class RemoteRoutes internal constructor(
         RemindersPeerRoute.PATH -> RemindersPeerRoute.handle(context, req)
         // Portal↔Portal household settings exchange: HouseholdKey-signed, its own message types.
         SettingsSyncNet.PATH -> SettingsSyncNet.handle(context, req)
+        // Portal↔Portal Home Assistant connection hand-off: HouseholdKey-signed, announced-address bound,
+        // rate-limited, the token sealed (AES-256-GCM) per requester and nonce. Never answers a phone.
+        HaShareWire.PATH -> HaShare.handle(context, req)
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
         CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
         // Portal↔Portal video message delivery: household-signed header, sealed chunked body.

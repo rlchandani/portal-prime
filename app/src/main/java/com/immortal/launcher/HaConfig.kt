@@ -8,6 +8,9 @@
 package com.immortal.launcher
 
 import android.content.Context
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -40,11 +43,17 @@ object HaConfig {
 
   fun token(context: Context): String = prefs(context).getString(KEY_TOKEN, "").orEmpty()
 
+  private val mutableRevision = MutableStateFlow(0L)
+
+  /** Bumped on every connection change, so a surface already on screen (Home header, widget) re-reads it. */
+  val revision: StateFlow<Long> = mutableRevision.asStateFlow()
+
   fun setConnection(context: Context, url: String, token: String) {
     prefs(context).edit()
         .putString(KEY_URL, url.trim().trimEnd('/'))
         .putString(KEY_TOKEN, token.trim())
         .apply()
+    mutableRevision.value++
   }
 
   fun isConfigured(context: Context): Boolean =
