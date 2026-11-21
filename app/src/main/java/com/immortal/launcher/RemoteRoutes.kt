@@ -122,6 +122,10 @@ class RemoteRoutes internal constructor(
         // Portal↔Portal Home Assistant connection hand-off: HouseholdKey-signed, announced-address bound,
         // rate-limited, the token sealed (AES-256-GCM) per requester and nonce. Never answers a phone.
         HaShareWire.PATH -> HaShare.handle(context, req)
+        // Portal↔Portal home-link vault (identity key + linked homes): HouseholdKey-signed, announced-address
+        // bound, sealed (AES-256-GCM) per requester, nonce and direction. Never answers a phone. Measurement
+        // builds only (HomeLinkGate): elsewhere the path is unregistered, the same 404 as any unknown path.
+        HomeLinkSyncWire.PATH -> if (HomeLinkGate.VAULT_SYNC) HomeLinkSync.handle(context, req) else json(404, err("not_found"))
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
         CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
         // Portal↔Portal video message delivery: household-signed header, sealed chunked body.

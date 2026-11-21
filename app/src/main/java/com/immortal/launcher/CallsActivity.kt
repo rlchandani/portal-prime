@@ -59,6 +59,8 @@ import kotlinx.coroutines.delay
  * and history), Call everyone, Settings, and a way into Portal's own Messenger/WhatsApp calling.
  */
 class CallsActivity : ComponentActivity() {
+  private val homeLinks by lazy { HomeLinkFeature(HomeLinkFeature.sharedRandom) }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val start = when (intent.getStringExtra(EXTRA_TAB)) {
@@ -70,7 +72,7 @@ class CallsActivity : ComponentActivity() {
       PortalPrimeTheme(darkTheme = false) {
         // Grandma mode replaces the whole app with big faces (set up on this Portal only).
         val rules by CallAutoAnswerStore.flow(this).collectAsState()
-        if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, onBack = ::finish)
+        if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, homeLinks, onBack = ::finish)
       }
     }
     // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
@@ -118,13 +120,14 @@ internal fun callsSurface(): CallSurface {
 }
 
 @Composable
-private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
+private fun CallsApp(start: CallsTab, homeLinks: HomeLinkFeature, onBack: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   var tab by rememberSaveable { mutableStateOf(start) }
   var everyone by remember { mutableStateOf(false) }
   var loopback by remember { mutableStateOf(false) }
   var testMessage by remember { mutableStateOf(false) }
+  var linkTest by remember { mutableStateOf(false) }
   val history by CallingStore.history.collectAsState()
   // Index read + prune touch disk: off the main thread; the list fills in via the StateFlow.
   LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
@@ -141,7 +144,8 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   Box(Modifier.fillMaxSize().background(p.background)) {
     Column(Modifier.fillMaxSize()) {
       CallsHeader(tab, CallsBadges(CallHistory.unseenMissed(history), CallMessageList.unseen(messages)), onTab = { tab = it },
-          onBack = onBack, onLoopback = { loopback = true }, onTestMessage = { testMessage = true })
+          onBack = onBack, onLoopback = { loopback = true }, onTestMessage = { testMessage = true },
+          onLinkTest = { linkTest = true })
       when (tab) {
         CallsTab.ROOMS -> CompositionLocalProvider(LocalJarvisPulse provides jarvisTarget) {
           CallsRooms(onEveryone = { everyone = true })
@@ -153,17 +157,18 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
     if (everyone) Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { everyone = false }) }
     if (loopback && BuildConfig.PORTAL_CALL_LOOPBACK) CallLoopbackScreen(onClose = { loopback = false })
     if (testMessage && BuildConfig.PORTAL_CALL_LOOPBACK) CallMessageTestSheet(onDismiss = { testMessage = false })
+    if (linkTest && BuildConfig.PORTAL_CALL_LOOPBACK) HomeLinkLoopbackScreen(homeLinks, onClose = { linkTest = false })
   }
 }
 
 @Composable
 private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit,
-                        onTestMessage: () -> Unit) {
+                        onTestMessage: () -> Unit, onLinkTest: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
   if (currentLayoutClass().compact) {
-    CallsHeaderCompact(tab, badges, onTab, onBack, onLoopback, onTestMessage)
+    CallsHeaderCompact(tab, badges, onTab, onBack, onLoopback, onTestMessage, onLinkTest)
     return
   }
   Row(Modifier.fillMaxWidth().height(130.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically,
@@ -179,6 +184,7 @@ private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) ->
     if (BuildConfig.PORTAL_CALL_LOOPBACK) {
       CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
       CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
+      CallPill("Link homes test", onLinkTest, icon = "house", surface = surface, size = CallButtonSize.SM)
     }
     CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
@@ -192,7 +198,7 @@ private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) ->
  */
 @Composable
 private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit,
-                               onTestMessage: () -> Unit) {
+                               onTestMessage: () -> Unit, onLinkTest: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
@@ -213,6 +219,7 @@ private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (Calls
       if (BuildConfig.PORTAL_CALL_LOOPBACK) {
       CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
       CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
+      CallPill("Link homes test", onLinkTest, icon = "house", surface = surface, size = CallButtonSize.SM)
     }
       CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     }
