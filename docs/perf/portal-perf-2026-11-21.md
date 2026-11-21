@@ -157,6 +157,39 @@ The branch columns are build `5daab363`: the final changes plus the sheet experi
 2. Open: the first frame is one composition of the whole map (~45 ms of main-thread work). Making it smaller needs either a lighter first composition or keeping CC alive behind Home, which trades against the memory result above.
 3. The +230 ms redraw happens because the background subscription drops the plan's non-alert entities. Keeping their last states would avoid the redraw, but would show stale states for ~200 ms. That is an owner decision.
 
+### Follow-up: the room highlight as its own layers (branch `cc-highlight`, partial)
+
+**Attribution (main 1.304, profileable benchmark build, 3 atrace captures of the read-only "door is open" row, after one warm-up open).**
+- No `cc:record:*` or `cc:drawCtx` section appears on a repeat open: the plan re-records nothing. The draw object and
+  the recorded passes for that focus are still in their LRUs from the warm-up, so the earlier "re-records its layers"
+  holds only for the first open of a room.
+- The tap frame is main-thread work: `Recomposer:recompose` 9–28 ms (`applyChanges` 2–7, `onForgotten` 1–2.4),
+  then a traversal of 12–19 ms (measure/layout 4–7 ms, the rest draw recording). The UI frames were 21–44 ms.
+- RenderThread: 16–28 ms for the same frame, of which `flush layers` 4.8–8.4 ms (the plan's offscreen textures and the
+  sheet's texture being rastered).
+- So a repeat open pays for the highlight in recomposition plus re-rastering, not in recording.
+
+**Change (commit on `cc-highlight`).** The highlight moved out of `CcPlanDraw` into `CcPlanFocus`
+(`ControlCenterPlanFocus.kt`): tint, veil, edge, which labels fade. `CcPlanDraw` and `CcDrawKey` no longer depend on it.
+- The floors, washes, glows, walls, openings and markers keep one draw object and one recording across every highlight.
+- Only these change: the tint and veil layers (a few rects), the labels (`CcPassKey` keyed by the highlighted room),
+  and the per-frame animation layer.
+- The draw order is unchanged: tint between floors and washes, veil between openings and markers, edge after the pulses.
+  `OVER` is split into `OPENINGS` + `MARKS` to make room for the veil. `MAX_LAYERS` went from 16 to 20.
+- JVM tests: `ControlCenterPlanFocusTest` (6) and `ControlCenterPlanLayerCacheTest.onlyTheLabelsAreRecordedPerHighlightedRoom`.
+
+**Not measured yet.** The Family Portal's device lock was held by another task from 01:40 PST for the rest of the
+time box, so neither the branch trace nor the framestats A/B was run. The targets (no sheet frame over 32 ms, p90 under
+16 ms) are therefore unverified. Built and waiting:
+- the branch profileable build with temporary `cc:x:*` sections (composition of the plan card, canvas and room sheet,
+  each plan layer's draw) and a `debug.cc.nohl` switch that opens the sheet without the highlight;
+- the main and branch performance builds plus their `.dm`.
+
+Since the trace shows no recording on a repeat open, this change alone is not expected to reach the targets for the
+measured case. It removes the first-open re-record and the re-raster of the floor's lower layers only if those layers
+move out of the shared texture, which they have not (they share it with the tint and veil). The attribution run with
+`debug.cc.nohl` comes next: it shows how much of the 21–44 ms is the highlight and how much is composing the sheet.
+
 ---
 
 # Phase B: Settings open (settings-open, 2026-11-21)
