@@ -10,7 +10,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
@@ -18,13 +17,14 @@ import java.util.concurrent.Executors
 /**
  * Keeps every Portal in this home on one [HomeLinkVault], like [ReminderSync]: a stored change
  * broadcasts a signed `home_link_rev` (keyed digest + LAN address); a Portal whose vault differs
- * POSTs its sealed vault to the sender's `/remote/homelinkpeer` and merges the sealed, signed
- * reply. Startup announces, which is the catch-up path after being off. A removal is a tombstone
- * in the vault, so "Remove Lakeview" reaches every Portal and wipes its key there too.
+ * **pulls** the sender's vault over `/remote/homelinkpeer` ([HomeLinkSyncWire] v2: signed by its
+ * Keystore device key, answered sealed to a one-time ECDH key) and merges it; the sender pulls
+ * back when the puller's digest differs. Startup announces, which is the catch-up path after
+ * being off. A removal is a tombstone in the vault, so "Remove Lakeview" reaches every Portal.
  *
- * Measurement builds only ([HomeLinkGate.VAULT_SYNC]): elsewhere nothing here starts, signals or
- * answers, because the vault carries the identity's private key and a phone holding the household
- * key could pose as a Portal to fetch it.
+ * Two gates ([HomeLinkGate]): the build switch, and per Portal the pinned device keys — a Portal
+ * that pinned nobody neither asks nor answers, so the household key alone (phones hold it) gets
+ * nothing.
  */
 internal object HomeLinkSync {
   private const val TAG = "HearthpaneHomeLinkSync"
@@ -52,9 +52,11 @@ internal object HomeLinkSync {
   fun handle(context: Context, req: FleetHttpServer.Request): FleetHttpServer.Response {
     if (!HomeLinkGate.VAULT_SYNC) return RemoteFeatureRoutes.json(404, RemoteFeatureRoutes.error("not_found"))
     val repo = HomeLinkRepository.get(context)
+    val app = context.applicationContext
     return HomeLinkSyncRoute(
-        key = { HouseholdKey.get(context) }, selfId = { selfId(context) }, clock = System::currentTimeMillis, replay = replay,
-        announcedHost = ::announcedHost, vault = { repo.vault.value }, merge = { repo.merge(it) },
+        key = { HouseholdKey.get(context) }, selfId = { selfId(context) }, device = PortalDeviceKey::get,
+        roster = { PortalRosterStore.get(app).roster }, clock = System::currentTimeMillis, replay = replay,
+        announcedHost = ::announcedHost, vault = { repo.vault.value }, pullBack = { from -> pullBack(app, from) },
         random = HomeLinkFeature.sharedRandom, log = { Log.i(TAG, it) },
     ).handle(req)
   }
@@ -63,6 +65,7 @@ internal object HomeLinkSync {
     if (!HomeLinkGate.VAULT_SYNC) return
     val app = context.applicationContext
     net.execute {
+      if (!HomeLinkGate.syncs(PortalRosterStore.get(app).roster)) return@execute
       val key = HouseholdKey.get(app) ?: return@execute
       val host = HouseholdListSync.lanAddress() ?: return@execute
       val digest = HomeLinkSyncWire.digest(HomeLinkRepository.get(app).vault.value, key)
@@ -75,29 +78,46 @@ internal object HomeLinkSync {
   private fun onSignal(context: Context, message: HouseholdMessage) {
     val signal = HouseholdListPeerAuth.parseSignal(message.body) ?: return
     if (!HomeLinkSyncPolicy.trusts(message.from, signal.host, announcedHost(message.from))) return
+    if (!HomeLinkGate.syncs(PortalRosterStore.get(context).roster)) return
     val key = HouseholdKey.get(context) ?: return
     if (signal.digest == HomeLinkSyncWire.digest(HomeLinkRepository.get(context).vault.value, key)) return
     retryStep = 0
     exchangeLater(context.applicationContext, signal)
   }
 
+  /** The caller of our route has a different vault: pull theirs once (never pulled back again). */
+  private fun pullBack(context: Context, from: String) {
+    val peer = CallingStore.peers.value.firstOrNull { it.id == from } ?: return
+    val host = peer.host ?: return
+    val port = peer.port.takeIf { it > 0 } ?: FleetConfig.port(context)
+    net.execute {
+      runCatching { exchange(context, host, port, back = true) }
+          .onFailure { Log.i(TAG, "home-link pull-back failed: ${it.javaClass.simpleName}") }
+    }
+  }
+
   private fun exchangeLater(context: Context, signal: HouseholdListPeerAuth.Signal) {
     net.execute {
-      val ok = runCatching { exchange(context, signal) }
+      val ok = runCatching { exchange(context, signal.host, signal.port, back = false) }
           .onFailure { Log.i(TAG, "home-link exchange failed: ${it.javaClass.simpleName}") }.getOrDefault(false)
       if (ok) clearRetry() else scheduleRetry(context, signal)
     }
   }
 
-  private fun exchange(context: Context, signal: HouseholdListPeerAuth.Signal): Boolean {
+  /** One pull from the Portal at [host]: true once its answer, signed by a pinned device key, is merged. */
+  private fun exchange(context: Context, host: String, port: Int, back: Boolean): Boolean {
     val key = HouseholdKey.get(context) ?: return false
     val self = selfId(context) ?: return false
+    val device = PortalDeviceKey.get() ?: return false
+    val roster = PortalRosterStore.get(context).roster
+    if (!HomeLinkGate.syncs(roster)) return false
     val repo = HomeLinkRepository.get(context)
     val nonce = ByteArray(NONCE_BYTES).also(HomeLinkFeature.sharedRandom::nextBytes).let(HouseholdKey::toHex)
-    val body = HomeLinkSyncWire.seal(key, self, nonce, HomeLinkSyncWire.REQUEST, repo.vault.value, HomeLinkFeature.sharedRandom)
-        ?: return false
-    val header = HomeLinkSyncWire.requestHeader(key, self, nonce, System.currentTimeMillis(), body) ?: return false
-    val conn = URL("http", signal.host, signal.port, HomeLinkSyncWire.PATH).openConnection() as HttpURLConnection
+    val now = System.currentTimeMillis()
+    val asking = HomeLinkSyncWire.ask(device, nonce, now, HomeLinkSyncWire.digest(repo.vault.value, key), back,
+        HomeLinkFeature.sharedRandom)
+    val header = HomeLinkSyncWire.requestHeader(key, self, nonce, now, asking.body) ?: return false
+    val conn = URL("http", host, port, HomeLinkSyncWire.PATH).openConnection() as HttpURLConnection
     try {
       conn.connectTimeout = CONNECT_MS
       conn.readTimeout = READ_MS
@@ -106,14 +126,12 @@ internal object HomeLinkSync {
       conn.instanceFollowRedirects = false
       conn.setRequestProperty("Content-Type", "application/json")
       conn.setRequestProperty(HomeLinkSyncWire.HEADER, header)
-      val bytes = body.toByteArray(Charsets.UTF_8)
+      val bytes = asking.body.toByteArray(Charsets.UTF_8)
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return false
-      val envelope = JSONObject(BoundedRead.reply(conn, HomeLinkSyncWire.MAX_BODY * 2) ?: return false)
-      val payload = envelope.optString("payload")
-      if (!HomeLinkSyncWire.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return false
-      val theirs = HomeLinkSyncWire.open(key, self, nonce, HomeLinkSyncWire.RESPONSE, payload) ?: return false
+      val answer = BoundedRead.reply(conn, HomeLinkSyncWire.MAX_BODY * 2) ?: return false
+      val theirs = HomeLinkSyncWire.receive(asking, answer, roster, device.kid) ?: return false
       repo.merge(theirs)
       return true
     } finally {

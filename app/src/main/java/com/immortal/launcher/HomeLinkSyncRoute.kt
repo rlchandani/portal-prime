@@ -6,25 +6,31 @@
  */
 package com.immortal.launcher
 
-import org.json.JSONObject
 import java.security.SecureRandom
 
 /**
- * `POST /remote/homelinkpeer` ([HomeLinkSyncWire]): another Portal in this home sends its sealed
- * vault; we merge it and answer with ours, sealed the other way. Because the vault holds the
- * household identity's private key, a verified household request is still refused unless it
- * comes from a Portal id (never a phone, which also holds the household key) at the address that
- * Portal last announced. Logs device ids only, never vault contents.
+ * `POST /remote/homelinkpeer` ([HomeLinkSyncWire] v2): another Portal in this home pulls our
+ * vault. Layered so the household key alone (which paired phones hold) gets nothing:
+ *
+ * 1. the household `home_link_sync` header (signed, fresh, not replayed, pins the body) from a
+ *    Portal id at the address that Portal last announced — a cheap filter, not the trust anchor;
+ * 2. the pull must be signed by a device key in our [PortalRoster] (pinned in person), and the
+ *    answer is sealed to the pull's one-time ECDH key and signed by our device key.
+ *
+ * If the caller's vault differs from ours and this wasn't already a pull-back, [pullBack] asks
+ * for theirs in turn. Logs device ids and key ids only, never vault contents.
  */
 internal class HomeLinkSyncRoute(
     private val key: () -> ByteArray?,
     private val selfId: () -> String?,
+    private val device: () -> HomeLinkSigner?,
+    private val roster: () -> PortalRoster,
     private val clock: () -> Long,
     private val replay: HouseholdMessage.ReplayGuard,
     /** The LAN address household Portal [id] last announced in its signed hello, or null if unknown. */
     private val announcedHost: (String) -> String?,
     private val vault: () -> HomeLinkVault,
-    private val merge: (HomeLinkVault) -> Unit,
+    private val pullBack: (from: String) -> Unit,
     private val random: SecureRandom,
     private val log: (String) -> Unit,
 ) {
@@ -39,25 +45,29 @@ internal class HomeLinkSyncRoute(
       return FleetHttpServer.requestBodyError(e) ?: reply(400, "bad_body")
     }
     val self = selfId() ?: return reply(503, "no_identity")
-    val caller = HomeLinkSyncWire.verifyRequest(req.header(HomeLinkSyncWire.HEADER), text, key, clock(), replay, self)
+    val device = device() ?: return reply(503, "no_device_key")
+    val from = HomeLinkSyncWire.verifyRequest(req.header(HomeLinkSyncWire.HEADER), text, key, clock(), replay, self)
         ?: return reply(401, "unauthorized")
-    refusal(caller, req.remoteAddress)?.let { (status, code) ->
-      log("refused home-link sync from ${caller.from}: $code")
-      return reply(status, code)
-    }
-    val theirs = HomeLinkSyncWire.open(key, caller.from, caller.nonce, HomeLinkSyncWire.REQUEST, text)
-        ?: return reply(400, "bad_state")
-    merge(theirs)
-    val payload = HomeLinkSyncWire.seal(key, caller.from, caller.nonce, HomeLinkSyncWire.RESPONSE, vault(), random)
-        ?: return reply(500, "seal_failed")
-    return RemoteFeatureRoutes.json(200, JSONObject().put("payload", payload)
-        .put("sig", HomeLinkSyncWire.signResponse(key, caller.nonce, payload)))
+    refusal(from, req.remoteAddress)?.let { code -> return refuse(from, code) }
+    val pull = HomeLinkSyncWire.parsePull(text) ?: return reply(400, "bad_pull")
+    val pin = HomeLinkSyncWire.admit(pull, roster(), HomeLinkIdentity.fingerprint(device.publicKey), clock())
+        ?: return refuse(from, "not_pinned")
+    val ours = vault()
+    val answer = HomeLinkSyncWire.give(device, pull, ours, random) ?: return reply(500, "seal_failed")
+    if (!pull.back && pull.digest != HomeLinkSyncWire.digest(ours, key)) pullBack(from)
+    log("home-link vault to ${pin.kid} ($from)")
+    return FleetHttpServer.Response(200, answer)
   }
 
-  private fun refusal(caller: HomeLinkSyncWire.Request, remoteAddress: String): Pair<Int, String>? {
-    if (CallPhoneId.isPhone(caller.from) || !DinnerWire.isDeviceId(caller.from)) return 403 to "forbidden"
-    val announced = announcedHost(caller.from) ?: return 403 to "unknown_peer"
-    return if (HaShareRoute.normalizedAddress(remoteAddress) != announced) 403 to "unknown_peer" else null
+  private fun refusal(from: String, remoteAddress: String): String? {
+    if (CallPhoneId.isPhone(from) || !DinnerWire.isDeviceId(from)) return "forbidden"
+    val announced = announcedHost(from) ?: return "unknown_peer"
+    return if (HaShareRoute.normalizedAddress(remoteAddress) != announced) "unknown_peer" else null
+  }
+
+  private fun refuse(from: String, code: String): FleetHttpServer.Response {
+    log("refused home-link sync from $from: $code")
+    return reply(403, code)
   }
 
   private fun reply(status: Int, code: String) = RemoteFeatureRoutes.json(status, RemoteFeatureRoutes.error(code))

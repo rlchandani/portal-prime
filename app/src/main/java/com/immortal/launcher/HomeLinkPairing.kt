@@ -8,7 +8,7 @@ package com.immortal.launcher
 
 
 /** This home, as it introduces itself to another. */
-internal class HomeLinkSelf(val identity: HomeLinkIdentity, val name: String) {
+internal class HomeLinkSelf(val identity: HomeLinkSigner, val name: String) {
   init { require(HomeLinkWire.validName(name)) { "home name must be 1-${HomeLinkWire.MAX_NAME} printable characters" } }
 }
 
