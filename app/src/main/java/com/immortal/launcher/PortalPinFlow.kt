@@ -81,6 +81,17 @@ internal data class PortalPinFlowState(
 
   /** Back to the list; the caller ends any live invite. */
   fun list(): PortalPinFlowState = PortalPinFlowState()
+
+  /**
+   * The system Back key: closes an open remove confirm, else any pairing step returns to the
+   * list (the caller ends the live invite, so nothing is kept), and from the list it's null —
+   * leave this screen. One screen per press, never the whole Calls screen.
+   */
+  fun back(): PortalPinFlowState? = when {
+    removing != null -> cancelRemove()
+    stage == PortalPinStage.LIST -> null
+    else -> list()
+  }
 }
 
 /** Words for the Portal pairing screens, in the approved mock's voice. Pure. */
@@ -105,6 +116,8 @@ internal object PortalPinCopy {
   const val TYPE_H2 = "Type the code shown on the other Portal"
   const val TYPE_HOW = "Pairing codes start with P and are 10 letters and numbers."
   const val PAIR_BUTTON = "Pair"
+  /** A home-link code typed on the pairing keypad. */
+  const val HOME_CODE_HERE = "That’s a home-link code. Use Join with a code in Households instead."
   const val JOINING = "Finding that Portal…"
   const val NOT_FOUND = "No Portal in this home is showing that code. Check it, and that both are on the same Wi-Fi."
   const val NO_ANSWER = "That Portal didn’t take the code. Check it and try again, or make a new code."
@@ -114,6 +127,7 @@ internal object PortalPinCopy {
   const val CANCEL = "Cancel"
   const val CLOSE = "Close"
   const val DONE = "Done"
+  const val OUT_OF_DATE = "a certificate is out of date"
   const val NOT_READY = "This Portal can’t pair yet: its device key or household id isn’t ready."
 
   fun repairBody(name: String): String =
@@ -134,7 +148,8 @@ internal object PortalPinCopy {
   }
 
   /** The line under a paired Portal: its household id and what its attestation showed. */
-  fun pinDetail(pin: PortalPin): String = "${pin.deviceId} · ${attestation(pin.attestation)}"
+  fun pinDetail(pin: PortalPin): String =
+      "${pin.deviceId} · ${attestation(pin.attestation)}" + if (pin.attestationOutOfDate) " · $OUT_OF_DATE" else ""
 
   fun attestation(level: PortalAttestationLevel): String = when (level) {
     PortalAttestationLevel.STRONGBOX -> "Key in StrongBox"

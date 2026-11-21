@@ -45,6 +45,7 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
   var letters by rememberSaveable { mutableStateOf(false) }
   val compact = currentLayoutClass().compact
   val code = entry.code
+  val hint = words.hint(entry)
   val onKey: (String) -> Unit = { key ->
     when (key) {
       HomeLinkKeypad.LETTERS -> letters = true
@@ -65,7 +66,7 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
           verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Text(words.h2, color = p.text, fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         HomeLinkSlots(entry.slots, entry.cursor, spoken = typedSpoken(entry))
-        Text(words.how, color = p.secondary, fontSize = 20.sp, textAlign = TextAlign.Center)
+        Text(hint.text, color = if (hint.error) p.error else p.secondary, fontSize = 20.sp, textAlign = TextAlign.Center)
         HomeLinkKeys(letters, compact = true, modifier = Modifier.fillMaxWidth(), onKey = onKey)
         join()
       }
@@ -75,7 +76,7 @@ internal fun HomeLinkJoinScreen(entry: HomeLinkCodeEntry, onEntry: (HomeLinkCode
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(30.dp)) {
           Text(words.h2, color = p.text, fontSize = 36.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
           HomeLinkSlots(entry.slots, entry.cursor, spoken = typedSpoken(entry))
-          Text(words.how, color = p.secondary, fontSize = 24.sp, textAlign = TextAlign.Center)
+          Text(hint.text, color = if (hint.error) p.error else p.secondary, fontSize = 24.sp, textAlign = TextAlign.Center)
           join()
         }
         // One fixed slot for both pads (the wider one), so toggling ABC/123 doesn't slide the code across.
@@ -121,10 +122,21 @@ private fun typedSpoken(entry: HomeLinkCodeEntry): String =
 private val DIGIT_PAD = 540.dp
 private val LETTER_PAD = 760.dp
 
+/** The line under the typed code: how codes look, or (as an error) why the button is off. */
+internal data class HomeLinkJoinHint(val text: String, val error: Boolean)
+
 /** The Join screen's words: joining a household, or pairing another Portal ([PortalPinCopy]). */
-internal data class HomeLinkJoinWords(val title: String, val h2: String, val how: String, val join: String) {
+internal data class HomeLinkJoinWords(val title: String, val h2: String, val how: String, val join: String,
+                                      /** Shown when a complete code belongs to the other ceremony. */
+                                      val otherCode: String) {
+  /** [how], or [otherCode] once a complete code of the other ceremony is typed (the button stays off). Pure. */
+  fun hint(entry: HomeLinkCodeEntry): HomeLinkJoinHint =
+      if (entry.otherDomain != null) HomeLinkJoinHint(otherCode, error = true) else HomeLinkJoinHint(how, error = false)
+
   companion object {
-    val HOME = HomeLinkJoinWords(HomeLinkCopy.JOIN_TITLE, HomeLinkCopy.JOIN_H2, HomeLinkCopy.JOIN_HOW, HomeLinkCopy.JOIN)
-    val PORTAL_PIN = HomeLinkJoinWords(PortalPinCopy.TYPE_TITLE, PortalPinCopy.TYPE_H2, PortalPinCopy.TYPE_HOW, PortalPinCopy.PAIR_BUTTON)
+    val HOME = HomeLinkJoinWords(HomeLinkCopy.JOIN_TITLE, HomeLinkCopy.JOIN_H2, HomeLinkCopy.JOIN_HOW, HomeLinkCopy.JOIN,
+        HomeLinkCopy.PIN_CODE_HERE)
+    val PORTAL_PIN = HomeLinkJoinWords(PortalPinCopy.TYPE_TITLE, PortalPinCopy.TYPE_H2, PortalPinCopy.TYPE_HOW, PortalPinCopy.PAIR_BUTTON,
+        PortalPinCopy.HOME_CODE_HERE)
   }
 }
