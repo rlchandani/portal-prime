@@ -9,25 +9,32 @@ package com.immortal.launcher
 import com.immortal.launcher.youtube.YtSecureStore
 
 /**
- * Where [HouseholdKey] keeps the household key, and its one-time move out of plain prefs (plan H1).
+ * Where [HouseholdKey] keeps the household key, and its move out of plain prefs (plan H1).
  *
- * - [sealed] is the home: AES-GCM under a non-exportable Keystore key, in `no_backup` (production:
- *   [com.immortal.launcher.youtube.YtKeystoreSecureStore]).
- * - [plain] is the legacy prefs entry (hex). It is still the way a key ARRIVES from a sealed
- *   settings backup restore, and the fallback when the Keystore can't seal. Whenever it holds a
- *   valid key that key wins (it is the newest write) and is moved into [sealed]; the plain copy is
- *   removed only after the sealed copy is safely written.
+ * - [sealed] is the new home: AES-GCM under a non-exportable Keystore key, in `no_backup`
+ *   (production: [com.immortal.launcher.youtube.YtKeystoreSecureStore]).
+ * - [plain] is the legacy prefs entry (hex) that every older build reads.
  *
- * No failure loses the key: a Keystore that can't seal keeps the plain entry (and keeps working);
- * one that can't open the sealed copy reads as "no key" for that call but keeps the file. Once
- * the sealed copy is the only one, its opened value is cached (so hot paths such as every bus
- * packet don't cost a Keystore call); every value is handed out as a copy. Nothing here logs key
- * material.
+ * **Rollback-safe phase ([retirePlaintext] = false, today).** Older official builds are routinely
+ * reinstalled (bench, OTA timing tests), so the plain entry is KEPT and written on every [set]:
+ * an older build always finds the current key. Reads prefer the sealed copy when it agrees with
+ * the plain entry. Because only an older build (or a backup restore) changes the plain entry
+ * alone, the plain entry decides presence and wins a disagreement, and the sealed copy follows it.
+ *
+ * **Finalize phase ([retirePlaintext] = true, a later release:
+ * [HouseholdKey.RETIRE_PLAINTEXT]).** A valid plain entry is moved into [sealed] and then
+ * removed; from then on the sealed copy alone is the key. Older builds would no longer find it.
+ *
+ * In both phases no failure loses the key: a Keystore that can't seal keeps the plain entry (and
+ * keeps working); one that can't open the sealed copy never deletes it. The opened value is cached
+ * (checked against the plain entry, so hot paths such as every bus packet don't cost a Keystore
+ * call) and handed out as a copy. Nothing here logs key material.
  */
 internal class HouseholdKeyVault(
     private val plain: PlainSlot,
     private val sealed: YtSecureStore,
     private val log: (String) -> Unit,
+    private val retirePlaintext: Boolean = HouseholdKey.RETIRE_PLAINTEXT,
 ) {
   /** The legacy SharedPreferences entry. [write] and [remove] report whether the commit landed. */
   interface PlainSlot {
@@ -39,30 +46,21 @@ internal class HouseholdKeyVault(
   @Volatile private var cached: ByteArray? = null
 
   @Synchronized
-  fun get(): ByteArray? {
-    plainKey()?.let { return migrate(it).copyOf() }
-    cached?.let { return it.copyOf() }
-    val text = try {
-      sealed.load()
-    } catch (e: Exception) {
-      log("household key: sealed copy unreadable (${e.javaClass.simpleName}); kept")
-      return null
-    }
-    val key = text?.let(HouseholdKey::fromHex)?.takeIf(HouseholdKey::isValidKey) ?: return null
-    cached = key
-    return key.copyOf()
-  }
+  fun get(): ByteArray? = (if (retirePlaintext) getFinal() else getDual())?.copyOf()
 
-  /** Stores [key], replacing any previous one. False for invalid material or when nothing landed. */
+  /** Stores [key], replacing any previous one. False for invalid material or when it didn't land. */
   @Synchronized
   fun set(key: ByteArray): Boolean {
     if (!HouseholdKey.isValidKey(key)) return false
     val hex = HouseholdKey.toHex(key)
     val sealedOk = seal(hex)
-    // A plain copy that can't be removed would shadow the new key, so overwrite it instead.
-    val stored = if (sealedOk) plain.read() == null || plain.remove() || plain.write(hex)
-        else plain.write(hex).also { ok -> if (ok) dropSealed() }
-    // Only the sealed copy is cached: while the key is plain, the prefs entry stays the source of truth.
+    val stored = when {
+      // Dual-write: the plain entry is what older builds (and this one's presence check) read.
+      !retirePlaintext -> plain.write(hex).also { ok -> if (ok && !sealedOk) dropSealed() }
+      // A plain copy that can't be removed would shadow the new key, so overwrite it instead.
+      sealedOk -> plain.read() == null || plain.remove() || plain.write(hex)
+      else -> plain.write(hex).also { ok -> if (ok) dropSealed() }
+    }
     cached = if (stored && sealedOk) key.copyOf() else null
     return stored
   }
@@ -82,7 +80,40 @@ internal class HouseholdKeyVault(
     cached = null
   }
 
-  private fun plainKey(): ByteArray? = plain.read()?.let(HouseholdKey::fromHex)?.takeIf(HouseholdKey::isValidKey)
+  // --- rollback-safe phase ----------------------------------------------------------------
+
+  private fun getDual(): ByteArray? {
+    val text = plain.read()
+    if (text == null) {
+      // Nothing plain while dual-writing means an older build or a restore removed the key.
+      if (cached != null || sealedExists()) dropSealed()
+      cached = null
+      return null
+    }
+    val plainKey = HouseholdKey.fromHex(text)?.takeIf(HouseholdKey::isValidKey) ?: return null // garbage, as before
+    val sealedKey = cached ?: openSealed()
+    if (sealedKey != null && sealedKey.contentEquals(plainKey)) {
+      cached = sealedKey
+      return sealedKey
+    }
+    // Missing, unreadable or stale (an older build set a new key): the plain entry wins; keep it.
+    cached = if (seal(text)) plainKey.copyOf() else null
+    return plainKey
+  }
+
+  private fun sealedExists(): Boolean = try {
+    sealed.load() != null
+  } catch (e: Exception) {
+    true
+  }
+
+  // --- finalize phase ---------------------------------------------------------------------
+
+  private fun getFinal(): ByteArray? {
+    plainKey()?.let { return migrate(it) }
+    cached?.let { return it }
+    return openSealed()?.also { cached = it }
+  }
 
   private fun migrate(key: ByteArray): ByteArray {
     cached = null
@@ -93,6 +124,20 @@ internal class HouseholdKeyVault(
       log("household key: moved to sealed storage")
     }
     return key
+  }
+
+  // --- shared -----------------------------------------------------------------------------
+
+  private fun plainKey(): ByteArray? = plain.read()?.let(HouseholdKey::fromHex)?.takeIf(HouseholdKey::isValidKey)
+
+  private fun openSealed(): ByteArray? {
+    val text = try {
+      sealed.load()
+    } catch (e: Exception) {
+      log("household key: sealed copy unreadable (${e.javaClass.simpleName}); kept")
+      return null
+    }
+    return text?.let(HouseholdKey::fromHex)?.takeIf(HouseholdKey::isValidKey)
   }
 
   private fun seal(hex: String): Boolean = try {

@@ -16,8 +16,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * The household key's move from plain prefs into Keystore-sealed storage (plan H1): the value
- * never changes, no failure loses it, and a Keystore that is down keeps the Portal working.
+ * The household key's move from plain prefs into Keystore-sealed storage (plan H1), in its later
+ * finalize phase ([HouseholdKey.RETIRE_PLAINTEXT] = true): the value never changes, no failure
+ * loses it, and a Keystore that is down keeps the Portal working. Today's rollback-safe phase is
+ * [HouseholdKeyVaultDualWriteTest].
  */
 class HouseholdKeyVaultTest {
   private val key = ByteArray(32) { (it * 7 + 1).toByte() }
@@ -27,7 +29,7 @@ class HouseholdKeyVaultTest {
   private val plain = FakePlain()
   private val sealed = FakeSealed()
   private val logged = mutableListOf<String>()
-  private val vault = HouseholdKeyVault(plain, sealed, logged::add)
+  private val vault = HouseholdKeyVault(plain, sealed, logged::add, retirePlaintext = true)
 
   // --- migration --------------------------------------------------------------------------
 
@@ -186,7 +188,7 @@ class HouseholdKeyVaultTest {
     assertTrue(logged.toString(), logged.none { it.contains(hex.take(8)) })
   }
 
-  private class FakePlain : HouseholdKeyVault.PlainSlot {
+  internal class FakePlain : HouseholdKeyVault.PlainSlot {
     var value: String? = null
     var commits = true
     var removable = true
@@ -196,7 +198,7 @@ class HouseholdKeyVaultTest {
     override fun remove(): Boolean = (commits && removable).also { if (it) value = null }
   }
 
-  private class FakeSealed : YtSecureStore {
+  internal class FakeSealed : YtSecureStore {
     var text: String? = null
     var broken = false
     var loads = 0

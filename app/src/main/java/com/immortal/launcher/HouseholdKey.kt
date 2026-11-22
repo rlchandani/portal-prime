@@ -21,8 +21,9 @@ import java.security.MessageDigest
  * credentials).
  *
  * At rest it is sealed with a non-exportable Android Keystore key under `no_backup/`[DIR]
- * ([HouseholdKeyVault]). The old plain prefs entry ([PREFS]/`k`) is migrated on first read and
- * remains the format sealed settings backups carry, so export and restore behave as before.
+ * ([HouseholdKeyVault]). Until [RETIRE_PLAINTEXT] flips, the old plain prefs entry ([PREFS]/`k`)
+ * is kept and dual-written so older builds still find the key; it is also the format sealed
+ * settings backups carry, so export and restore behave as before.
  */
 internal object HouseholdKey {
   const val PREFS = "immortal_household"
@@ -32,6 +33,13 @@ internal object HouseholdKey {
   private const val ALIAS = "immortal.household.key"
   private const val TAG = "HouseholdKey"
   const val SIZE = 32
+
+  /**
+   * FOLLOW-UP (plan slice 0, "finalize" release): flip to true once no Portal will be given an
+   * older build again. Then the plain `k` entry is migrated into the sealed file and DELETED, and
+   * older builds stop finding the key. Until then the plain entry is kept and written on every set.
+   */
+  const val RETIRE_PLAINTEXT = false
 
   @Volatile private var holder: Pair<Context, HouseholdKeyVault>? = null
 
@@ -68,7 +76,7 @@ internal object HouseholdKey {
     }
     // noBackupFilesDir is null only on a JVM test mock: no sealed home, so the plain entry stays (as before).
     val sealed = app.noBackupFilesDir?.let { YtKeystoreSecureStore(File(File(it, DIR), FILE), ALIAS) } ?: NoSealedStore
-    return HouseholdKeyVault(plain, sealed) { runCatching { Log.i(TAG, it) } }
+    return HouseholdKeyVault(plain, sealed, log = { runCatching { Log.i(TAG, it) } })
   }
 
   /** A sealed home that is never available: every seal fails, so the vault keeps the plain entry. */
