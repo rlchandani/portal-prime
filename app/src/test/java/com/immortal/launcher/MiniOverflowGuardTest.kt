@@ -54,6 +54,13 @@ class MiniOverflowGuardTest {
     assertTrue("turned $turnedText dp", turnedText >= 10 * DinnerPresetLayout.LANDSCAPE.textSp * 0.6)
   }
 
+  @Test fun dinnerPresetWordsAreNeverCutOffAtTheTileBottom() {
+    // Measured on the Portal at the Mini's 800 x 1280: the sheet's tiles are ~190 dp tall upright.
+    val upright = DinnerPresetLayout.PORTRAIT
+    assertTrue(DinnerPresetLayout.contentHeight(upright, DinnerPresetLayout.stackGap(LayoutClass.COMPACT_PORTRAIT)) <= 190)
+    assertTrue("upright keeps the glyph beside the words", upright.glyphBeside)
+  }
+
   @Test fun theHomeMusicCardFitsEveryWindow() {
     for (w in listOf(800, 1280, 1920)) {
       val side = MusicHomeCardDims.sideWidth(w, inset = 24)

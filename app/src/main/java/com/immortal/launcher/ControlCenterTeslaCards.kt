@@ -122,7 +122,7 @@ private fun RowScope.StatusCell(r: CcStatusRow) {
     CcIcon(r.icon, tint, 30.dp)
     Column(Modifier.weight(1f)) {
       Text(r.value, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Text(r.label, color = c.sec, fontSize = 16.sp, maxLines = 1)
+      Text(r.label, color = c.sec, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
   }
 }

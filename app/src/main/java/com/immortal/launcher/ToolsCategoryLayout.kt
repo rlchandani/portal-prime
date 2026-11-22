@@ -7,22 +7,42 @@
 package com.immortal.launcher
 
 /**
- * Rows of the Tools library's category chips on compact windows (pure, JVM-tested): in reading
- * order, wrapped onto further rows instead of scrolling sideways. The Mini upright fits the basic
- * set on one row; the advanced set's "Advanced" chip moves to a second row.
+ * The Tools library's compact geometry (pure, JVM-tested): its category chips and its card
+ * columns. On compact windows the chips sit in a measured flow row (wrapping, never scrolling
+ * sideways); upright they use tighter padding so the whole set fits one line at the default text
+ * size, and the cards go single-column so a wrapped description never leaves its neighbour shorter.
  */
 internal object ToolsCategoryLayout {
-  /** Gap between chips (both directions) and the inset around the chip block, dp. */
-  const val GAP_DP = 12
+  /** One chip family: label padding each side and the gap between neighbours, dp. */
+  data class Chips(val padding: Int, val gap: Int)
+
+  /** The Portal+'s scrolling row, as shipped. */
+  val LARGE = Chips(padding = 24, gap = 12)
+  /** The Mini turned: the shipped look, a little tighter. */
+  val LANDSCAPE = Chips(padding = 20, gap = 12)
+  /** The Mini upright: tight enough for every category, Advanced included, on one line. */
+  val PORTRAIT = Chips(padding = 14, gap = 4)
+
+  /** The gap between wrapped chip lines and the inset around the chip block, dp. */
+  const val ROW_GAP_DP = 12
   const val INSET_DP = 4
 
-  /** Compact chip label padding each side (the Portal+ keeps 24 dp). */
-  const val CHIP_PADDING_DP = 20
+  fun of(cls: LayoutClass): Chips = when (cls) {
+    LayoutClass.LARGE -> LARGE
+    LayoutClass.COMPACT_LANDSCAPE -> LANDSCAPE
+    LayoutClass.COMPACT_PORTRAIT -> PORTRAIT
+  }
 
-  /** 22 sp medium label (generously 13 dp a character) + [CHIP_PADDING_DP] each side. */
-  val CHIP = CompactRowFit.Spec(charDp = 13.0, chromeDp = 2.0 * CHIP_PADDING_DP)
+  /** 22 sp medium label (about 13 dp a character, measured on the Portal) + [padding] each side. */
+  fun chip(chips: Chips) = CompactRowFit.Spec(charDp = 13.0, chromeDp = 2.0 * chips.padding)
 
-  /** Category indices per row for a library [widthDp] wide (the grid's content width). */
-  fun rows(categories: List<String>, widthDp: Double, fontScale: Float = 1f): List<List<Int>> =
-      CompactRowFit.pack(categories.map { CHIP.width(it, fontScale) }, GAP_DP.toDouble(), widthDp - 2 * INSET_DP)
+  /** Below this content width (dp) the library has two card columns instead of three. */
+  const val THREE_COLUMN_MIN_DP = 1200.0
+
+  /** Card columns for a library [widthDp] wide: one upright, else two or three by width. */
+  fun libraryColumns(cls: LayoutClass, widthDp: Double): Int = when {
+    cls.compactPortrait -> 1
+    widthDp < THREE_COLUMN_MIN_DP -> 2
+    else -> 3
+  }
 }

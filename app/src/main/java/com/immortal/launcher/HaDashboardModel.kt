@@ -55,6 +55,9 @@ object HaDashboardModel {
     Kind.SENSOR -> 4
   }
 
+  /** The glyph in a toggle/dimmer tile's icon well, by HA domain (a light's bulb, else a plug). */
+  fun wellIcon(domain: String): String = if (domain == "light") "bulb" else "plug"
+
   /** How many lights/switches are on — for the room subtitle and the house-wide hero count. */
   fun litCount(details: List<HaDashboardApi.Detail>): Int =
       details.count { (it.domain == "light" || it.domain == "switch") && it.state.equals("on", true) }

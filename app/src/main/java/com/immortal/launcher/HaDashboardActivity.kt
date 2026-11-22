@@ -597,6 +597,15 @@ private fun EntityTile(
     }
 }
 
+/** A tile's icon well with its domain glyph (it used to be an empty square). */
+@Composable
+private fun HaTileWell(domain: String, on: Boolean) {
+    Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(if (on) AmberText.copy(0.12f) else Glass.SubTint),
+        contentAlignment = Alignment.Center) {
+        ApprovedHomeIcon(HaDashboardModel.wellIcon(domain), Modifier.size(22.dp), tint = if (on) AmberText else Color.White.copy(alpha = 0.8f))
+    }
+}
+
 @Composable
 private fun ToggleTile(
     d: HaDashboardApi.Detail,
@@ -617,7 +626,7 @@ private fun ToggleTile(
             .padding(horizontal = 17.dp, vertical = 17.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(if (on) AmberText.copy(0.12f) else Glass.SubTint))
+        HaTileWell(d.domain, on)
         Column {
             Text(d.friendlyName, color = fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             Text(if (on) "On" else "Off", color = fgSub, fontSize = 12.sp)
@@ -654,7 +663,7 @@ private fun DimmerTile(
             modifier = Modifier.weight(1f).fillMaxHeight().toggleable(value = on, role = Role.Switch) { onToggle(d.entityId, on) },
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(if (on) AmberText.copy(0.12f) else Glass.SubTint))
+            HaTileWell(d.domain, on)
             Column {
                 Text(d.friendlyName, color = fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
                 Text(if (on) "$pct%" else "Off", color = fgSub, fontSize = 12.sp)

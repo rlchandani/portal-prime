@@ -141,9 +141,12 @@ private fun RowScope.IdleTile(idle: CcIdleCharge) {
   Row(Modifier.weight(IDLE_WEIGHT).clip(TILE).background(c.surface2).padding(horizontal = 20.dp, vertical = 16.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
     CcIcon("charger", c.sec, 34.dp)
+    // The Mini's tile drops the charge rate from the estimate; anything still too long ellipsizes.
+    val detail = if (currentLayoutClass().compact) idle.shortDetail else idle.detail
     Column {
-      Text(idle.title, color = c.text, fontSize = 26.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-      Text(idle.detail ?: "Not charging", color = c.sec, fontSize = 18.sp, maxLines = 1)
+      Text(idle.title, color = c.text, fontSize = 26.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+          overflow = TextOverflow.Ellipsis)
+      Text(detail ?: "Not charging", color = c.sec, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
   }
 }

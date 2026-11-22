@@ -170,29 +170,45 @@ private fun SheetHeader(title: String, line: String, lineIcon: String, warn: Boo
     }
     return
   }
+  // The title keeps its one line; who it reaches takes what's left beside it (right-aligned, as
+  // shipped) and ellipsizes there, rather than squeezing the title onto two lines on the Mini turned.
   Row(Modifier.fillMaxWidth().padding(bottom = 32.dp), verticalAlignment = Alignment.CenterVertically) {
-    Text(title, color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-    lineRow(Modifier.padding(start = 14.dp, end = 32.dp))
+    Text(title, color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium, maxLines = 1, softWrap = false)
+    Row(Modifier.weight(1f).padding(start = 24.dp, end = 32.dp), horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically) {
+      lineRow(Modifier.weight(1f, fill = false).padding(start = 14.dp))
+    }
     trailing()
   }
 }
 
 /**
  * The preset tiles' grid and size per window (pure, JVM-tested). The Portal+ keeps its 3 × 2 grid
- * of tall tiles; the Mini upright gets 2 × 3 (three tiles left ~130 dp for 44 sp words), the Mini
- * turned keeps 3 × 2 with the glyph beside the words (its ~100 dp tall tiles can't stack them).
+ * of tall tiles; the Mini upright gets 2 × 3 (three tiles left ~130 dp for 44 sp words) and the Mini
+ * turned keeps 3 × 2, both with the glyph beside the words (their ~190 / ~135 dp tall tiles can't stack them).
  */
 internal object DinnerPresetLayout {
   data class Tile(val columns: Int, val padding: Int, val glyph: Int, val textSp: Int, val lineSp: Int, val glyphBeside: Boolean)
 
   val LARGE = Tile(columns = 3, padding = 40, glyph = 132, textSp = 44, lineSp = 52, glyphBeside = false)
-  val PORTRAIT = Tile(columns = 2, padding = 28, glyph = 96, textSp = 36, lineSp = 44, glyphBeside = false)
+  // Upright the 2 × 3 tiles are ~190 dp tall: a glyph stacked over two lines of words cut them off,
+  // so the glyph sits beside the words there too.
+  val PORTRAIT = Tile(columns = 2, padding = 22, glyph = 72, textSp = 30, lineSp = 36, glyphBeside = true)
   val LANDSCAPE = Tile(columns = 3, padding = 18, glyph = 64, textSp = 30, lineSp = 36, glyphBeside = true)
 
   fun of(cls: LayoutClass): Tile = when (cls) {
     LayoutClass.LARGE -> LARGE
     LayoutClass.COMPACT_PORTRAIT -> PORTRAIT
     LayoutClass.COMPACT_LANDSCAPE -> LANDSCAPE
+  }
+
+  /** The spacer between a stacked glyph and its words, dp. */
+  fun stackGap(cls: LayoutClass): Int = if (cls.compact) 20 else 30
+
+  /** Height a tile's content needs with its words on their two lines (the tile must be at least this tall). */
+  fun contentHeight(tile: Tile, stackGap: Int): Int {
+    val words = 2 * tile.lineSp
+    return 2 * tile.padding + if (tile.glyphBeside) maxOf(tile.glyph, words) else tile.glyph + stackGap + words
   }
 
   /** Width left for a tile's words in a pane [paneDp] wide with [gapDp] between tiles. */
@@ -238,7 +254,7 @@ private fun DinnerPresetPane(
             words()
           } else Column(tileModifier, verticalArrangement = Arrangement.Center) {
             DinnerGlyph(preset.icon, tile.glyph)
-            Spacer(Modifier.height(if (layout.compact) 20.dp else 30.dp))
+            Spacer(Modifier.height(DinnerPresetLayout.stackGap(layout).dp))
             words()
           }
         }

@@ -116,8 +116,11 @@ class ControlCenterTeslaTextCoverageTest {
     val kw = CcTeslaIdle.rateKw(48, null)!!
     assertEquals(11.52, kw, 1e-9)
     val mins = CcTeslaIdle.minutesTo(50, 80, 75.0, kw)
-    assertEquals("About ${CcTeslaText.duration(mins)} to 80% at 12 kW",
-        idle(CcChargeState.PLUGGED, { it.copy(limitPct = 80, chargeAmps = 48) }).detail)
+    val estimate = idle(CcChargeState.PLUGGED, { it.copy(limitPct = 80, chargeAmps = 48) })
+    assertEquals("About ${CcTeslaText.duration(mins)} to 80% at 12 kW", estimate.detail)
+    assertEquals("the Mini's tile drops the rate", "About ${CcTeslaText.duration(mins)} to 80%", estimate.shortDetail)
+    assertEquals("At your 50% limit", idle(CcChargeState.PLUGGED, { it.copy(limitPct = 50) }).shortDetail)
+    assertNull(idle(CcChargeState.PLUGGED, { it.copy(batteryPct = null) }).shortDetail)
     val grid = CcChargerView("Wall Connector", null, null, null, null, null, gridVolts = 200.0)
     assertEquals(9.6, CcTeslaIdle.rateKw(48, grid.gridVolts)!!, 1e-9)
     val onGrid = CcTeslaIdle.minutesTo(50, 80, 75.0, 9.6)
