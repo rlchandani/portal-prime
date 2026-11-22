@@ -758,3 +758,54 @@ Official 1.313 (unattributed; 9 changes): worst frame 61–289 ms (median 130), 
 **Tests:** `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 528 tests, 509 pass, 19 skipped, 0 fail. New: Cinema drawn edge values and a property test that the copy covers the laid-out box for every shape from 0.3 to 2.2:1 (`slideshow_drawn_edge.test.mjs`); the cinema initial request is 1685 px in the resolved-resources fixture. `:app:testDebugUnitTest`: 9178 tests, 0 failures, including `FilmstripTextureWarmupTest` (7: one step per post, then a single admission; empty deck; superseded deck abandoned; close abandons once; rejected post; failed upload hint still admits; paused delayed owned post keeps its remaining delay).
 
 **Device** at the end: official 1.314 (on-device sha256 `e06ce483…`, matching `hearthpane-latest.json`), Home on top and default, test source never used, dev mode off (`fleetctl info`: `devMode: false`), STREAM_MUSIC 3.
+
+## Screensaver Gallery Wall change: pre-rasterised doodle tile (branch `gallery-wall`)
+
+**Question:** a household Gallery Wall change costs ~3× any other mode (round 4: 19–23 frames over 60 ms, ~3.4 s of frames over 32 ms, WebView `drawGl`). Where does it go, and can it be made smooth with no visible change?
+
+**Attribution.** A wall paints the tiled `photo-doodles-dark.svg` 21 times: the wall, each of the 10 tiles, and each tile's opaque photo matte (`styles.css:80` before, `mode-impls.js:919–923` before). A tiled SVG background reaches the GPU as a picture shader that is rasterised again for each paint and raster tile. That is the only thing this branch changes, and the A/B below moves from 4–19 to 0–2 frames over 60 ms per change. The doodle accounts for most of the cost. The 30 px `box-shadow` and the rounded clip are unchanged. The branch trace (below) leaves no frame they could explain.
+
+**Change:**
+1. `app/src/main/assets/screensaver/photo-doodles-dark-{480,540,960}.png` (new, 12–30 KB): the same vector rasterised by Chromium at 1x (Portal), 1.125x (Portal+ device scale, 540 × 405 px) and 2x, on a transparent background. They are reproducible with `scripts/generate_doodle_tiles.mjs`, which gives byte-identical output on a rerun.
+2. `styles.css:80–84`: the wall and tile doodle is `image-set(… 1x, … 1.125x, … 2x)` at the same 480 × 360 px tile size. `mode-impls.js:913–916` `GALLERY_DOODLE` holds the same value, and the photo matte uses it (`:925`). Chromium decodes and uploads the tile once and draws it 1:1 at each device scale.
+- **Not changed:** the box-shadow, the rounded clip, transitions, layout, timing and the photo copies (already drawn-size, `SS.containEdge`). No containment or layer hints were added. The trace showed nothing left for them to fix, and each could change pixels or GPU memory. The other modes that use the dark doodle (Diptych, Cinema matte, Hero + Sidebar, Memories) are not changed. They paint it once per scene, and the same tile would suit them.
+
+**Tests:** `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 531 tests, 512 pass, 19 browser tests skipped, 0 fail. New `slideshow_gallery_doodle.test.mjs` (3) checks that each candidate is an RGBA PNG of 480 × 360 × scale; that the CSS rule and `GALLERY_DOODLE` are the same value; and that Gallery Wall no longer references the SVG. Gallery tests that pinned the SVG string now pin the tile value (`helpers/slideshow_scene_fixture.mjs` `GALLERY_DOODLE`). `:app:testDebugUnitTest`: 9178 tests, 0 failures.
+
+**Visual check.**
+- Desktop Chromium, real `styles.css` from `main` and from the branch, a 10-tile wall at fractional positions: at dpr 1.125, 99.5 % of channels are identical, max difference 5 / 255 (mean 1.2 where different). At dpr 1, max 1 / 255.
+- On the Portal+ (test source pinned to `galleryWall`, generated scenes, official 1.315 vs branch, 3 walls each): tile selection is random per build, so the comparison used the wall background at the same screen position, compared at 100 % crop. Doodle positions, stroke weight and tone match. 95–96 % of channels are identical; the rest differ by at most 14 / 255, on a few edge pixels.
+- Scratch screenshots were deleted.
+
+**Method.**
+- (1) **Microbenchmark:** test source pinned to `galleryWall` at 15 s, generated scenes, in `PhotoFramePreviewActivity`. A pinned mode never advances beats (`scheduler.js:86`). So each change is forced with a left swipe (`next()`, a new Gallery Wall beat with the full 1.6 s crossfade over the previous wall), 6 per run, 12 s apart. Framestats were polled back to back. Changes were attributed by `photo_beat` (0.5 s before to 3 s after), and the first beat (start) is left out.
+- (2) **Household long window:** round 4's method (shuffle, settings unchanged, real dream, 5 min, `photo_beat` attribution).
+- Plain `adb install -r`; O = official 1.315 (sha256 verified); B = branch `assemblePerformance`. STREAM_MUSIC 0, restored to 3. No household screenshots.
+
+| Forced Gallery Wall change (6 per run) | O run 1 | O run 2 | B run 1 | B run 2 |
+|---|---|---|---|---|
+| Worst frame per change, ms | 273, 146, 136, 143, 126, 125 | 145, 136, 110, 142, 121, 158 | 53, 56, 55, 55, 43, 42 | 53, 48, 69, 39, 61, 46 |
+| Frames over 60 ms per change | 19, 4, 4, 4, 4, 19 | 19, 19, 4, 19, 5, 17 | 0, 0, 0, 0, 0, 0 | 0, 0, 2, 0, 1, 0 |
+| Frames over 32 ms, total | 69 | 99 | 53 | 34 |
+| Sum of frames over 32 ms, mean per change | 1156 ms | 1590 ms | 358 ms | 245 ms |
+
+- The official changes with 17–19 frames over 60 ms reproduce the household signature. None of the 12 branch changes has more than 2 frames over 60 ms, and the worst frame is 39–69 ms (official 110–273 ms).
+- **Tile swap** (the pin's in-mode swap every 15 s; clusters off the 15 s cadence are a once-a-minute event in the preview and are left out). O: 10 swaps, worst 86–223 ms, 3–4 frames over 60 ms each. B: 9 swaps, worst 41–125 ms. The first three swaps after the install were 65–125 ms with 1–3 frames over 60 ms; the later six were 41–50 ms with 0.
+- **Wall build** (test-source start, no crossfade): O worst 96–166 ms (589 ms once), B 53–66 ms (176 ms on the first start after the install).
+- **Trace** (branch, one forced change, atrace gfx/view/webview/sched): 2 frames over 30 ms. One `DrawFrame` was 52 ms (GPU thread 48 ms, `kswapd0` 25 ms), the other 39 ms (GPU thread 34 ms). The rest of the 1.6 s crossfade stayed under 30 ms.
+- **Household long window:** shuffle picks the mode at random, so 6 runs were taken (O 2, B 4). Gallery Wall appeared in O run 2 and twice in B run 4.
+
+| Household Gallery Wall change | Worst frame | Frames over 60 ms | Frames over 32 ms | Sum over 32 ms |
+|---|---|---|---|---|
+| O run 2 | 332 ms | 21 | 26 | 3.65 s |
+| round 4 (`engine-modes`, 3 changes) | 228–271 ms | 19–23 | — | 3.3–3.4 s |
+| B run 4, change 1 | 143 ms | 11 | 32 | 1.76 s |
+| B run 4, change 2 | 103 ms | 5 | 36 | 1.69 s |
+
+- On household photos the change costs about half of what it did: worst frame 103–143 ms against 228–332 ms, and 5–11 frames over 60 ms against 19–23. That is less than on the generated scenes. Household copies are larger, and the outgoing mode is heavier.
+- About 1.7 s of 33–60 ms frames remain through the fade. They are not traced on household photos yet. The next suspects are the 10 photo uploads at the crossfade and memory pressure (`kswapd0` was busy in the branch trace).
+- Other modes on the branch matched official within run-to-run spread, as expected: Gallery Wall is the only mode that uses the new tile.
+- Memory (launcher PSS MB, Home → running → +5 s): O 210 → 427 → 221 and 182 → 439 → 198; B 198–213 → 292–414 → 205–211.
+- At the start of the last stint the device was on official 1.314 with the Home chooser on top, left by the previous holder. The branch install restored the default Home.
+
+**Device** at the end: official 1.315 (on-device sha256 `229e6741…`, matching `hearthpane-latest.json`), Home on top and default, test source off, dev mode off (`fleetctl info`: `devMode: false`), STREAM_MUSIC 3.

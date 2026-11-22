@@ -77,7 +77,11 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-gcell .ss-img, .ss-mcell .ss-img { transition: opacity 1.1s ease; }
 .ss-wall.gallery-wall { background: #1c1b19; }
 .gallery-wall .ss-gcell { background: #1c1b19; }
-.ss-wall.gallery-wall, .gallery-wall .ss-gcell { background-image: url("photo-doodles-dark.svg"); background-size: 480px 360px; }
+/* Gallery Wall paints the doodle tile 21 times per wall (wall, each tile, each photo matte). A tiled
+   SVG is re-rasterised for every paint and raster tile; the same vector pre-rasterised at the
+   device scale (scripts/generate_doodle_tiles.mjs) is decoded and uploaded once. */
+.ss-wall.gallery-wall, .gallery-wall .ss-gcell { background-size: 480px 360px;
+  background-image: image-set(url("photo-doodles-dark-480.png") 1x, url("photo-doodles-dark-540.png") 1.125x, url("photo-doodles-dark-960.png") 2x); }
 .ss-gcell .gallery-photo { opacity: 0; background-color: #1c1b19; animation: none; will-change: auto; }
 .ss-gcell .gallery-photo.on { opacity: 1; }
 .ss-gcell .gallery-photo.retired { opacity: 0; visibility: hidden; transition: none; }

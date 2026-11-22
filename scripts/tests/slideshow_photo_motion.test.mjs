@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
+import { GALLERY_DOODLE, createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
 
 const steadyModes = ['kenBurns', 'diptych', 'framed', 'push', 'memories',
   'panorama', 'mosaic', 'cinema', 'heroSidebar'];
@@ -49,7 +49,7 @@ function galleryGoldenSnapshot(r) {
     const classes = node.classes.split(/\s+/);
     if (classes.includes('gallery-wall') || classes.includes('ss-gcell')) {
       assert.equal(node.computed.background, '#1c1b19', 'Gallery matte must remain opaque');
-      assert.equal(node.computed['background-image'], 'url("photo-doodles-dark.svg")');
+      assert.equal(node.computed['background-image'], GALLERY_DOODLE);
       assert.equal(node.computed['background-size'], '480px 360px');
       delete node.computed['background-image'];
       delete node.computed['background-size'];
@@ -69,8 +69,9 @@ function galleryGoldenSnapshot(r) {
     assert.equal(node.computed['background-position'], node.style.backgroundPosition);
     assert.equal(node.computed['background-repeat'], node.style.backgroundRepeat);
     if (node.style.backgroundImage !== 'none') {
-      const composed = /^url\("([^"]+)"\), url\("photo-doodles-dark\.svg"\)$/.exec(node.style.backgroundImage);
-      assert.ok(composed, 'The prepared photo must be first and the fixed doodle SVG second');
+      const suffix = ', ' + GALLERY_DOODLE, value = node.style.backgroundImage;
+      const composed = value.endsWith(suffix) && /^url\("([^"]+)"\)$/.exec(value.slice(0, -suffix.length));
+      assert.ok(composed, 'The prepared photo must be first and the fixed doodle tile second');
       assert.ok(state.resources.some(resource => resource.url === composed[1]));
       node.style.backgroundImage = `url("${composed[1]}")`;
       node.computed['background-image'] = node.style.backgroundImage;

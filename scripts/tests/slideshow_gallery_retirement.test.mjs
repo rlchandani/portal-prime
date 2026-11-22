@@ -6,7 +6,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
+import { GALLERY_DOODLE, createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
 
 const photographs = () => Array.from({ length: 16 }, (_, id) => ({
   seed: 'wall-' + id, w: id % 3 === 0 ? 900 : id % 3 === 1 ? 1800 : 1200,
@@ -44,7 +44,9 @@ test('Gallery Wall shows static whole photos with every tile inside the viewport
       assert.equal(r.state(image).animation, 'none', 'A wall tile must not animate continuously');
       assert.equal(r.state(image).promotion, 'auto');
       assert.equal(r.computed(image)['background-size'], 'contain, 480px 360px');
-      assert.match(image.style.backgroundImage, /^url\("[^"]+"\), url\("photo-doodles-dark\.svg"\)$/);
+      const [photo, ...doodle] = image.style.backgroundImage.split(', ');
+      assert.match(photo, /^url\("[^"]+"\)$/);
+      assert.equal(doodle.join(', '), GALLERY_DOODLE, 'The photo is first and the doodle tile second');
       assert.equal(r.computed(image)['background-position'], 'center, left top');
       assert.equal(r.computed(image)['background-repeat'], 'no-repeat, repeat');
       assert.equal(r.computed(image)['background-color'], '#1c1b19',

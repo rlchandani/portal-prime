@@ -10,6 +10,9 @@ import vm from 'node:vm';
 
 const assets = new URL('../../../app/src/main/assets/screensaver/', import.meta.url);
 const css = readFileSync(new URL('styles.css', assets), 'utf8');
+// Gallery Wall's doodle tile: the vector pre-rasterised at 1x, 1.125x (Portal+) and 2x.
+export const GALLERY_DOODLE = 'image-set(url("photo-doodles-dark-480.png") 1x, ' +
+  'url("photo-doodles-dark-540.png") 1.125x, url("photo-doodles-dark-960.png") 2x)';
 // Evaluate the real class/descendant declarations used by the retained-photo styles. This fixture does
 // not emulate rasterization; it checks the mode's DOM lifecycle and resulting CSS inputs.
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, declarations]) => ({
