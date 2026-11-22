@@ -213,6 +213,8 @@ internal class FleetAndroidHost(private val context: Context) :
   }
 
   override fun whosThereDebug(body: JSONObject): JSONObject = WhosThereDebug.apply(context, body)
+  override fun jarvisMemoryDebug(body: JSONObject): JSONObject =
+      com.immortal.launcher.memory.MemoryDebug.apply(context, body)
   override fun isSettingsPage(page: String) = SettingsTree.contains(page)
 
   override fun openScreen(screen: String, page: String?): Boolean {

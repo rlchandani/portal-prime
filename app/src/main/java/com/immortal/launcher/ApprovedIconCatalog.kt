@@ -95,6 +95,7 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "more", "overflow" -> R.drawable.portal_icon_more
     "edit", "pencil", "customize" -> R.drawable.portal_icon_edit
     "check", "done" -> R.drawable.portal_icon_check
+    "trash", "forget" -> R.drawable.memory_icon_trash
     else -> R.drawable.approved_icon_info
 }
 

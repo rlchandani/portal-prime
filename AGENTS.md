@@ -118,6 +118,12 @@ The Kotlin package is flat; files are grouped by name prefix:
 - **Multi-room audio / now playing:** `MultiRoom*`, `NowPlaying*`, `Snapcast*`, `Ma*`,
   `MediaSession*`, `MediaNotificationListenerService`
 - **Smart home (MQTT):** `Mqtt*`
+- **Jarvis personalization (`memory/`):** switch `JarvisWakeConfig.learnFromConversations` (off by default) or the
+  operator `MemoryDebug` (`fleet action jarvis_memory_debug {"forceOn":true}`); Jarvis's `memory_context` /
+  `memory_observe` / `memory_forget` and `hearthpane.memory` in `MemoryHandoff` / `MemoryTool`; pure rules in
+  `MemoryAccess` (who), `MemoryExtractor` + `assets/memory/dictionary.json` (what), `MemoryLearner` /
+  `MemoryConfidence` (how sure), `MemoryNote` (the prompt note); `JarvisKnowsActivity` ("What Jarvis knows");
+  silent usage counts `UsageCounts` / `MemoryUsage`. Never log user text or profile content.
 - **Remote / Portal TV:** `Remote*`, `TvFocus`
 - **Boot / lifecycle:** `ImmortalApp`, `BootReceiver`, `BootLaunch`, `Sleep*`, `ScreenControl`
 - **Settings (the registry — read [Settings infrastructure](#settings-infrastructure) before

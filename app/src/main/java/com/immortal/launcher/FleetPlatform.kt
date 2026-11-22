@@ -141,6 +141,8 @@ internal interface FleetActions {
   fun setClockFace(face: String)
   fun openClockPreview()
   fun whosThereDebug(body: JSONObject): JSONObject
+  /** Jarvis personalization's operator switch ([com.immortal.launcher.memory.MemoryDebug]). */
+  fun jarvisMemoryDebug(body: JSONObject): JSONObject = JSONObject()
   fun isSettingsPage(page: String): Boolean
   /** Open one of [FleetActionApi.SCREENS], optionally on a Settings [page]. */
   fun openScreen(screen: String, page: String?): Boolean

@@ -584,6 +584,7 @@ private fun AppsDialog(title: String, onDismiss: () -> Unit, content: @Composabl
 }
 
 private fun launchApprovedIntent(context: Context, intent: Intent, onLaunched: () -> Unit = {}): Boolean = runCatching {
+  intent.component?.let { com.immortal.launcher.memory.MemoryUsage.app(context, it.packageName) }
   if (intent.component?.packageName == JarvisHandoff.PACKAGE) {
     return@runCatching JarvisHandoff.launch(context, onLaunched)
   } else if (intent.component == ComponentName(context, StoreActivity::class.java))

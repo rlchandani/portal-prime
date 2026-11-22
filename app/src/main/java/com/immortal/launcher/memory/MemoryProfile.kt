@@ -12,12 +12,14 @@ package com.immortal.launcher.memory
  * one sealed file each ([MemoryProfileStore]). Pure data plus [normalized], which enforces the
  * plan's caps and privacy rules so no writer can store something the plan forbids.
  *
- * Slice 0: the schema and the store only. Nothing writes profiles yet.
+ * Written by [MemoryLearner] (slice 1). [paused] is the person's "Learning off": nothing new is learned, what is
+ * known stays and is still used.
  */
 internal data class MemoryProfile(
     val scope: MemoryScope,
     val facts: List<MemoryFact> = emptyList(),
     val recentTopics: List<RecentTopic> = emptyList(),
+    val paused: Boolean = false,
 ) {
   /**
    * The profile with every rule applied: caps (facts, evidence per fact, recent topics), confidence

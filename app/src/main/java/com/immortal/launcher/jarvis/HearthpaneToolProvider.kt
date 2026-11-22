@@ -22,6 +22,10 @@ import com.immortal.launcher.ReminderStore
 import com.immortal.launcher.RemindersFeature
 import com.immortal.launcher.WhosThere
 import com.immortal.launcher.jarvis.wake.HearthpaneWake
+import com.immortal.launcher.memory.JarvisKnowsActivity
+import com.immortal.launcher.memory.JarvisMemory
+import com.immortal.launcher.memory.MemoryHandoff
+import com.immortal.launcher.memory.MemoryTool
 import org.json.JSONObject
 
 /**
@@ -34,7 +38,14 @@ class HearthpaneToolProvider : ContentProvider() {
   private val tools by lazy {
     HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
         homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search,
-        reminders = { args -> reminderTool.invoke(args) }, household = HearthpaneHouseholdTools.build(requireNotNull(context)))
+        reminders = { args -> reminderTool.invoke(args) },
+        household = HearthpaneHouseholdTools.build(requireNotNull(context)) + (MemoryTool.NAME to ::memoryTool))
+  }
+
+  /** `hearthpane.memory`, bound per call so it always sees the conversation under way. */
+  private fun memoryTool(args: String?): JSONObject {
+    val ctx = requireNotNull(context).applicationContext
+    return JarvisMemory.handoff(ctx).tool(show = { JarvisKnowsActivity.open(ctx) }).invoke(args)
   }
   private val reminderTool by lazy {
     val ctx = requireNotNull(context).applicationContext
@@ -59,9 +70,25 @@ class HearthpaneToolProvider : ContentProvider() {
       return null
     }
     if (method == JarvisPrivacy.METHOD) return Bundle().apply { putString(EXTRA_RESULT, privacy().toString()) }
+    if (method in MEMORY_METHODS) return Bundle().apply { putString(EXTRA_RESULT, memory(ctx, method, extras).toString()) }
     val result = tools.invoke(arg, extras?.getString(EXTRA_ARGS))
     Log.i(TAG, "$arg → ${if (result.has("error")) "error" else "ok"} (${result.toString().length} chars)")
     return Bundle().apply { putString(EXTRA_RESULT, result.toString()) }
+  }
+
+  /** Jarvis's end-of-conversation handoff and the note at its open; never logs what was said. */
+  private fun memory(ctx: android.content.Context, method: String, extras: Bundle?): JSONObject {
+    val args = extras?.getString(EXTRA_ARGS)
+    val handoff = JarvisMemory.handoff(ctx.applicationContext)
+    val result = runCatching {
+      when (method) {
+        MemoryHandoff.METHOD_CONTEXT -> handoff.context(args)
+        MemoryHandoff.METHOD_OBSERVE -> handoff.observe(args)
+        else -> handoff.undo(args)
+      }
+    }.getOrElse { JSONObject().put("error", "memory unavailable") }
+    Log.i(TAG, "$method → ${if (result.has("error")) "error" else "ok"} (${result.toString().length} chars)")
+    return result
   }
 
   /** Facts for Jarvis's screenshot guard; never pixels, and nothing the model sees. */
@@ -89,7 +116,9 @@ class HearthpaneToolProvider : ContentProvider() {
     private const val TAG = "HearthpaneTools"
     const val JARVIS_PACKAGE = "com.portal.assistant"
     const val METHOD_INVOKE = "invoke"
-    private val METHODS = setOf(METHOD_INVOKE, JarvisPrivacy.METHOD)
+    private val MEMORY_METHODS =
+        setOf(MemoryHandoff.METHOD_CONTEXT, MemoryHandoff.METHOD_OBSERVE, MemoryHandoff.METHOD_FORGET)
+    private val METHODS = setOf(METHOD_INVOKE, JarvisPrivacy.METHOD) + MEMORY_METHODS
     const val EXTRA_ARGS = "com.portal.assistant.tools.extra.ARGS"
     const val EXTRA_RESULT = "com.portal.assistant.tools.extra.RESULT"
 

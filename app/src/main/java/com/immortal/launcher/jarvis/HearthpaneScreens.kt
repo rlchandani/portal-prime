@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher.jarvis
 
+import com.immortal.launcher.memory.MemoryUsage
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -49,7 +50,10 @@ internal object HearthpaneScreens {
     var token = 0L
     owner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
       when (event) {
-        Lifecycle.Event.ON_START -> token = show(entry)
+        Lifecycle.Event.ON_START -> {
+          token = show(entry)
+          (owner as? android.content.Context)?.let { c -> runCatching { MemoryUsage.screen(c, entry.id()) } }
+        }
         Lifecycle.Event.ON_STOP -> hide(token)
         else -> Unit
       }

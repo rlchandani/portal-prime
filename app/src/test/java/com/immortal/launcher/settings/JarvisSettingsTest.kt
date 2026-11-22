@@ -13,7 +13,23 @@ import org.junit.Test
 
 /** Settings › Jarvis: "Hey Jarvis on Hearthpane screens" is registered, on by default, and has one home. */
 class JarvisSettingsTest {
-  private val spec = JarvisSettings.domain.specs.single() as BoolSpec<JarvisWakeConfig.Settings>
+  @Suppress("UNCHECKED_CAST")
+  private val spec = JarvisSettings.domain.specs.first { it.key == "wakeOnScreens" } as BoolSpec<JarvisWakeConfig.Settings>
+
+  @Suppress("UNCHECKED_CAST")
+  private val learn =
+      JarvisSettings.domain.specs.first { it.key == "learnFromConversations" } as BoolSpec<JarvisWakeConfig.Settings>
+
+  @Test fun learningFromConversationsDefaultsOffUntilTheOwnerTurnsItOn() {
+    assertEquals(false, JarvisWakeConfig.Settings().learnFromConversations)
+    assertEquals(false, learn.get(requireNotNull(JarvisSettings.domain.defaults)()))
+    assertEquals("Jarvis learns from conversations", learn.title)
+  }
+
+  @Test fun whatJarvisKnowsIsANavRowToItsScreen() {
+    val nav = JarvisSettings.domain.specs.first { it.key == JarvisSettings.KNOWS_KEY } as NavSpec<*>
+    assertEquals(com.immortal.launcher.memory.JarvisKnowsActivity::class.java, nav.activity)
+  }
 
   @Test fun wakeOnScreensDefaultsOn() {
     assertTrue(JarvisWakeConfig.Settings().wakeOnScreens)
@@ -23,7 +39,7 @@ class JarvisSettingsTest {
 
   @Test fun settingsCoverEveryPersistedField() {
     val fields = JarvisWakeConfig.Settings::class.java.declaredFields.map { it.name }.filterNot { it.contains('$') }.toSet()
-    assertEquals(fields, JarvisSettings.domain.specs.map { it.key }.toSet())
+    assertEquals(fields, JarvisSettings.domain.specs.map { it.key }.toSet() - JarvisSettings.KNOWS_KEY)
   }
 
   @Test fun registered() {

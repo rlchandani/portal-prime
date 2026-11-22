@@ -46,6 +46,9 @@ internal class FleetActionApi(private val actions: FleetActions) {
       // Who's there? test switches (operator only, in memory): {"ignoreQuietHours":bool, "glance":true, "benchmark":true}.
       "whos_there_debug" -> json(200, JSONObject().put("ok", true).put("action", "whos_there_debug")
           .put("result", actions.whosThereDebug(body)))
+      // Jarvis personalization test switch (operator only): {"forceOn":bool, "forgetAll":true}; answers counts only.
+      "jarvis_memory_debug" -> json(200, JSONObject().put("ok", true).put("action", "jarvis_memory_debug")
+          .put("result", actions.jarvisMemoryDebug(body)))
       "open_screen" -> openScreen(body)
       // Rotation test hook (operator only): {"request":"portrait"|"landscape"|"reverse_landscape"|"auto"|"forget"}.
       "orientation" -> {

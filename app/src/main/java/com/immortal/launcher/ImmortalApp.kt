@@ -120,6 +120,7 @@ class ImmortalApp : Application() {
       StartupStep("MediaSessionMusicTransport") { MediaSessionMusicTransport.install() },
       // Signed Portal↔Portal bus, then the household features on it.
       StartupStep("HouseholdBus") { HouseholdBus.start(this) },
+      StartupStep("JarvisMemory") { com.immortal.launcher.memory.JarvisMemory.warm(this) },
       StartupStep("HouseholdList") { HouseholdListFeature.install(this) },
       StartupStep("DinnerCall") { DinnerCallFeature.install(this) },
       // Hearthpane Calling: Portal↔Portal video calls and drop-ins over the signed household bus.

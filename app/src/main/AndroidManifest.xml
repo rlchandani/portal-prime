@@ -207,6 +207,8 @@
             android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Clock-face picker subpage (the FaceCatalog faces). -->
+        <activity android:name=".memory.JarvisKnowsActivity" android:exported="false"
+            android:theme="@style/Theme.SampleApp.Navigation" />
         <activity
             android:name=".FacePickerActivity"
             android:exported="false"

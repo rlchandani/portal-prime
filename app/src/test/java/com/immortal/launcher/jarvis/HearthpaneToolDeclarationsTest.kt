@@ -29,7 +29,7 @@ class HearthpaneToolDeclarationsTest {
     val names = (0 until decls.length()).map { decls.getJSONObject(it).getString("name") }
     assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL,
         HearthpaneTools.REMINDERS, HearthpaneAnnounce.NAME, HearthpaneLists.NAME, HearthpaneAlarms.NAME,
-        HearthpaneBriefing.NAME, HearthpaneCall.NAME), names)
+        HearthpaneBriefing.NAME, HearthpaneCall.NAME, com.immortal.launcher.memory.MemoryTool.NAME), names)
     for (i in 0 until decls.length()) {
       val d = decls.getJSONObject(i)
       assertTrue(d.getString("description").isNotBlank())

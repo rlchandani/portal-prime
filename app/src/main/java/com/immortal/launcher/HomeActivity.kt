@@ -93,10 +93,14 @@ class HomeActivity : ComponentActivity() {
             widgetLibraryRequest = widgetLibraryRequest,
             appsSearchOpenRequest = appsSearchOpenRequest,
             musicOpenRequest = musicOpenRequest,
-            onOpenMusic = { musicOpenRequest++ },
+            onOpenMusic = {
+              musicOpenRequest++
+              com.immortal.launcher.memory.MemoryUsage.screen(this, com.immortal.launcher.jarvis.HearthpaneScreens.MUSIC)
+            },
             selectedTab = launcherTabReader,
             onSelectTab = { launcherTab = it },
             onLaunch = { cn ->
+              com.immortal.launcher.memory.MemoryUsage.app(this, cn.packageName)
               runCatching {
                 if (cn == CALLS_COMPONENT) {
                   // The "Calls" tile opens Hearthpane Calling (rooms, recent, Call everyone); Portal's

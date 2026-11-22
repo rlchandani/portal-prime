@@ -34,6 +34,7 @@ internal object MemoryProfileCodec {
         .put("scope", p.scope.token)
         .put("facts", JSONArray().apply { p.facts.forEach { put(fact(it)) } })
         .put("topics", JSONArray().apply { p.recentTopics.forEach { put(topic(it)) } })
+        .apply { if (p.paused) put("paused", true) }
         .toString()
   }
 
@@ -48,7 +49,7 @@ internal object MemoryProfileCodec {
     if (MemoryScope.fromToken(root.optString("scope")) != expected) throw FormatException("scope mismatch")
     val facts = root.optJSONArray("facts").objects().mapNotNull(::readFact)
     val topics = root.optJSONArray("topics").objects().mapNotNull(::readTopic)
-    return MemoryProfile(expected, facts, topics).normalized()
+    return MemoryProfile(expected, facts, topics, paused = root.optBoolean("paused", false)).normalized()
   }
 
   private fun fact(f: MemoryFact): JSONObject = JSONObject()
