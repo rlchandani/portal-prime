@@ -10,6 +10,7 @@ package com.immortal.launcher
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -592,13 +593,20 @@ internal fun Stepper(
     }
 }
 
+private val StepperButtonShape = RoundedCornerShape(9.dp)
+
 @Composable
 private fun StepperButton(glyph: String, rowFocused: Boolean, enabled: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(width = 68.dp, height = 68.dp)
-            .clip(RoundedCornerShape(9.dp))
-            .background(if (rowFocused) IosFocusTint else IosBackground)
+            .clip(StepperButtonShape)
+            // On a focused row the buttons take the card colour, not the row's tint, so they stay
+            // visible; in day theme they also carry the card trim (page grey on white was 1.1:1).
+            .background(if (rowFocused) IosCard else IosBackground)
+            .then(LocalApprovedPalette.current.let { palette ->
+                if (palette.dark) Modifier else Modifier.border(ApprovedOutlineWidth, palette.outline, StepperButtonShape)
+            })
             .focusProperties { canFocus = false }
             .then(if (enabled) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier.semantics { disabled() }),
         contentAlignment = Alignment.Center,
