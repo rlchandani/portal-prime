@@ -15,8 +15,8 @@ import org.junit.Test
 class WakePolicyTest {
   private val listening = WakePolicy.Facts(
       enabled = true, micPermission = true, jarvisInstalled = true, modelReady = true, screenInteractive = true,
-      dreaming = false, hostResumed = true, hostEligible = true, callActive = false, cameraInUse = false,
-      micClaimed = false, quietHours = false, handingOff = false)
+      dreaming = false, hostResumed = true, callActive = false, systemCall = false, micMuted = false,
+      cameraInUse = false, micClaimed = false, quietHours = false, handingOff = false)
 
   private fun pausedFor(facts: WakePolicy.Facts) = (WakePolicy.decide(facts) as Decision.Pause).reason
 
@@ -34,11 +34,35 @@ class WakePolicyTest {
   @Test fun screenOffAndTheDreamPause() {
     assertEquals(Reason.SCREEN_OFF, pausedFor(listening.copy(screenInteractive = false)))
     assertEquals(Reason.DREAMING, pausedFor(listening.copy(dreaming = true)))
-    assertEquals(Reason.INELIGIBLE_SCREEN, pausedFor(listening.copy(hostEligible = false)))
+  }
+
+  /** The idle photo frame is a Hearthpane Activity in front: it listens like Home; only the system dream can't. */
+  @Test fun thePhotoFrameActivityListensButTheSystemDreamDoesNot() {
+    assertEquals(Decision.Listen, WakePolicy.decide(listening))
+    assertEquals(Reason.DREAMING, pausedFor(listening.copy(dreaming = true, hostResumed = true)))
+  }
+
+  @Test fun theFrameStillHonoursTheOffSwitchAndQuietHours() {
+    assertEquals(Reason.DISABLED, pausedFor(listening.copy(enabled = false)))
+    assertEquals(Reason.QUIET_HOURS, pausedFor(listening.copy(quietHours = true)))
+  }
+
+  @Test fun aMutedMicOrPrivacySwitchPauses() {
+    assertEquals(Reason.MIC_MUTED, pausedFor(listening.copy(micMuted = true)))
+  }
+
+  @Test fun anotherAppsCallPausesAndOutranksAMuteAsInJarvis() {
+    assertEquals(Reason.CALL, pausedFor(listening.copy(systemCall = true)))
+    assertEquals(Reason.CALL, pausedFor(listening.copy(systemCall = true, micMuted = true)))
+    assertEquals(Reason.CALL, pausedFor(listening.copy(callActive = true, micMuted = true)))
+  }
+
+  @Test fun aMuteOutranksTheCameraAndQuietHours() {
+    assertEquals(Reason.MIC_MUTED, pausedFor(listening.copy(micMuted = true, cameraInUse = true, quietHours = true)))
   }
 
   @Test fun anotherAppOrJarvissCardInFrontPauses() {
-    assertEquals(Reason.NOT_IN_FRONT, pausedFor(listening.copy(hostResumed = false, hostEligible = false)))
+    assertEquals(Reason.NOT_IN_FRONT, pausedFor(listening.copy(hostResumed = false)))
     assertEquals(Reason.HANDING_OFF, pausedFor(listening.copy(handingOff = true)))
   }
 

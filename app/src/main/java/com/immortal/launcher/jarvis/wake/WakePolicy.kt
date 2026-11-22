@@ -8,8 +8,10 @@ package com.immortal.launcher.jarvis.wake
 
 /**
  * When Hearthpane may listen for "Hey Jarvis" (decision D6 of the floating-Jarvis note): only while one of its
- * own screens is the resumed, interactive foreground and nothing else has a claim on the mic or the camera. The
- * one place this is decided; pure, so every rule is JVM-tested. Order in [decide] = which reason the log shows.
+ * own screens — Home, any Hearthpane screen, or the idle photo frame Activity — is the resumed, interactive
+ * foreground and nothing else has a claim on the mic or the camera. The system dream is never one: Android 10
+ * silences every app's mic behind it. The one place this is decided; pure, so every rule is JVM-tested. Order in
+ * [decide] = which reason the log shows.
  */
 internal object WakePolicy {
   /** Everything the decision reads, as one immutable snapshot. */
@@ -23,12 +25,17 @@ internal object WakePolicy {
       val modelReady: Boolean,
       val screenInteractive: Boolean,
       val dreaming: Boolean,
-      /** A Hearthpane Activity is resumed: not another app, not Jarvis's card (which pauses the screen behind). */
+      /**
+       * A Hearthpane Activity is resumed: not another app, not Jarvis's card (which pauses the screen behind). The
+       * photo frame Activity counts: it is in front, so it hears the room.
+       */
       val hostResumed: Boolean,
-      /** The resumed screen is one that may listen; the photo frame counts as the dream. */
-      val hostEligible: Boolean,
       /** A Hearthpane call or drop-in (ringing included). */
       val callActive: Boolean,
+      /** The audio system is in another app's call ([WakeAudioFacts.systemCall]). */
+      val systemCall: Boolean,
+      /** The mic is muted system-wide (the Portal's privacy switch, or a mute) ([WakeAudioFacts.micMuted]). */
+      val micMuted: Boolean,
       /** The camera Hearthpane and Meta's calls use (camera 0) is open: a Who's there? glance, a call, a message. */
       val cameraInUse: Boolean,
       /**
@@ -47,10 +54,10 @@ internal object WakePolicy {
     NO_JARVIS("Jarvis isn't installed"),
     NO_MODEL("wake model unavailable"),
     SCREEN_OFF("screen off"),
-    DREAMING("photo frame or screensaver"),
+    DREAMING("the system screensaver is showing"),
     NOT_IN_FRONT("another app or Jarvis is in front"),
-    INELIGIBLE_SCREEN("photo frame or screensaver"),
     CALL("a call is active"),
+    MIC_MUTED("the microphone is muted"),
     CAMERA("the camera is in use"),
     MIC_BUSY("another Hearthpane feature is using the mic"),
     QUIET_HOURS("quiet hours"),
@@ -72,8 +79,8 @@ internal object WakePolicy {
       f.dreaming -> Reason.DREAMING
       f.handingOff -> Reason.HANDING_OFF
       !f.hostResumed -> Reason.NOT_IN_FRONT
-      !f.hostEligible -> Reason.INELIGIBLE_SCREEN
-      f.callActive -> Reason.CALL
+      f.callActive || f.systemCall -> Reason.CALL
+      f.micMuted -> Reason.MIC_MUTED
       f.cameraInUse -> Reason.CAMERA
       f.micClaimed -> Reason.MIC_BUSY
       f.quietHours -> Reason.QUIET_HOURS

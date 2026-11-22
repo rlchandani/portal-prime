@@ -23,8 +23,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 /**
- * Full-screen photo frame as a normal activity. Two jobs:
- *  - on-demand preview (Screensaver tile), and
+ * Full-screen photo frame as a normal activity. Three jobs:
+ *  - on-demand preview (Screensaver tile),
+ *  - the idle frame: Home's [IdleFrameTimer] opens it just before the system screen timeout, so Hearthpane stays
+ *    in front and "Hey Jarvis" keeps listening ([IdleFramePolicy]; the dream remains the fallback), and
  *  - the continuation frame: when the system force-wakes the real screensaver
  *    (see [DreamPolicy]), this activity takes over seamlessly.
  *
@@ -40,6 +42,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
   private var screenReceiver: BroadcastReceiver? = null
   private var hostStarted = false
   private var nightBrightness: NightWindowBrightness? = null
+  private var listeningDot: FrameListeningDot? = null
 
   // Read from the *latest* intent (onCreate or onNewIntent), never captured in a closure:
   // this activity is singleTask, so a relaunch while the frame is already up reuses the live
@@ -113,6 +116,7 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     nightBrightness = NightWindowBrightness(this, window)
     frame.onNightClockChanged = { night ->
       nightBrightness?.setNight(night, ScreensaverConfig.load(this@PhotoFramePreviewActivity).nightClockBrightness)
+      listeningDot?.setNight(night)
     }
 
     if (nightClock) {
@@ -138,6 +142,8 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     }
 
     setContentView(frame.view)
+    // "Hey Jarvis" listens on this frame (it is in front; the dream never is): show the ember dot while it does.
+    listeningDot = FrameListeningDot(this, night = nightClock)
     ImmortalDreamNavigation.attached(this)
     frame.start()
     screenReceiver = object : BroadcastReceiver() {

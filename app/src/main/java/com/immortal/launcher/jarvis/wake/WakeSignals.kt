@@ -11,12 +11,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.camera2.CameraManager
+import android.media.AudioManager
+import android.media.AudioRecordingConfiguration
 import android.os.Handler
 import android.util.Log
 
 /**
- * The platform signals [WakePolicy] reads that arrive as callbacks: the screen and the dream, and camera 0. All callbacks run on the main [handler] and only flip a field and call [changed];
- * the decision stays in [WakePolicy]. Registered once for the process lifetime (a few cheap callbacks, no polling).
+ * The platform signals [WakePolicy] reads that arrive as callbacks: the screen and the dream, camera 0, and the mic
+ * (a mute or privacy switch, another app starting a call's capture). All callbacks run on the main [handler] and only
+ * flip a field and call [changed]; the decision stays in [WakePolicy]. Registered once for the process lifetime (a
+ * few cheap callbacks, no polling). The audio mode has no callback before API 31: [audio] is read at each decision.
  */
 internal class WakeSignals(private val context: Context, private val handler: Handler, private val changed: () -> Unit) {
   @Volatile var dreaming = false
@@ -24,9 +28,26 @@ internal class WakeSignals(private val context: Context, private val handler: Ha
   @Volatile var cameraInUse = false
     private set
 
+  /** The mic as the audio system reports it right now. Main thread. */
+  fun audio(): WakeAudioFacts = WakeAudioFacts.read(context.getSystemService(AudioManager::class.java))
+
   fun register() {
     registerScreen()
     registerCamera()
+    registerMic()
+  }
+
+  /** A mute (the hardware privacy switch mutes the mic system-wide) or another app's capture starting or ending. */
+  private fun registerMic() {
+    context.registerReceiver(object : BroadcastReceiver() {
+      override fun onReceive(c: Context, intent: Intent) = changed()
+    }, IntentFilter(ACTION_MIC_MUTE_CHANGED), null, handler)
+    val audio = context.getSystemService(AudioManager::class.java) ?: return
+    runCatching {
+      audio.registerAudioRecordingCallback(object : AudioManager.AudioRecordingCallback() {
+        override fun onRecordingConfigChanged(configs: List<AudioRecordingConfiguration>) = changed()
+      }, handler)
+    }.onFailure { Log.w(TAG, "recording callback unavailable: ${it.javaClass.simpleName}") }
   }
 
   private fun registerScreen() {
@@ -68,5 +89,7 @@ internal class WakeSignals(private val context: Context, private val handler: Ha
   private companion object {
     const val TAG = "HearthpaneWake"
     const val WATCHED_CAMERA = "0"
+    /** `AudioManager.ACTION_MICROPHONE_MUTE_CHANGED` (API 28; the Portals run 28 and 29). Registered receivers only. */
+    const val ACTION_MIC_MUTE_CHANGED = "android.media.action.MICROPHONE_MUTE_CHANGED"
   }
 }

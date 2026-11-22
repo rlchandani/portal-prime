@@ -576,6 +576,8 @@ internal fun LauncherScreen(
           ReminderAlertBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
           MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           WhosThereHiChip(Modifier.align(Alignment.TopCenter).padding(top = 4.dp))
+          // "Hey Jarvis" is listening: a small ember in the top-start margin, outside every measured row.
+          WakeListeningDot(Modifier.align(Alignment.TopStart).padding(start = 7.dp, top = 7.dp))
           if (whoSheet) WhosThereNotYouSheet(onSettings = { context.openApprovedHomeSettings(SettingsPageIds.PEOPLE) },
               onDismiss = { whoSheet = false })
           }
