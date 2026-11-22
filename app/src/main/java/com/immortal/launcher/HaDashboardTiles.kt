@@ -207,7 +207,7 @@ internal fun HaSensorTile(d: HaDashboardApi.Detail, history: List<Float>, stale:
       HaNameStatus(d.friendlyName, "24 h", Tone.PLAIN, Modifier.padding(top = 4.dp))
     }
     Row(Modifier.align(Alignment.BottomStart), verticalAlignment = Alignment.Bottom) {
-      HaText(d.state, dims.big, c.text, serif = true, lineHeight = 1f)
+      HaText(HaEntityLook.reading(d), dims.big, c.text, serif = true, lineHeight = 1f)
       if (d.unit.isNotBlank()) HaText(d.unit, dims.status, c.sec, Modifier.padding(start = 6.dp), FontWeight.Medium)
     }
     if (history.size >= 2) HaSparkline(history, Modifier.align(Alignment.BottomEnd).fillMaxWidth(SPARK_W).fillMaxHeight(SPARK_H))

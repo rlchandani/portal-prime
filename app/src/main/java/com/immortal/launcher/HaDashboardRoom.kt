@@ -77,8 +77,8 @@ private fun HaRoomHead(room: HaDashboardApi.Area, details: List<HaDashboardApi.D
     HaText(room.name, d.roomTitle, c.text, Modifier.semantics { heading() }, serif = true, lineHeight = 1f)
     Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
       if (details.isNotEmpty()) HaFact("bulb", if (lit.isEmpty()) "Lights off" else "${lit.size} on")
-      HaDashboardModel.temperature(details)?.let { HaFact("therm", "${it.state}°") }
-      HaDashboardModel.humidity(details)?.let { HaFact("drop", "${it.state}%") }
+      HaDashboardModel.temperature(details)?.let { HaFact("therm", "${HaEntityLook.reading(it)}°") }
+      HaDashboardModel.humidity(details)?.let { HaFact("drop", "${HaEntityLook.reading(it)}%") }
     }
     if (lit.isNotEmpty() && !offline) {
       HaPill("All off", { onAction(HaDashboardSession.Action.AllOff(room.name, lit)) }, icon = "power")

@@ -108,4 +108,14 @@ class HaEntityLookTest {
     assertTrue(HaEntityLook.isActive(haDetail("media_player.m", state = "playing")))
     assertFalse(HaEntityLook.isActive(haDetail("media_player.m", state = "paused")))
   }
+
+  @Test fun `sensor readings are rounded for the wall`() {
+    assertEquals("77.7", HaEntityLook.reading(haDetail("sensor.t", state = "77.72", unit = "°F")))
+    assertEquals("20.5", HaEntityLook.reading(haDetail("sensor.t", state = "20.5", unit = "°C")))
+    assertEquals("21", HaEntityLook.reading(haDetail("sensor.t", state = "21.04", unit = "°C")))
+    assertEquals("36", HaEntityLook.reading(haDetail("sensor.h", state = "36.1", unit = "%")))
+    assertEquals("640", HaEntityLook.reading(haDetail("sensor.c", state = "640.4", unit = "ppm")))
+    assertEquals("1203", HaEntityLook.reading(haDetail("sensor.l", state = "1203.3", unit = "lx")))
+    assertEquals("unavailable", HaEntityLook.reading(haDetail("sensor.x", state = "unavailable")))
+  }
 }

@@ -47,20 +47,32 @@ internal object HaDashboardIcons {
     "blinds" to "M4 3h16M5 3v11h14V3M5 7h14M5 11h14M12 14v3M12 17a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3z",
   )
 
+  // Transport glyphs are filled AND stroked in the mock, so the bar beside each triangle shows.
+  private val solid: Map<String, String> = mapOf(
+    "play" to "M8 5v14l11-7z",
+    "prev" to "M18 6v12l-9-6zM6 6v12",
+    "next" to "M6 6v12l9-6zM18 6v12",
+    "pause" to "M8 5v14M16 5v14",
+  )
+
   private val cache = HashMap<String, ImageVector>()
 
   operator fun get(name: String): ImageVector = synchronized(cache) {
-    cache.getOrPut(name) { paths[name]?.let { build(name, it) } ?: CcIcons[name] }
+    cache.getOrPut(name) {
+      paths[name]?.let { build(name, it, filled = false) } ?: solid[name]?.let { build(name, it, filled = true) } ?: CcIcons[name]
+    }
   }
 
-  private fun build(name: String, d: String): ImageVector =
+  private fun build(name: String, d: String, filled: Boolean): ImageVector =
       ImageVector.Builder(name = "ha_$name", defaultWidth = 24.dp, defaultHeight = 24.dp,
           viewportWidth = 24f, viewportHeight = 24f)
-          .addPath(addPathNodes(d), stroke = SolidColor(Color.Black), strokeLineWidth = STROKE,
+          .addPath(addPathNodes(d), fill = if (filled) SolidColor(Color.Black) else null, stroke = SolidColor(Color.Black),
+              strokeLineWidth = if (name == "pause") PAUSE_STROKE else STROKE,
               strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round)
           .build()
 
   private const val STROKE = 1.9f
+  private const val PAUSE_STROKE = 3.2f
 }
 
 /** A dashboard glyph at [size], tinted [tint]; decorative (the enclosing control names it). */

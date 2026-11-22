@@ -121,6 +121,19 @@ object HaEntityLook {
   fun dimmed(d: HaDashboardApi.Detail, pct: Int): HaDashboardApi.Detail =
       d.copy(state = if (pct > 0) "on" else "off", brightnessPct = pct.coerceIn(0, MAX_PCT))
 
+  /**
+   * A sensor reading as a wall display shows it: "77.72" °F → "77.7", humidity "36.1" % → "36".
+   * Non-numeric states pass through.
+   */
+  fun reading(d: HaDashboardApi.Detail): String {
+    val v = d.state.toFloatOrNull() ?: return d.state
+    if (d.unit == "%" || d.unit == "ppm" || kotlin.math.abs(v) >= WHOLE_FROM) return Math.round(v).toString()
+    val tenth = Math.round(v * TENTHS) / TENTHS
+    return if (tenth == Math.round(tenth).toFloat()) Math.round(tenth).toString() else String.format(Locale.US, "%.1f", tenth)
+  }
+
+  private const val TENTHS = 10f
+  private const val WHOLE_FROM = 1000f
   private const val DEFAULT_ON_PCT = 60
   private const val MAX_PCT = 100
 }

@@ -57,7 +57,7 @@ internal fun haDashboardView(state: HaDashboardState, session: HaDashboardSessio
   val subline = stateSubline(state) ?: HaDashboardDay.subline(
       HaDashboardDay.clock(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), use24h), part,
       HaDashboardDay.Facts(lit = HaDashboardModel.litCount(all), lock = HaDashboardDay.lockFact(all),
-          insideTemp = HaDashboardModel.temperature(all)?.let { HaClimate.degrees(it.state.toFloat()) },
+          insideTemp = HaDashboardModel.temperature(all)?.let { "${HaEntityLook.reading(it)}°" },
           offlineMinutes = offline, hasNightScene = scenes.any { HaDashboardDay.sceneWhen(it.name) == HaDashboardDay.Part.NIGHT }))
   val room = house?.let { session.room(it) }?.let { r -> areas.first { it.id == r.id } }
   return HaDashboardView(state, session, part.greeting, subline,
