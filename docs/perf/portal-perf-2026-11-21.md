@@ -1125,6 +1125,39 @@ their own layers so a header re-layout does not re-record every icon; cache each
 (RenderThread). Portal Mini (800×1280): same code paths (`LauncherScreen`'s compact header is in the same
 `HomeRecomposeScope`, same dock and tab host); not measured.
 
+### v3 measured: official 1.322 (= v2) vs `home-tabs-v3` (1.322 + change 5), 2026-11-22
+
+**Device:** Family Portal+ (2160×1440), 03:23–03:31 PST. Plain `adb install -r`, no force-stop, STREAM_MUSIC 3 → 0
+→ 3, framestats only (no screenshots, recordings or traces), only the tab bar labels tapped. Ended on official 1.322
+(on-device sha256 `b3140a96…` = `hearthpane-latest.json`), Home on top and default, dev off.
+
+**Builds:** official 1.322 (contains v2, sha `b3140a96…`); `home-tabs-v3` = local main `b713403d` + cherry-pick of
+`ca7cb42f` (`assemblePerformance`, sha `b1d09cfc…`; `testDebugUnitTest` green, `LauncherPageWakeTest` 5 tests).
+
+**Method:** as above (warm-up cycle, 2 rounds × 4 × (Home → Apps, Apps → Tools, Tools → Home), `gfxinfo reset`
+before each tap, HomeActivity `framestats` 2.5 s after; frame = FrameCompleted − IntendedVsync, Flags 0), run in
+the order official, v3, v3, official so each build has one pass on either side: 16 switches per direction per build.
+
+| Frames over 32 ms (16 switches each) | official 1.322 (v2) | v3 |
+|---|---|---|
+| → Apps: total / worst median ms / switches with none | 28 / 42 / 3 | **15 / 35 / 6** |
+| → Tools | 2 / 25 / 14 | **0 / 22 / 16** |
+| → Home | 29 / 48 / 1 | 30 / 44 / 0 |
+| Sum of frames over 32 ms per switch, median ms (Apps / Tools / Home) | 81 / 0 / 89 | **35** / 0 / 86 |
+
+Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 16 and 12 / 0 / 13; v3 9 / 0 / 16 and
+6 / 0 / 14. The official baseline reproduces the 1.317 → v2 column above.
+
+- **→ Apps: v3 halves the long frames** (28 → 15; per-switch over-32 ms time 81 → 35 ms median, in both passes):
+  splitting Home's sleep and Apps' wake onto different frames removes the +3 wake-frame stall. Not yet at target
+  (worst median 35 ms, 6 of 16 switches clean).
+- **→ Tools:** unchanged within noise (already at target on v2; v3 had no frame over 32 ms in 16 switches).
+- **→ Home:** no change (29 vs 30 frames, worst median 48 vs 44 ms): its remaining cost is the switch frame (header
+  re-record and Customize measure, above), which change 5 does not touch. No regression in any direction.
+
+**Verdict:** v3 is a clear win for → Apps with no regression; ship it. Next for → Home: the header items listed above
+(keep Customize composed, header button layers), then page layers during the slide.
+
 ## Screensaver doodle tiles in every mode, and Gallery Wall upload warm-up (branch `ss-tiles`)
 
 **Status: partial.** Device work was stopped early at the owner's request: the test source had been on the Family Portal too long. The doodle-tile part is measured. The Gallery Wall warm-up part has one household change and an untraced remainder.
