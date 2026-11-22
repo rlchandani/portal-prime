@@ -1,6 +1,6 @@
 {
-  "versionCode": 311,
-  "versionName": "1.317",
+  "versionCode": 312,
+  "versionName": "1.318",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Control Center: screen switches are smooth — accessibility updates and the header title swap moved off the switch frame, cameras start just after (taps: slow frames 22 → 5 per 16; back: 23 → 9)."
+  "notes": "Settings reopens near-instantly; Control Center opens fully drawn with last-known states (locks/alarm/garage wait for live data); smoother Home tab switches; every screensaver doodle background is a pre-rendered tile (Cinema change stalls 10 → 0)."
 }
