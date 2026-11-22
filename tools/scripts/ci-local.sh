@@ -85,6 +85,7 @@ portal_python() {
   [ -d /private/tmp ] || { echo "✗ /private/tmp is required by the profile tooling tests" >&2; return 1; }
   need python3 && python3 -m unittest discover -s scripts -p 'test_portal_*.py'
 }
+perf_python() { need python3 && python3 -I -m unittest discover -s tools/perf; }
 gradle_unit() {
   # Never run more than MAX_GRADLE_PROCESSES Gradle JVMs on this machine at once.
   while [ "$(pgrep -f GradleMain | wc -l | tr -d ' ')" -ge "$MAX_GRADLE_PROCESSES" ]; do
@@ -144,6 +145,7 @@ remote_browser() {
 run "tests: slideshow sources and labels (node)" slideshow_js
 run "tests: remote and screensaver JavaScript guards (node)" remote_js
 run "tests: Portal Python regression guards" portal_python
+run "tests: on-device benchmark harness (tools/perf, no device)" perf_python
 run "Catalog validation: catalog tests" catalog_tests
 run "Catalog validation: validate_catalog.py$([ "$offline" -eq 1 ] || echo ' --network')" catalog_validate
 run "Release guard: version.json ⇄ build.gradle.kts" version_sync

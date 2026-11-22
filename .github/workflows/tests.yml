@@ -56,6 +56,9 @@ jobs:
       - name: Test Portal Python regression guards
         run: python3 -m unittest discover -s scripts -p 'test_portal_*.py'
 
+      - name: Test the on-device benchmark harness (no device)
+        run: python3 -I -m unittest discover -s tools/perf
+
       - name: Run unit tests
         # compileDebugKotlin runs out of heap under gradle.properties' 2 GB default (the
         # Kotlin daemon inherits it). Compile in-process with a 6 GB Gradle heap; the

@@ -209,6 +209,16 @@ Quick reference (run from `provisioning/`):
 ./fleetctl dev update <app.apk> --device "<name>"   # install a local build (same signing key!)
 ```
 
+## On-device benchmarks (`tools/perf`)
+
+Do not run Portal performance measurements by hand. Submit a job to the per-Portal queue with
+`python3 -I tools/perf/bench.py submit --device <serial> --scenario <name> --official --apk <branch.apk>`,
+then `bench.py wait <job-id>` for the frame tables and the A/B verdict; one `bench.py worker --device
+<serial>` per Portal takes the device lock once per job (waiting politely when another agent holds it),
+enforces a hard time cap, and always restores the Portal (official release, wm, rotation, test source,
+cc_debug, music, Home, dev off). Scenarios, screenshot rules and safety guarantees are in
+[`tools/perf/README.md`](tools/perf/README.md).
+
 ## Conventions and hard rules
 
 - **Match existing style.** Keep changes focused; prefer editing over rewrites. Reuse existing
