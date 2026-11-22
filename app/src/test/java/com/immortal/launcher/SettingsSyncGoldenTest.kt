@@ -140,7 +140,7 @@ private class SyncGoldenRun(private val data: JSONObject, private val sc: JSONOb
       "local" -> { val v = step.getJSONObject("values"); SettingsSyncCatalog.household.apply(c, v.keys().asSequence().associateWith { v.get(it) }) }
       "fireMain" -> {
         val due = synchronized(h.posted) { h.posted.toList().also { h.posted.clear() } }
-        h.withWorkersHeld { due.forEach { it.first.run() } }
+        due.forEach { it.first.run() }
       }
       "resolveJoin" -> SettingsSync.resolveJoin(step.getBoolean("keepMine"))
       "dismissAdoptCard" -> SettingsSync.dismissAdoptCard()

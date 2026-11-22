@@ -17,9 +17,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Collections
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONObject
 import org.mockito.ArgumentMatchers.anyInt
@@ -36,6 +33,9 @@ import org.mockito.Mockito.`when`
  * a scratch dir behind a mocked Context, the real household settings catalog, and this Portal's
  * device id. Everything it does (logs, published status, ledger, settings written, the delayed
  * main-thread work it queues, replies) is appended to [out], one line each.
+ *
+ * Single-threaded: the sync's worker and network executors are one [SyncGoldenQueue] that runs only
+ * in [drain] (or when the test thread waits on it), so [out]'s order never depends on scheduling.
  */
 internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
   val out: MutableList<String> = Collections.synchronizedList(ArrayList())
@@ -54,7 +54,6 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
   private val catalog get() = SettingsSyncCatalog.household
   private val wellFormed: (String, Any?) -> Any? = { k, v -> catalog.wellFormed(k, v) }
   private val testThread = ThreadMocks(out)
-  private val workerMocks = ArrayList<Pair<ExecutorService, ThreadMocks>>()
   private val looper: MockedStatic<Looper> = Mockito.mockStatic(Looper::class.java)
   private val handlers: MockedConstruction<Handler> = Mockito.mockConstruction(Handler::class.java) { h, _ ->
     `when`(h.postDelayed(Mockito.any(), anyLong())).thenAnswer { SyncGoldenMain.post(it.getArgument(0), it.getArgument(1)); true }
@@ -62,6 +61,9 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
   }
   private val appliedHook = SettingsDomain.valuesApplied
   private val realClock = SettingsSync.clock
+  private val realWorker = SettingsSync.worker
+  private val realNet = SettingsSync.net
+  private val queue = SyncGoldenQueue()
   private val ticks = AtomicLong(CLOCK_START_MS)
 
   /**
@@ -71,15 +73,13 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
    */
   fun now(): Long = ticks.incrementAndGet()
 
-  val worker: ExecutorService = staticField("worker")
-  val net: ExecutorService = staticField("net")
-
   init {
     SyncGoldenMain.harness = this
     SettingsSync.clock = this::now
+    SettingsSync.worker = queue.lane()
+    SettingsSync.net = queue.lane()
     File(dir, "remote-companion.json").writeText(JSONObject().put("deviceId", SELF).toString())
     prefs("fleet_agent").edit().putString("name", "Family").putInt("port", PORT).apply()
-    for (ex in listOf(worker, net)) workerMocks += ex to ex.submit<ThreadMocks> { ThreadMocks(out) }.get()
     resetSync()
   }
 
@@ -90,7 +90,8 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     resetSync()
     SettingsDomain.valuesApplied = appliedHook
     SettingsSync.clock = realClock
-    workerMocks.forEach { (ex, m) -> ex.submit { m.close() }.get() }
+    SettingsSync.worker = realWorker
+    SettingsSync.net = realNet
     SyncGoldenMain.harness = null
     handlers.close(); looper.close(); testThread.close()
   }
@@ -101,31 +102,18 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     setStatic("core", null)
     staticField<java.util.concurrent.atomic.AtomicBoolean>("pausedFlag").set(false)
     staticField<kotlinx.coroutines.flow.MutableStateFlow<SettingsSyncStatus>>("_status").value = SettingsSyncStatus()
+    forgetPeerRouteNonces()
   }
 
-  /**
-   * Runs [block] (main-thread work) while the worker and network threads are parked, so work it
-   * hands them is recorded after everything [block] itself records. Without this, a gossip tick's
-   * `worker.execute { detect() }` could log before the same tick's repost was recorded.
-   */
-  fun <T> withWorkersHeld(block: () -> T): T {
-    val release = CountDownLatch(1)
-    val parked = listOf(worker, net).map { ex ->
-      val holding = CountDownLatch(1)
-      ex.submit { holding.countDown(); release.await(HOLD_TIMEOUT_S, TimeUnit.SECONDS) }.also { holding.await() }
-    }
-    try {
-      return block()
-    } finally {
-      release.countDown()
-      parked.forEach { it.get() }
-    }
+  /** The peer route's replay guard is process-wide; scenarios reuse nonces, so a rerun in one JVM must start clean. */
+  private fun forgetPeerRouteNonces() {
+    val guard = staticField<HouseholdMessage.ReplayGuard>("replay", SettingsSyncNet::class.java)
+    val seen = HouseholdMessage.ReplayGuard::class.java.getDeclaredField("seen").apply { isAccessible = true }.get(guard) as MutableMap<*, *>
+    synchronized(guard) { seen.clear() }
   }
 
-  /** Waits until the worker and network threads have nothing left (each may queue on the other). */
-  fun drain() {
-    repeat(DRAIN_ROUNDS) { worker.submit {}.get(); net.submit {}.get() }
-  }
+  /** Runs the work the sync handed its worker and network threads, and any work that queues, to the end. */
+  fun drain() = queue.drain()
 
   fun busHandler(type: String): HouseholdBus.Handler =
       staticField<Map<String, HouseholdBus.Handler>>("handlers", HouseholdBus::class.java)[type] ?: error("no $type handler")
@@ -168,9 +156,6 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     const val PEER_HI = "99999999-9999-4999-8999-999999999999"
     const val PEER_LO = "11111111-1111-4111-8111-111111111111"
     const val PORT = 8765
-    private const val DRAIN_ROUNDS = 4
-    /** Upper bound on a parked worker, so a main block that waited on one fails instead of hanging. */
-    private const val HOLD_TIMEOUT_S = 30L
     /** 2027-01-15: inside [NOW_MS], so stamps still read as `<now>` in the golden. */
     private const val CLOCK_START_MS = 1_800_000_000_000L
     val NAMES = mapOf(SELF to "self", PEER_HI to "hi", PEER_LO to "lo")
@@ -196,9 +181,9 @@ internal object SyncGoldenMain {
 }
 
 /**
- * Mockito's static and construction mocks only apply on the thread that opens them, so each sync
- * thread opens its own: Log calls are recorded and the companion store's AtomicFile reads a plain
- * file.
+ * Mockito's static and construction mocks only apply on the thread that opens them; all sync work
+ * runs on the test thread, which opens these: Log calls are recorded and the companion store's
+ * AtomicFile reads a plain file.
  */
 internal class ThreadMocks(out: MutableList<String>) : AutoCloseable {
   private val log: MockedStatic<Log> = Mockito.mockStatic(Log::class.java) { inv ->

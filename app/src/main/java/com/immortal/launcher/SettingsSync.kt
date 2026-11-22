@@ -14,6 +14,7 @@ import android.os.Looper
 import android.util.Log
 import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsSyncCatalog
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,8 +37,14 @@ internal object SettingsSync {
   private const val TAG = "HearthpaneSettingsSync"
   const val GOSSIP_MS = SettingsSyncCore.GOSSIP_MS
 
-  private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-settings-sync").apply { isDaemon = true } }
-  private val net = Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-settings-net").apply { isDaemon = true } }
+  /**
+   * The ledger thread and the peer-POST thread. Seams (like [clock]) so tests can run both on one
+   * queue they drain themselves; read when the core is built and when a bus message arrives.
+   */
+  @Volatile internal var worker: ExecutorService =
+      Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-settings-sync").apply { isDaemon = true } }
+  @Volatile internal var net: ExecutorService =
+      Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-settings-net").apply { isDaemon = true } }
   private val main by lazy { Handler(Looper.getMainLooper()) }
 
   @Volatile private var installed = false
