@@ -182,7 +182,7 @@ internal class FleetBackupRoutes(
     val names = dir.list().orEmpty().filter { it.endsWith(".xml") }.map { it.removeSuffix(".xml") }
         .filter(FleetBackupArchive::isExportablePref).sorted()
     if (names.size > FleetBackupArchive.MAX_PREF_FILES) throw FleetBackupArchive.ArchiveException("backup_too_large")
-    return names.associateWith { name ->
+    val collected = names.associateWith { name ->
       val out = sortedMapOf<String, PrefValue>()
       context.getSharedPreferences(name, Context.MODE_PRIVATE).all.forEach { (key, raw) ->
         val value = FleetBackupArchive.prefValue(raw)
@@ -190,6 +190,19 @@ internal class FleetBackupRoutes(
       }
       out
     }
+    return withHouseholdKey(collected)
+  }
+
+  /**
+   * The household key is sealed to this Portal's Keystore, not in prefs, so a backup would miss it.
+   * Carry it in its old prefs form (inside the sealed archive), so a restore brings it back as before.
+   */
+  private fun withHouseholdKey(prefs: Map<String, Map<String, PrefValue>>): Map<String, Map<String, PrefValue>> {
+    val key = HouseholdKey.get(context) ?: return prefs
+    val entry = HouseholdKey.PLAIN_KEY to PrefValue.Str(HouseholdKey.toHex(key))
+    key.fill(0)
+    val household = (prefs[HouseholdKey.PREFS].orEmpty() + entry).toSortedMap()
+    return (prefs + (HouseholdKey.PREFS to household)).toSortedMap()
   }
 
   private fun collectFiles(): Map<String, ByteArray> {
@@ -268,6 +281,8 @@ internal class FleetBackupRoutes(
       if (!editor.commit()) throw IllegalStateException("preference file not stored")
       prefFiles++
     }
+    // The household key lives sealed outside prefs; take over (or drop) whatever the restore put there.
+    if (HouseholdKey.PREFS in plan.prefs) HouseholdKey.adoptRestored(context)
     var dataFiles = 0
     // Under the companion store's lock, so no reader can re-memoize its identity mid-replacement.
     synchronized(RemoteCompanionStore.mutationLock) {

@@ -204,6 +204,27 @@ class FleetBackupRoutesTest {
     assertTrue(appliedHousehold.isEmpty())
   }
 
+  @Test fun theExportCarriesTheHouseholdKeyWhereverItIsStored() {
+    seedPortal()
+    // Sealed in the Keystore, the key is no longer a prefs file the export would list on its own.
+    File(dataDir, "shared_prefs/immortal_household.xml").delete()
+    enrolAndConfirm()
+    val (_, plain) = exportAndOpen()
+    val archive = FleetBackupArchive.decode(plain, platform::householdWellFormed)
+    assertEquals(mapOf("k" to FleetBackupArchive.PrefValue.Str("ab".repeat(32))),
+        archive.prefs.getValue("immortal_household"))
+  }
+
+  @Test fun sameDeviceImportBringsTheHouseholdKeyBack() {
+    seedPortal()
+    enrolAndConfirm()
+    val backup = call("POST", "/backup/export").second.getJSONObject("backup")
+    assertTrue(HouseholdKey.set(context, ByteArray(32) { 0x11 }))
+    val (status, body) = call("POST", "/backup/import", importBody(backup))
+    assertEquals(body.toString(), 200, status)
+    assertEquals("ab".repeat(32), HouseholdKey.get(context)?.let(HouseholdKey::toHex))
+  }
+
   @Test fun anotherDevicesArchiveIsRefusedWithoutCrossDevice() {
     seedPortal()
     enrolAndConfirm()

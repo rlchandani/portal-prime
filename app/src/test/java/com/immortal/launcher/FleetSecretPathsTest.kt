@@ -60,10 +60,17 @@ class FleetSecretPathsTest {
     assertTrue(FleetSecretPaths.isBlocked(whos))
   }
 
+  @Test fun theSealedHouseholdKeyIsBlockedForEveryRoute() {
+    val dir = File(root, HouseholdKey.DIR).apply { mkdirs() }
+    assertTrue(FleetSecretPaths.isBlocked(File(dir, "key.bin")))
+    assertTrue(FleetSecretPaths.isBlocked(dir))
+  }
+
   @Test fun readsRefuseEverySecretHoldingPrivateStore() {
     for (sub in listOf("shared_prefs/immortal_household.xml", "shared_prefs/immortal_ha.xml",
         "shared_prefs/remote_pairing.xml", "shared_prefs/fleet_agent.xml", "databases/any.db",
         "files/household_list.json", "no_backup/remote-companion.json", "no_backup/whos_there/household.bin",
+        "no_backup/household/key.bin", "no_backup/memory/household.bin",
         "app_webview/Cookies", "cache/ss_remote/a.jpg", "")) {
       assertTrue(sub, readBlocked("/data/user/0/$pkg/$sub"))
       assertTrue(sub, readBlocked("/data/data/$pkg/$sub"))
