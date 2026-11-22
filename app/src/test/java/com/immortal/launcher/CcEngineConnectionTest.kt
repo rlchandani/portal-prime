@@ -234,3 +234,82 @@ class CcEngineConnectionTest {
     assertEquals(1000, r.ws.closed)
   }
 }
+
+/** Control Center opens with the last-known states of the entities the background subscription doesn't watch. */
+class CcEngineLastKnownTest {
+  private fun CcEngineRig.hideThenShow() {
+    engine.setVisible(false); sched.runDue()
+    engine.setVisible(true); sched.runDue()
+  }
+
+  @Test fun anOpenDrawsTheLastKnownStatesAtOnceUnconfirmed() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.engine.setVisible(false); r.sched.runDue()
+    assertEquals(setOf("binary_sensor.leak"), r.engine.live.raw.keys)
+    assertEquals(setOf("light.kitchen", "lock.front", "camera.porch", "valve.main"), r.engine.lastKnown.keys)
+    r.engine.setVisible(true); r.sched.runDue()
+    assertEquals("on", r.state.entity("light.kitchen")?.state)
+    assertEquals("locked", r.state.entity("lock.front")?.state)
+    assertEquals(setOf("light.kitchen", "lock.front", "camera.porch", "valve.main"), r.state.unconfirmed)
+    assertTrue("the plan is built before the subscription answers", r.state.planModels.isNotEmpty())
+    assertEquals("safety-critical shows as in flight", setOf("lock.front"), r.state.pending)
+    assertTrue(r.engine.lastKnown.isEmpty())
+  }
+
+  @Test fun theFullAnswerConfirmsInPlaceAndDropsWhatHaNoLongerHas() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.hideThenShow()
+    val versionBefore = r.state.entitiesVersion
+    val fresh = JSONObject().put("a", JSONObject()
+        .put("light.kitchen", CcEngineRig.state("off", "Kitchen light")).put("lock.front", CcEngineRig.state("locked", "Front lock"))
+        .put("binary_sensor.leak", CcEngineRig.state("off", "Leak", "moisture")).put("valve.main", CcEngineRig.state("open", "Water main")))
+    r.reply("subscribe_entities")
+    r.event("subscribe_entities", fresh)
+    r.advance(CcEngine.FLUSH_MS)
+    assertTrue(r.state.unconfirmed.isEmpty())
+    assertTrue(r.state.pending.isEmpty())
+    assertEquals("a stale value updates in place", "off", r.state.entity("light.kitchen")?.state)
+    assertNull("gone from HA", r.state.entity("camera.porch"))
+    assertTrue(r.state.entitiesVersion > versionBefore)
+  }
+
+  @Test fun aDiffDoesNotConfirmALastKnownLock() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.hideThenShow()
+    r.reply("subscribe_entities")
+    r.event("subscribe_entities", CcEngineRig.diff("lock.front", "unlocked"))
+    r.advance(CcEngine.FLUSH_MS)
+    assertTrue("lock.front" in r.state.unconfirmed)
+  }
+
+  @Test fun anActionOnALastKnownLockIsRefusedUntilHaConfirmsIt() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.hideThenShow()
+    val lock = r.state.entity("lock.front")!!
+    val calls = r.ws.types().count { it == "call_service" }
+    assertFalse(r.engine.send(CcCalls.unlock(lock), undoable = false, onResult = null, confirmed = true))
+    r.sched.runDue()
+    assertEquals(calls, r.ws.types().count { it == "call_service" })
+    r.reply("subscribe_entities")
+    r.event("subscribe_entities", CcEngineRig.ENTITIES)
+    r.advance(CcEngine.FLUSH_MS)
+    assertTrue(r.engine.send(CcCalls.unlock(r.state.entity("lock.front")!!), undoable = false, onResult = null, confirmed = true))
+    r.sched.runDue()
+    assertEquals(calls + 1, r.ws.types().count { it == "call_service" })
+  }
+
+  @Test fun theEngineRechecksEvenIfTheScreenRaced() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.hideThenShow()
+    var result: Boolean? = null
+    r.run { dispatch(CcCalls.unlock(live.raw.getValue("lock.front")), undoable = false) { ok, _ -> result = ok } }
+    assertEquals(false, result)
+    assertFalse(r.ws.types().contains("call_service"))
+  }
+
+  @Test fun aLastKnownLightCanStillBeSwitched() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.hideThenShow()
+    assertTrue(r.engine.send(CcCalls.power(r.state.entity("light.kitchen")!!, false), undoable = false, onResult = null, confirmed = true))
+  }
+}

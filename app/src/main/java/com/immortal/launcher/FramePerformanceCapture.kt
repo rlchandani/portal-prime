@@ -267,6 +267,9 @@ internal object FramePerformanceCapture {
     }
     try {
       context.startActivity(intent)
+      // Settings runs in its own task (see SettingsRetention). A task launch would use Home's task-open
+      // animation; none keeps the open as it was (Settings appears on its first draw over a still Home).
+      @Suppress("DEPRECATION") (context as? android.app.Activity)?.overridePendingTransition(0, 0)
     } catch (error: RuntimeException) {
       report?.record(SettingsEntryStage.LAUNCH_FAILED)
       throw error

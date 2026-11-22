@@ -29,6 +29,13 @@ internal class CcEngine(
   var ui: CcUiState = flow.value
   var live = CcLive()
   private var publishedLive: CcLive? = null
+  /** The plan's entities the background subscription doesn't watch, as last seen (see [CcLastKnown]). */
+  var lastKnown: Map<String, CcEntity> = emptyMap()
+  /** Restored from [lastKnown] on an open and not yet confirmed by HA. */
+  var unconfirmed: Set<String> = emptySet()
+  /** The foreground subscription's first full answer will confirm or drop [unconfirmed]. */
+  var awaitingFull = false
+  private var publishedUnconfirmed: Set<String> = emptySet()
   var protocol: CcProtocol? = null
   var socket: CcSocket? = null
   var generation = 0L
@@ -197,9 +204,12 @@ internal class CcEngine(
 
   fun publish(alertsToo: Boolean = false) {
     // Reuse the same entity map until the live state actually changes, so Compose readers skip.
-    if (live !== publishedLive) {
+    if (live !== publishedLive || unconfirmed !== publishedUnconfirmed) {
       publishedLive = live
-      ui = ui.copy(entities = live.view(), pending = live.pending.keys, appliancesDone = live.done, entitiesVersion = ui.entitiesVersion + 1)
+      publishedUnconfirmed = unconfirmed
+      val view = live.view()
+      ui = ui.copy(entities = view, pending = CcLastKnown.busy(live.pending.keys, unconfirmed, view), unconfirmed = unconfirmed,
+          appliancesDone = live.done, entitiesVersion = ui.entitiesVersion + 1)
     }
     // Derive what every screen reads once, here on the engine thread, not inside a frame.
     ui = ui.copy(now = clock())

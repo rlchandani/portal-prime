@@ -19,6 +19,8 @@ internal data class CcUiState(
     val entities: Map<String, CcEntity> = emptyMap(),
     /** Entities with a call in flight (tiles show a soft progress ring). */
     val pending: Set<String> = emptySet(),
+    /** Last-known entities an open restored that HA hasn't confirmed yet ([CcLastKnown]); never alert sources. */
+    val unconfirmed: Set<String> = emptySet(),
     val registry: CcRegistry? = null,
     /** Null until the plan has been looked up; [CcPlan.EMPTY] = no plan yet (editor CTA). */
     val plan: CcPlan? = null,
@@ -93,6 +95,7 @@ internal data class CcUiState(
     val house = if (car.isEmpty()) entities else entities.filterKeys { it !in car }
     return CcAlerts.active(house, now, settings.warningAfterMin, roomName, appliancesDone)
         .filter { a -> (dismissed[a.id] ?: 0L) < now }
+        .filter { a -> unconfirmed.isEmpty() || a.entityId !in unconfirmed }
         .filter { a -> a.severity == CcSeverity.CRITICAL || entities[a.entityId]?.let { !CcPolicy.hidden(it, settings) } != false }
   }
 

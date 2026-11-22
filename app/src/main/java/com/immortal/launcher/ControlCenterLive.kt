@@ -49,11 +49,14 @@ internal data class CcLive(
     changed.forEach { (id, e) ->
       val before = raw[id]
       if (e == null) { raw = raw - id; pending = pending - id; return@forEach }
+      // An unchanged entity (e.g. a full answer confirming a last-known state) keeps its instance.
+      if (e == before && id !in pending) return@forEach
       raw = raw + (id to e)
       if (CcAlerts.finished(before, e)) done = done + (id to now)
       if (e.isOn && done.containsKey(id)) done = done - id
       pending[id]?.let { p -> pending = if (p.optimistic.matches(e)) pending - id else pending + (id to p.copy(updated = true)) }
     }
+    if (raw === this.raw && pending === this.pending && done === this.done) return this
     return CcLive(raw, pending, done)
   }
 
