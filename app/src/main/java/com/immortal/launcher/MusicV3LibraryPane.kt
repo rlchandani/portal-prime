@@ -19,10 +19,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.youtube.YouTubeMusicLibrary
@@ -105,7 +107,13 @@ private fun LibraryShelves(
       ShelfLoad(likedLoad, onSignInAgain) { tracks ->
         val liked = rememberLikedState(library, accountId, tracks)
         val songs = liked.view.tracks
-        MusicStageHeading(LIKED_LABEL, Modifier.padding(top = 28.dp), detail = MusicV3Rules.songCount(songs.size)) {
+        val scale = LocalDensity.current.fontScale
+        val widths = remember(dims, scale) {
+          listOf(MusicPillFit.pill("Play", dims, glyph = true, fontScale = scale),
+              MusicPillFit.pill("Shuffle", dims, glyph = true, fontScale = scale), MusicPillFit.pill("See all", dims, fontScale = scale))
+        }
+        MusicStageHeading(LIKED_LABEL, Modifier.padding(top = 28.dp), detail = MusicV3Rules.songCount(songs.size),
+            actionWidths = widths) {
           MusicStagePill("Play", style = MusicPillStyle.SOLID, glyph = MusicV3Glyph.PLAY, enabled = songs.isNotEmpty()) {
             actions.playAll(songs, LIKED_LABEL, shuffle = false)
           }
