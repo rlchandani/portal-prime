@@ -220,7 +220,7 @@ test('failed handoff keeps current scene/history and releases only incoming nati
   const f=fixture({choices:['kenBurns','filmstrip','cinema']}),engine=f.start(); await f.tick(16);
   engine.next(); await f.flush(); await admit(f); await f.tick(16); await acknowledge(f,false);
   assert.deepEqual(f.reports,['kenBurns']); assert.equal(f.stage.children.length,1); assert.equal(f.ordinary[0].disposed,false);
-  assert.ok(f.ordinary[0].resumes>0); engine.previous(); await f.tick(16);
+  assert.ok(f.ordinary[0].resumes>0); engine.previous(); await f.tick(48);
   assert.deepEqual(f.reports,['kenBurns','kenBurns']); engine.stop(); assert.equal(f.timers.size,0);
 });
 test('latest navigation queues during handoff and previous replays committed history', async () => {
@@ -277,7 +277,7 @@ test('registry stays bounded and invalid source IDs use original legacy selectio
 test('legacy fallback failure keeps previous scene and retries without a native style marker', async () => {
   const f=fixture({choices:['kenBurns','filmstrip','cinema'],failLegacy:true,acceptPrepare:false}),engine=f.start();
   await f.tick(16); engine.next();await f.flush();assert.deepEqual(f.reports,['kenBurns']);assert.equal(f.ordinary[0].disposed,false);
-  await f.tick(5000);await f.tick(16);assert.deepEqual(f.reports,['kenBurns','cinema']);engine.stop();assert.equal(f.timers.size,0);
+  await f.tick(5000);await f.tick(48);assert.deepEqual(f.reports,['kenBurns','cinema']);engine.stop();assert.equal(f.timers.size,0);
 });
 test('command deadline pauses and a late acknowledgement cannot restart a disposed scene', async () => {
   const f=fixture({autoCommands:false}),scene=f.run('command-timeout');await f.flush();await admit(f);await scene.cleanup.ready;

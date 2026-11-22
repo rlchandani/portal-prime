@@ -4,8 +4,14 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
   font-family: -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif; }
 #stage { position: fixed; inset: 0; }
 /* Per-beat layer: each shuffle mode renders into one of these; a new beat fades in over
-   the still-running previous one (duration matches XFADE_MS in scheduler.js). */
-.ss-beat { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s cubic-bezier(0.4,0,0.2,1); }
+   the still-running previous one (duration matches XFADE_MS in scheduler.js).
+   Every beat keeps its own compositor layer (will-change: opacity). Without it the incoming beat is
+   a layer only while its opacity animates: when the dissolve ends it is painted into #stage's layer
+   and the whole screen is rasterised and uploaded again (~14 frames of 33-56 ms on the Portal+).
+   A beat built for a dissolve sits at .001 (.prewarm, below one 8-bit step) so it is rasterised while
+   it is laid out, before its dissolve starts (scheduler.js PREWARM_FRAMES). */
+.ss-beat { position: absolute; inset: 0; opacity: 0; will-change: opacity; transition: opacity 1.6s cubic-bezier(0.4,0,0.2,1); }
+.ss-beat.prewarm { opacity: .001; }
 .ss-beat.on { opacity: 1; }
 .ss-beat.first-scene { transition: none; }
 /* During a crossfade the OUTGOING beat is frozen so only the incoming mode animates — otherwise two
