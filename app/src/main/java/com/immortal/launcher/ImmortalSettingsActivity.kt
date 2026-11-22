@@ -7,9 +7,14 @@
 
 package com.immortal.launcher
 
+import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -17,6 +22,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,11 +40,35 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 
 private const val STATE_STACK = "settings_split_stack"
 private const val STATE_CONTROL = "settings_split_control"
 private const val STATE_LIST = "settings_single_pane_list"
+private const val TAG = "ImmortalSettings"
+
+/**
+ * Counts the started activities in Settings' own task other than Settings (its sub-screens), so a retained
+ * Settings is never released from under a sub-screen that is on screen. Registered for the activity's lifetime
+ * and unregistered in onDestroy; it compares task ids and holds no other Activity.
+ */
+internal class SettingsTaskWatcher(private val host: Activity) : Application.ActivityLifecycleCallbacks {
+  var startedInTask = 0
+    private set
+
+  private fun counts(activity: Activity) = activity !== host && activity.taskId == host.taskId
+
+  override fun onActivityStarted(activity: Activity) { if (counts(activity)) startedInTask++ }
+  override fun onActivityStopped(activity: Activity) {
+    if (counts(activity)) startedInTask = (startedInTask - 1).coerceAtLeast(0)
+  }
+  override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
+  override fun onActivityResumed(activity: Activity) = Unit
+  override fun onActivityPaused(activity: Activity) = Unit
+  override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
+  override fun onActivityDestroyed(activity: Activity) = Unit
+}
 
 /**
  * Where Settings opens. A recreate (rotation, theme) restores its saved stack and never re-applies
@@ -83,9 +113,102 @@ class ImmortalSettingsActivity : ComponentActivity() {
       entryFirstDraw = FramePerformanceCapture.bindSettingsEntry(window, report)
   }
 
+  // Kept alive between opens (see [SettingsRetention]).
+  private val reopenResets = SettingsReopenResets()
+  /** Bumped by a light reopen: search, dialogs and scroll reset without recomposing pages. */
+  private var reopenGeneration by mutableIntStateOf(0)
+  /** Bumped by a full reopen: the whole tree is composed afresh, as a cold open would. */
+  private var contentGeneration by mutableIntStateOf(0)
+  /** The last exit was Back at the top, which leaves no dialog, editor or sub-page open. */
+  private var parked = false
+  private var stoppedSinceResume = false
+  private var stoppedAt: Long? = null
+  private var idleRelease: Job? = null
+  private var taskWatcher: SettingsTaskWatcher? = null
+
+  override fun onStart() {
+    super.onStart()
+    idleRelease?.cancel()
+    idleRelease = null
+    stoppedAt = null
+  }
+
+  override fun onStop() {
+    super.onStop()
+    if (isFinishing || isChangingConfigurations) return
+    stoppedSinceResume = true
+    stoppedAt = SystemClock.elapsedRealtime()
+    scheduleIdleRelease()
+  }
+
+  override fun onTrimMemory(level: Int) {
+    super.onTrimMemory(level)
+    if (SettingsRetention.releaseOnTrim(level, visible = lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)))
+      release("trim $level")
+  }
+
+  private fun scheduleIdleRelease() {
+    idleRelease?.cancel()
+    idleRelease = lifecycleScope.launch {
+      while (true) {
+        delay(SettingsRetention.IDLE_RELEASE_MS)
+        if (SettingsRetention.releaseWhenIdle(stoppedAt, SystemClock.elapsedRealtime()) && release("idle")) break
+      }
+    }
+  }
+
+  /**
+   * Finishes a Settings that is off screen so the next open is cold. A sub-screen of Settings that is still on
+   * screen (it shares this task) keeps the task alive. Returns true when released.
+   */
+  private fun release(reason: String): Boolean {
+    if (isFinishing || isDestroyed) return true
+    val inTask = taskWatcher?.startedInTask ?: 0
+    if (!SettingsRetention.releasable(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED), inTask)) return false
+    Log.i(TAG, "Releasing retained Settings ($reason)")
+    finishAndRemoveTask()
+    return true
+  }
+
+  /** Back at the top: park behind Home (no transition, as finishing showed none) instead of finishing. */
+  private fun leaveOnBack() {
+    val exit = SettingsRetention.exitOnBack(isFinishing, retentionEnabled = true)
+    if (exit == SettingsRetention.Exit.PARK && runCatching { moveTaskToBack(true) }.getOrDefault(false)) {
+      @Suppress("DEPRECATION") overridePendingTransition(0, 0)
+      parked = true
+    } else finish()
+  }
+
+  /** Settings' own Home button started Home over it: keep Settings parked instead of finishing it. */
+  internal fun parkBehindHome() {
+    @Suppress("DEPRECATION") overridePendingTransition(0, 0)
+    parked = true
+  }
+
+  /** A new launch reached the retained Settings: reset it to what a cold open would show, before its first frame. */
+  private fun prepareReopen(intent: Intent) {
+    val leftTask = stoppedSinceResume && (taskWatcher?.startedInTask ?: 0) == 0
+    val reopen = SettingsRetention.reopen(leftTask, parked)
+    if (reopen == SettingsRetention.Reopen.NONE) return
+    showList = true
+    jarvisPulse = null
+    stack = SettingsBackStack.of(SettingsLastPage.resolve(SettingsLastPage.read(this),
+        ImmortalSettings.advancedSettings(this)))
+    SettingsLastPage.write(this, stack.current)
+    if (reopen == SettingsRetention.Reopen.FULL) contentGeneration++
+    else {
+      reopenGeneration++
+      val failed = reopenResets.runAll()
+      if (failed > 0) Log.w(TAG, "Settings reopen: $failed view resets failed")
+    }
+    Log.i(TAG, "Settings reopened ($reopen)")
+  }
+
   override fun onResume() {
     entryReport?.record(SettingsEntryStage.RESUME_STARTED)
     super.onResume()
+    stoppedSinceResume = false
+    parked = false
     ApprovedSettingsRemoteBack.resumed(this)
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.resumed(this)
     entryReport?.record(SettingsEntryStage.RESUME_FINISHED)
@@ -109,6 +232,8 @@ class ImmortalSettingsActivity : ComponentActivity() {
     entryFirstDraw?.dispose()
     entryFirstDraw = null
     SettingsPreviewPhotos.clear()
+    taskWatcher?.let(application::unregisterActivityLifecycleCallbacks)
+    taskWatcher = null
     entryReport?.record(SettingsEntryStage.DESTROYED)
     entryReport = null
     super.onDestroy()
@@ -186,27 +311,40 @@ class ImmortalSettingsActivity : ComponentActivity() {
     // Kept awake while visible, set before the first frame so it costs no second window relayout.
     window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     keepHomesBarState()
+    taskWatcher = SettingsTaskWatcher(this).also(application::registerActivityLifecycleCallbacks)
+    // Registered before setContent, so every Compose BackHandler (sub-page, single-pane list) runs first.
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() = leaveOnBack()
+    })
     setContent {
       PortalPrimeTheme(darkTheme = false) {
-        val navigate = remember { ::navigateLocal }
-        val back = remember { { show(stack.back()) } }
-        // Reads the live stack, so a highlight that ends late can never undo a newer navigation.
-        val clearHighlight = remember { { show(stack.withoutControl()) } }
-        val viewports = remember { ApprovedSettingsViewportMemory() }
-        CompositionLocalProvider(
-            LocalApprovedSettingsNavigate provides navigate,
-            LocalApprovedSettingsBack provides back,
-            LocalApprovedSettingsViewportMemory provides viewports,
-            LocalJarvisPulse provides jarvisPulse,
-        ) {
-          val listPane = remember { SettingsPane(showList = true, onShowList = { showList = true }) }
-          val pagePane = remember { SettingsPane(showList = false, onShowList = listPane.onShowList) }
-          SettingsHostScreen(stack, ::show, ::reveal, clearHighlight, if (showList) listPane else pagePane)
-        }
+        key(contentGeneration) { SettingsContent() }
       }
     }
     observeEntryFirstDraw()
     trackForJarvis()
+  }
+
+  @Composable
+  private fun SettingsContent() {
+    val navigate = remember { ::navigateLocal }
+    val back = remember { { show(stack.back()) } }
+    // Reads the live stack, so a highlight that ends late can never undo a newer navigation.
+    val clearHighlight = remember { { show(stack.withoutControl()) } }
+    val viewports = remember { ApprovedSettingsViewportMemory() }
+    SettingsReopenReset(viewports, viewports::clear)
+    CompositionLocalProvider(
+        LocalApprovedSettingsNavigate provides navigate,
+        LocalApprovedSettingsBack provides back,
+        LocalApprovedSettingsViewportMemory provides viewports,
+        LocalJarvisPulse provides jarvisPulse,
+        LocalSettingsReopenResets provides reopenResets,
+        LocalSettingsReopenGeneration provides reopenGeneration,
+    ) {
+      val listPane = remember { SettingsPane(showList = true, onShowList = { showList = true }) }
+      val pagePane = remember { SettingsPane(showList = false, onShowList = listPane.onShowList) }
+      SettingsHostScreen(stack, ::show, ::reveal, clearHighlight, if (showList) listPane else pagePane)
+    }
   }
 
   /**
@@ -248,6 +386,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
+    prepareReopen(intent)
     requestedStack(intent)?.let(::reveal)
   }
 
@@ -272,7 +411,9 @@ private fun SettingsHostScreen(
   BackHandler(enabled = stack.canGoBack) { show(stack.back()) }
   // Single pane: Back at a page's root returns to the page list before leaving Settings.
   BackHandler(enabled = !stack.canGoBack && !pane.showList && settingsSinglePane()) { pane.onShowList() }
-  var prerequisite by remember(stack.current, stack.control) { mutableStateOf<String?>(null) }
+  var prerequisite by remember(stack.current, stack.control, LocalSettingsReopenGeneration.current) {
+    mutableStateOf<String?>(null)
+  }
   LaunchedEffect(stack.current, stack.control) {
     stack.control?.let { control ->
       prerequisite = withContext(Dispatchers.IO) { approvedSettingsPrerequisite(context, control) }
@@ -347,7 +488,8 @@ private fun rememberSettingsHostActions(
       context.startActivity(Intent(context, HomeActivity::class.java)
           .putExtra("approved_home_tab", "home")
           .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-      (context as? android.app.Activity)?.finish()
+      // Home is in front now; Settings stays parked behind it, as after Back (see SettingsRetention).
+      (context as? ImmortalSettingsActivity)?.parkBehindHome() ?: (context as? android.app.Activity)?.finish()
     }
   }
 }

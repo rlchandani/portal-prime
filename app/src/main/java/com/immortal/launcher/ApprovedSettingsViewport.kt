@@ -25,6 +25,9 @@ internal class ApprovedSettingsViewportMemory(private val capacity: Int = 32) {
 
     fun read(route: String): Position? = positions[route]
 
+    /** A reopen starts every page from its top again, as a fresh Settings does. */
+    fun clear() = positions.clear()
+
     fun save(route: String, position: Position) {
         require(position.index >= 0 && position.offset >= 0)
         positions.remove(route)
@@ -42,6 +45,7 @@ internal fun rememberApprovedSettingsScrollState(routeKey: String): ScrollState 
     return key(routeKey) {
         val saved = remember(memory) { memory.read("column:$routeKey") }
         val state = rememberScrollState(saved?.offset ?: 0)
+        SettingsReopenScrollsToTop(state)
         DisposableEffect(memory, state) {
             onDispose {
                 memory.save("column:$routeKey", ApprovedSettingsViewportMemory.Position(offset = state.value))
@@ -58,6 +62,7 @@ internal fun rememberApprovedSettingsLazyScrollState(routeKey: String?): LazyLis
     return key(routeKey) {
         val saved = remember(memory) { memory.read("list:$routeKey") }
         val state = rememberLazyListState(saved?.index ?: 0, saved?.offset ?: 0)
+        SettingsReopenScrollsToTop(state)
         DisposableEffect(memory, state) {
             onDispose {
                 memory.save("list:$routeKey", ApprovedSettingsViewportMemory.Position(

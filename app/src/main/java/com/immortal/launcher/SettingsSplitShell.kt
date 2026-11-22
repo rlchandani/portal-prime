@@ -102,10 +102,12 @@ internal fun SettingsSplitShell(
     val context = LocalContext.current
     val focus = LocalFocusManager.current
     val advanced = LocalAdvancedSettings.current
-    var query by remember { mutableStateOf("") }
-    var pending by remember { mutableStateOf<ApprovedSettingsSearchResult?>(null) }
-    var consent by remember { mutableStateOf(false) }
-    var applyError by remember { mutableStateOf<String?>(null) }
+    // A reopen of the retained Settings starts with no query and no dialog, as a fresh Settings does.
+    val reopen = LocalSettingsReopenGeneration.current
+    var query by remember(reopen) { mutableStateOf("") }
+    var pending by remember(reopen) { mutableStateOf<ApprovedSettingsSearchResult?>(null) }
+    var consent by remember(reopen) { mutableStateOf(false) }
+    var applyError by remember(reopen) { mutableStateOf<String?>(null) }
     // Built off the main thread once Settings is up; nothing reads it until a query is typed.
     val index by produceState<List<ApprovedSettingsSearchResult>?>(null) {
         value = withContext(Dispatchers.Default) { approvedSettingsSearchIndex() }
@@ -133,7 +135,7 @@ internal fun SettingsSplitShell(
 
     // Hoisted out of the LazyColumn builder (not a composable scope) so its identity survives a page
     // switch; otherwise every sidebar row receives a new click handler and recomposes.
-    val selectPage = remember(onSelectPage) { { page: String -> query = ""; onSelectPage(page) } }
+    val selectPage = remember(onSelectPage, reopen) { { page: String -> query = ""; onSelectPage(page) } }
     // Read by the sidebar rows, not the list builder (see settingsSidebarGroups).
     val currentRoot = rememberUpdatedState(selectedRoot)
     val selectedRootProvider = remember { { currentRoot.value } }
@@ -152,6 +154,7 @@ internal fun SettingsSplitShell(
         val reveal = rememberSettingsMasterReveal(stage)
         if (!reveal.shown) SideEffect { openingMaster.value = reveal }
         val sidebarList = rememberLazyListState()
+        SettingsReopenScrollsToTop(sidebarList)
         SettingsMasterRevealEffect(reveal, sidebarList, remember { settingsSidebarEntryCount() })
         Column(modifier.fillMaxHeight().background(IosSidebar).settingsRevealed(reveal)
             .settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE)) {

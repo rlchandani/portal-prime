@@ -522,10 +522,16 @@
 
         <!-- Immortal's own settings (weather unit, home-screen forecast widget, tile
              size), opened from the Immortal tile in the launcher's Settings folder. -->
+        <!-- Settings stays alive between opens (SettingsRetention): its own task, so Back can move it
+             behind Home (moveTaskToBack) instead of finishing, and singleTask so every launch reuses the
+             retained instance through onNewIntent. Excluded from recents, as it was inside Home's task. -->
         <activity
             android:name=".ImmortalSettingsActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:excludeFromRecents="true"
             android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.settings"
             android:label="Hearthpane Settings"
             android:theme="@style/Theme.SampleApp.Settings"
             android:windowSoftInputMode="adjustResize" />

@@ -14,7 +14,12 @@ package com.immortal.launcher
 
 internal fun CcEngine.install() = post { ensure() }
 
-internal fun CcEngine.setVisible(on: Boolean) = post { visible = (visible + if (on) 1 else -1).coerceAtLeast(0); ensure() }
+internal fun CcEngine.setVisible(on: Boolean) = post {
+  val was = visible
+  visible = (visible + if (on) 1 else -1).coerceAtLeast(0)
+  if (was == 0 && visible > 0) restoreLastKnown()
+  ensure()
+}
 
 /** HA address/token or Control Center settings changed. */
 internal fun CcEngine.restartWithSettings() = post { ui = ui.copy(settings = host.settings()); restart() }
@@ -29,6 +34,7 @@ internal fun CcEngine.retryNow() = post { attempt = 0; restart() }
 internal fun CcEngine.send(call: CcCall, undoable: Boolean, onResult: ((Boolean, String?) -> Unit)?, confirmed: Boolean): Boolean {
   val s = flow.value
   if (refused(s, call, confirmed)) return false
+  CcLastKnown.refusal(call.entityId?.let(s::entity), s.unconfirmed)?.let { why -> post { toast(why, error = true) }; return false }
   val reason = s.connection.disabledReason
   if (reason != null) { post { toast(reason, error = true) }; return false }
   post { dispatch(call, undoable, onResult) }

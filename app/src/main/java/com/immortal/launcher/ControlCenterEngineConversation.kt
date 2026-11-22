@@ -20,9 +20,9 @@ internal fun CcEngine.handle(ws: CcSocket, p: CcProtocol, text: String) {
     CcProtocol.Out.AuthOk -> authOk(ws, p)
     CcProtocol.Out.AuthFailed -> { log.w("control center token refused"); abandonSocket()
       scheduleRetry(generation, CcPhase.AUTH_FAILED, CcBackoff.AUTH_MS); return }
-    is CcProtocol.Out.Entities -> entities { live.applyCompressed(out.event, clock()) }
-    is CcProtocol.Out.Snapshot -> entities { live.snapshot(out.entities) }
-    is CcProtocol.Out.Changed -> entities { live.update(mapOf(out.entityId to out.entity), clock()) }
+    is CcProtocol.Out.Entities -> entities(CcLastKnown.additions(out.event)) { live.applyCompressed(out.event, clock()) }
+    is CcProtocol.Out.Snapshot -> entities(out.entities.map { it.id }, sweep = true) { live.snapshot(out.entities) }
+    is CcProtocol.Out.Changed -> entities(listOf(out.entityId), sweep = false) { live.update(mapOf(out.entityId to out.entity), clock()) }
     // Already live (a resubscribe, or get_states answered first): the states are here, nothing to wait for.
     CcProtocol.Out.Subscribed -> if (ui.connection.phase != CcPhase.LIVE) setPhase(ui.connection.phase, "Waiting for the first update")
     CcProtocol.Out.Pong -> Unit
@@ -36,8 +36,10 @@ private fun CcEngine.authOk(ws: CcSocket, p: CcProtocol) {
   startHeartbeat()
 }
 
-private fun CcEngine.entities(change: () -> CcLive) {
+/** [full] are the ids this message gave whole (confirming them); [sweep] marks a full answer. */
+private fun CcEngine.entities(full: Collection<String>, sweep: Boolean = full.isNotEmpty(), change: () -> CcLive) {
   live = change()
+  reconcileLastKnown(full, sweep)
   if (ui.connection.phase != CcPhase.LIVE) {
     attempt = 0; hadLive = true
     ui = ui.copy(connection = CcConnection(CcPhase.LIVE, "", clock(), 0L))
@@ -119,6 +121,7 @@ private fun CcEngine.subscribe(ws: CcSocket, p: CcProtocol) {
   val ids = interest()
   subscribed = ids
   subscribedForeground = foreground
+  awaitingFull = foreground && unconfirmed.isNotEmpty()
   // Nothing worth watching in the background (no registry, no plan): stay quiet, no subscription.
   if (ids != null && ids.isEmpty()) { setPhase(CcPhase.LIVE, ""); return }
   ws.send(p.subscribe(ids).text)
@@ -132,7 +135,14 @@ internal fun CcEngine.retarget() {
   val ids = interest()
   val fg = foreground
   if (ids == subscribed && subscribedForeground == fg) return
-  if (!fg) live = live.snapshot(live.raw.values.filter { ids == null || it.id in ids })
+  if (!fg) {
+    // Kept as last known (not dropped), so the next open draws them at once (see [CcLastKnown]).
+    val split = CcLastKnown.split(live.raw, ids, lastKnown)
+    lastKnown = split.retained
+    live = live.snapshot(split.kept)
+    unconfirmed = unconfirmed.filterTo(HashSet()) { it in live.raw }
+    awaitingFull = false
+  } else awaitingFull = unconfirmed.isNotEmpty()
   subscribed = ids
   subscribedForeground = fg
   p.resubscribe(ids).forEach { ws.send(it.text) }
@@ -141,3 +151,28 @@ internal fun CcEngine.retarget() {
 private fun CcEngine.interest(): Set<String>? =
     if (foreground) CcInterest.foreground(ui.registry, ui.plan)
     else CcInterest.background(ui.registry) ?: ui.plan?.entityIds.orEmpty()
+
+/**
+ * An open: the retained last-known entities go back on screen at once, unconfirmed, and the engine publishes
+ * (building the plan models here, not in CC's first frame). Engine thread.
+ */
+internal fun CcEngine.restoreLastKnown() {
+  val restored = CcLastKnown.restorable(live.raw, lastKnown)
+  lastKnown = emptyMap()
+  if (restored.isEmpty()) return
+  live = live.snapshot(live.raw.values + restored.values)
+  unconfirmed = unconfirmed + restored.keys
+  publish()
+}
+
+/** HA gave [full] whole: they're live again. A full answer to the foreground subscription drops the rest. */
+private fun CcEngine.reconcileLastKnown(full: Collection<String>, sweep: Boolean) {
+  if (unconfirmed.isEmpty()) { awaitingFull = false; return }
+  unconfirmed = CcLastKnown.confirm(unconfirmed, full)
+  if (!(sweep && awaitingFull) || unconfirmed.isEmpty()) { if (unconfirmed.isEmpty()) awaitingFull = false; return }
+  // Not in HA's answer: gone from HA or from the plan since it was last seen.
+  val gone = unconfirmed
+  live = live.snapshot(live.raw.values.filter { it.id !in gone })
+  unconfirmed = emptySet()
+  awaitingFull = false
+}

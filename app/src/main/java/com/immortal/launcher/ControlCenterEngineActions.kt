@@ -17,6 +17,10 @@ internal fun CcEngine.toast(text: String, undo: Boolean = false, error: Boolean 
 internal fun CcEngine.dispatch(call: CcCall, undoable: Boolean, onResult: ((Boolean, String?) -> Unit)?) {
   val ws = socket; val p = protocol
   if (ws == null || p == null || !ui.connection.canControl) { toast(ui.connection.disabledReason ?: "Not connected", error = true); onResult?.invoke(false, null); return }
+  // Re-checked here against the engine's own state: never act on a safety-critical last-known state.
+  CcLastKnown.refusal(call.entityId?.let { live.raw[it] }, unconfirmed)?.let { why ->
+    toast(why, error = true); onResult?.invoke(false, null); return
+  }
   if (dryRun) { dryRunCall(call, onResult); return }
   val key = "c${++callSeq}"
   val before = call.entityId?.let { live.raw[it] }
