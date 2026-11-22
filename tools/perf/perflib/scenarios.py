@@ -12,6 +12,7 @@ An entry:
                    wait (s) -> one framestats window, or
                    poll (s) -> framestats polled back to back, de-duplicated; with beats=True each
                                photo_beat (0.5 s before .. 3 s after) is one sample, the first skipped
+                 flags: accepted framestats Flags (default (0,); CC steps (0, 1))
                  expect: the short activity name that must be resumed afterwards (else abort)
   teardown       actions at the end of every rep
   audit          screens for the uiautomator overflow audit (replaces steps)
@@ -22,6 +23,9 @@ sleep, home, dream, test_source, orientation, mini, screenshot.
 
 CC_OPEN = {"action": "open_control_center", "screen": "map"}
 DOOR_ROW = "door is open"
+# Control Center steps count Flags 0 and 1, as the cc-* A/B scripts did: on BACK to Home every Home
+# frame carries Flags 1 (window became visible), so flags-0-only reads an empty window.
+CC_FLAGS = (0, 1)
 HOME = "HomeActivity"
 CC = "ControlCenterActivity"
 SETTINGS = "ImmortalSettingsActivity"
@@ -54,8 +58,8 @@ BASE = {
         "warmup": 0,
         "inner": 1,
         "steps": [
-            {"name": "open", "do": [("fleet", CC_OPEN)], "wait": 3, "expect": CC},
-            {"name": "back", "do": [("key", "BACK")], "wait": 3, "expect": HOME},
+            {"name": "open", "do": [("fleet", CC_OPEN)], "wait": 3, "expect": CC, "flags": CC_FLAGS},
+            {"name": "back", "do": [("key", "BACK")], "wait": 3, "expect": HOME, "flags": CC_FLAGS},
         ],
         "teardown": [("sleep", 2)],
     },
@@ -67,8 +71,8 @@ BASE = {
         "warmup": 1,
         "inner": 4,
         "steps": [
-            {"name": "to-alerts", "do": [("tap_desc", DOOR_ROW)], "wait": 3, "expect": CC},
-            {"name": "back", "do": [("key", "BACK")], "wait": 3, "expect": CC},
+            {"name": "to-alerts", "do": [("tap_desc", DOOR_ROW)], "wait": 3, "expect": CC, "flags": CC_FLAGS},
+            {"name": "back", "do": [("key", "BACK")], "wait": 3, "expect": CC, "flags": CC_FLAGS},
         ],
         "teardown": [("key", "BACK"), ("sleep", 4), ("expect", HOME)],
     },

@@ -126,9 +126,11 @@ class Session:
             text = self.d.framestats()
             self._trace_stop(tag)
             if measured:
-                frames = framestats.parse_frames(text)
+                flags = tuple(step.get("flags", (0,)))
+                frames = framestats.parse_frames(text, flags=flags)
                 self._sample(label, rep, step["name"], n, framestats.summarize(frames),
-                             framestats.parse_hwui(text), self._save(tag + ".framestats.txt", text))
+                             framestats.parse_hwui(text), self._save(tag + ".framestats.txt", text),
+                             extra={"flags": list(flags)})
         self._expect(step.get("expect"), step["name"])
         if measured:
             self._actions(step.get("after", []), once_key=f"{label}-{step['name']}")

@@ -51,6 +51,15 @@ class FramestatsTest(unittest.TestCase):
         self.assertEqual(len(framestats.parse_frames(flagged)), 3)
         self.assertEqual(len(framestats.parse_frames(flagged, all_flags=True)), 4)
 
+    def test_back_to_home_frames_carry_flag_1(self):
+        # Real capture (Family, official 1.326, bench.py cc-open): BACK from Control Center to Home.
+        text = fixture("framestats-cc-back-home.txt")
+        self.assertEqual(framestats.parse_frames(text), [])  # the survey's flags-0 rule sees nothing
+        frames = framestats.parse_frames(text, flags=(0, 1))
+        self.assertEqual([round(f.total_ms, 1) for f in frames], [80.5, 40.1])
+        self.assertEqual(framestats.summarize(frames)["windows"], {"HomeActivity": 2})
+        self.assertEqual(framestats.parse_hwui(text).frames, 7)
+
     def test_photo_beats_and_windows(self):
         log = ("99370.100 21250 21250 I ImmortalEngine: photo_beat galleryWall @file:///scheduler.js:80\n"
                "99370.300 21250 21250 I ImmortalEngine: photo_strips 3\n"

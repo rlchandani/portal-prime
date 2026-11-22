@@ -1,7 +1,7 @@
 """Parsing `dumpsys gfxinfo <pkg> framestats` and summarising frames.
 
-A frame's time is FrameCompleted - IntendedVsync (ms); only Flags == 0 rows count (the survey's
-rule; flagged rows are first/layout-changed or skipped frames). Rows from repeated polls are
+A frame's time is FrameCompleted - IntendedVsync (ms); by default only Flags == 0 rows count (the
+survey's rule); a step may also accept Flags 1 (window visibility/layout changed). Rows from repeated polls are
 de-duplicated by (window, IntendedVsync). UI = SyncQueued - IntendedVsync, RT = SwapBuffers - SyncStart.
 """
 
@@ -63,8 +63,12 @@ def parse_hwui(text):
     return Hwui(**vals)
 
 
-def parse_frames(text, all_flags=False):
-    """Frames (sorted by vsync, de-duplicated) from one or many concatenated framestats dumps."""
+def parse_frames(text, all_flags=False, flags=(0,)):
+    """Frames (sorted by vsync, de-duplicated) from one or many concatenated framestats dumps.
+
+    [flags]: accepted Flags values. (0,) is the survey rule; the Control Center scripts also counted
+    1 (window visibility/layout changed), which is every frame of a window that just reappeared.
+    """
     seen = {}
     window, header, inside = None, None, False
     for line in text.splitlines():
@@ -92,7 +96,7 @@ def parse_frames(text, all_flags=False):
             row = dict(zip(header, (int(x) for x in parts[:len(header)])))
         except ValueError:
             continue
-        if not all_flags and row.get("Flags", 1) != 0:
+        if not all_flags and row.get("Flags", -1) not in flags:
             continue
         iv, fc = row.get("IntendedVsync", 0), row.get("FrameCompleted", 0)
         if iv <= 0 or fc <= iv:

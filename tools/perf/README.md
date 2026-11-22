@@ -39,6 +39,8 @@ Results: `scratch-tmp/perf-results/<timestamp>-<scenario>/result.json` (every sa
 counts, HWUI summary, memory, installs, priors, restore steps) and `result.md` (tables), raw dumps
 under `raw/`. Frame metrics follow the survey: framestats `FrameCompleted - IntendedVsync`, flags 0,
 frames > 16.7 / 32 / 60 ms, worst, p50/p90/p99 (nearest rank), janky %, sum of frames > 32 ms.
+The Control Center steps also count Flags 1, as the cc-* scripts did, because after BACK every Home
+frame carries Flags 1 (its window became visible) and flags 0 alone shows an empty window.
 
 Verdict rule: B **wins** a metric only when B's median is lower than A's median by more than A's
 spread (max - min over A's samples); **loss** if higher by more than that spread; otherwise **noise**.
