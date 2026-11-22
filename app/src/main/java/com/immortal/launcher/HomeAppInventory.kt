@@ -106,6 +106,7 @@ internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>):
   val music = ComponentName(context, WebAppActivity::class.java)
   val dashboard = ComponentName(context, HomeDashboardActivity::class.java)
   val control = ComponentName(context, ControlCenterActivity::class.java)
+  val haDashboard = ComponentName(context, HaDashboardActivity::class.java)
   val settings = ComponentName(context, ImmortalSettingsActivity::class.java)
   return inventory.mapNotNull { app ->
     val key = when (app.component) {
@@ -113,6 +114,7 @@ internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>):
       music -> "music"
       dashboard -> "dashboard"
       control -> ApprovedAppsBuiltins.CONTROL
+      haDashboard -> ApprovedAppsBuiltins.HA_DASHBOARD
       settings -> "settings"
       CALLS_COMPONENT -> "calls"
       else -> null
@@ -212,6 +214,17 @@ internal fun loadApps(context: Context): List<AppEntry> {
               label = "Home Control",
               component = ComponentName(context.packageName, ControlCenterActivity::class.java.name),
               icon = controlIcon,
+              uninstallable = false,
+          )
+        }
+        // "Home Assistant" — Hearthpane's own HA dashboard — whenever Home Assistant is connected.
+        if (HaConfig.isConfigured(context)) {
+          val haIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
+              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+          if (haIcon != null) out = out + AppEntry(
+              label = "Home Assistant",
+              component = ComponentName(context.packageName, HaDashboardActivity::class.java.name),
+              icon = haIcon,
               uninstallable = false,
           )
         }

@@ -237,6 +237,8 @@ internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg)
   "builtin:settings" -> "gear" to Color(0xFF647480)
   "builtin:dashboard" -> "home" to Color(0xFF2879B8)
   "builtin:control" -> "home" to Color(0xFFD9773A)
+  // The Home Assistant companion app's own identity: the same household, the same tile.
+  "builtin:ha_dashboard" -> "home" to Color(0xFF2879B8)
   "builtin:folder" -> "folder" to Color(0xFF2879B8)
   else -> null
 }

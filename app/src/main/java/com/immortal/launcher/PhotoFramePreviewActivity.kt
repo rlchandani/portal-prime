@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
@@ -27,7 +29,8 @@ import androidx.core.view.WindowInsetsControllerCompat
  *  - on-demand preview (Screensaver tile),
  *  - the idle frame: Home's [IdleFrameTimer] opens it just before the system screen timeout, so Hearthpane stays
  *    in front and "Hey Jarvis" keeps listening ([IdleFramePolicy]; the dream remains the fallback), and
- *  - the continuation frame: when the system force-wakes the real screensaver
+ *  - the continuation frame: a starting dream hands over to it at once when the frame would hold the
+ *    screen ([DreamHandoverPolicy]), and when the system force-wakes the real screensaver
  *    (see [DreamPolicy]), this activity takes over seamlessly.
  *
  * Keep-screen-on policy ([DreamPolicy.holdScreenOn], keyed on [FrameMode]): in PRESENCE mode
@@ -196,6 +199,27 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     // Counted like the dream window: its photos and textures are dropped 4 s after it goes.
     CcGpuTrim.instance.started()
     updateHostVisibility()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    reportNextFrame()
+  }
+
+  /**
+   * Tells a starting dream waiting to hand over ([DreamHandover]) once this window's next frame reaches the screen,
+   * so the dream can go without a gap. Behind the dream this is the matte the frame starts on.
+   */
+  private fun reportNextFrame() {
+    window.decorView.doOnAttach { decor ->
+      val drawn = Runnable { decor.post { ImmortalDreamNavigation.previewFrameDrawn(this) } }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && decor.isHardwareAccelerated) {
+        decor.viewTreeObserver.registerFrameCommitCallback(drawn)
+        decor.invalidate()
+      } else {
+        decor.post(drawn)
+      }
+    }
   }
 
   override fun onPause() {

@@ -126,6 +126,9 @@ class HomeActivity : ComponentActivity() {
                     cn.className == ControlCenterActivity::class.java.name) {
                   startActivity(ControlCenterActivity.intent(this@HomeActivity))
                 } else if (cn.packageName == packageName &&
+                    cn.className == HaDashboardActivity::class.java.name) {
+                  startActivity(Intent(this@HomeActivity, HaDashboardActivity::class.java))
+                } else if (cn.packageName == packageName &&
                     cn.className == WebAppActivity::class.java.name) {
                   // Music stays inside the retained Home host; no separate Activity/theme.
                   musicOpenRequest++

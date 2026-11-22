@@ -31,6 +31,7 @@ class PhotoDreamService : DreamService() {
   private var gpuCounted = false
   private var lostPanelShown = false
   private var nightBrightness: NightWindowBrightness? = null
+  private var handover: DreamHandover? = null
 
   override fun onWindowAttributesChanged(attrs: WindowManager.LayoutParams) {
     super.onWindowAttributesChanged(attrs)
@@ -70,6 +71,23 @@ class PhotoDreamService : DreamService() {
     window?.setFlags(
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
         WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+    // "Hey Jarvis" is deaf behind a dream: when the frame would hold the screen anyway, the frame Activity takes
+    // over now (first frame), not at the Portal's force-wake ~2 minutes in. Otherwise the dream shows it as before.
+    val handover = DreamHandover(this, finishDream = { finish() }, fallBack = ::startFrame)
+    this.handover = handover
+    val decision = handover.decide(pinnedOrigin)
+    Log.i(TAG, "attached: ${DreamHandoverPolicy.log(decision)}")
+    if (decision == DreamHandoverPolicy.Decision.HandOver && handover.begin()) {
+      // Only the matte the frame starts on: the Activity's own start draws the first photo and its fade.
+      setContentView(FrameLayout(this).apply { setBackgroundColor(SlideshowStage.MATTE) })
+      return
+    }
+    startFrame()
+  }
+
+  /** The dream shows the frame itself: no handover, or the handover's Activity never drew. */
+  private fun startFrame() {
+    if (frameStopped || this::frame.isInitialized) return
     frame = PhotoFrameController(this)
     nightBrightness = window?.let { NightWindowBrightness(this, it).also { brightness -> brightness.setActive(true) } }
     frame.onNightClockChanged = { night ->
@@ -124,6 +142,7 @@ class PhotoDreamService : DreamService() {
 
   override fun onDreamingStopped() {
     Log.i(TAG, "onDreamingStopped")
+    handover?.cancel()
     pauseFrameIfReady()
     super.onDreamingStopped()
     DreamPolicy.onImmortalDreamingStopped(this, pinnedOrigin)
@@ -136,6 +155,8 @@ class PhotoDreamService : DreamService() {
   }
 
   override fun onDetachedFromWindow() {
+    handover?.cancel()
+    handover = null
     ImmortalDreamNavigation.detached(this)
     PinnedAppScreensaver.nativeDreamDetached()
     Log.i(TAG, "detached: dream ending")
@@ -192,6 +213,23 @@ internal object ImmortalDreamNavigation {
 
   fun detached(activity: PhotoFramePreviewActivity) {
     if (preview.get() === activity) preview.clear()
+  }
+
+  /** A starting dream waiting for the frame Activity's first frame ([DreamHandover]). */
+  private var previewFrameWaiter: (() -> Unit)? = null
+
+  fun awaitPreviewFrame(onDrawn: () -> Unit) { previewFrameWaiter = onDrawn }
+
+  fun cancelPreviewFrameWait(onDrawn: () -> Unit) {
+    if (previewFrameWaiter === onDrawn) previewFrameWaiter = null
+  }
+
+  /** The frame Activity committed a frame to the screen (under the dream while one covers it). */
+  fun previewFrameDrawn(activity: PhotoFramePreviewActivity) {
+    if (preview.get() !== activity) return
+    val waiter = previewFrameWaiter ?: return
+    previewFrameWaiter = null
+    waiter()
   }
 
   /** Called on main by navigation admission; only Immortal registers here. */

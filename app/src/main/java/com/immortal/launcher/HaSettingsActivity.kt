@@ -189,7 +189,7 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
                     context.startActivity(ControlCenterActivity.intent(context))
                 }
                 Divider()
-                NavRow("Classic dashboard") {
+                NavRow("Home dashboard") {
                     cancelConnection()
                     context.startActivity(android.content.Intent(context, HaDashboardActivity::class.java))
                 }
