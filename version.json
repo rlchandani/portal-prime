@@ -1,6 +1,6 @@
 {
-  "versionCode": 320,
-  "versionName": "1.326",
+  "versionCode": 321,
+  "versionName": "1.327",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Settings lists (World clock, Start on boot, Almanac, Clock, Music, Home Assistant and more) now scroll with the page, so no row is cut off at a card's edge."
+  "notes": "Redesigned Home Assistant dashboard: matches Control Center, real scenes, a greeting that follows the time of day, proper loading/offline/error screens, and locks and covers now show Unlocked/Open correctly. Adds the automated Portal benchmark tool."
 }
