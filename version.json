@@ -1,6 +1,6 @@
 {
-  "versionCode": 325,
-  "versionName": "1.331",
+  "versionCode": 326,
+  "versionName": "1.332",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Privacy groundwork: the household sync key is now also kept in the Portal's encrypted key store, and an encrypted store is in place for what Jarvis will learn."
+  "notes": "Jarvis can learn your teams, stocks and news from conversations (off by default; Settings › Jarvis › Memory)"
 }
