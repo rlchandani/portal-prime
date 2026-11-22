@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit
 internal object JarvisMemory {
   private const val TAG = "HearthpaneMemory"
   private const val USAGE_FILE = "usage.bin"
+  private const val FEEDBACK_FILE = "foryou.bin"
   private const val PORTAL_MAX = 40
 
   private val io = Executors.newSingleThreadScheduledExecutor { r ->
@@ -66,7 +67,10 @@ internal object JarvisMemory {
 
   fun handoff(context: Context): MemoryHandoff = bind(context).handoff
 
-  /** Counts one open of [surface] (silent, slice 2 shadow data). Nothing for guests, kids or with the switch off. */
+  /**
+   * Counts one open of [surface] (silent; slice 2's "For you right now"). Nothing for guests, kids, with the switch
+   * off, or while the scope's learning is paused.
+   */
   fun recordUsage(context: Context, surface: String) {
     val ctx = context.applicationContext
     io.execute {
@@ -91,7 +95,14 @@ internal object JarvisMemory {
 
   private fun record(context: Context, scope: MemoryScope, surface: String) {
     val zone = ZoneId.systemDefault()
-    runtime(context).recordUsage { it.record(scope, surface, System.currentTimeMillis(), zone) }
+    val runtime = runtime(context)
+    if (runtime.profile(scope).paused) return
+    runtime.recordUsage { it.record(scope, surface, System.currentTimeMillis(), zone) }
+  }
+
+  /** Runs [task] on the memory thread (sealed reads and writes stay off the main thread). */
+  fun background(task: () -> Unit) {
+    io.execute { runCatching(task).onFailure { Log.w(TAG, "memory task failed (${it.javaClass.simpleName})") } }
   }
 
   private fun bind(context: Context): Bound = bound ?: synchronized(this) {
@@ -102,6 +113,8 @@ internal object JarvisMemory {
     val store = MemoryProfileStore.get(ctx)
     val usageFile = File(File(ctx.noBackupFilesDir, MemoryProfileStore.DIR), USAGE_FILE)
     val usageStore by lazy { YtKeystoreSecureStore(usageFile, MemoryProfileStore.ALIAS) }
+    val feedbackFile = File(File(ctx.noBackupFilesDir, MemoryProfileStore.DIR), FEEDBACK_FILE)
+    val feedbackStore by lazy { YtKeystoreSecureStore(feedbackFile, MemoryProfileStore.ALIAS) }
     val runtime = MemoryRuntime(
         load = store::load,
         save = store::save,
@@ -111,6 +124,8 @@ internal object JarvisMemory {
         wipe = store::forgetAll,
         schedule = { delay, task -> io.schedule({ runCatching(task) }, delay, TimeUnit.MILLISECONDS) },
         now = System::currentTimeMillis,
+        loadFeedback = { ForYouFeedback.decode(runCatching { feedbackStore.load() }.getOrNull()) },
+        saveFeedback = { log -> runCatching { feedbackStore.save(log.encode()) }.isSuccess },
     )
     val handoff = MemoryHandoff(
         runtime = runtime,

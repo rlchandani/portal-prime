@@ -529,6 +529,9 @@ internal fun LauncherScreen(
             }
             if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
             SettingsSyncHomeCard(Modifier.padding(top = 8.dp))
+            // "For you right now" (Jarvis personalization slice 2): only once a habit has formed, never in Customize.
+            if (!editMode) HomeForYouRow(orderedApps, onLaunch, onOpenMusic,
+                Modifier.padding(top = if (homeLayout.compactLandscape) 8.dp else 16.dp))
             Spacer(Modifier.height(if (homeLayout.compactLandscape) 8.dp else 16.dp))
             if (connected == false) {
               val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
