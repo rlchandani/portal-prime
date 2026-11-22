@@ -42,15 +42,19 @@ class ControlCenterActivity : ComponentActivity() {
   private var pointing = false
   /** Screen asked for by the latest intent (fleet `open_control_center`, banners). */
   private val requested = mutableStateOf<Pair<CcScreen, Long>?>(null)
+  /** Builds the first frame over a few unseen frames (see [CcFirstDraw]). */
+  private val firstDraw = CcFirstDraw()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val start = screenOf(intent)
     setContent {
       ProvideHearthpaneTouchTargets {
-        CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish)
+        CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish,
+            firstDraw = firstDraw)
       }
     }
+    firstDraw.hold(window.decorView)
     // The Compose root paints the whole window opaque, so the theme's window background would only
     // be a second full-screen fill on every frame.
     window.setBackgroundDrawable(null)

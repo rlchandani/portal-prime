@@ -40,7 +40,8 @@ internal val LocalCcMotion = compositionLocalOf { false }
 
 /** The whole Control Center: rail + header + the current screen, the sheet, modals and toasts. */
 @Composable
-internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requested: Pair<CcScreen, Long>? = null, onExit: () -> Unit) {
+internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requested: Pair<CcScreen, Long>? = null, onExit: () -> Unit,
+    firstDraw: CcFirstDraw? = null) {
   val context = LocalContext.current
   val state by ControlCenter.state(context).collectAsState()
   val latest by rememberUpdatedState(state)
@@ -65,6 +66,9 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
     }
   }
   CcJarvisHomeEffects(ui) { latest }
+  if (firstDraw != null) LaunchedEffect(firstDraw) { firstDraw.stage() }
+  // The shell composes first; the screen and its hosts join a frame later, still before the first draw.
+  val bodyComposed = firstDraw?.bodyComposed ?: true
   val layout = currentLayoutClass()
   // One body moved between the portrait and landscape frames, so rotating keeps the screens' state.
   val body = remember(ui) { movableContentOf { s: CcUiState -> CcScreenBody(s, ui) } }
@@ -82,19 +86,21 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
           if (layout.compactPortrait) Column(Modifier.fillMaxSize()) {
             // The Mini upright: two-row header on top, the screen, the bottom bar instead of the rail.
             CcCompactHeader(header, heading, ui, onJarvis)
-            Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
+            Box(Modifier.weight(1f).fillMaxWidth()) { if (bodyComposed) body(state) }
             CcCompactNavBar(rail, ui, onHome = onExit)
           } else Row(Modifier.fillMaxSize()) {
             CcRail(rail, ui, onHome = onExit)
             Column(Modifier.weight(1f).fillMaxSize()) {
               CcHeader(header, heading, ui, onJarvis)
-              Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
+              Box(Modifier.weight(1f).fillMaxWidth()) { if (bodyComposed) body(state) }
             }
           }
-          CcSheetHost(state, ui)
-          CcConnectionOverlay(state, ui)
-          CcModalHost(state, ui)
-          CcToastHost(state.toast)
+          if (bodyComposed) {
+            CcSheetHost(state, ui)
+            CcConnectionOverlay(state, ui)
+            CcModalHost(state, ui)
+            CcToastHost(state.toast)
+          }
         }
       }
     }

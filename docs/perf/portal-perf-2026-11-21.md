@@ -1372,3 +1372,85 @@ Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 
 - **Pixel diff** (desktop, vs `main`, dpr 1, 1.125 and 2): rest and settled shots are 100 % identical. Mid-fade, Polaroid at dpr 1.125 is 66.5 % identical with max 1 / 255, and the other scales are 100 %. Gallery Wall at dpr 1 is 64 % identical with max 1 / 255. That is capture noise, because its code path is official.
 - **Tests:** JS 546 tests, 527 pass, 19 skipped, 0 fail. `slideshow_beat_prewarm.test.cjs` has 10 tests, covering Polaroid layered and prewarmed, and Gallery Wall, Ken Burns and Mosaic plain. `:app:testDebugUnitTest`: 9058 tests, 0 failures. `ci-local.sh --clean-checkout` on the merged HEAD (`a71dbbe6`): 12 passed, 0 failed, 1 skipped.
 - **Screensaver performance work stops here** at the owner's direction. The Gallery Wall fade-end cost (round 2) is open. `tools/perf` now takes `--atrace-categories` / `--atrace-buffer-kb` for a future `webview` / `sched` trace.
+
+## Control Center open: first frame built over held frames (branch `cc-open-2`, 1.327)
+
+**Device:** Family Portal+ (2160×1440, accessibility services on), every run through the bench tool
+(`tools/perf/bench.py`, scenario `cc-open`: fleet `open_control_center` → Map, 3 s; BACK, 3 s; framestats of every
+window, Flags 0 and 1). The worker restored official 1.327 after each job (restore OK every time).
+
+**Attribution (`assembleBenchmark` with the v5 local-only edits, not committed: baseline-profile wildcards for
+app / Compose / coroutines / lifecycle and an app keep-names rule, `.dm` install; `--simpleperf`, 5 reps).**
+The first capture (job `20261122-103406`) missed the open: `simpleperf record` was started in the background just
+before the fleet command and was not yet sampling for the first ~200 ms. The tool now waits 0.6 s after starting it
+(below); job `20261122-103916` then sampled every open. Stacks are often cut short (deep Compose stacks exceed the
+dwarf stack copy), so the split below is by the innermost recognisable frame, and the profiler makes the open ~2×
+slower; the proportions are what counts.
+
+On the official build (framestats, unprofiled) an open is one doFrame of 90–200 ms on the main thread that holds
+both windows: Control Center's first traversal (attach, the whole shell and Map composed and measured, `relayout`
+binder ~5–7 ms: ~60 ms on a good run) and its first draw (~25–35 ms), with Home's layout-changed frame (Flags 1)
+queued behind it in the same doFrame. The next Control Center frame's vsync passed during that, so it counts as a
+second long frame (155–230 ms), and a third Flags 1 frame follows ~300 ms in (40–96 ms). Inside the first
+frame (benchmark, per rep): traversal 80–160 ms sampled = composition (side column cards, rail tabs and icons,
+scenes / attention / car cards, camera tile placeholder), text measure 8–20 ms, graphics-layer block updates
+2–11 ms, accessibility 3–5 ms; draw 37–60 ms = vector icons rasterised into their bitmap caches
+(`VectorPainter`: `Bitmap.createBitmap`, software `drawPath` / stroke, `prepareToDraw`) 8–13 ms, text 3–5 ms,
+the rest display-list recording. After the open, ~300 ms in, one burst of accessibility work (bounds-update loop
+and `checkForSemanticsChanges`, 9–12 ms) lands on a frame of its own.
+
+BACK is Home's: its first frame after becoming visible again (Flags 1) spends ~30 ms before traversal in
+`handleResumeActivity` / `HomeActivity.onResume` (settings and config loads, `HearthpaneWake`) and the Compose
+frame (`LauncherScreen` recomposing on resume, incl. `ImmortalSettings.use24HourClock` read in composition), then
+~25 ms re-recording Home's whole tree (its display lists were dropped while it was hidden). Not changed here.
+
+**Change (`ControlCenterFirstDraw.kt`, new; `ControlCenterActivity.kt`, `ControlCenterShell.kt`):** `CcFirstDraw`
+holds the window's first draw with a cancelled pre-draw (no frame is drawn or shown; Home stays on screen) while
+`CcApp` composes in stages, one per frame: v1 = the shell on the window's first frame and the screen body and its
+hosts (sheet, connection overlay, modals, toasts) on the next, then the draw is released the frame after; v2 =
+nothing on the first frame (the attach shares its doFrame with Home's frame), the shell on the second, the body on
+the third, then two quiet held frames so the drawn frame does not start late. The hold is capped
+(`MAX_HELD_FRAMES`: v1 8, v2 12 frames); a timed-out hold composes everything and draws. v1 is the commit on
+`cc-open-2` (its rebuilt APK is byte-identical to the measured one, `5e6cb8b2…`); v2 is on `cc-open-2-v2`. The first drawn frame is the same content an
+unheld open drew; the window appears a few vsyncs after its work instead of after one long frame. 3 JVM tests
+(`CcFirstDrawTest`).
+
+**A/B (job `20261122-104747`: official 1.327 `96f7e955…` vs v1 performance build `5e6cb8b2…`, 5 reps
+interleaved):**
+
+| | official 1.327 | v1 |
+|---|---|---|
+| Open: frames over 32 ms per open | 4, 4, 3, 5, 5 (21) | 4, 3, 3, 3, 4 (17) |
+| Open: worst frame, median (per rep) | **210** (189, 229, 210, 260, 176) | **104** (128, 92, 96, 104, 110) — win |
+| Open: sum of frames over 32 ms, median | **694** | **244** — win |
+| Open: p90, median | 198 | 78 — win |
+| Open per rep: Home's frame / CC frames 1, 2, 3 (ms) | 159–260 / 147–251, 155–229, 14–96 | 92–110 / 74–128, 46–103, 23–36 |
+| BACK: frames over 32 ms / worst median | 2 ×5 / 85 | 2 ×5 / 80 (noise) |
+
+- The open's long frames get much shorter (worst median 210 → 104 ms, time in frames over 32 ms 694 → 244 ms
+  per open), but the count barely moves (4 → 3 per open): Home's frame still shares its doFrame with the held
+  first traversal (attach + shell, ~45–60 ms), the first drawn Control Center frame is ~25 ms of recording plus
+  ~12 ms RenderThread on top of a vsync already missed by the held body frame, and the frame after it 40–60 ms.
+- Accessibility (`uiautomator-overflow:control_center`, job `20261122-105556`, raw dumps now saved): 50 nodes on
+  both, identical text, classes, flags, selection and bounds; the only differences are the heading's clock
+  (11:23 → 11:24 am) and the deck camera's snapshot age ("just now" → "under a minute ago"). Event order
+  (`uiautomator events`) is not something the bench tool records and was not captured.
+
+- Tests: `CcFirstDrawTest` 3; full `:app:testDebugUnitTest` green (9122 tests); `ci-local.sh --clean-checkout`
+  12 passed, 0 failed, 1 skipped (PowerShell 7 parse: no `pwsh` here).
+
+**Tool fixes (`tools/perf/perflib/engine.py`):** `--simpleperf` waits `SIMPLEPERF_START_S` = 0.6 s after starting
+the recording, so a step's first frames are sampled; the `uiautomator-overflow` audit saves each raw dump
+(`raw/<build>-r<rep>-<screen>.uidump.txt`) for accessibility diffs. Tool unit tests green (63).
+
+**v2 not measured.** Built (`assemblePerformance`) and unit-tested, queued as job `20261122-112556` (official,
+v1, v2, 5 reps), then withdrawn before it ran because the Family Portal was reserved for other work; the job file
+is kept at `scratch-tmp/cc-open-2/withdrawn-20261122-112556-01C0-8ff6.json`. Resubmit with
+`bench.py submit --device 2221B01C7T01C0 --scenario cc-open --official --apk <v1> --apk <v2> --reps 5`.
+
+**Against the target (no frame over 32 ms on open or BACK): not met.** v1 halves the open's worst frame and cuts
+its time over 32 ms by ~65 %, with the same content and accessibility tree. Next, in order: measure v2 (Home's
+frame no longer sharing the attach's doFrame, the drawn frame starting on time); then the first drawn frame's own
+cost (~25 ms recording, of which the `VectorPainter` bitmap caches of the rail, side-card and scene icons are the
+largest single item, plus ~12 ms RenderThread) and the frame right after it (40–60 ms); and BACK, which is
+Home's resume (settings reads in `onResume` and in `LauncherScreen`'s composition, then a full re-record of Home).
