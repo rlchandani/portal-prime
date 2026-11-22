@@ -3,8 +3,11 @@
 # Run every GitHub Actions check (.github/workflows/*.yml) locally, so a push to main can
 # be gated on the same results CI will report. Exits non-zero if any check fails.
 #
-#   tools/scripts/ci-local.sh [--skip-gradle] [--skip-browser] [--offline]
+#   tools/scripts/ci-local.sh [--clean-checkout] [--skip-gradle] [--skip-browser] [--offline]
 #
+#   --clean-checkout  run in a fresh detached worktree of HEAD, like CI: committed files
+#                     only, no local.properties, cold build (catches compile-heap OOMs and
+#                     uncommitted-file false greens). Needs ANDROID_HOME or sdk.dir.
 #   --skip-gradle   skip :app:testDebugUnitTest (the slowest step; CI still runs it)
 #   --skip-browser  skip the Playwright pairing-keyboard browser test (remote-browser.yml)
 #   --offline       skip the catalog validator's network checks (catalog.yml runs them)
@@ -18,18 +21,36 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 root="$(pwd)"
 
-skip_gradle=0 skip_browser=0 offline=0
+skip_gradle=0 skip_browser=0 offline=0 clean_checkout=0
 for arg in "$@"; do
   case "$arg" in
+    --clean-checkout) clean_checkout=1 ;;
     --skip-gradle) skip_gradle=1 ;;
     --skip-browser) skip_browser=1 ;;
     --offline) offline=1 ;;
-    -h|--help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $arg (see --help)" >&2; exit 2 ;;
   esac
 done
 
+if [ "$clean_checkout" -eq 1 ]; then
+  sdk="${ANDROID_HOME:-$(sed -n 's/^sdk\.dir=//p' local.properties 2>/dev/null)}"
+  [ -n "$sdk" ] || { echo "✗ --clean-checkout needs ANDROID_HOME (or sdk.dir in local.properties)" >&2; exit 2; }
+  checkout="$(mktemp -d "${TMPDIR:-/tmp}/portal-ci-checkout.XXXXXX")"
+  git worktree add --detach --quiet "$checkout/repo" HEAD || exit 2
+  echo "▸ clean checkout of $(git rev-parse --short HEAD) at $checkout/repo"
+  forwarded=()
+  for arg in "$@"; do [ "$arg" = "--clean-checkout" ] || forwarded+=("$arg"); done
+  ANDROID_HOME="$sdk" bash "$checkout/repo/tools/scripts/ci-local.sh" ${forwarded[@]+"${forwarded[@]}"}
+  status=$?
+  git worktree remove --force "$checkout/repo" && rm -rf "$checkout"
+  exit "$status"
+fi
+
 readonly PLAYWRIGHT_VERSION="1.62.1"  # keep in sync with remote-browser.yml
+# Exactly the "Run unit tests" command in tests.yml, heap flags included, so a CI
+# OutOfMemoryError reproduces here (scripts/test_portal_ci_local_parity.py enforces it).
+readonly GRADLE_UNIT_TEST_CMD="./gradlew :app:testDebugUnitTest --no-daemon -Dorg.gradle.jvmargs=-Xmx6g -Pkotlin.compiler.execution.strategy=in-process"
 readonly MAX_GRADLE_PROCESSES=2
 readonly GRADLE_WAIT_S=15
 cache="${CI_LOCAL_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/portal-ci-local}"
@@ -69,8 +90,9 @@ gradle_unit() {
   while [ "$(pgrep -f GradleMain | wc -l | tr -d ' ')" -ge "$MAX_GRADLE_PROCESSES" ]; do
     echo "  waiting: $MAX_GRADLE_PROCESSES Gradle processes already running"; sleep "$GRADLE_WAIT_S"
   done
-  ./gradlew --no-daemon -q :app:testDebugUnitTest \
-    -Dorg.gradle.jvmargs=-Xmx6g -Pkotlin.compiler.execution.strategy=in-process
+  # Word-split on purpose: the command is a flat token list.
+  # shellcheck disable=SC2086
+  $GRADLE_UNIT_TEST_CMD
 }
 
 # ---- catalog.yml / release-guard.yml / docs.yml ---------------------------------------------

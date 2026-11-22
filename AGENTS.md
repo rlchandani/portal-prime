@@ -25,7 +25,7 @@ Always run the relevant check below after a change and fix failures before finis
 | Validate the store catalog | `python3 scripts/validate_catalog.py --network` |
 | Lint provisioning scripts | `bash -n provisioning/provision.sh` |
 | Build the fleet CLI | `cd provisioning && rustc -O fleet.rs -o fleetctl` |
-| Run every CI workflow locally (gate pushes on it) | `tools/scripts/ci-local.sh` |
+| Run every CI workflow locally (gate pushes on it) | `tools/scripts/ci-local.sh --clean-checkout` |
 | Bump the version (gradle + version.json) | `tools/scripts/bump-version.sh <versionName> "<notes>"` |
 
 CI workflows live in [`.github/workflows/`](.github/workflows/): `tests.yml` (unit tests),

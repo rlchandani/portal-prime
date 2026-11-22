@@ -47,9 +47,11 @@ dev APK in `provisioning/apks/` and run provisioning as usual, then iterate with
 `tools/scripts/ci-local.sh` runs the same checks as every workflow in
 `.github/workflows/` (JS and Python regression guards, catalog validation, version sync,
 `mkdocs build --strict`, provisioning/fleet tests, the Playwright pairing test and
-`:app:testDebugUnitTest`) and exits non-zero if any fails. Gate every push to `main` on it:
+`:app:testDebugUnitTest` with the workflow's exact Gradle heap flags) and exits non-zero if
+any fails. Gate every push to `main` on a clean-checkout run, which tests the committed HEAD
+in a fresh worktree with a cold build, as CI does:
 
-    tools/scripts/ci-local.sh && git push origin main
+    tools/scripts/ci-local.sh --clean-checkout && git push origin main
 
 `--skip-gradle`, `--skip-browser` and `--offline` trim it for quick iterations; tool
 dependencies are cached in `CI_LOCAL_CACHE` (default `~/.cache/portal-ci-local`). Bump the
