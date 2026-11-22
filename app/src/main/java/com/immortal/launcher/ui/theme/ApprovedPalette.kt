@@ -23,7 +23,7 @@ data class ApprovedPalette(
 val ApprovedLightPalette = ApprovedPalette(
     Color(0xFFF2F3F7), Color(0xFFE9EDF3), Color.White, Color(0xFFE5EBF2),
     Color(0xFF182C39), Color(0xFF536674), Color(0xFFDCE3EB), Color(0xFF176ABB),
-    Color(0xFFD7E7F8), Color(0xFF288B61), false, outline = Color(0xFFC9D2DC), switchOffTrack = Color(0xFFB4BFCC))
+    Color(0xFFD7E7F8), Color(0xFF288B61), false, outline = Color(0xFFC9D2DC), switchOffTrack = Color(0xFF8593A1))
 val ApprovedDarkPalette = ApprovedPalette(
     Color(0xFF14161B), Color(0xFF14161B), Color(0xFF2B2B2B), Color(0xFF363636),
     Color.White, Color(0xFFB8B8B8), Color(0xFF484848), Color.White,

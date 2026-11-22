@@ -802,6 +802,8 @@ internal fun ActionSettingRow(
     actionLabel: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    /** A Remove action: the shared [SettingsRemoveButton] instead of the blue primary. */
+    destructive: Boolean = false,
     onClick: () -> Unit,
 ) {
     Row(
@@ -819,7 +821,8 @@ internal fun ActionSettingRow(
         ApprovedSettingsLabel(title, subtitle.ifBlank { LocalApprovedSettingsHelp.current.orEmpty() },
             Modifier.weight(1f))
         // The full row owns touch, accessibility and D-pad; this button adds no second focus stop.
-        SettingsActionSurface(actionLabel, enabled = enabled)
+        if (destructive) SettingsRemoveButton(actionLabel, enabled = enabled, onClick = null)
+        else SettingsActionSurface(actionLabel, enabled = enabled)
     }
 }
 

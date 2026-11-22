@@ -257,7 +257,7 @@ private fun UnlistedBootAppRow(pkg: String, enabled: Boolean, onRemove: () -> Un
     Text(pkg, color = IosLabel, fontSize = Sizes.rowSub,
         maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         modifier = Modifier.weight(1f))
-    ActionPill("Remove", enabled = enabled,
+    SettingsRemoveButton(enabled = enabled,
         modifier = Modifier.semantics { contentDescription = "Remove startup entry $pkg" }) {
       onRemove()
     }

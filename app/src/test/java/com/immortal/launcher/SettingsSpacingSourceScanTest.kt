@@ -12,7 +12,8 @@ import org.junit.Test
 
 /**
  * Settings tripwires from the 2026-11-22 capture pass: a hand-made footer (`start = 4.dp`) sat 24 dp
- * left of every other footer on Home Screen, Music, MQTT, World clock and Start on boot.
+ * left of every other footer on Home Screen, Music, MQTT, World clock and Start on boot; chip rows
+ * at 24 dp beside 28 dp row text.
  */
 class SettingsSpacingSourceScanTest {
     private val root: File =
@@ -29,7 +30,16 @@ class SettingsSpacingSourceScanTest {
         assertTrue("Use FooterNote (28 dp text inset) for text under a card:\n" + bad.joinToString("\n"), bad.isEmpty())
     }
 
+    /** News, Stocks and Crypto suggestion chips sat at 24 dp, left of the 28 dp row text. */
+    @Test fun settingsChipRowsUseTheRowTextInset() {
+        val bad = settingsSources.flatMap { (name, text) ->
+            text.lines().mapIndexedNotNull { i, line -> if (UNIFORM_CHIP_PADDING.containsMatchIn(line)) "$name:${i + 1}" else null }
+        }
+        assertTrue("Inset chip rows by SettingsSpacing.TEXT_INSET_DP:\n" + bad.joinToString("\n"), bad.isEmpty())
+    }
+
     private companion object {
         val AD_HOC_FOOTER = Regex("""padding\(top = \d+\.dp, start = 4\.dp""")
+        val UNIFORM_CHIP_PADDING = Regex("""FlowRow\(Modifier\.padding\(\d+\.dp\)""")
     }
 }

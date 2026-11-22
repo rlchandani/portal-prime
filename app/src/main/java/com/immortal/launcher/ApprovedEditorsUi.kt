@@ -168,7 +168,7 @@ internal fun ApprovedEditorsCollectionRow(
                 modifier = Modifier.padding(top = 6.dp))
         }
         if (action != null && onAction != null) ApprovedSettingsTextButton(action, onAction)
-        ApprovedSettingsTextButton("Remove", onRemove)
+        SettingsRemoveButton(onClick = onRemove)
     }
 }
 
@@ -179,7 +179,7 @@ internal fun ApprovedEditorsRemoveDialog(
     ApprovedSettingsDialog("Remove $name?", onDismiss = onCancel) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ApprovedEditorsButton("Cancel", onClick = onCancel)
-            ApprovedEditorsButton("Remove", primary = true, onClick = onRemove)
+            SettingsRemoveButton(onClick = onRemove)
         }
     }
 }

@@ -69,7 +69,7 @@ internal fun StocksSettingsContent() {
         }
         SectionLabel("Popular choices")
         Card {
-            FlowRow(Modifier.padding(24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
+            FlowRow(Modifier.padding(horizontal = SettingsSpacing.TEXT_INSET_DP.dp, vertical = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 TICKER_SUGGESTIONS.forEach { symbol ->
                     val added = symbol in selected

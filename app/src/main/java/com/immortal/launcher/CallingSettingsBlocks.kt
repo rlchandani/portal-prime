@@ -170,13 +170,13 @@ private fun RuleCard(title: String, body: String, modifier: Modifier) {
 @Composable
 internal fun CallCameraBlock() {
   Card {
-    SettingsInfoRow("Camera framing", CallingCopy.FRAMING_NOTE) { LockedValue("Automatic") }
+    SettingsInfoRow("Camera framing", CallingCopy.FRAMING_NOTE) { SettingsLockedValue("Automatic") }
     Divider()
     SettingsInfoRow("If the camera is busy or the shutter is closed", "The call carries on with audio and tells you why.") {
-      LockedValue("Audio")
+      SettingsLockedValue("Audio")
     }
     Divider()
-    SettingsInfoRow("Self view", "Always shown while your camera is on.") { LockedAlways() }
+    SettingsInfoRow("Self view", "Always shown while your camera is on.") { SettingsLockedValue() }
   }
 }
 
@@ -186,7 +186,7 @@ internal fun CallPrivacyBlock() {
   Card {
     PRIVACY_ROWS.forEachIndexed { i, (title, help) ->
       if (i > 0) Divider()
-      SettingsInfoRow(title, help) { LockedAlways() }
+      SettingsInfoRow(title, help) { SettingsLockedValue() }
     }
   }
   FooterNote("Calls are yours. This is exactly what happens, and none of it can be switched off.")
@@ -204,18 +204,6 @@ private fun SettingsInfoRow(title: String, help: String, trailing: @Composable (
   }
 }
 
-@Composable
-private fun LockedAlways() = LockedValue("Always")
-
-@Composable
-private fun LockedValue(text: String) {
-  val p = LocalApprovedPalette.current
-  Row(Modifier.height(52.dp).background(p.surface2, RoundedCornerShape(50)).padding(horizontal = 20.dp),
-      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-    CallIcon("lock", p.secondary, 24.dp)
-    Text(text, color = p.secondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
-  }
-}
 
 private val PRIVACY_ROWS = listOf(
     "Camera and mic open only after you answer" to "Before that, the other room sees this room’s name, nothing else",
