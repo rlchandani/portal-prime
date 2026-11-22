@@ -22,3 +22,33 @@ class SettingsRowValueWidthTest {
         assertEquals(ROW_VALUE_MAX_DP, settingsRowValueMaxWidthDp(0, singlePane = true))
     }
 }
+
+class SettingsCompactCardsTest {
+    /** Guest card preview and Photo Sources tiles stack on the Mini and sit side by side on Portal+. */
+    @org.junit.Test fun sideBySideOnPortalPlusStackedOnTheMini() {
+        org.junit.Assert.assertFalse(SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(1920)))
+        org.junit.Assert.assertTrue(SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(800, singlePane = true)))
+        org.junit.Assert.assertTrue(SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(1280)))
+        org.junit.Assert.assertFalse(SettingsSplitMetrics.compactCards(0))
+    }
+}
+
+class SettingsBackLabelTest {
+    @org.junit.Test fun parentNameWhenItFitsElseBack() {
+        // Mini upright: the back button has 30% of 760 dp.
+        org.junit.Assert.assertEquals("Settings", settingsBackLabel("Settings", 228))
+        org.junit.Assert.assertEquals("Back", settingsBackLabel("Widgets & Calendar", 228))
+        // Portal+: 40% of the detail column fits the longest parent name.
+        org.junit.Assert.assertEquals("People & Recognition", settingsBackLabel("People & Recognition", 518))
+        org.junit.Assert.assertEquals("Back", settingsBackLabel(null, 518))
+    }
+}
+
+class SettingsSidebarCompactTest {
+    @org.junit.Test fun onlyTheMinisTurnedSplitViewUsesCompactSidebarRows() {
+        org.junit.Assert.assertFalse(SettingsSplitMetrics.sidebarCompact(1920, singlePane = false))
+        org.junit.Assert.assertTrue(SettingsSplitMetrics.sidebarCompact(1280, singlePane = false))
+        // Upright the list is the whole window, so its rows keep the full size.
+        org.junit.Assert.assertFalse(SettingsSplitMetrics.sidebarCompact(800, singlePane = true))
+    }
+}

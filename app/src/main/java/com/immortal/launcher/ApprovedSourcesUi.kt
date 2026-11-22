@@ -42,6 +42,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -312,7 +313,8 @@ internal fun ApprovedSourcesInfoRow(title: String, value: String) {
         Text(title, color = palette.text, fontSize = 26.sp, lineHeight = 34.sp,
             modifier = Modifier.weight(1f))
         Text(value, color = palette.secondary, fontSize = 23.sp, lineHeight = 30.sp,
-            textAlign = TextAlign.End, modifier = Modifier.widthIn(max = 600.dp))
+            textAlign = TextAlign.End, modifier = Modifier.widthIn(max = settingsRowValueMaxWidthDp(
+                LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current).dp))
     }
 }
 

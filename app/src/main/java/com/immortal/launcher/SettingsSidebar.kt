@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -133,6 +134,8 @@ private fun SettingsSidebarRow(
             bottomStart = if (last) SidebarGroupRadius else 0.dp, bottomEnd = if (last) SidebarGroupRadius else 0.dp)
     }
     val divider = IosDivider
+    // The Mini turned (420 dp column): a slightly smaller title and gap keep "Display & Brightness" whole.
+    val compact = SettingsSplitMetrics.sidebarCompact(LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current)
     Row(
         Modifier.fillMaxWidth().defaultMinSize(minHeight = SidebarRowHeight).clip(shape)
             .background(if (selected) IosFocusTint else IosCard)
@@ -145,10 +148,10 @@ private fun SettingsSidebarRow(
             .semantics { this.selected = selected }
             .padding(start = 18.dp, end = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalArrangement = Arrangement.spacedBy(if (compact) 14.dp else 20.dp),
     ) {
         SettingsTileIcon(page.icon, Color(page.color), SettingsTileSize.SIDEBAR, shared = true)
-        Text(page.title, color = IosLabel, fontSize = 27.sp, lineHeight = 32.sp, maxLines = 1,
+        Text(page.title, color = IosLabel, fontSize = if (compact) 24.sp else 27.sp, lineHeight = 32.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             modifier = Modifier.weight(1f))
         hint?.let { Text(it, color = IosSecondary, fontSize = 23.sp, maxLines = 1) }
@@ -189,8 +192,10 @@ private fun SettingsProfileCard(selected: Boolean, onClick: () -> Unit) {
                     else -> null
                 }
                 dot?.let { Box(Modifier.size(10.dp).background(it, CircleShape)) }
+                // Two lines rather than a cut-off "Hearthpane 1.319 · …" in the Mini's narrow column.
                 Text(status.text, color = IosSecondary, fontSize = 20.sp, lineHeight = 26.sp,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    maxLines = if (SettingsSplitMetrics.sidebarCompact(LocalConfiguration.current.screenWidthDp,
+                        LocalSettingsSinglePane.current)) 2 else 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

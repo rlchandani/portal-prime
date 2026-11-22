@@ -136,10 +136,11 @@ internal fun ApprovedEditorsEmpty(message: String = "Nothing added yet. Add an i
 internal fun <T> ApprovedEditorsCollection(
     title: String, entries: List<T>, key: (T) -> Any,
     empty: String = "Nothing added yet. Add an item below.",
+    /** The block's first element (right under the page's own section gap). */
+    leading: Boolean = true,
     row: @Composable (T) -> Unit,
 ) {
-    // Every collection opens its block, right under the page's own section gap.
-    SectionLabel(title, leading = true)
+    SectionLabel(title, leading = leading)
     Card {
         if (entries.isEmpty()) ApprovedEditorsEmpty(empty)
         else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp)) {

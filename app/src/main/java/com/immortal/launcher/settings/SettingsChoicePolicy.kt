@@ -87,8 +87,8 @@ object SettingsChoicePolicy {
   const val HELP_DP_PER_CHAR = 10
   /** More help lines than this beside an inline track, and the track goes below. */
   const val MAX_HELP_LINES_BESIDE = 3
-  /** What an inline track leaves beside it: the row's 2 × 28 dp padding, the 24 dp gap, the 420 dp track. */
-  const val INLINE_TRACK_RESERVE_DP = 28 * 2 + 24 + 420
+  /** What an inline track leaves beside it: the row's 2 × 28 dp padding, the 24 dp gap, the track at its 520 dp cap. */
+  const val INLINE_TRACK_RESERVE_DP = 28 * 2 + 24 + 520
 
   /**
    * True when the tiles go below the title: long sets always, and short ones when the title would

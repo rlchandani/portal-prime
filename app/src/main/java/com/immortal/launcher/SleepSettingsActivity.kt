@@ -15,7 +15,6 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,12 +75,13 @@ internal fun SleepSettingsContent() {
 
   fun stopCountdown() = SleepScheduler.cancelSleepTimer(context)
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column {
       Box(Modifier.focusRequester(firstFocus).focusGroup()) {
         SleepCountdownCard(settings.sleepTimerEnabled, ScreensaverConfig.clampSleepTimer(settings.sleepTimerMin),
             onStart = ::startCountdown, onStop = ::stopCountdown)
       }
 
+      SettingsCardGap()
       // The rows share one card, with the same switches and tiles as every other page.
       Card {
         ToggleRow("Sleep timer", settings.sleepTimerEnabled) {
@@ -116,7 +116,6 @@ internal fun SleepSettingsContent() {
         }
       }
 
-      Spacer(Modifier.size(8.dp))
       FooterNote(
           if (advanced) "When the timer ends, the screen sleeps using your audio and app preferences."
           else "Turn the screen off after a set time.",

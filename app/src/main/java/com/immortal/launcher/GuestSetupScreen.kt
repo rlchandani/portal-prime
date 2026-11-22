@@ -10,6 +10,7 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -63,14 +64,28 @@ internal fun GuestSettingsContent() {
       message = if (ok) null else "Couldn't save the password or door code. Try again."
     }
   }
-  Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
-    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(28.dp)) {
+  val preview = GuestCardContent(draft.settings, draft.password, if (draft.doorCodeOn) draft.doorCode else "", card.use24)
+  val flow = @Composable { modifier: Modifier ->
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(28.dp)) {
       if (saved) GuestSetupDone(onEdit = { saved = false })
       else GuestSetupFlow(draft, card.use24, message, onDraft = { draft = it; message = null }, onSave = save)
     }
-    GuestSetupPreview(GuestCardContent(draft.settings, draft.password, if (draft.doorCodeOn) draft.doorCode else "", card.use24))
+  }
+  val cardWidth = SettingsSplitMetrics.pageContentWidthDp(LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current)
+  if (SettingsSplitMetrics.compactCards(cardWidth)) {
+    // The Mini's cards: the steps get the full width and the preview follows them.
+    Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(40.dp)) {
+      flow(Modifier.fillMaxWidth())
+      GuestSetupPreview(preview)
+    }
+  } else {
+    Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+      flow(Modifier.weight(1f))
+      GuestSetupPreview(preview)
+    }
   }
 }
+
 
 @Composable
 private fun GuestSetupFlow(

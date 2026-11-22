@@ -65,15 +65,15 @@ internal fun AlmanacSettingsContent() {
       catch (_: Exception) { failed = true }
     }
   }
-  Text("Adds optional daily lines to the Classic screensaver’s ambient dashboard. " +
-      "Choose Classic and enable Ambient dashboard in Photo Frame.",
-      color = IosSecondary, fontSize = Sizes.rowSub)
   Card {
     NavRow("Photo Frame") { navigate(approvedSettingsRoute(SettingsPageIds.FRAME, "screensaver.ambientDashboard")) }
   }
+  FooterNote("Adds optional daily lines to the Classic screensaver’s ambient dashboard. " +
+      "Choose Classic and enable Ambient dashboard in Photo Frame.")
   val current = snapshot
-  if (current == null && !failed) Text("Loading Almanac settings…", color = IosSecondary)
+  if (current == null && !failed) FooterNote("Loading Almanac settings…")
   if (current != null) {
+    SettingsSectionGap()
     SettingsList(domain, current, editsEnabled = !saving) { key, value ->
       if (!saving) {
         saving = true

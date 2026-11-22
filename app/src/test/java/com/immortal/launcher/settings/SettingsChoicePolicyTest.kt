@@ -105,8 +105,9 @@ class SettingsChoicePolicyTest {
     val labels = listOf("Light", "Dark")
     // Portal+ cards (1008 dp): a long title still sits beside the track.
     assertFalse(SettingsChoicePolicy.stacked(labels, "Temperature unit", 1008))
-    // Mini cards (744 dp): a short title stays inline, a long one moves the track below it.
-    assertFalse(SettingsChoicePolicy.stacked(labels, "Appearance", 744))
+    // Mini cards (744 dp): a short title stays inline, a longer one moves the track below it.
+    assertFalse(SettingsChoicePolicy.stacked(labels, "Size", 744))
+    assertTrue(SettingsChoicePolicy.stacked(labels, "Temperature unit", 744))
     assertTrue(SettingsChoicePolicy.stacked(labels, "Keep people in frame", 744))
     // Unknown width keeps the label-only rule; long sets always stack.
     assertFalse(SettingsChoicePolicy.stacked(labels, "Keep people in frame", 0))

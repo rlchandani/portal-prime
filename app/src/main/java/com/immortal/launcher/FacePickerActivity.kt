@@ -92,7 +92,7 @@ internal fun FacePickerContent() {
         }
     }
     // Time format (Display & Brightness) and Show now playing (Photo Frame) each have one home.
-    ApprovedSourcesPreviewFooter(topGap = 12.dp) {
+    ApprovedSourcesPreviewFooter(topGap = SettingsSpacing.CARD_GAP_DP.dp) {
         context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
     }
 }

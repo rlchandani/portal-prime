@@ -187,7 +187,7 @@ internal fun IntercomContent() {
   val broadcastBusy = mode == IntercomMode.BROADCAST || mode == IntercomMode.STARTING_BROADCAST
   val listenBusy = mode == IntercomMode.LISTENING || mode == IntercomMode.CONNECTING
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column {
       // Grouped as in the approved mock: what this Portal sends, then listening to another room.
       ApprovedSettingsSectionLabel("This Portal")
       if (myIp.isNotBlank()) {
@@ -202,8 +202,9 @@ internal fun IntercomContent() {
 
       if (status.isNotBlank()) {
         Text(status, color = IosBlue, fontSize = Sizes.rowSub, textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth().padding(top = SettingsSpacing.FOOTER_GAP_DP.dp))
       }
+      SettingsCardGap()
 
       // Broadcast (baby monitor in the nursery): this device's mic → the network.
       ActionButton(
@@ -218,9 +219,9 @@ internal fun IntercomContent() {
       }
 
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
-      ApprovedSettingsSectionLabel("Listen to another room")
+      SectionLabel("Listen to another room")
       Card {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 28.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
           OutlinedTextField(colors = iosTextFieldColors(), value = host, onValueChange = { host = it }, singleLine = true,
               label = { Text("Other Portal's address (e.g. 192.168.1.42)") },
               modifier = Modifier.fillMaxWidth())

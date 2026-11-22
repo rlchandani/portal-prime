@@ -44,6 +44,8 @@ private val InlineTrackMinWidth = 420.dp
 /** Inline tracks stop here so the title beside them keeps its width (tiles share it evenly). */
 private val InlineTrackMaxWidth = 520.dp
 private val TileLabelSize = 24.sp
+/** Small enough that five tiles (Clock Faces) keep "Hearthpane" whole on the Mini's 744 dp cards. */
+private val TileLabelPadding = 6.dp
 private val RowPaddingH = 28.dp
 private val RowPaddingV = 18.dp
 private val StackGap = 14.dp
@@ -111,7 +113,7 @@ internal fun SettingsTileTrack(
             ) {
                 Text(tile.label, color = IosLabel, fontSize = TileLabelSize, maxLines = 1, textAlign = TextAlign.Center,
                     fontWeight = if (tile.selected) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier.padding(horizontal = 12.dp))
+                    modifier = Modifier.padding(horizontal = TileLabelPadding))
             }
         }
     }

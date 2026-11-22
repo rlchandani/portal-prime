@@ -11,7 +11,6 @@ import android.app.Activity
 import android.provider.Settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -135,7 +134,7 @@ internal fun MqttContent() {
                   "no YAML needed.")
         }
       }
-      Spacer(Modifier.size(26.dp))
+      SettingsCardGap()
       Card {
         Row(
             modifier = Modifier.fillMaxWidth().padding(18.dp),

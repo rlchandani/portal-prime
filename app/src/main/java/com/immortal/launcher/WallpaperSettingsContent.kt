@@ -82,7 +82,7 @@ internal fun WallpaperSection() {
   }
   val selectedLabel = WallpaperChoices.firstOrNull { it.first == configuration.mode }?.second ?: "Custom"
   Card {
-    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(Modifier.padding(horizontal = 28.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
       Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text("Background", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
         Text(selectedLabel, color = IosSecondary, fontSize = Sizes.rowSub,
