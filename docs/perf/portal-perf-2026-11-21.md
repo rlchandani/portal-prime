@@ -1338,3 +1338,27 @@ Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 
 - `:app:testDebugUnitTest`: 9058 tests, 0 failures.
 - `ci-local.sh --clean-checkout`: 11 passed, 0 failed, 1 skipped (PowerShell provisioning).
 - The device was restored by the bench to official 1.326 (`restore OK, verify: ok`).
+
+### Round 2: staged release of the old beat, staggered Gallery Wall prewarm (not kept)
+
+**Change tried** (not committed; patch kept as `scratch-tmp/ss-finish/v2-retire-stagger.patch` plus `slideshow_gallery_prewarm.test.mjs`):
+- `scheduler.js` `retire`: at the fade end the old beat dropped to opacity 0 (`.ss-beat.retiring`). Its texture owners (Gallery cells, Polaroid prints) then left 3 per frame, and only after that did the mode clean up and the layer go.
+- Gallery Wall in a `.prewarm` beat added 2 cells per frame (`GALLERY_PREWARM_CELLS`).
+- Native handoffs were unchanged.
+- Desktop pixel diff was 100 % identical at rest, mid-fade and settled, at dpr 1, 1.125 and 2. JS 547 tests, 528 pass, 19 skipped, 0 fail. `:app:testDebugUnitTest` passed.
+
+**Bench** (official 1.327 vs this build, `screensaver-pinned`, 4 reps):
+
+| Mode | Build | Changes | > 32 ms total | > 60 ms total | Worst median | Sum > 32 median | Janky % median |
+|---|---|---|---|---|---|---|---|
+| Polaroid | O 1.327 | 20 | 90 | 14 | 57 | 205 ms | 98 |
+| Polaroid | round 2 | 20 | 79 | 9 | 55 | 183 ms | 25 |
+| Gallery Wall | O 1.327 | 20 | 148 | 7 | 48 | — | 96 |
+| Gallery Wall | round 2 | 20 | 127 | 12 | 50 | — | 23 |
+
+- **Staged release made Polaroid worse than round 1.** The single 39–47 ms frame at +1.73 s became 2–3 frames of 45–67 ms at +1.72–1.76 s (round 1: 58 frames over 32 ms and 4 over 60 ms).
+- **It did not move Gallery Wall's fade-end cluster.** That is still 8–19 frames of 33–70 ms at +1.75–2.1 s in about half the changes.
+- So that cost is not the old wall's texture frees. It starts on the frame the old beat stops being drawn, whether by removal (round 1) or by opacity 0 (round 2). It is not reproduced on desktop, where no raster follows.
+- One hypothesis: with two full-screen beats and 20 photos, WebView is over its tile memory budget during the fade. The incoming wall would then be drawn from partial or low-resolution tiles, and re-rastered at full resolution once the old beat's memory frees. This needs a device trace with `webview` and `sched` and a larger buffer than the bench's `gfx view` capture.
+- **The staggered build did remove the 100–104 ms pre-raster frames.** In round 2 the worst Gallery frame before the beat was 68 ms, mostly 35–50 ms. It is a candidate to keep once the fade-end cost is solved. It was not measured on its own.
+- **Not ship-ready:** Gallery Wall frames over 60 ms rise in both rounds (11 → 24, 7 → 12). The branch stays at round 1 (`13788fd3`).
