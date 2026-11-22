@@ -1,6 +1,6 @@
 {
-  "versionCode": 315,
-  "versionName": "1.321",
+  "versionCode": 316,
+  "versionName": "1.322",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Settings layout polish: rows no longer overlap, cards have consistent gaps and rounded corners, captions align, and every page fits the Portal Mini. Polaroid screensaver changes are smoother."
+  "notes": "Everything fits the Portal Mini: no sideways scrolling or clipped labels across Home, Tools, Apps, Control Center, Music, the guest card and Call everyone, with visual polish on both sizes."
 }
