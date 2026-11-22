@@ -1362,3 +1362,13 @@ Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 
 - One hypothesis: with two full-screen beats and 20 photos, WebView is over its tile memory budget during the fade. The incoming wall would then be drawn from partial or low-resolution tiles, and re-rastered at full resolution once the old beat's memory frees. This needs a device trace with `webview` and `sched` and a larger buffer than the bench's `gfx view` capture.
 - **The staggered build did remove the 100–104 ms pre-raster frames.** In round 2 the worst Gallery frame before the beat was 68 ms, mostly 35–50 ms. It is a candidate to keep once the fade-end cost is solved. It was not measured on its own.
 - **Not ship-ready:** Gallery Wall frames over 60 ms rise in both rounds (11 → 24, 7 → 12). The branch stays at round 1 (`13788fd3`).
+
+### Round 3: Polaroid only (shipped candidate)
+
+- `scheduler.js` `LAYERED_MODES = {"polaroid"}`. Polaroid beats get `.ss-beat.layered` (`will-change: opacity`). A Polaroid beat that dissolves over a current beat also gets `.prewarm` and the `PREWARM_FRAMES` (3) wait.
+- Every other mode, Gallery Wall included, is back on the official plain beat with one-frame promotion. The native Filmstrip test timings are back to the official values.
+- **Bench:** a pinned Polaroid change runs the same code path as round 1, so round 1's result stands: 105 → 58 frames over 32 ms and 19 → 4 over 60 ms, janky median 97 → 7.2 %. The round-3 build itself was not benched for Polaroid. That job was withdrawn when Family was reserved, and device work then stopped.
+- A Gallery Wall check of the round-3 build (job `20261122-111954-01C0-615c`) was still running at the time of writing. In round 3 Gallery Wall runs the official CSS and scheduler path.
+- **Pixel diff** (desktop, vs `main`, dpr 1, 1.125 and 2): rest and settled shots are 100 % identical. Mid-fade, Polaroid at dpr 1.125 is 66.5 % identical with max 1 / 255, and the other scales are 100 %. Gallery Wall at dpr 1 is 64 % identical with max 1 / 255. That is capture noise, because its code path is official.
+- **Tests:** JS 546 tests, 527 pass, 19 skipped, 0 fail. `slideshow_beat_prewarm.test.cjs` has 10 tests, covering Polaroid layered and prewarmed, and Gallery Wall, Ken Burns and Mosaic plain. `:app:testDebugUnitTest`: 9058 tests, 0 failures. `ci-local.sh --clean-checkout` on the merged HEAD (`a71dbbe6`): 12 passed, 0 failed, 1 skipped.
+- **Screensaver performance work stops here** at the owner's direction. The Gallery Wall fade-end cost (round 2) is open. `tools/perf` now takes `--atrace-categories` / `--atrace-buffer-kb` for a future `webview` / `sched` trace.
