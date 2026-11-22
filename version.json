@@ -1,6 +1,6 @@
 {
-  "versionCode": 312,
-  "versionName": "1.318",
+  "versionCode": 313,
+  "versionName": "1.319",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Settings reopens near-instantly; Control Center opens fully drawn with last-known states (locks/alarm/garage wait for live data); smoother Home tab switches; every screensaver doodle background is a pre-rendered tile (Cinema change stalls 10 → 0)."
+  "notes": "Removes unused calls-between-homes code (calls stay in-home) and cleans up its leftover test data on each Portal."
 }
