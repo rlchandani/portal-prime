@@ -34,7 +34,7 @@ class HearthpaneToolProvider : ContentProvider() {
   private val tools by lazy {
     HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
         homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search,
-        reminders = { args -> reminderTool.invoke(args) })
+        reminders = { args -> reminderTool.invoke(args) }, household = HearthpaneHouseholdTools.build(requireNotNull(context)))
   }
   private val reminderTool by lazy {
     val ctx = requireNotNull(context).applicationContext

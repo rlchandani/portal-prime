@@ -122,4 +122,15 @@ class HearthpaneToolsTest {
     // Without the Control Center seam (the default) it says so.
     assertTrue(tools.invoke(HearthpaneTools.HOME_CONTROL, "{}").has("error"))
   }
+
+  @Test fun householdToolsAreRoutedByNameWithTheirRawArgumentsAndFailuresAreErrors() {
+    val seen = mutableListOf<Pair<String, String?>>()
+    val t = HearthpaneTools({ front }, { _, _ -> }, household = mapOf(
+        HearthpaneLists.NAME to { a -> seen += HearthpaneLists.NAME to a; JSONObject().put("ok", true) },
+        HearthpaneAlarms.NAME to { _ -> throw IllegalStateException("boom") }))
+    assertTrue(t.invoke(HearthpaneLists.NAME, """{"action":"list"}""").getBoolean("ok"))
+    assertEquals(listOf(HearthpaneLists.NAME to """{"action":"list"}"""), seen)
+    assertEquals("hearthpane.alarms failed", t.invoke(HearthpaneAlarms.NAME, "{}").getString("error"))
+    assertTrue(t.invoke(HearthpaneCall.NAME, "{}").getString("error").startsWith("unknown tool"))
+  }
 }
