@@ -35,16 +35,14 @@ import java.io.File
 internal object FleetSecretPaths {
   private val protectedStores = listOf(listOf("no_backup", "youtube"), listOf("no_backup", GuestPasswordStore.DIR),
       listOf("no_backup", AutoAnswerRepository.DIR),
-      // Calls between homes: the household identity key and linked homes (sealed).
-      listOf("no_backup", HomeLinkRepository.DIR),
-      // The Portals pinned in person, whose device keys may fetch that vault.
-      listOf("no_backup", PortalRosterStore.DIR),
       // Video messages (sealed, with their wrapped key) and the sender's temp take.
       listOf("no_backup", CallMessageStore.DIR), listOf("no_backup", CallMessageStore.OUT_DIR),
       // Messages waiting for a paired phone to collect them (transit-sealed).
       listOf("no_backup", CallPhoneOutbox.DIR),
       // Who's there templates and people (sealed) plus the audit file.
-      listOf("no_backup", WhosThereStore.DIR))
+      listOf("no_backup", WhosThereStore.DIR)) +
+      // Retired cross-home calling's sealed leftovers, until RetiredHomeLinkCleanup has removed them.
+      RetiredHomeLinkCleanup.DIRS.map { listOf("no_backup", it) }
 
   /**
    * Roots of an app's private data directory, as canonical path parts. `*` is one path part

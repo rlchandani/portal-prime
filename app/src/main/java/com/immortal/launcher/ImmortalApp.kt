@@ -124,8 +124,8 @@ class ImmortalApp : Application() {
       StartupStep("DinnerCall") { DinnerCallFeature.install(this) },
       // Hearthpane Calling: Portal↔Portal video calls and drop-ins over the signed household bus.
       StartupStep("Calling") { Calling.install(this) },
-      // Calls between homes: the household identity and linked homes, kept in step on every Portal here.
-      StartupStep("HomeLinkSync") { HomeLinkSync.install(this) },
+      // Retired cross-home calling: deletes its leftover vault, roster and Keystore keys once.
+      StartupStep("RetiredHomeLinkCleanup") { RetiredHomeLinkCleanup.install(this) },
       StartupStep("SharedTimers") { SharedTimersFeature.install(this) },
       StartupStep("Chores") { ChoresFeature.install(this) },
       StartupStep("Doorbell") { DoorbellFeature.install(this) },
