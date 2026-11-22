@@ -1,6 +1,6 @@
 {
-  "versionCode": 316,
-  "versionName": "1.322",
+  "versionCode": 317,
+  "versionName": "1.323",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Everything fits the Portal Mini: no sideways scrolling or clipped labels across Home, Tools, Apps, Control Center, Music, the guest card and Call everyone, with visual polish on both sizes."
+  "notes": "Small UI polish: Control Center alert preview card reads cleanly with even buttons, the light-theme toggle no longer looks like the sleep button, the Store shows more apps on the Mini turned sideways, and Call everyone's header no longer cuts off."
 }
