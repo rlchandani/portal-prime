@@ -70,12 +70,14 @@ internal class WakeMic(
       val pcm = ByteArray(READ_BYTES)
       val features = IntArray(MicroFilterbank.CHANNELS)
       var score = WakeScore()
+      var level: WakeLevel? = WakeLevel()
       rec.startRecording()
       if (rec.recordingState != AudioRecord.RECORDSTATE_RECORDING) return Outcome.Ended("mic busy")
       try {
         while (live) {
           val n = rec.read(pcm, 0, READ_BYTES)
           if (n < 0) return Outcome.Ended("read error $n")
+          level = level?.add(pcm, n)?.let { if (it.complete) { Log.i(TAG, it.describe()); null } else it }
           WakeGain.apply(pcm, n)
           for (offset in 0..n - CHUNK_BYTES step CHUNK_BYTES) {
             if (!frontend.process(pcm, offset, features)) continue

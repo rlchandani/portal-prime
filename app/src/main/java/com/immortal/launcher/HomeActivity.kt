@@ -65,6 +65,9 @@ class HomeActivity : ComponentActivity() {
   override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean =
       MusicMediaKeys.dispatch(event) || super.dispatchKeyEvent(event)
 
+  /** Opens the photo frame as this app's Activity at idle, so "Hey Jarvis" keeps working ([IdleFramePolicy]). */
+  private val idleFrame = IdleFrameTimer(this)
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // Cold start: the RenderThread's one-time EGL setup overlaps the first composition.
@@ -245,6 +248,7 @@ class HomeActivity : ComponentActivity() {
     // The user is back on the launcher: end the idle session and, inside the overnight window,
     // arm the touch-renewed "you have the device" session. SleepScheduler owns that policy.
     SleepScheduler.onReturnedToLauncher(this)
+    idleFrame.resumed()
     ApprovedHomeNavigation.resumed(this)
     // Music's first open no longer pays Chromium's start-up: it happens here, once, at idle.
     cancelMusicPrewarm?.invoke()
@@ -257,6 +261,7 @@ class HomeActivity : ComponentActivity() {
   }
 
   override fun onPause() {
+    idleFrame.paused()
     cancelWebViewStartup?.invoke()
     cancelWebViewStartup = null
     cancelMusicPrewarm?.invoke()
@@ -279,6 +284,12 @@ class HomeActivity : ComponentActivity() {
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     SleepScheduler.onInteraction(this)
     return super.dispatchTouchEvent(ev)
+  }
+
+  // Every touch and key that reaches Home (Activity calls this from its dispatch); restarts the idle frame's count.
+  override fun onUserInteraction() {
+    super.onUserInteraction()
+    idleFrame.interacted()
   }
 
   private fun enterImmersive() {

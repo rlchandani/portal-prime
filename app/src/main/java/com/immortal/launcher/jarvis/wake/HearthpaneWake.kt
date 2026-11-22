@@ -21,11 +21,13 @@ import com.immortal.launcher.BriefingPolicy
 import com.immortal.launcher.Calling
 import com.immortal.launcher.ChimeConfig
 import com.immortal.launcher.JarvisHandoff
-import com.immortal.launcher.PhotoFramePreviewActivity
 import com.immortal.launcher.RemoteCompanionJarvis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -34,7 +36,7 @@ import java.util.TimeZone
 import java.util.concurrent.Executors
 
 /**
- * "Hey Jarvis" while a Hearthpane screen is in front (D6). On these Android 10 Portals only the top app hears the
+ * "Hey Jarvis" while a Hearthpane screen — the idle photo frame Activity included — is in front (D6). On these Android 10 Portals only the top app hears the
  * mic, so Jarvis can't listen behind Hearthpane; Hearthpane listens instead and, on a wake, opens Jarvis's floating
  * card straight into listening. The Android shell around [WakePolicy]: it gathers the facts, starts or stops the
  * [WakeMic] on every change, and hands a wake to [JarvisHandoff]. Main thread only (callbacks hop to it).
@@ -64,6 +66,7 @@ internal object HearthpaneWake {
   private var jarvisWakeChecked = false
   private var retryMs = RETRY_MS
   private var startPending = false
+  private val listeningState = MutableStateFlow(false)
   private val startRunnable = Runnable { startPending = false; startNow() }
   private val minuteTick = Runnable { evaluate() }
 
@@ -92,6 +95,9 @@ internal object HearthpaneWake {
 
   fun callActive(): Boolean = callActive
 
+  /** True while the detector is really listening ([WakeIndicator]): drives the ember dot on Home and the frame. */
+  val listening: StateFlow<Boolean> = listeningState.asStateFlow()
+
   /** A setting changed (Settings › Jarvis, or the phone remote): decide again. Any thread. */
   fun refresh(@Suppress("UNUSED_PARAMETER") context: Context) {
     main.post {
@@ -104,6 +110,7 @@ internal object HearthpaneWake {
 
   private fun facts(now: Long): WakePolicy.Facts {
     val host = resumed?.get()
+    val audio = signals.audio()
     return WakePolicy.Facts(
         enabled = JarvisWakeConfig.load(app).wakeOnScreens,
         micPermission = app.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED,
@@ -112,8 +119,9 @@ internal object HearthpaneWake {
         screenInteractive = app.getSystemService(PowerManager::class.java)?.isInteractive != false,
         dreaming = signals.dreaming,
         hostResumed = host != null,
-        hostEligible = host != null && host !is PhotoFramePreviewActivity,
         callActive = callActive,
+        systemCall = audio.systemCall,
+        micMuted = audio.micMuted,
         cameraInUse = signals.cameraInUse,
         micClaimed = MicClaims.active,
         quietHours = ChimeConfig.isQuietNow(app, BriefingPolicy.minuteOfDay(System.currentTimeMillis(), TimeZone.getDefault())),
@@ -138,9 +146,15 @@ internal object HearthpaneWake {
       } else {
         mic?.stop()
       }
+      publishListening()
       return
     }
     if (mic?.active != true) scheduleStart(START_DELAY_MS)
+    publishListening()
+  }
+
+  private fun publishListening() {
+    listeningState.value = WakeIndicator.shown(lastDecision, mic?.active == true)
   }
 
   private fun scheduleStart(delayMs: Long) {
@@ -164,6 +178,7 @@ internal object HearthpaneWake {
     if (loaded == null) return loadModel()
     val current = mic ?: WakeMic(loaded, MicEvents).also { mic = it }
     current.start()
+    publishListening()
   }
 
   private fun loadModel() {
@@ -213,6 +228,7 @@ internal object HearthpaneWake {
   }
 
   private fun handleEnded(reason: String) {
+    publishListening()
     if (reason == "stopped") return
     Log.w(TAG, "listening ended: $reason; retrying in ${retryMs / 1000} s")
     cancelStart()
