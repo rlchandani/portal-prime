@@ -138,7 +138,10 @@ private class SyncGoldenRun(private val data: JSONObject, private val sc: JSONOb
       "peer" -> h.out += "peer -> " + SettingsSync.handlePeer(c, id(step.getString("from")), step.optString("raw").ifBlank { payload(step.getJSONObject("payload")) })
       "route" -> route(step)
       "local" -> { val v = step.getJSONObject("values"); SettingsSyncCatalog.household.apply(c, v.keys().asSequence().associateWith { v.get(it) }) }
-      "fireMain" -> { val due = synchronized(h.posted) { h.posted.toList().also { h.posted.clear() } }; due.forEach { it.first.run() } }
+      "fireMain" -> {
+        val due = synchronized(h.posted) { h.posted.toList().also { h.posted.clear() } }
+        h.withWorkersHeld { due.forEach { it.first.run() } }
+      }
       "resolveJoin" -> SettingsSync.resolveJoin(step.getBoolean("keepMine"))
       "dismissAdoptCard" -> SettingsSync.dismissAdoptCard()
       "pause" -> SettingsSync.setPaused(step.getBoolean("on"))

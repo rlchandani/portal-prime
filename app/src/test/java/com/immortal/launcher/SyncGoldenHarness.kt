@@ -17,7 +17,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Collections
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONObject
 import org.mockito.ArgumentMatchers.anyInt
@@ -101,6 +103,25 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     staticField<kotlinx.coroutines.flow.MutableStateFlow<SettingsSyncStatus>>("_status").value = SettingsSyncStatus()
   }
 
+  /**
+   * Runs [block] (main-thread work) while the worker and network threads are parked, so work it
+   * hands them is recorded after everything [block] itself records. Without this, a gossip tick's
+   * `worker.execute { detect() }` could log before the same tick's repost was recorded.
+   */
+  fun <T> withWorkersHeld(block: () -> T): T {
+    val release = CountDownLatch(1)
+    val parked = listOf(worker, net).map { ex ->
+      val holding = CountDownLatch(1)
+      ex.submit { holding.countDown(); release.await(HOLD_TIMEOUT_S, TimeUnit.SECONDS) }.also { holding.await() }
+    }
+    try {
+      return block()
+    } finally {
+      release.countDown()
+      parked.forEach { it.get() }
+    }
+  }
+
   /** Waits until the worker and network threads have nothing left (each may queue on the other). */
   fun drain() {
     repeat(DRAIN_ROUNDS) { worker.submit {}.get(); net.submit {}.get() }
@@ -148,6 +169,8 @@ internal class SyncGoldenHarness(private val dir: File) : AutoCloseable {
     const val PEER_LO = "11111111-1111-4111-8111-111111111111"
     const val PORT = 8765
     private const val DRAIN_ROUNDS = 4
+    /** Upper bound on a parked worker, so a main block that waited on one fails instead of hanging. */
+    private const val HOLD_TIMEOUT_S = 30L
     /** 2027-01-15: inside [NOW_MS], so stamps still read as `<now>` in the golden. */
     private const val CLOCK_START_MS = 1_800_000_000_000L
     val NAMES = mapOf(SELF to "self", PEER_HI to "hi", PEER_LO to "lo")
