@@ -1,6 +1,6 @@
 {
-  "versionCode": 313,
-  "versionName": "1.319",
+  "versionCode": 314,
+  "versionName": "1.320",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Removes unused calls-between-homes code (calls stay in-home) and cleans up its leftover test data on each Portal."
+  "notes": "Calls page fits the Portal Mini: the Rooms/Recent/Messages tabs span the width and Messenger & WhatsApp gets its own row, with no sideways scrolling."
 }
