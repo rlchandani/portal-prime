@@ -90,6 +90,10 @@ def markdown(result):
     ]
     if result.get("error"):
         parts.append(f"- Error: {result['error']}")
+    if result.get("ota"):
+        from .otaphases import markdown as ota_markdown
+        parts += ["", ota_markdown(result["ota"])]
+        return "\n".join(parts) + "\n"
     parts += ["", "## Frames (framestats, flags 0; worst/p90/p99 in ms)", "", steps_table(result)]
     for title, body in (("Memory", memory_table(result)), ("uiautomator overflow", audit_table(result))):
         if body:

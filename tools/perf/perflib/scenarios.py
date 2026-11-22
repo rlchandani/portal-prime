@@ -16,6 +16,7 @@ An entry:
                  expect: the short activity name that must be resumed afterwards (else abort)
   teardown       actions at the end of every rep
   audit          screens for the uiautomator overflow audit (replaces steps)
+  ota            True = run by perflib/ota.py (builds: previous + latest official), not the step engine
 
 Actions are (verb, arg) tuples, run by engine.ACTIONS: tap_label, tap_desc, fleet, key, swipe_left,
 sleep, home, dream, test_source, orientation, mini, screenshot.
@@ -114,6 +115,18 @@ BASE = {
             {"name": "to-landscape", "do": [("orientation", "landscape")], "wait": 3.5, "expect": HOME},
         ],
         "teardown": [("orientation", "forget"), ("sleep", 2)],
+    },
+    "ota-update": {
+        "summary": "Wireless update one official release behind -> latest via fleet /update/ota check + install; "
+                   "phase timings, what restarted",
+        "screenshots": False,
+        "start": HOME,
+        "ota": True,
+        "setup": [],
+        "warmup": 0,
+        "inner": 1,
+        "steps": [],
+        "teardown": [],
     },
     "uiautomator-overflow": {
         "summary": "uiautomator dump of each listed screen; flags nodes wider than the screen / h-scrollable",

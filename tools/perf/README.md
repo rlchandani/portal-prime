@@ -73,10 +73,46 @@ python3 -I $B submit --device 2221B01C7T01C0 --scenario screensaver-pinned:galle
 | `screensaver-household` | real dream (`Somnambulator`), household settings, 300 s polled window (`--poll-s`), one sample per `photo_beat` (first beat = start, skipped); warm-up dream 40 s | never |
 | `rotation` | Mini emulation (1280x800 @160, auto-rotate off): fleet orientation portrait / landscape, 3.5 s each | never |
 | `mini-size:<portrait\|landscape>:<scenario>` | any scenario at 800x1280 / 1280x800, density 160, auto-rotate off | as the inner scenario |
+| `ota-update` | one wireless update, previous official -> latest, through fleet `/update/ota` check + install; phase table, what restarted (see below) | never |
 | `uiautomator-overflow[:screen,...]` | dumps home, apps, tools, control_center, settings, calls, store; flags nodes wider than the screen, past its edge, or horizontally scrollable | never |
 
 Each scenario is a small dict in [`perflib/scenarios.py`](perflib/scenarios.py) (setup / warm-up /
 inner passes / steps / teardown / its screenshot rule). Add one there; the engine needs no change.
+
+## OTA update timing (`ota-update`)
+
+How long a real update takes on a Portal, split into phases, and what restarts.
+
+```bash
+id=$(python3 -I $B submit --device 2221B01C7T01C0 --scenario ota-update)   # no --apk, no --reps
+python3 -I $B wait "$id"
+```
+
+1. **Behind?** If the Portal's versionCode is below the latest official release it is updated as is
+   (`mode: natural`). Otherwise the previous official release (`gh release download`, sha256 checked
+   against its own `hearthpane-latest.json`) is installed with the usual `adb install -r` (`-d` only when
+   Android refuses the downgrade; the official build accepts it) and the run is `mode: forced`. If even
+   that is refused the job ends `not-behind`: the harness never uninstalls.
+2. **Production trigger:** `fleetctl dev off` (dev mode pauses the updater; the job does not use `force`),
+   `raw POST /update/ota {"action":"check"}` (retried while the updater answers `busy`), then
+   `{"action":"install"}`.
+3. **Polled** every 0.5 s until Home is back: `pidof`, `dumpsys package` versionCode, fleet
+   `GET /update/ota` status while the old process lives, then the resumed activity.
+4. **logcat** (`-d -v epoch`, main/system/events, never cleared) gives the exact times: our own
+   `PerfBenchOta check-sent / install-sent` marks (also used to put Mac poll times on the device clock),
+   `HearthpaneOta` "update available" (the check's and the install run's manifest fetch = download start)
+   and "installing" (download done + integrity verified; the app logs no separate download-end line),
+   `ImmortalFleet` "committed install", `Force stopping`, `am_proc_died` / `am_proc_start`, `Displayed …HomeActivity`
+   (first frame) and `wm_on_resume_called`. A poll time is used only when the line is missing
+   (source `poll (first seen)`, at most one poll late); `package replaced` is always a poll.
+5. **Restarts:** `/proc/uptime` + boot id before/after (no reboot = uptime grew, same boot id) and the
+   pids of the launcher, Jarvis (`com.portal.assistant`), SystemUI and system_server.
+
+`result.json` `ota` holds `events` (seconds after the check request + source), `phases`, `totals`
+(install -> Home first frame, whole update, launcher downtime), `download` (bytes from the manifest,
+seconds, MB/s), `restarts`, the status transitions and the raw check reply; `raw/ota.logcat.txt` is the
+filtered logcat. Restore is the usual one (official latest, Home on top, dev off). The workers run the
+`bench.py` they were started from, so a worker must run code that has this scenario.
 
 ## Safety guarantees (enforced in code, unit-tested)
 

@@ -23,7 +23,11 @@ def _raise_interrupted(signum, _frame):
     raise Interrupted(f"signal {signum}")
 
 
-def resolve_builds(apk_specs, official_flag, official_source):
+def resolve_builds(apk_specs, official_flag, official_source, scenario_name=None):
+    if scenario_name and scenarios.get(scenario_name).get("ota"):
+        if apk_specs:
+            raise BuildError("ota-update measures official releases only; drop --apk")
+        return [official_source.previous("P"), official_source.latest("O")]
     builds = []
     if official_flag:
         builds.append(official_source.latest("O"))
@@ -82,9 +86,15 @@ def run_session(*, serial, scenario_name, builds, options, out_dir, lock, fleetc
     try:
         lock.check()
         preflight(device, priors, log)
-        session = Session(device, scenario_name, scenario, builds, options, out_dir, log)
-        session.run()
-        result["status"] = "ok"
+        if scenario.get("ota"):
+            from .ota import OtaRun
+            session = OtaRun(device, builds, out_dir, log)
+            session.run()
+            result["status"] = session.status
+        else:
+            session = Session(device, scenario_name, scenario, builds, options, out_dir, log)
+            session.run()
+            result["status"] = "ok"
     except Interrupted as e:
         result.update(status="interrupted", error=str(e))
         log(f"interrupted ({e}); restoring")

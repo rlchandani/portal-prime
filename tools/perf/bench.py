@@ -100,9 +100,13 @@ def parse_args(argv):
 
 
 def _validate(args):
-    scenarios.get(args.scenario)  # KeyError on unknown
+    is_ota = bool(scenarios.get(args.scenario).get("ota"))  # KeyError on unknown
     if not MIN_REPS <= args.reps <= MAX_REPS:
         raise ValueError(f"--reps must be {MIN_REPS}..{MAX_REPS}")
+    if is_ota:
+        if args.apk:
+            raise ValueError("ota-update measures official releases only (previous -> latest); drop --apk")
+        args.reps, args.official = 1, True  # one update per job
     if not args.apk and not args.official:
         raise ValueError("give --official and/or --apk")
     if (args.atrace_categories is not None or args.atrace_buffer_kb is not None) and not args.atrace:
@@ -153,7 +157,8 @@ def cmd_run(args):
     out = args.out or default_out_dir(job.get("results_root") or DEFAULT_RESULTS_ROOT, job["scenario"])
     os.makedirs(out, exist_ok=True)
     official = OfficialSource()
-    builds = resolve_builds(job["apks"], job["official"], official)  # before the lock: no device needed
+    # before the lock: no device needed
+    builds = resolve_builds(job["apks"], job["official"], official, scenario_name=job["scenario"])
     held = os.environ.get(HELD_LOCK_ENV)
     if held:
         lock, own = HeldLock(serial, held), False
