@@ -1,6 +1,6 @@
 {
-  "versionCode": 77,
-  "versionName": "1.83",
-  "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Calendar downloads reject oversized and incomplete responses before parsing, release their connections, and preserve the existing saved-event recovery."
+  "versionCode": 311,
+  "versionName": "1.317",
+  "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
+  "notes": "Control Center: screen switches are smooth — accessibility updates and the header title swap moved off the switch frame, cameras start just after (taps: slow frames 22 → 5 per 16; back: 23 → 9)."
 }

@@ -5,14 +5,18 @@
 #   - version.json.apkUrl is the stable self-update URL
 #   - version.json.notes is non-empty
 #
-# Used by CI (.github/workflows/release-guard.yml) on every change to either file, and
-# by scripts/cut-release.sh right after it bumps. The whole point: a hand-edit that bumps
+# Used by CI (.github/workflows/release-guard.yml) on every change to either file, by
+# tools/scripts/bump-version.sh and scripts/cut-release.sh right after they bump, and by
+# tools/scripts/ci-local.sh. The whole point: a hand-edit that bumps
 # one file and forgets the other can no longer reach a release — it fails here first.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-repo="${RELEASE_REPO:-starbrightlab/immortal}"
-stable_apk_url="https://github.com/$repo/releases/latest/download/immortal.apk"
+# This fork publishes Hearthpane OTA releases (tools/scripts/ota-release.sh) as
+# hearthpane.apk on rlchandani/portal-prime. Override both for another release home.
+repo="${RELEASE_REPO:-rlchandani/portal-prime}"
+apk_asset="${RELEASE_APK_ASSET:-hearthpane.apk}"
+stable_apk_url="https://github.com/$repo/releases/latest/download/$apk_asset"
 
 g_code="$(sed -n 's/^[[:space:]]*versionCode = \([0-9]*\).*/\1/p' app/build.gradle.kts | head -1)"
 g_name="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -1)"
@@ -35,7 +39,7 @@ note(){ echo "✗ $*" >&2; fail=1; }
 [ "${j_notes_len:-0}" -gt 0 ] || note "version.json notes is empty"
 
 if [ "$fail" -ne 0 ]; then
-  echo "Release metadata is inconsistent. Bump both files together — scripts/cut-release.sh does this for you." >&2
+  echo "Release metadata is inconsistent. Bump both files together — tools/scripts/bump-version.sh does this for you." >&2
   exit 1
 fi
 echo "✓ version sync OK — gradle and version.json agree (versionCode $g_code, versionName $g_name)"

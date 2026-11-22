@@ -4,6 +4,9 @@
 #
 #   tools/scripts/ota-release.sh [--dry-run] [--notes "One-line what's new"]
 #
+# Bump first with tools/scripts/bump-version.sh (gradle + version.json together); --notes
+# defaults to version.json's notes.
+#
 # Portals poll https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane-latest.json
 # (see app/.../OtaConstants.kt and docs/plans/ota-github-releases-2026-11-08.md). This script:
 #
@@ -104,6 +107,8 @@ min_sdk="$(sed -nE 's/^[[:space:]]*minSdk = ([0-9]+).*/\1/p' "$gradle_file" | he
 [ -n "$version_code" ] && [ -n "$version_name" ] && [ -n "$min_sdk" ] || die "couldn't read versions from $gradle_file"
 echo "$version_name" | grep -Eq '^[0-9]+(\.[0-9]+){1,2}$' || die "unexpected versionName: $version_name"
 tag="$TAG_PREFIX$version_name"
+scripts/check-version-sync.sh >/dev/null \
+  || die "version.json disagrees with $gradle_file — bump with tools/scripts/bump-version.sh"
 ok "building $version_name ($version_code), tag $tag"
 
 work="$(mktemp -d "${TMPDIR:-/tmp}/hearthpane-ota.XXXXXX")"
@@ -166,6 +171,8 @@ ok "sha256 $sha, $size bytes"
 
 # ---- manifest -------------------------------------------------------------------------------
 step "Manifest"
+# Default to the notes tools/scripts/bump-version.sh wrote into version.json.
+[ -n "$notes" ] || notes="$(python3 -I -c 'import json; print(json.load(open("version.json"))["notes"])')"
 [ -n "$notes" ] || notes="$(git log -1 --format=%s)"
 apk_url="https://github.com/$REPO/releases/download/$tag/$APK_ASSET"
 python3 -I - "$out/$MANIFEST_ASSET" "$PACKAGE" "$version_code" "$version_name" "$sha" "$size" "$apk_url" \

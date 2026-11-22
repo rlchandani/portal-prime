@@ -11,11 +11,13 @@ import unittest
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check-version-sync.sh"
-STABLE_URL = "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk"
+STABLE_URL = "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk"
+UPSTREAM_URL = "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk"
 
 
 class PortalVersionSyncTest(unittest.TestCase):
-    def run_guard(self, declarations, *, code=90, name="2.9", url=STABLE_URL, notes="A release."):
+    def run_guard(self, declarations, *, code=90, name="2.9", url=STABLE_URL, notes="A release.",
+                  overrides=None):
         with tempfile.TemporaryDirectory(prefix="portal-version-sync-test-") as temporary:
             root = Path(temporary)
             (root / "scripts").mkdir()
@@ -29,6 +31,8 @@ class PortalVersionSyncTest(unittest.TestCase):
             }) + "\n", encoding="utf-8")
             env = dict(os.environ)
             env.pop("RELEASE_REPO", None)
+            env.pop("RELEASE_APK_ASSET", None)
+            env.update(overrides or {})
             return subprocess.run(["bash", str(guard)], cwd=root, env=env,
                                   capture_output=True, text=True, timeout=10)
 
@@ -86,6 +90,18 @@ class PortalVersionSyncTest(unittest.TestCase):
     def test_blank_notes_still_reject(self):
         result = self.run_guard('        versionCode = 90\n        versionName = "2.9"\n', notes=" \t \n")
         self.assert_rejected(result, "version.json notes is empty")
+
+    def test_upstream_immortal_url_is_rejected_by_default(self):
+        result = self.run_guard('        versionCode = 90\n        versionName = "2.9"\n',
+                                url=UPSTREAM_URL)
+        self.assert_rejected(result, "expected '" + STABLE_URL + "'")
+
+    def test_explicit_repo_and_asset_override_select_another_stable_url(self):
+        result = self.run_guard('        versionCode = 90\n        versionName = "2.9"\n',
+                                url=UPSTREAM_URL,
+                                overrides={"RELEASE_REPO": "starbrightlab/immortal",
+                                           "RELEASE_APK_ASSET": "immortal.apk"})
+        self.assert_synced(result)
 
 
 if __name__ == "__main__":

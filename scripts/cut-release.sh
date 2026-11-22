@@ -96,7 +96,7 @@ with open(p, "w") as f:
     json.dump(d, f, indent=2)
     f.write("\n")
 PY
-scripts/check-version-sync.sh >/dev/null || die "version sync check failed right after bumping (this is a bug in cut-release.sh)"
+RELEASE_REPO="$repo" RELEASE_APK_ASSET=immortal.apk scripts/check-version-sync.sh >/dev/null || die "version sync check failed right after bumping (this is a bug in cut-release.sh)"
 echo "  gradle + version.json bumped and consistent"
 
 step "Build signed release APK"
