@@ -17,11 +17,12 @@ const affected = ['diptych', 'galleryWall', 'polaroid', 'mosaic', 'filmstrip'];
 // portrait at its drawn size: 1340 px tall at the top of its motion (Ken Burns stops at 1.075,
 // where the pair touches the screen; the drift of Push and Memories reaches 1.04). Framed asks
 // for its portrait print, Gallery Wall for each tile, Polaroid for its 600 / 480 px print box and
-// Panorama for its strip. Requests without a drawn size get the copy they got before (320 ->
+// Panorama for its strip, Cinema for its contained 3:2 photo (the 78 % scope: 1123 px tall,
+// 1685 wide). Requests without a drawn size get the copy they got before (320 ->
 // 600, 1000 / 1100 -> 1200, 1400 -> 1800; SS.largeEdge).
 const expectedEdges = { kenBurns: [600, 1440], diptych: [1800], framed: [1168],
   galleryWall: [331, 395, 496, 592, 602], push: [600, 1394], memories: [600, 1394], panorama: [2160],
-  polaroid: [600, 720], mosaic: [1200], filmstrip: [1200, 1800], cinema: [2400], heroSidebar: [1200, 1800] };
+  polaroid: [600, 720], mosaic: [1200], filmstrip: [1200, 1800], cinema: [1685], heroSidebar: [1200, 1800] };
 
 // Synthetic DOM, clock and image transport only. Execute the actual photo resolver,
 // preload/decode helper, modes and scheduler; this fixture cannot measure rasterization.

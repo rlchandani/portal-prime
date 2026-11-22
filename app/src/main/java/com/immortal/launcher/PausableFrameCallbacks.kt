@@ -69,6 +69,10 @@ internal class PausableFrameCallbacks(
   fun postOwned(runnable: Runnable, onDiscard: () -> Unit): Boolean =
       postEntry(runnable, 0L, onDiscard)
 
+  /** [postOwned] after [delayMillis]; a paused queue keeps the remaining delay. */
+  fun postOwnedDelayed(runnable: Runnable, delayMillis: Long, onDiscard: () -> Unit): Boolean =
+      postEntry(runnable, delayMillis, onDiscard)
+
   /** Paused posts are retained; a closed queue or a rejecting active transport returns false. */
   fun postDelayed(runnable: Runnable, delayMillis: Long): Boolean =
       postEntry(runnable, delayMillis, null)
