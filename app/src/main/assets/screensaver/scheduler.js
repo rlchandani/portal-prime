@@ -18,6 +18,10 @@
     // dissolve's first frames. Once it is ready, the dissolve waits this many frames: a commit waits
     // for the previous tree's raster, so the last of them lands only after the beat is rasterised.
     const PREWARM_FRAMES = 3;
+    // Modes where a layered, prewarmed beat is measured as a win on the Portal+ (bench
+    // screensaver-pinned, docs/perf/portal-perf-2026-11-21.md). Every other mode keeps the plain beat:
+    // Gallery Wall's fade-end frames rose with it.
+    const LAYERED_MODES = new Set(["polaroid"]);
     // Rotation mid-show (mock): hold the beat, dim to 20 %, wait 400 ms, re-lay the same beat for
     // the new screen, then reveal over 500 ms. ScreensaverLayout.ROTATION_* holds the native values.
     const ROTATION_DIM = 0.2, ROTATION_DIM_MS = 400, ROTATION_REVEAL_MS = 500;
@@ -221,7 +225,8 @@
       // Replaying a beat replays its deck order, early-shown pair photos included.
       if (target) { cursor.i = target.start; cursor.ahead = []; }
       const layer = document.createElement("div");
-      layer.className = current ? "ss-beat freeze prewarm" : "ss-beat freeze";
+      const layered = LAYERED_MODES.has(modeId);
+      layer.className = "ss-beat freeze" + (layered ? " layered" : "") + (layered && current ? " prewarm" : "");
       layer.style.setProperty("--motion-duration", (intervalMs + MOTION_OVERLAP_MS) + "ms");
       stage.appendChild(layer);
       const scene = { layer, modeId, start: cursor.i, historyIndex: targetIndex, live: true, ready: false,

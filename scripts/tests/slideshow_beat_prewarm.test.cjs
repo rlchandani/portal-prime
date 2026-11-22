@@ -4,9 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-// A beat that dissolves over the current one is built at .001 opacity (.ss-beat.prewarm) so it is
-// rasterised before its dissolve, and every beat keeps its own layer (will-change: opacity) so the
-// screen is not rasterised again when a dissolve ends (scheduler.js PREWARM_FRAMES, styles.css).
+// In a layered mode (scheduler.js LAYERED_MODES: Polaroid), a beat that dissolves over the current one
+// is built at .001 opacity (.ss-beat.prewarm) so it is rasterised before its dissolve, and keeps its
+// own layer (.ss-beat.layered, will-change: opacity) so the screen is not rasterised again when the
+// dissolve ends. Every other mode keeps the plain beat.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -16,7 +17,7 @@ const vm = require('node:vm');
 const assets = path.join(__dirname, '../../app/src/main/assets/screensaver/');
 const FRAME = 16;
 
-function fixture() {
+function fixture(mode = 'polaroid') {
   let now = 0, nextTimer = 1;
   const timers = new Map(), scenes = [];
   class Element {
@@ -48,7 +49,7 @@ function fixture() {
   for (const file of ['modes.js', 'mode-impls.js', 'scheduler.js']) {
     vm.runInContext(fs.readFileSync(assets + file, 'utf8'), context, { filename: file });
   }
-  context.SS.pickNextMode = () => 'kenBurns';
+  context.SS.pickNextMode = () => mode;
   // Every WebView mode is a fake whose readiness the test resolves.
   for (const id of context.SS.MODE_IDS) if (id !== 'filmstrip') context.SS.MODES[id] = { name: id, run(ctx) {
     let resolve;
@@ -69,7 +70,7 @@ function fixture() {
     }
     now = end; await flush();
   }
-  const engine = context.SS.startEngine({ stage, mode: 'kenBurns', intervalSec: 30 });
+  const engine = context.SS.startEngine({ stage, mode, intervalSec: 30 });
   const has = (scene, name) => scene.layer.classList.contains(name);
   return { context, engine, scenes, stage, timers, tick, flush, has };
 }
@@ -144,11 +145,34 @@ test('beats keep their own layer and the prewarm opacity is below half an 8-bit 
     assert.ok(match, selector);
     return { body: match[1], at: match.index };
   };
-  const beat = rule('.ss-beat'), prewarm = rule('.ss-beat.prewarm'), on = rule('.ss-beat.on');
-  assert.match(beat.body, /will-change: opacity;/);
+  const beat = rule('.ss-beat'), layered = rule('.ss-beat.layered');
+  const prewarm = rule('.ss-beat.prewarm'), on = rule('.ss-beat.on');
+  assert.doesNotMatch(beat.body, /will-change/, 'a plain beat keeps the official layering');
+  assert.match(layered.body, /will-change: opacity;/);
   assert.match(beat.body, /opacity: 0;/);
   const opacity = Number(/opacity: ([.\d]+);/.exec(prewarm.body)[1]);
   assert.ok(opacity > 0, 'a beat at opacity 0 is not rasterised');
   assert.ok(opacity * 255 < .5, 'the prewarm beat must not change any 8-bit value');
   assert.ok(on.at > prewarm.at, '.on must win over .prewarm when both are present');
+});
+
+for (const mode of ['galleryWall', 'kenBurns', 'mosaic']) test(`${mode} keeps the plain beat: no layer, no prewarm, one frame`, async () => {
+  const f = fixture(mode); await firstScene(f);
+  assert.equal(f.has(f.scenes[0], 'layered'), false);
+  f.engine.next(); await f.flush();
+  const incoming = f.scenes[1];
+  assert.equal(f.has(incoming, 'prewarm'), false);
+  assert.equal(f.has(incoming, 'layered'), false);
+  incoming.ready(); await f.tick(FRAME);
+  assert.equal(f.has(incoming, 'on'), true);
+  f.engine.stop(); assert.equal(f.timers.size, 0);
+});
+
+test('Polaroid beats are layered, the first one too', async () => {
+  const f = fixture('polaroid'); await firstScene(f);
+  assert.equal(f.has(f.scenes[0], 'layered'), true);
+  assert.equal(f.has(f.scenes[0], 'prewarm'), false);
+  f.engine.next(); await f.flush();
+  assert.equal(f.has(f.scenes[1], 'layered'), true);
+  f.engine.stop();
 });
