@@ -1202,7 +1202,7 @@ their own layers so a header re-layout does not re-record every icon; cache each
 
 ## Polaroid print shadow as a 9-slice bitmap (branch `polaroid`, desktop only)
 
-**Status: desktop measurement only.** No device time this run. On-device A/B is still to do.
+**Status:** desktop measurement, then a short on-device A/B (see *On device* at the end of this section).
 
 **Attribution** (headless Chromium 1223, real engine assets from `main`, Polaroid pinned, 12 generated scenes, seeded `Math.random`, viewport 1920 × 1280 CSS at dpr 1.125 = 2160 × 1440 device px, CPU throttle 6×, software raster; 6 changes forced with `next()` 2.5 s apart; trace `cc` / `devtools.timeline`; `RasterTask` time summed over the 6 changes; 4 interleaved rounds):
 
@@ -1244,3 +1244,22 @@ their own layers so a header re-layout does not re-record every icon; cache each
 - The Polaroid golden hash (`slideshow_photo_motion.test.mjs`) is unchanged once the print's declarations are mapped back to the reviewed paper and box-shadow (`printShadowSnapshot`). So only the shadow and paper source changed.
 
 **Caveats.** Desktop raster here is software. The Portal+ WebView uses GPU raster, where a rotated blurred rounded rectangle also misses the analytic or cached path, but the size of the saving there is not measured. The machine was shared with another Gradle build, so absolute numbers vary by about ±25 % between rounds. The ratios held in every round: the bitmap removed 62–74 % of the shadow's raster cost.
+
+**On device** (Family Portal+, 2026-11-22 01:11–01:15 PST, device lock held 4 min 28 s). The operator test source was pinned to `polaroid` at a 15 s beat, so only generated scenes were on screen. 6 changes were forced by a left swipe (`next()`), 12 s apart. framestats were polled throughout, and each `photo_beat` was attributed from 0.5 s before to 3 s after. The start beat is excluded. Flags 0 frames, IntendedVsync → FrameCompleted. O = official 1.320 (`hearthpane.apk`, sha256 `867264f6…`, verified on the device). B = the branch rebased on `main` 1.321, a `performance` build. 1.320 → 1.321 changes no screensaver asset or code. Each build got Home and 15 s idle before its run. One run each: B first, then O. No audio was played.
+
+| Per change (6) | O worst frame, ms | B worst | O frames > 60 ms | B | O frames > 32 ms | B | O sum > 32 ms | B |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 110 | 79 | 3 | 3 | 5 | 4 | 399 | 259 |
+| 2 | 81 | 82 | 4 | 3 | 4 | 3 | 290 | 221 |
+| 3 | 79 | 65 | 3 | 2 | 5 | 3 | 298 | 181 |
+| 4 | 77 | 74 | 3 | 3 | 5 | 5 | 287 | 278 |
+| 5 | 74 | 72 | 3 | 3 | 5 | 4 | 295 | 237 |
+| 6 | 62 | 76 | 1 | 3 | 4 | 4 | 219 | 260 |
+| **Total / range** | 62–110 | 65–82 | 17 | 17 | 28 | 23 | mean 298 | mean 239 |
+
+- The summed time over 32 ms per change drops by about 20 % (298 → 239 ms), and 5 fewer frames go over 32 ms. The worst frame no longer reaches 100 ms (110 → 82).
+- Frames over 60 ms are unchanged (17 and 17). Each change still has 2–3 long frames. So the 62–74 % raster saving measured on desktop software raster does not carry over in full to the Portal+'s GPU raster. The rest of the change cost is elsewhere (likely the photo upload and the rotated layer composite; not traced).
+- O matches the earlier Polaroid run on 1.317 (58–94 ms, 15 frames over 60 ms, 282 ms).
+- These are single runs, about 6 changes each. A difference of about 20 % in the summed time is within the spread seen between rounds elsewhere in this doc. The household long-window A/B was not run.
+
+**Visual check on device** (branch, one screenshot, taken only after confirming that `PhotoFramePreviewActivity` was on top, the test source was active and pinned to `polaroid@…`, and the frame showed "TEST SCENE … generated"; 2160 × 1440, inspected at 100 % crop, then deleted). The shadow ramps are smooth on every print, with no 9-slice seams, no stretched or doubled corners, and no hard edge where the ramp meets the table. The tilt is drawn cleanly. The paper corners are rounded and the shadow follows them. The bottom row's paper looks greyer than the top row's. That is the global `#chrome-scrim` bottom gradient (`styles.css:232–233`), which this branch does not change. No screenshot of official was taken, so this check is against the desktop comparison above, not against a device capture of `main`.
