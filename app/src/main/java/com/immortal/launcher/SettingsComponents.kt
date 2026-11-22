@@ -362,12 +362,15 @@ internal fun NavRow(
 /** A row's trailing value takes at most this much of the card so the title keeps its line. */
 internal const val ROW_VALUE_MAX_DP = 500
 internal const val ROW_VALUE_MAX_FRACTION = .4f
+/** On the Mini's cards a long value ("Shuffle - all styles (existing)") must leave the help its width. */
+internal const val ROW_VALUE_MAX_FRACTION_COMPACT = .32f
 
-/** Width cap (dp) of a row's trailing value: [ROW_VALUE_MAX_DP], or 40% of a narrower page's cards. */
+/** Width cap (dp) of a row's trailing value: [ROW_VALUE_MAX_DP], or a fraction of a narrower page's cards. */
 internal fun settingsRowValueMaxWidthDp(screenWidthDp: Int, singlePane: Boolean): Int {
     val card = SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane)
     if (card <= 0) return ROW_VALUE_MAX_DP
-    return minOf(ROW_VALUE_MAX_DP, (card * ROW_VALUE_MAX_FRACTION).toInt())
+    val fraction = if (SettingsSplitMetrics.compactCards(card)) ROW_VALUE_MAX_FRACTION_COMPACT else ROW_VALUE_MAX_FRACTION
+    return minOf(ROW_VALUE_MAX_DP, (card * fraction).toInt())
 }
 
 // ---------------------------------------------------------------------------

@@ -10,12 +10,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SettingsRowValueWidthTest {
-    @Test fun valueKeepsAtMostFortyPercentOfTheCardSoTheTitleNeverWrapsWordByWord() {
+    @Test fun valueKeepsAtMostFortyPercentOfTheCardAndAThirdOnTheMiniSoTheTitleNeverWrapsWordByWord() {
         // Portal+ (1920 dp): cards are 1008 dp wide.
         assertEquals(403, settingsRowValueMaxWidthDp(1920, singlePane = false))
         // Mini upright (single pane, 744 dp cards) and turned (split, 747 dp cards).
-        assertEquals(297, settingsRowValueMaxWidthDp(800, singlePane = true))
-        assertEquals(298, settingsRowValueMaxWidthDp(1280, singlePane = false))
+        assertEquals(238, settingsRowValueMaxWidthDp(800, singlePane = true))
+        assertEquals(239, settingsRowValueMaxWidthDp(1280, singlePane = false))
     }
 
     @Test fun unknownWidthFallsBackToTheFixedCap() {

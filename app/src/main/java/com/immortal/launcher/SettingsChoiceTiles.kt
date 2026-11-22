@@ -44,6 +44,8 @@ private val InlineTrackMinWidth = 420.dp
 /** Inline tracks stop here so the title beside them keeps its width (tiles share it evenly). */
 private val InlineTrackMaxWidth = 520.dp
 private val TileLabelSize = 24.sp
+private val DenseTileLabelSize = 21.sp
+private const val DENSE_TRACK_TILES = 5
 /** Small enough that five tiles (Clock Faces) keep "Hearthpane" whole on the Mini's 744 dp cards. */
 private val TileLabelPadding = 6.dp
 private val RowPaddingH = 28.dp
@@ -95,6 +97,11 @@ internal fun SettingsTileTrack(
     onSelect: (Int) -> Unit,
 ) {
     val selectedFill = if (LocalApprovedPalette.current.dark) DarkSelectedTile else IosCard
+    // Five tiles on the Mini's cards (Clock Faces) need the smaller label to keep "Hearthpane" whole.
+    val cardWidth = SettingsSplitMetrics.pageContentWidthDp(LocalConfiguration.current.screenWidthDp,
+        LocalSettingsSinglePane.current)
+    val labelSize = if (tiles.size >= DENSE_TRACK_TILES && SettingsSplitMetrics.compactCards(cardWidth)) DenseTileLabelSize
+        else TileLabelSize
     val shape = RoundedCornerShape(TileRadius)
     Row(
         modifier.background(IosSegmentTrack, RoundedCornerShape(TrackRadius)).padding(TrackPadding)
@@ -111,7 +118,7 @@ internal fun SettingsTileTrack(
                     .semantics { role = Role.RadioButton; selected = tile.selected },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(tile.label, color = IosLabel, fontSize = TileLabelSize, maxLines = 1, textAlign = TextAlign.Center,
+                Text(tile.label, color = IosLabel, fontSize = labelSize, maxLines = 1, textAlign = TextAlign.Center,
                     fontWeight = if (tile.selected) FontWeight.SemiBold else FontWeight.Normal,
                     modifier = Modifier.padding(horizontal = TileLabelPadding))
             }
