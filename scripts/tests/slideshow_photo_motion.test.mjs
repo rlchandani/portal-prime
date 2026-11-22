@@ -56,6 +56,27 @@ function vectorDoodleSnapshot(r) {
   return state;
 }
 
+// Polaroid was reviewed with its live box-shadow and paper on the print. Both now sit on the print's
+// pseudo layers, and only prints under 224 px a side (these 10:1 and 1:40 photos) keep the live
+// shadow by class (slideshow_polaroid_shadow.test.mjs), so map the print's declarations back.
+const PRINT_SHADOW = '0 30px 64px -16px rgba(0,0,0,0.75)';
+function printShadowSnapshot(r) {
+  const state = vectorDoodleSnapshot(r);
+  for (const node of state.nodes) {
+    const classes = node.classes.split(/\s+/);
+    if (!classes.includes('ss-polaroid')) continue;
+    assert.equal(node.computed.isolation, 'isolate');
+    if (classes.includes('ss-live-shadow')) assert.equal(node.computed['box-shadow'], PRINT_SHADOW);
+    else assert.equal(node.computed['box-shadow'], undefined);
+    node.classes = classes.filter(name => name !== 'ss-live-shadow').join(' ');
+    node.computed = Object.fromEntries(Object.entries(node.computed).flatMap(([key, value]) =>
+      key === 'isolation' ? [['background', '#fbfaf6']]
+        : key === 'border-radius' ? [[key, value], ['box-shadow', PRINT_SHADOW]]
+          : key === 'box-shadow' ? [] : [[key, value]]));
+  }
+  return state;
+}
+
 function galleryGoldenSnapshot(r) {
   const state = snapshot(r);
   for (const node of state.nodes) {
@@ -134,7 +155,8 @@ for (const [mode, selections, output] of legacyOutput) {
         const hash = createHash('sha256');
         for (const time of [0, 3500, 5000, 7500, 10000, 15000, 27500]) {
           await r.advanceTo(time);
-          hash.update(JSON.stringify(mode === 'galleryWall' ? galleryGoldenSnapshot(r) : vectorDoodleSnapshot(r)));
+          hash.update(JSON.stringify(mode === 'galleryWall' ? galleryGoldenSnapshot(r)
+            : mode === 'polaroid' ? printShadowSnapshot(r) : vectorDoodleSnapshot(r)));
         }
         assert.equal(draws, selections, 'Motion must not change random selection order');
         if (photoMotion !== false) assert.equal(hash.digest('hex'), output);
