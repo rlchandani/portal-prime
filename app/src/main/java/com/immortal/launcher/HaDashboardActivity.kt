@@ -34,7 +34,8 @@ import kotlinx.coroutines.delay
  * upright), the chosen room's tiles in a dense 4/3/2-column grid, light and dark from Appearance,
  * and a state for loading, offline, sign-in, no rooms, empty room, failed actions and not set up.
  *
- * Entry: Settings → Home Assistant, Control Center settings, fleet `open_screen` "ha_dashboard".
+ * Entry: the Apps tab's "Home Assistant" tile (once HA is connected), "Home Assistant dashboard" in Settings → Home Assistant
+ * and Control Center settings, fleet `open_screen` "ha_dashboard".
  */
 class HaDashboardActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

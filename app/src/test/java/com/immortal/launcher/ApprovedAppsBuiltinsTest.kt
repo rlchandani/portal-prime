@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -26,5 +27,28 @@ class ApprovedAppsBuiltinsTest {
   @Test fun search_matchesLabels() {
     assertEquals(listOf("control"), ApprovedAppsBuiltins.tiles(setOf("control", "dashboard"), "control").map { it.first })
     assertEquals(listOf("control", "dashboard"), ApprovedAppsBuiltins.tiles(setOf("control", "dashboard"), " home ").map { it.first })
+  }
+
+  @Test fun homeAssistant_isListedOnlyOnceHomePreparedIt() {
+    assertTrue(ApprovedAppsBuiltins.tiles(emptySet()).none { it.first == ApprovedAppsBuiltins.HA_DASHBOARD })
+    assertTrue(ApprovedAppsBuiltins.HA_DASHBOARD to "Home Assistant" in
+        ApprovedAppsBuiltins.tiles(setOf(ApprovedAppsBuiltins.HA_DASHBOARD)))
+  }
+
+  @Test fun homeAssistant_sitsBetweenHomeControlAndTheBrowserDashboard() {
+    assertEquals(listOf("store", "music", "calls", "settings", "control", "ha_dashboard", "dashboard"),
+        ApprovedAppsBuiltins.tiles(setOf("control", "ha_dashboard", "dashboard")).map { it.first })
+  }
+
+  @Test fun homeAssistant_isFoundBySearch() {
+    assertEquals(listOf("ha_dashboard"), ApprovedAppsBuiltins.tiles(setOf("control", "ha_dashboard"), "assistant").map { it.first })
+  }
+
+  /** The approved icon catalog draws the Home Assistant tile; the other built-ins keep Home's artwork. */
+  @Test fun homeAssistant_usesTheCatalogGlyphNotLegacyArtwork() {
+    assertNull(ApprovedAppsBuiltins.artwork(ApprovedAppsBuiltins.HA_DASHBOARD, "legacy"))
+    assertEquals("art", ApprovedAppsBuiltins.artwork(ApprovedAppsBuiltins.CONTROL, "art"))
+    assertEquals("art", ApprovedAppsBuiltins.artwork(null, "art"))
+    assertEquals("home" to androidx.compose.ui.graphics.Color(0xFF2879B8), approvedAppIdentity("builtin:ha_dashboard"))
   }
 }

@@ -369,7 +369,7 @@ private fun ApprovedAppsContent(
         val entry = tiles[index]
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
           InstalledAppTile(entry, appsLayout, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (showingRecents) entry.app?.let(::recencyLine) else null,
-              shortcutIcon = shortcutIcons[entry.builtin],
+              shortcutIcon = ApprovedAppsBuiltins.artwork(entry.builtin, shortcutIcons[entry.builtin]),
               onOpen = {
                 when {
                   entry.app != null -> launchApp(entry.app)
@@ -602,6 +602,7 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
         .putExtra(APPROVED_HOME_MUSIC, true))
     "dashboard" -> HomeDashboardActivity.openDashboard(context)
     ApprovedAppsBuiltins.CONTROL -> launchApprovedIntent(context, ControlCenterActivity.intent(context))
+    ApprovedAppsBuiltins.HA_DASHBOARD -> launchApprovedIntent(context, Intent(context, HaDashboardActivity::class.java))
     // Same as Home's Calls tile: Hearthpane Calling (Messenger/WhatsApp stay one tap away inside it).
     "calls" -> CallsActivity.open(context)
   }
