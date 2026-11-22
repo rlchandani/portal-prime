@@ -115,20 +115,31 @@ internal object Sizes {
 // ---------------------------------------------------------------------------
 
 /**
- * iOS-style uppercase grey section header with standard iOS typography (13sp, letter-spacing
- * 0.4sp). Padding matches the iOS spec: 20dp start, 6dp bottom, 16dp top.
+ * A section title above a card inside a bespoke block, in the same style and inset as the page's
+ * own section headers ([SettingsSectionHeader]), so every caption on a page lines up with the row
+ * text. It keeps one section gap above it, except [leading] (the block's first element: the page
+ * already put a section gap there, and two would double it).
  */
 @Composable
-internal fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String, leading: Boolean = false) {
+    SettingsCaptionTitle(text, Modifier.padding(top = if (leading) 0.dp else SettingsSpacing.SECTION_GAP_DP.dp))
+}
+
+/** The one section-title style of Settings: page headers, block labels and editor sections. */
+@Composable
+internal fun SettingsCaptionTitle(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        color = IosTertiary,
-        fontSize = Sizes.sectionLabel,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 30.sp,
-        modifier = Modifier.padding(start = 6.dp, end = 6.dp, top = 32.dp, bottom = 12.dp),
+        color = IosSecondary,
+        fontSize = SettingsCaptionTitleSize,
+        lineHeight = 28.sp,
+        fontWeight = FontWeight.SemiBold,
+        modifier = modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp,
+            bottom = SettingsSpacing.HEADER_GAP_DP.dp),
     )
 }
+
+internal val SettingsCaptionTitleSize = 21.sp
 
 // ---------------------------------------------------------------------------
 // Card
@@ -340,11 +351,26 @@ internal fun NavRow(
                 fontSize = Sizes.rowValue,
                 maxLines = 2,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.widthIn(max = 500.dp).padding(end = 20.dp),
+                modifier = Modifier.widthIn(max = settingsRowValueMaxWidthDp(
+                    LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current).dp).padding(end = 20.dp),
             )
         }
         ApprovedSettingsChevron()
     }
+}
+
+/** A row's trailing value takes at most this much of the card so the title keeps its line. */
+internal const val ROW_VALUE_MAX_DP = 500
+internal const val ROW_VALUE_MAX_FRACTION = .4f
+/** On the Mini's cards a long value ("Shuffle - all styles (existing)") must leave the help its width. */
+internal const val ROW_VALUE_MAX_FRACTION_COMPACT = .32f
+
+/** Width cap (dp) of a row's trailing value: [ROW_VALUE_MAX_DP], or a fraction of a narrower page's cards. */
+internal fun settingsRowValueMaxWidthDp(screenWidthDp: Int, singlePane: Boolean): Int {
+    val card = SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane)
+    if (card <= 0) return ROW_VALUE_MAX_DP
+    val fraction = if (SettingsSplitMetrics.compactCards(card)) ROW_VALUE_MAX_FRACTION_COMPACT else ROW_VALUE_MAX_FRACTION
+    return minOf(ROW_VALUE_MAX_DP, (card * fraction).toInt())
 }
 
 // ---------------------------------------------------------------------------
@@ -591,15 +617,30 @@ internal fun ArrowButton(glyph: String, rowFocused: Boolean, onClick: () -> Unit
 // Footer note
 // ---------------------------------------------------------------------------
 
-/** Grey footer text shown beneath a card group, matching iOS 13sp / line-height 1.5. */
+/** Grey footer text beneath a card, at the same inset and gap as a page section's footer. */
 @Composable
 internal fun FooterNote(text: String) {
     Text(
         text = text,
         color = IosTertiary,
         fontSize = Sizes.rowSub,
-        lineHeight = 30.sp,
-        modifier = Modifier.padding(start = 20.dp, end = 16.dp, top = 10.dp, bottom = 4.dp),
+        lineHeight = 28.sp,
+        modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp,
+            top = SettingsSpacing.FOOTER_GAP_DP.dp),
+    )
+}
+
+/** A live status line under a card's footer ("Next: Fri 07:30"), on the footer's inset. */
+@Composable
+internal fun SettingsStatusLine(text: String) {
+    Text(
+        text = text,
+        color = IosBlue,
+        fontSize = Sizes.rowSub,
+        lineHeight = 28.sp,
+        fontWeight = FontWeight.Medium,
+        modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp,
+            top = SettingsSpacing.FOOTER_GAP_DP.dp),
     )
 }
 

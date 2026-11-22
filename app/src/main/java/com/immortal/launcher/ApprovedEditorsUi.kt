@@ -38,13 +38,10 @@ internal fun ApprovedEditorsForm(
     actions: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card {
-        Column(Modifier.padding(32.dp)) {
-            SectionLabel("Options")
-            Card { Column(content = content) }
-            actions()
-        }
-    }
+    // One card of fields under its own section title, the actions below it: no card inside a card.
+    SectionLabel("Options")
+    Card { Column(content = content) }
+    actions()
 }
 
 @Composable
@@ -117,11 +114,11 @@ internal fun ApprovedEditorsActions(
     label: String = "Add", error: String? = null, enabled: Boolean = true,
     onCancel: () -> Unit, onSave: () -> Unit,
 ) {
-    Column(Modifier.padding(vertical = 28.dp)) {
+    Column(Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, top = SettingsSpacing.FOOTER_GAP_DP.dp)) {
         // Reserve the reviewed validation/status line to avoid jumping buttons on errors.
         Text(error.orEmpty(), color = LocalApprovedPalette.current.error, fontSize = 23.sp,
             lineHeight = 34.sp, modifier = Modifier.defaultMinSize(minHeight = 34.dp))
-        Row(Modifier.padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ApprovedEditorsButton(label, primary = true, enabled = enabled, onClick = onSave)
             ApprovedEditorsButton("Cancel", onClick = onCancel)
         }
@@ -131,7 +128,7 @@ internal fun ApprovedEditorsActions(
 @Composable
 internal fun ApprovedEditorsEmpty(message: String = "Nothing added yet. Add an item below.") {
     Text(message, color = IosSecondary, fontSize = 23.sp, lineHeight = 34.sp,
-        modifier = Modifier.padding(26.dp))
+        modifier = Modifier.padding(horizontal = 28.dp, vertical = 26.dp))
 }
 
 /** Fixed maximum viewport makes nested scrolling safe and composition independent of list size. */
@@ -139,9 +136,11 @@ internal fun ApprovedEditorsEmpty(message: String = "Nothing added yet. Add an i
 internal fun <T> ApprovedEditorsCollection(
     title: String, entries: List<T>, key: (T) -> Any,
     empty: String = "Nothing added yet. Add an item below.",
+    /** The block's first element (right under the page's own section gap). */
+    leading: Boolean = true,
     row: @Composable (T) -> Unit,
 ) {
-    SectionLabel(title)
+    SectionLabel(title, leading = leading)
     Card {
         if (entries.isEmpty()) ApprovedEditorsEmpty(empty)
         else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 560.dp)) {

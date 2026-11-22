@@ -191,7 +191,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
         // Brightness slider row.
         Row(
             modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 28.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Text("Brightness", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.width(240.dp))
@@ -232,7 +232,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
     }
     brightnessError?.let {
       Text(it, color = IosRed, fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+          modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp))
     }
     FooterNote("Adjust the screen brightness, or let it adapt to the room automatically.")
   }
@@ -241,7 +241,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
     Card(Modifier.jarvisPulse(pulse == SettingsJarvisPulse.DisplayCard.VOLUME)) {
       Row(
           modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
-              .padding(horizontal = 16.dp, vertical = 10.dp),
+              .padding(horizontal = 28.dp, vertical = 10.dp),
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Text("Media volume", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.width(240.dp))

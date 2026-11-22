@@ -68,7 +68,7 @@ internal fun ApprovedTouchSounds() {
     FooterNote(if (failed) "Touch sound change unavailable" else "Loading touch sound settings…")
     return
   }
-  SectionLabel("Touch")
+  SectionLabel("Touch", leading = true)
   Card {
     if (!current.canWrite) {
       NavRow("Allow touch sound control", value = "Grant") { SystemSounds.requestWriteAccess(context) }
@@ -103,13 +103,16 @@ internal fun ApprovedTouchSounds() {
 @Composable
 internal fun ApprovedManagedSettingsPage() {
   val context = LocalContext.current
+  // The first label sits right under the page's own section gap.
+  var leading = true
   com.immortal.launcher.settings.SettingsRegistry.domains.forEach { raw ->
     @Suppress("UNCHECKED_CAST")
     val domain = raw as com.immortal.launcher.settings.SettingsDomain<Any>
     val snapshot = domain.load(context)
     val controls = domain.specs.filter { "${domain.id}.${it.key}" in ApprovedManagedControls }
     if (controls.isNotEmpty()) {
-      SectionLabel(domain.title)
+      SectionLabel(domain.title, leading = leading)
+      leading = false
       Card {
         controls.forEachIndexed { index, spec ->
           if (index > 0) Divider()
@@ -183,7 +186,7 @@ internal fun DeviceNameSection() {
   SettingsList(SettingsDomains.fleet, settings) { key, value ->
     SettingsDomains.fleet.apply(context, JSONObject().put(key, value))
   }
-  Spacer(Modifier.size(16.dp))
+  SettingsCardGap()
   Card { ApprovedSourcesInfoRow("Model", android.os.Build.MODEL) }
 }
 

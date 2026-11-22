@@ -21,6 +21,21 @@ internal object SettingsSplitMetrics {
     /** Single-pane Settings (narrow windows, see [settingsSinglePane]): the page has the full width. */
     const val SINGLE_PANE_SIDE_PADDING_DP = 28
 
+    /**
+     * Below this card width (dp: the Mini's 744 dp cards, either way up) side-by-side content in a
+     * page (a preview beside a form, two tiles a row) would squeeze its text; it stacks instead.
+     */
+    const val COMPACT_CARDS_BELOW_DP = 960
+
+    fun compactCards(cardWidthDp: Int): Boolean = cardWidthDp in 1 until COMPACT_CARDS_BELOW_DP
+
+    /** A left column narrower than this (the Mini turned: 420 dp) uses the compact row type. */
+    const val SIDEBAR_COMPACT_BELOW_DP = 500
+
+    /** Whether the split view's left column is narrow enough for the compact row type. */
+    fun sidebarCompact(screenWidthDp: Int, singlePane: Boolean): Boolean =
+        !singlePane && sidebarWidthDp(screenWidthDp) < SIDEBAR_COMPACT_BELOW_DP
+
     fun sidebarWidthDp(screenWidthDp: Int): Int =
         (screenWidthDp * SIDEBAR_FRACTION).toInt().coerceIn(SIDEBAR_MIN_DP, SIDEBAR_MAX_DP)
 

@@ -92,4 +92,73 @@ class SettingsPageLayoutTest {
         assertEquals(listOf("immortal"), settingsPageDomains("display"))
         assertTrue(settingsPageDomains("greeting").isEmpty())
     }
+
+    @Test fun rowsNextToABlockCloseTheirCardAndTheBlockKeepsACardGap() {
+        // Calls › Messages / Drop-ins / Phones mix registry rows, a bespoke block and a link.
+        val calls = settingsPageLayout("calls", advanced = true, screensaverOn = true).entries
+        val messagesRow = calls[settingsPageLayout("calls", true, true).controlIndex.getValue("calling.messagesOn")]
+        assertTrue(messagesRow.first && messagesRow.last)
+        val phones = calls.dropWhile { it.key != "block:CALL_PHONES" }
+        val block = phones.first()
+        assertTrue(block.gapBefore && block.gapAfter)
+        val pair = phones[1]
+        assertEquals(SettingsEntryKind.LINK, pair.kind)
+        assertTrue(pair.first && pair.last)
+        val dropIns = calls.single { it.key == "block:CALL_DROP_INS" }
+        assertTrue(dropIns.gapBefore)
+        assertFalse(dropIns.gapAfter)
+    }
+
+    @Test fun everyCardOnEveryPageIsClosedAndOnlyBlocksBetweenCardsCarryGaps() {
+        SettingsTree.pages.forEach { page ->
+            val entries = settingsPageLayout(page.id, advanced = true, screensaverOn = true).entries
+            var open = false
+            entries.forEachIndexed { i, entry ->
+                val card = entry.kind in setOf(SettingsEntryKind.ROWS, SettingsEntryKind.LINK, SettingsEntryKind.EXTERNAL)
+                if (card) {
+                    assertEquals("${page.id}: ${entry.key} opens a card only when none is open", !open, entry.first)
+                    open = !entry.last
+                } else {
+                    assertFalse("${page.id}: ${entry.key} sits inside an unclosed card", open)
+                }
+                if (entry.kind != SettingsEntryKind.BLOCK) assertFalse(entry.gapBefore || entry.gapAfter)
+                if (entry.gapBefore) assertTrue("${page.id}: ${entry.key} gap follows a card",
+                    entries[i - 1].kind in setOf(SettingsEntryKind.ROWS, SettingsEntryKind.LINK, SettingsEntryKind.EXTERNAL, SettingsEntryKind.BLOCK))
+            }
+            assertFalse("${page.id} ends inside a card", open)
+        }
+    }
+
+    @Test fun cardGroupsSplitRunsAtEveryBlock() {
+        val rows = SettingsDomainRows("calling", listOf("phonesOn"))
+        val block = SettingsBlockItem(SettingsBlock.CALL_PHONES)
+        val link = SettingsLinkItem("Pair a phone", "phone")
+        assertEquals(listOf(listOf(rows), listOf(block), listOf(link)), settingsCardGroups(listOf(rows, block, link)))
+        assertEquals(listOf(listOf(rows, link)), settingsCardGroups(listOf(rows, link)))
+        assertEquals(listOf(listOf(block), listOf(block)), settingsCardGroups(listOf(block, block)))
+        assertTrue(settingsCardGroups(emptyList()).isEmpty())
+    }
+
+    @Test fun pageRhythmTokensStayOnTheScale() {
+        // The vertical rhythm every page and block shares; change it here, deliberately.
+        assertEquals(34, SettingsSpacing.SECTION_GAP_DP)
+        assertEquals(20, SettingsSpacing.CARD_GAP_DP)
+        assertEquals(28, SettingsSpacing.TEXT_INSET_DP)
+        assertTrue(SettingsSpacing.CARD_GAP_DP < SettingsSpacing.SECTION_GAP_DP)
+        val gapped = settingsPageLayout("calls", advanced = true, screensaverOn = true).entries.single { it.key == "block:CALL_PHONES" }
+        assertEquals(SettingsRevealPlan.placeholderDp(gapped.copy(gapBefore = false, gapAfter = false)) +
+            2 * SettingsSpacing.CARD_GAP_DP, SettingsRevealPlan.placeholderDp(gapped))
+    }
+
+    @Test fun aSectionWhoseRowsAreAllGatedOffDrawsNoEmptyHeaderOrFooter() {
+        // Calendar › Photo frame rows wait for a feed; Photo Sources › Self-hosted for a self-hosted source.
+        val full = settingsPageLayout("w-calendar", advanced = true, screensaverOn = true)
+        val rowsKey = full.entries.single { it.kind == SettingsEntryKind.ROWS && "calendar.widgetOn" in (it.item as SettingsDomainRows).ids() }.key
+        val gated = settingsPageLayout("w-calendar", advanced = true, screensaverOn = true, emptyRows = setOf(rowsKey))
+        assertFalse(gated.entries.any { it.kind == SettingsEntryKind.HEADER && it.text == "Photo frame" })
+        assertTrue(gated.entries.any { it.kind == SettingsEntryKind.HEADER && it.text == "Feed" })
+        val sources = settingsPageLayout("sources", advanced = true, screensaverOn = true,
+            emptyRows = setOf("rows:screensaver:cacheEnabled"))
+        assertFalse(sources.entries.any { it.kind == SettingsEntryKind.FOOTER && it.text == "Keeps a copy so photos show when offline." })
+    }
 }

@@ -42,15 +42,15 @@ import kotlinx.coroutines.delay
 internal const val SETTINGS_HIGHLIGHT_MS = 2_600L
 private const val SETTINGS_HIGHLIGHT_HOLD = .3f
 private const val HIGHLIGHT_ALPHA = .3f
-private val SectionInset = 30.dp
+private val SectionInset = SettingsSpacing.TEXT_INSET_DP.dp
 private val AdvancedBadgeColor = Color(0xFFE8A23A)
 
 /** Section title above a card, with an ADV badge for Advanced-only sections. */
 @Composable
 internal fun SettingsSectionHeader(text: String, advanced: Boolean) {
-    Row(Modifier.padding(start = SectionInset, end = SectionInset, bottom = 10.dp),
+    Row(Modifier.padding(start = SectionInset, end = SectionInset, bottom = SettingsSpacing.HEADER_GAP_DP.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(text, color = IosSecondary, fontSize = 21.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold)
+        Text(text, color = IosSecondary, fontSize = SettingsCaptionTitleSize, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold)
         if (advanced) SettingsAdvancedBadge()
     }
 }
@@ -66,7 +66,14 @@ internal fun SettingsAdvancedBadge() {
 @Composable
 internal fun SettingsSectionFooter(text: String) {
     Text(text, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp,
-        modifier = Modifier.padding(start = SectionInset, end = SectionInset, top = 10.dp))
+        modifier = Modifier.padding(start = SectionInset, end = SectionInset, top = SettingsSpacing.FOOTER_GAP_DP.dp))
+}
+
+/** A page-wide note (Synced across your Portals): the footer's style, with its own gap above the first section. */
+@Composable
+internal fun SettingsPageNote(text: String) {
+    Text(text, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp,
+        modifier = Modifier.padding(start = SectionInset, end = SectionInset, bottom = SettingsSpacing.CARD_GAP_DP.dp))
 }
 
 /** The coloured tile, title and one-line description at the top of a top-level page. */
@@ -109,6 +116,22 @@ internal fun SettingsNotice(text: String) {
             .background(IosCard, RoundedCornerShape(Sizes.cardRadius)).padding(28.dp))
 }
 
+/** The specs of [rows] that draw a row right now (Advanced, derived and each spec's own gate). */
+internal fun settingsVisibleSpecs(rows: SettingsDomainRows, state: SettingsDomainState, context: android.content.Context,
+                                  advanced: Boolean) =
+    rows.keys.mapNotNull { key -> state.domain.specs.firstOrNull { it.key == key } }
+        .filter { spec ->
+            spec !is DerivedSpec<*> && (advanced || !SettingsPresentation.isAdvanced(rows.domain, spec.key)) &&
+                spec.visibleWhen(context, state.snapshot)
+        }
+
+/** Keys of [page]'s row items that draw no row with the current snapshots. */
+internal fun settingsEmptyRowItems(page: String, states: Map<String, SettingsDomainState>,
+                                   context: android.content.Context, advanced: Boolean): Set<String> =
+    SettingsPageSections.of(page).flatMap { it.items }.filterIsInstance<SettingsDomainRows>()
+        .filter { rows -> states[rows.domain]?.let { settingsVisibleSpecs(rows, it, context, advanced).isEmpty() } ?: false }
+        .map { it.key }.toSet()
+
 /** Registry rows of one domain inside the section card, through the shared renderer. */
 @Composable
 internal fun SettingsDomainRowsCard(
@@ -120,15 +143,14 @@ internal fun SettingsDomainRowsCard(
 ) {
     val context = LocalContext.current
     val advanced = LocalAdvancedSettings.current
-    val specs = rows.keys.mapNotNull { key -> state.domain.specs.firstOrNull { it.key == key } }
-        .filter { spec ->
-            spec !is DerivedSpec<*> && (advanced || !SettingsPresentation.isAdvanced(rows.domain, spec.key)) &&
-                spec.visibleWhen(context, state.snapshot)
-        }
-    specs.forEachIndexed { index, spec ->
-        val id = "${rows.domain}.${spec.key}"
-        ApprovedSettingsLazyRow(id, first && index == 0, last && index == specs.lastIndex, highlight) {
-            SettingControl(rows.domain, spec, state.snapshot, advanced, state.editsEnabled, state.apply)
+    val specs = settingsVisibleSpecs(rows, state, context, advanced)
+    // One column: the rows must stack wherever the entry is drawn (directly or precomposed).
+    Column(Modifier.fillMaxWidth()) {
+        specs.forEachIndexed { index, spec ->
+            val id = "${rows.domain}.${spec.key}"
+            ApprovedSettingsLazyRow(id, first && index == 0, last && index == specs.lastIndex, highlight) {
+                SettingControl(rows.domain, spec, state.snapshot, advanced, state.editsEnabled, state.apply)
+            }
         }
     }
 }
@@ -191,5 +213,3 @@ internal fun SettingsAdvancedHintRow() {
     }
 }
 
-@Composable
-internal fun SettingsSectionGap() = Spacer(Modifier.size(34.dp))

@@ -113,11 +113,11 @@ internal fun CallDropInGridBlock() {
       if (rooms.isEmpty()) Text("Other rooms appear here once their Portals answer.", color = p.secondary, fontSize = 21.sp)
     }
   }
-  Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+  Row(Modifier.padding(top = SettingsSpacing.CARD_GAP_DP.dp), horizontalArrangement = Arrangement.spacedBy(SettingsSpacing.CARD_GAP_DP.dp)) {
     RuleCard("Always a chime and banner", "3-second countdown with Not now. Never silent.", Modifier.weight(1f))
     RuleCard("Never from phones", "A phone can’t drop in. Only rooms in this home can.", Modifier.weight(1f))
   }
-  Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+  Row(Modifier.padding(top = SettingsSpacing.CARD_GAP_DP.dp), horizontalArrangement = Arrangement.spacedBy(SettingsSpacing.CARD_GAP_DP.dp)) {
     RuleCard("Never in quiet hours", "It becomes a normal ring request", Modifier.weight(1f))
     RuleCard("15 minutes max", "Then it ends unless someone taps Keep going", Modifier.weight(1f))
   }

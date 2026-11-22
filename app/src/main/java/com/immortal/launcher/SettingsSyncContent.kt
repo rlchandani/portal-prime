@@ -100,7 +100,7 @@ private fun AdoptCard(from: String, conflicts: Boolean) {
       if (conflicts) CardPillButton("Keep this Portal’s settings") { SettingsSync.resolveJoin(keepMine = true) }
     }
   }
-  Spacer(Modifier.height(16.dp))
+  SettingsCardGap()
 }
 
 @Composable

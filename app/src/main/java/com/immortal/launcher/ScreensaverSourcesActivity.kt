@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.selected
@@ -84,22 +85,26 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
     }
     fun openSource(page: String) = navigate(approvedSettingsRoute(page))
     val showAdvanced = LocalAdvancedSettings.current
-    Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-            SourceTile("Hearthpane photos", "A calming built-in photo feed. No setup needed.",
-                settings.source == ScreensaverConfig.SOURCE_DEFAULT,
-                "photo", SettingsTileColors.EMBER, Modifier.weight(1f)) {
-                ScreensaverConfig.useDefault(context)
-                onDone()
-            }
-            SourceTile("My photos & videos", "Choose a photo folder on your Portal.",
-                settings.usesFolder, "folder", SettingsTileColors.GOLD, Modifier.weight(1f)) { openSource("folder") }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-            SourceTile("Shared album link", "Use an iCloud, Google Photos or Synology share link.",
-                settings.usesUrl, "link", SettingsTileColors.BLUE, Modifier.weight(1f)) { openSource("album") }
-            SourceTile("Connect your phone", "Set up photos from another device on your Wi-Fi.",
-                false, "phone", SettingsTileColors.LIME, Modifier.weight(1f)) { openSource("phone") }
+    val tiles: List<@Composable (Modifier) -> Unit> = listOf(
+        { m -> SourceTile("Hearthpane photos", "A calming built-in photo feed. No setup needed.",
+            settings.source == ScreensaverConfig.SOURCE_DEFAULT, "photo", SettingsTileColors.EMBER, m) {
+            ScreensaverConfig.useDefault(context)
+            onDone()
+        } },
+        { m -> SourceTile("My photos & videos", "Choose a photo folder on your Portal.",
+            settings.usesFolder, "folder", SettingsTileColors.GOLD, m) { openSource("folder") } },
+        { m -> SourceTile("Shared album link", "Use an iCloud, Google Photos or Synology share link.",
+            settings.usesUrl, "link", SettingsTileColors.BLUE, m) { openSource("album") } },
+        { m -> SourceTile("Connect your phone", "Set up photos from another device on your Wi-Fi.",
+            false, "phone", SettingsTileColors.LIME, m) { openSource("phone") } },
+    )
+    // Two tiles a row on Portal+; one on the Mini's cards, where two would wrap every title.
+    val columns = if (SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(
+            LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current))) 1 else 2
+    val gap = SettingsSpacing.CARD_GAP_DP.dp
+    Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+        tiles.chunked(columns).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(gap)) { row.forEach { tile -> tile(Modifier.weight(1f)) } }
         }
     }
     if (settings.source != ScreensaverConfig.SOURCE_DEFAULT) {

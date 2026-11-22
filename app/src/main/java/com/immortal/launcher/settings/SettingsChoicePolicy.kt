@@ -81,6 +81,29 @@ object SettingsChoicePolicy {
   fun stacked(labels: List<String>): Boolean =
       labels.size > MAX_INLINE_OPTIONS || labels.sumOf { it.length } > MAX_INLINE_LABEL_CHARS
 
+  /** Row title width per character (dp) at the 28 sp row title, a generous average for Latin text. */
+  const val TITLE_DP_PER_CHAR = 15
+  /** Help line width per character (dp) at the 20 sp help size. */
+  const val HELP_DP_PER_CHAR = 10
+  /** More help lines than this beside an inline track, and the track goes below. */
+  const val MAX_HELP_LINES_BESIDE = 3
+  /** What an inline track leaves beside it: the row's 2 × 28 dp padding, the 24 dp gap, the track at its 520 dp cap. */
+  const val INLINE_TRACK_RESERVE_DP = 28 * 2 + 24 + 520
+
+  /**
+   * True when the tiles go below the title: long sets always, and short ones when the title would
+   * otherwise wrap beside the track in a [cardWidthDp]-wide card (the Mini's 744 dp cards).
+   * [cardWidthDp] ≤ 0 (unknown) keeps the label-only rule.
+   */
+  fun stacked(labels: List<String>, title: String, cardWidthDp: Int, help: String? = null): Boolean {
+    if (stacked(labels)) return true
+    if (cardWidthDp <= 0) return false
+    val beside = cardWidthDp - INLINE_TRACK_RESERVE_DP
+    // A help text that would need more than two lines beside the track reads as a narrow column.
+    val helpLines = (help?.length ?: 0) * HELP_DP_PER_CHAR / beside.coerceAtLeast(1)
+    return title.length * TITLE_DP_PER_CHAR > beside || helpLines >= MAX_HELP_LINES_BESIDE
+  }
+
   fun tileLabel(domain: String, key: String, value: String, label: String): String =
       tileLabels["$domain.$key"]?.get(value) ?: label
 

@@ -233,6 +233,19 @@ internal fun SettingsSplitShell(
     composition?.finish()
 }
 
+/** Back button label width per character (dp) at 24 sp, and its chevron + padding. */
+internal const val BACK_LABEL_DP_PER_CHAR = 14
+internal const val BACK_BUTTON_CHROME_DP = 20 * 2 + 26 + 12
+
+/**
+ * The parent's name when it fits the back button's [widthDp], else "Back", as iPadOS does: never
+ * a cut-off "Widgets & …" on the Mini.
+ */
+internal fun settingsBackLabel(parent: String?, widthDp: Int): String {
+    val label = parent ?: return "Back"
+    return if (label.length * BACK_LABEL_DP_PER_CHAR + BACK_BUTTON_CHROME_DP <= widthDp) label else "Back"
+}
+
 /** Back button with the parent's name (≤ 40%), and the page title centred (≤ 50%), like iPadOS. */
 @Composable
 private fun SettingsNavBar(heading: SettingsDetailHeading) {
@@ -243,7 +256,8 @@ private fun SettingsNavBar(heading: SettingsDetailHeading) {
             contentAlignment = Alignment.CenterStart) {
             val side = maxWidth * SINGLE_PANE_BACK_FRACTION
             if (heading.onBack != null) {
-                ApprovedSettingsBackButton(heading.backTitle ?: "Back", Modifier.widthIn(max = side), heading.onBack)
+                ApprovedSettingsBackButton(settingsBackLabel(heading.backTitle, side.value.toInt()), Modifier.widthIn(max = side),
+                    heading.onBack)
             }
             Text(heading.title, color = IosLabel, fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
@@ -254,8 +268,8 @@ private fun SettingsNavBar(heading: SettingsDetailHeading) {
     BoxWithConstraints(Modifier.fillMaxWidth().height(NavBarHeight).padding(horizontal = 28.dp),
         contentAlignment = Alignment.CenterStart) {
         if (heading.onBack != null) {
-            ApprovedSettingsBackButton(heading.backTitle ?: "Back", Modifier.widthIn(max = maxWidth * BACK_FRACTION),
-                heading.onBack)
+            ApprovedSettingsBackButton(settingsBackLabel(heading.backTitle, (maxWidth * BACK_FRACTION).value.toInt()),
+                Modifier.widthIn(max = maxWidth * BACK_FRACTION), heading.onBack)
         }
         Text(heading.title, color = IosLabel, fontSize = 29.sp, lineHeight = 36.sp, fontWeight = FontWeight.SemiBold,
             maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,

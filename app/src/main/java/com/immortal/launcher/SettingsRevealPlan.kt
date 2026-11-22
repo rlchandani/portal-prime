@@ -31,7 +31,7 @@ internal object SettingsRevealPlan {
     private const val ROW_DP = 100
     private const val NOTICE_DP = 110
     private const val HINT_DP = 110
-    private const val GAP_DP = 34
+    private const val GAP_DP = SettingsSpacing.SECTION_GAP_DP
     private const val BLOCK_DP = 420
 
     fun weight(entry: SettingsPageEntry): Int = when (entry.kind) {
@@ -53,7 +53,8 @@ internal object SettingsRevealPlan {
         SettingsEntryKind.ROWS -> ROW_DP * ((entry.item as? SettingsDomainRows)?.keys?.size ?: 1)
         SettingsEntryKind.ADVANCED_HINT -> HINT_DP
         SettingsEntryKind.GAP -> GAP_DP
-        SettingsEntryKind.BLOCK -> BLOCK_DP
+        SettingsEntryKind.BLOCK -> BLOCK_DP +
+            SettingsSpacing.CARD_GAP_DP * ((if (entry.gapBefore) 1 else 0) + (if (entry.gapAfter) 1 else 0))
     }
 
     /**

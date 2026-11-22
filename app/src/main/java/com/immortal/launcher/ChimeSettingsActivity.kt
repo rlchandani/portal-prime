@@ -170,7 +170,7 @@ internal fun ChimeSettingsContent() {
       Card {
         Text(ChimePreviews.message(previewState),
             color = if (previewState.phase == SoundPreviewPhase.FAILED) IosRed else IosSecondary,
-            fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)
+            fontSize = Sizes.rowSub, modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp)
                 .semantics { contentDescription = "Sound preview: ${previewState.phase.name.lowercase()}" })
         if (settings.spokenTimeOn) {
           ChimeVoicePicker(settings.spokenVoice, enabled = !applying) { name ->
@@ -178,7 +178,7 @@ internal fun ChimeSettingsContent() {
             apply("spokenVoice", name)
           }
         }
-        FlowRow(Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, bottom = 18.dp),
+        FlowRow(Modifier.fillMaxWidth().padding(start = 28.dp, end = 28.dp, bottom = 22.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
           ChimePreviews.available(settings).forEach { preview ->
             ChimePreviewButton(preview.label, enabled = previewEnabled) { audition(preview) }

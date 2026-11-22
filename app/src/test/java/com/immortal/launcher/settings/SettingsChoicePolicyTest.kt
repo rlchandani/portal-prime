@@ -100,4 +100,25 @@ class SettingsChoicePolicyTest {
     assertEquals("90 min", P.minutesLabel(90))
     assertEquals("2 hours", P.minutesLabel(120))
   }
+
+  @Test fun shortSetsStackOnlyWhenTheTitleWouldWrapBesideTheTrack() {
+    val labels = listOf("Light", "Dark")
+    // Portal+ cards (1008 dp): a long title still sits beside the track.
+    assertFalse(SettingsChoicePolicy.stacked(labels, "Temperature unit", 1008))
+    // Mini cards (744 dp): a short title stays inline, a longer one moves the track below it.
+    assertFalse(SettingsChoicePolicy.stacked(labels, "Size", 744))
+    assertTrue(SettingsChoicePolicy.stacked(labels, "Temperature unit", 744))
+    assertTrue(SettingsChoicePolicy.stacked(labels, "Keep people in frame", 744))
+    // Unknown width keeps the label-only rule; long sets always stack.
+    assertFalse(SettingsChoicePolicy.stacked(labels, "Keep people in frame", 0))
+    assertTrue(SettingsChoicePolicy.stacked(listOf("One", "Two", "Three", "Four"), "A", 1008))
+  }
+
+  @Test fun aLongHelpTextMovesTheTrackBelowInsteadOfANarrowColumn() {
+    val labels = listOf("Off", "Someone", "Names")
+    val help = "Someone: a soft pulse where a Portal, motion or occupancy sensor notices someone. Names: also " +
+        "the people Who's there? recognised in the last 5 minutes, if they turned on Show my room on the home map."
+    assertTrue(SettingsChoicePolicy.stacked(labels, "Show who's where on the map", 1008, help))
+    assertFalse(SettingsChoicePolicy.stacked(labels, "Show who's where on the map", 1008, "Shown on the map."))
+  }
 }

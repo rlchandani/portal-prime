@@ -100,10 +100,10 @@ private fun MemoryHealthRow() {
         color = IosSecondary,
         fontSize = Sizes.rowSub,
         lineHeight = 28.sp,
-        modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp),
+        modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp, top = 8.dp),
     )
   }
-  Spacer(Modifier.size(20.dp))
+  SettingsCardGap()
 }
 
 @Composable
@@ -180,14 +180,16 @@ private fun DeviceHealthChecks() {
 
   Column {
       // Summary banner — green when healthy, amber when something needs attention.
-      // Light semantic tints (dark green/amber would clash with the light background).
+      // Semantic tints per theme: pastel on the light background, deep on the dark one.
+      val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
+      val attention = health.failed || issues > 0
       Surface(
           color = when {
             checking -> IosCard
-            health.failed || issues > 0 -> Color(0xFFFDF1DD)
-            else -> Color(0xFFE6F7EA)
+            attention -> if (dark) Color(0xFF3A2C12) else Color(0xFFFDF1DD)
+            else -> if (dark) Color(0xFF15301E) else Color(0xFFE6F7EA)
           },
-          shape = RoundedCornerShape(14.dp),
+          shape = RoundedCornerShape(Sizes.cardRadius),
           modifier = Modifier.fillMaxWidth().semantics {
             contentDescription = when {
               checking -> "Checking device health"
@@ -196,7 +198,7 @@ private fun DeviceHealthChecks() {
             }
           },
       ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically,
+        Row(Modifier.padding(horizontal = 28.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Text(
               when {
@@ -208,8 +210,8 @@ private fun DeviceHealthChecks() {
               },
               color = when {
                 checking -> IosSecondary
-                health.failed || issues > 0 -> Color(0xFFB26A00)
-                else -> Color(0xFF1E7B34)
+                attention -> if (dark) Color(0xFFF2B24C) else Color(0xFFB26A00)
+                else -> if (dark) Color(0xFF6FD08C) else Color(0xFF1E7B34)
               },
               fontSize = Sizes.rowTitle,
               modifier = Modifier.weight(1f),
@@ -218,7 +220,7 @@ private fun DeviceHealthChecks() {
               enabled = !checking, modifier = Modifier.semantics { if (checking) disabled() }) { recheck() }
         }
       }
-      Spacer(Modifier.size(20.dp))
+      SettingsCardGap()
 
       Card {
         checks.forEachIndexed { i, c ->
@@ -229,7 +231,6 @@ private fun DeviceHealthChecks() {
       }
 
       if (issues > 0) {
-        Spacer(Modifier.size(22.dp))
         SectionLabel("How to fix")
         Text(
             if (checks.filter { !it.granted }.all { it.repair == DevicePermissions.Repair.RECONNECT_CONTROLS })
@@ -240,7 +241,7 @@ private fun DeviceHealthChecks() {
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             lineHeight = 20.sp,
-            modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+            modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp),
         )
       }
 
@@ -254,14 +255,14 @@ private fun DeviceHealthChecks() {
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, bottom = 6.dp),
         )
         Text(
             "Remove Hearthpane’s screen-lock permission before uninstalling. This stops automatic " +
                 "and remote screen-off until Hearthpane setup restores the permission.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
-            modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
+            modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp, bottom = 10.dp),
         )
         Text(
             if (disablingAdmin) "Removing screen-lock permission…"
@@ -291,7 +292,7 @@ private fun DeviceHealthChecks() {
                         confirmingDisable = true
                       }
                     }
-                    .padding(start = 4.dp, top = 2.dp, bottom = 4.dp),
+                    .padding(start = SettingsSpacing.TEXT_INSET_DP.dp, top = 2.dp, bottom = 4.dp),
         )
       }
     }
@@ -301,7 +302,7 @@ private fun DeviceHealthChecks() {
 private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean,
     reconnectingControls: Boolean, repairEnabled: Boolean, onReconnect: () -> Unit) {
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 14.dp),
+      modifier = Modifier.fillMaxWidth().padding(start = 28.dp, end = 28.dp, top = 14.dp, bottom = 14.dp),
       verticalAlignment = Alignment.Top,
   ) {
     Text(

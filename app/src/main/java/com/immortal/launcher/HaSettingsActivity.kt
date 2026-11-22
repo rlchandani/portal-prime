@@ -216,17 +216,17 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
 
         if (entitiesOnly) {
             ApprovedEditorsCollection("Pinned to widget", pinned, key = { it.entityId },
-                empty = "No entities selected.") { entity ->
+                empty = "No entities selected.", leading = false) { entity ->
                 ApprovedEditorsCollectionRow(entity.name, entity.entityId, onRemove = { removal = entity })
             }
         }
         if (entitiesOnly && discovered.isNotEmpty()) {
-            Spacer(Modifier.height(24.dp))
+            SettingsCardGap()
             Card {
                 ApprovedEditorsField("Search ${discovered.size} entities", query, { query = it },
                     placeholder = "Search by name or entity id")
             }
-            Spacer(Modifier.height(24.dp))
+            SettingsCardGap()
             Card {
                 if (filtering) ApprovedEditorsEmpty("Searching…")
                 else if (groups.isEmpty()) ApprovedEditorsEmpty("No entities match \"$query\".")
@@ -291,6 +291,7 @@ private fun HomeDashboardSettings(): Boolean {
         })
         error?.let { FooterNote(it) }
         if (snapshot.url.isNotBlank()) {
+            SettingsCardGap()
             Card {
                 NavRow("Open dashboard") { HomeDashboardActivity.openDashboard(context) }
             }
