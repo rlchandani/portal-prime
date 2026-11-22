@@ -7,9 +7,6 @@
 package com.immortal.launcher
 
 import android.animation.Animator
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.Role
-import androidx.compose.foundation.selection.selectableGroup
 import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import android.animation.AnimatorListenerAdapter
 import android.animation.TimeInterpolator
@@ -27,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -74,14 +72,17 @@ internal val ApprovedHomeTabPalette = ApprovedDarkPalette
  */
 @Composable
 internal fun ApprovedHomeTabs(
-    selected: ApprovedLauncherTab,
+    selected: () -> ApprovedLauncherTab,
     modifier: Modifier = Modifier,
     contentActive: Boolean = true,
     prefetch: List<ApprovedLauncherTab> = emptyList(),
+    spoken: State<ApprovedLauncherTab>? = null,
+    wakeFrames: Int = 0,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
+  // [selected] is read here, not by the caller: a switch recomposes only the tab host.
   if (!BuildConfig.PORTAL_NATIVE_HOME_TABS) {
-    ApprovedLauncherTabs(selected, modifier, contentActive, prefetch, content)
+    ApprovedLauncherTabs(selected(), modifier, contentActive, prefetch, spoken, wakeFrames, content)
     return
   }
   val hostOwner = LocalLifecycleOwner.current
@@ -99,7 +100,7 @@ internal fun ApprovedHomeTabs(
     AndroidView(
         modifier = modifier.clipToBounds(),
         factory = { context ->
-          ApprovedHomeTabViews(context, selected, hostOwner, onSelection = { clearFocus.value() }) { tab ->
+          ApprovedHomeTabViews(context, selected(), hostOwner, onSelection = { clearFocus.value() }) { tab ->
             val page = ApprovedHomeTabView(ComposeView(context).apply {
               id = pageIds[tab.ordinal]
               setParentCompositionContext(composition)
@@ -141,7 +142,7 @@ internal fun ApprovedHomeTabs(
             page
           }
         },
-        update = { it.setContentActive(contentActive); it.select(selected) },
+        update = { it.setContentActive(contentActive); it.select(selected()) },
         onRelease = { it.release() },
     )
   }
@@ -460,28 +461,6 @@ internal fun ApprovedHomeIcon(
     tint: Color = ApprovedHomePalette.Secondary,
 ) {
   ApprovedIcon(name, modifier, tint)
-}
-
-@Composable
-internal fun ApprovedHomeDock(selected: String, onSelect: (String) -> Unit) {
-  ApprovedHomeSurface(radius = 26.dp, modifier = Modifier.height(92.dp)) {
-    Row(Modifier.fillMaxHeight().padding(8.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-      listOf("home" to "Home", "apps" to "Apps", "tools" to "Tools").forEach { (id, label) ->
-        val active = selected == id
-        Row(Modifier.width(176.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp))
-            .background(if (active) ApprovedHomePalette.Selected else Color.Transparent)
-            .semantics { this.selected = active }
-            .tvFocusable(RoundedCornerShape(18.dp), ringColor = ApprovedHomePalette.Accent, role = Role.Tab) { onSelect(id) },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
-          ApprovedHomeIcon(id, tint = if (active) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary)
-          Text(label, color = if (active) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary,
-              fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
-        }
-      }
-    }
-  }
 }
 
 @Composable

@@ -90,7 +90,8 @@ internal fun LauncherScreen(
     appsSearchOpenRequest: Int,
     musicOpenRequest: Int,
     onOpenMusic: () -> Unit,
-    selectedTab: ApprovedLauncherTab,
+    /** Read only where needed (header, tab host, dock), so a switch does not recompose this whole screen. */
+    selectedTab: () -> ApprovedLauncherTab,
     onSelectTab: (ApprovedLauncherTab) -> Unit,
     onLaunch: (ComponentName) -> Unit,
     onOpenStore: () -> Unit,
@@ -212,18 +213,21 @@ internal fun LauncherScreen(
         "Favorites changed on another screen. Review the layout and try again.", Toast.LENGTH_LONG).show()
     return saved
   }
-  LaunchedEffect(selectedTab) {
+  // A switch's accessibility changes (dock "selected", the page in the tree) land on one later frame.
+  val spokenTab = rememberHomeSpokenTab(selectedTab)
+  // Per switch (and once at first composition, as a keyed LaunchedEffect), without reading the tab here.
+  LaunchedEffect(Unit) { snapshotFlow { selectedTab() }.collect { tab ->
     showSearch = false
     showSleep = false
     showPair = false
     appMenu = null
-    if (selectedTab != ApprovedLauncherTab.HOME) {
+    if (tab != ApprovedLauncherTab.HOME) {
       editMode = false
       showLibrary = false
     }
     assignments = UserLayout.load(context)
     order = UserLayout.loadOrder(context)
-  }
+  } }
   OnResume {
     assignments = UserLayout.load(context)
     order = UserLayout.loadOrder(context)
@@ -328,7 +332,7 @@ internal fun LauncherScreen(
   BackHandler(enabled = true) {
     when (HomeBackPolicy.resolve(
         musicOpen = musicLayout != null,
-        onHomeTab = selectedTab == ApprovedLauncherTab.HOME,
+        onHomeTab = selectedTab() == ApprovedLauncherTab.HOME,
         hasDraft = addFlow.draft != null,
         editMode = editMode,
     )) {
@@ -372,7 +376,9 @@ internal fun LauncherScreen(
         val jarvisMic by produceState(false, installedApps, hey) {
           value = hey == null && withContext(Dispatchers.IO) { jarvisInstalled(context) }
         }
-        val showCustomize = selectedTab == ApprovedLauncherTab.HOME && homeMusicLayout == null
+        // Its own recompose scope: Customize comes and goes with the Home tab, which re-runs the header only.
+        HomeRecomposeScope {
+        val showCustomize = selectedTab() == ApprovedLauncherTab.HOME && homeMusicLayout == null
         val homeControl = rememberHomeControlShown()
         // Optional header pieces drop at narrow widths so the round buttons never squish.
         val header = HomeHeaderBudget.plan(LocalConfiguration.current.screenWidthDp, HomeHeaderItems(
@@ -417,7 +423,7 @@ internal fun LauncherScreen(
             ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), size = b, onClick = onOpenMusic)
             if (homeControl) HomeControlHeaderButton(size = b)
             ApprovedHeaderButton("search", "Search apps and settings", size = b) {
-              if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
+              if (selectedTab() == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
             }
             ApprovedHeaderButton("settings", "Settings", size = b, onClick = openSettings)
           }
@@ -467,7 +473,7 @@ internal fun LauncherScreen(
             if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
             if (homeControl) HomeControlHeaderButton()
             ApprovedHeaderButton("search", "Search apps and settings") {
-              if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
+              if (selectedTab() == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
             }
             ApprovedHeaderButton("settings", "Settings") {
               runCatching {
@@ -478,11 +484,13 @@ internal fun LauncherScreen(
             }
           }
         }
+        }
         Box(Modifier.weight(1f).fillMaxWidth()) {
         ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
             bottom = if (homeTabsMusicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
             contentActive = homeTabsMusicLayout == null || homeTabsMusicLayout == MusicPlayerLayout.COMPACT,
-            prefetch = LauncherTabPrefetch.HOME_TABS) { tab ->
+            prefetch = LauncherTabPrefetch.HOME_TABS, spoken = spokenTab,
+            wakeFrames = HOME_TAB_WAKE_FRAMES) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
@@ -600,13 +608,13 @@ internal fun LauncherScreen(
         }
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-          ApprovedHomeDock(selectedTab.id) { destination ->
+          ApprovedHomeDock({ selectedTab().id }, { spokenTab.value.id }) { destination ->
             musicLayout = null
             when (destination) {
               "apps" -> { editMode = false; onSelectTab(ApprovedLauncherTab.APPS) }
               "tools" -> {
                 editMode = false
-                if (selectedTab == ApprovedLauncherTab.TOOLS) toolsLibraryRequest++
+                if (selectedTab() == ApprovedLauncherTab.TOOLS) toolsLibraryRequest++
                 else onSelectTab(ApprovedLauncherTab.TOOLS)
               }
               else -> { editMode = false; onSelectTab(ApprovedLauncherTab.HOME) }
@@ -787,3 +795,7 @@ internal fun LauncherScreen(
   }
 
 }
+
+/** A restart scope of its own: state read inside [content] recomposes [content] only, not its caller. */
+@Composable
+internal fun HomeRecomposeScope(content: @Composable () -> Unit) = content()

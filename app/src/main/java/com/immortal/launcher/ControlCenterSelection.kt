@@ -172,7 +172,7 @@ internal fun CcIcon(name: String, tint: ColorProducer, size: Dp, modifier: Modif
 internal fun rememberCcTint(color: Color): ColorProducer = remember(color) { ColorProducer { color } }
 
 /** Reuses one tint filter per colour (a tab only ever has two). */
-private class CcTintFilters {
+internal class CcTintFilters {
   private var color = Color.Unspecified
   private var filter: ColorFilter? = null
 

@@ -1057,3 +1057,70 @@ Both changes were owner decisions from the two "Next" lists above.
 - `cc_engine_golden.txt` was re-recorded. Only `entitiesVersion` counts changed, because identical updates no
   longer bump the version.
 - Full suite: 9,216 tests, 0 failures.
+
+## Home tab switch (Home / Apps / Tools), 1.317 vs `home-tabs`
+
+**Device:** Family Portal+ (2160×1440, accessibility services on). Plain `adb install -r -d`, no force-stop.
+STREAM_MUSIC 0 during each stint, restored to 3. No screenshots or recordings (Home shows family photos), no debug
+props. Only the tab bar was tapped. Ended on official 1.317 (sha256 `4db51aa3…`), Home on top and default, dev off.
+
+**Builds:** official 1.317; `home-tabs` `assemblePerformance` v1 (changes 1–3), v2 (v1 + change 4), v3 (v2 + change
+5, built, unit-tested, **not measured**: device time ended); `assembleBenchmark` of main and of v1/v2 for simpleperf.
+
+**Method:** per round: warm-up cycle, then 4 × (Home → Apps, Apps → Tools, Tools → Home), `gfxinfo reset` before each
+tap, `framestats` of the HomeActivity window 2.5 s after. 2 rounds per build (8 switches per direction). atrace
+`gfx view` on 1.317, simpleperf 4 kHz around 6 switches per benchmark build.
+
+**Where a switch went on 1.317:** one stall: the switch frame's main thread 32–82 ms (atrace `animation` 31–52 ms,
+`Record View#draw()` 9–12 ms) and RenderThread 9–24 ms; the next frame is long mostly because its vsync was missed.
+Main thread (simpleperf): the whole `LauncherScreen` recomposed because it took the tab as a parameter (7–15 ms incl.
+header, background, `rememberLauncherForActivityResult`), the dock 2–8.5 ms (every tab re-composed, icons re-resolved
+through `painterResource`), the pages' activation (`LocalApprovedLauncherPageActive` readers, lifecycle
+RESUMED/CREATED, Apps' grid, producers restarting) 2–10 ms plus apply 1–20 ms (side effects, lifecycle observers),
+and the page swap in the semantics tree (rebuild 1–6 ms on the next frame).
+
+**Changes (`home-tabs`):**
+1. `HomeActivity.kt:62` passes a tab reader; `HomeLauncherScreen.kt:94` reads it only in the header's own scope
+   (`HomeRecomposeScope`, `:380`; Customize comes and goes with Home), the tab host (`ApprovedHomeUi.kt:84`) and the
+   dock (`:611`), and the per-switch resets run from a `snapshotFlow` (`:219`). A switch no longer recomposes the screen.
+2. `ApprovedHomeDock.kt` (new; the dock moved out of `ApprovedHomeUi.kt`): each tab is a fixed tree (CcTab pattern):
+   fill, icon tint (`ApprovedDrawnTintIcon`) and label colour (`BasicText` colour producer) are read while drawing.
+   Same nodes, bounds, role and text as before.
+3. Accessibility off the switch frame (CcUi.spokenScreen pattern): `rememberHomeSpokenTab` / `followAfterFrames`
+   (`ApprovedHomeDock.kt`) set the spoken tab 2 frames after a switch; the dock's "selected" (`homeTabSelected`,
+   observed, no recomposition) and which page is in the semantics tree (`ApprovedLauncherTabs.kt`
+   `launcherPageSemantics`, one shared hidden-page modifier) follow it.
+4. Deferred page wake (heavy starts after the switch): `ApprovedLauncherTabs(wakeFrames)`; Home passes
+   `HOME_TAB_WAKE_FRAMES` = 3, one frame after the accessibility swap. Lifecycle, producers, cameras and
+   `LocalApprovedLauncherPageActive` readers follow the woken tab; input closes on the switch itself and opens once
+   the page is awake. Other callers (device checks, preview) keep immediate activation.
+5. (v3, unmeasured) The page that slid out stays awake until its slide settles (`launcherPageAwake`,
+   `LauncherPageWake`), so the incoming wake and the outgoing sleep no longer share frame +3 (on v2 benchmark that
+   frame was 40–73 ms on Home → Apps: Home's widgets sleeping plus Apps' grid waking).
+
+| Frames over 32 ms (8 switches each) | official 1.317 | v1 | v2 |
+|---|---|---|---|
+| → Apps: total / worst median ms / switches with none | 15 / 74 / 0 | 18 / 61 / 0 | 14 / 42 / 0 |
+| → Tools | 12 / 47 / 0 | 10 / 38 / 1 | **2 / 24 / 6** |
+| → Home | 15 / 63 / 0 | 16 / 68 / 0 | 14 / 43 / 1 |
+| Sum of frames over 32 ms per switch, median ms (Apps / Tools / Home) | 126 / 61 / 104 | 117 / 38 / 124 | 78 / 0 / 81 |
+
+- Memory after leaving: unchanged (PSS 228 MB / graphics 50.8 MB on both).
+- v1 alone barely moved Apps and Home: with the screen and dock no longer composing, the pages' activation
+  dominated the switch frame. v2 moves it: Tools is fixed (6 of 8 switches with no frame over 32 ms, worst median
+  24 ms); Apps and Home keep a long switch frame but the worst median fell 74 → 42 and 63 → 43 ms.
+- What is left (v2 benchmark): **Home ←** switch frame main thread ~41 ms: re-recording the header (Customize
+  appears, every header button's vector icon is re-drawn, 9 ms), measure 9 ms (Customize's text laid out afresh,
+  `TextStringSimpleNode.measure` ~5 ms), composition 8 ms; RenderThread 18–32 ms per slide frame (two full pages
+  drawn, no cached layers). **→ Apps:** the wake frame (+3, both pages changing state), addressed by change 5.
+- Accessibility (uiautomator dump of Home, Apps, Tools on v1/v2 vs 1.317): same nodes (124 / 106 / 151), order,
+  classes, bounds, selected and clickable flags; differences are the clock, the temperature and the R8-renamed
+  ComposeView class. Events (`uiautomator events` around each switch): the same types (VIEW_SELECTED, a
+  WINDOW_CONTENT_CHANGED, then SUBTREE batches); VIEW_SELECTED now arrives ~25 ms later, after one SUBTREE batch from
+  the outgoing page's motion (it stays in the tree for two frames).
+
+**Against the target (no tab-switch frame over 32 ms): met for Tools (v2), not for Apps and Home.** Next: measure v3;
+keep Customize composed (zero-width, unplaced off Home) so its text is not re-laid out; give the header buttons
+their own layers so a header re-layout does not re-record every icon; cache each page as a layer during the slide
+(RenderThread). Portal Mini (800×1280): same code paths (`LauncherScreen`'s compact header is in the same
+`HomeRecomposeScope`, same dock and tab host); not measured.
