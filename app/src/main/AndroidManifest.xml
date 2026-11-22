@@ -310,11 +310,12 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
 
-        <!-- Full-screen HA dashboard (mock 08 port). -->
+        <!-- Full-screen HA dashboard (approved redesign, mocks/ha-dashboard-20261122). Rotation relayouts in place. -->
         <activity
             android:name=".HaDashboardActivity"
             android:exported="false"
             android:label="Home"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
 
         <activity

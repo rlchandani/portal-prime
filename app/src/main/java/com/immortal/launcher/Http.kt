@@ -106,7 +106,46 @@ object Http {
       userAgent: String?,
       configure: (HttpURLConnection) -> Unit = {},
       read: (HttpURLConnection) -> T,
-  ): T? {
+  ): T? = requestWithStatus(method, url, headers, connectTimeoutMs, readTimeoutMs, userAgent, configure, read).value
+
+  /**
+   * One HTTP outcome for callers that must tell "the server said no" from "no answer": [code] is
+   * the HTTP status, or [NO_RESPONSE] when the request never got one (DNS, refused, timeout).
+   * [value] is the 2xx body, else null.
+   */
+  data class Outcome<out T>(val code: Int, val value: T?) {
+    val ok: Boolean get() = code in 200..299 && value != null
+  }
+
+  /** [Outcome.code] when no HTTP response arrived at all. */
+  const val NO_RESPONSE = 0
+
+  /** POST like [postString], but keeps the status code (see [Outcome]). */
+  fun postForOutcome(
+      url: String,
+      body: String,
+      headers: Map<String, String> = emptyMap(),
+      connectTimeoutMs: Int = DEFAULT_CONNECT_MS,
+      readTimeoutMs: Int = DEFAULT_READ_MS,
+  ): Outcome<String> =
+      requestWithStatus("POST", url, headers, connectTimeoutMs, readTimeoutMs, DEFAULT_UA, configure = { c ->
+        c.doOutput = true
+        c.setRequestProperty("Content-Type", "application/json")
+        c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+      }) {
+        it.inputStream.use { s -> s.readBytes().toString(Charsets.UTF_8) }
+      }
+
+  private fun <T> requestWithStatus(
+      method: String,
+      url: String,
+      headers: Map<String, String>,
+      connectTimeoutMs: Int,
+      readTimeoutMs: Int,
+      userAgent: String?,
+      configure: (HttpURLConnection) -> Unit = {},
+      read: (HttpURLConnection) -> T,
+  ): Outcome<T> {
     ToolsWork.checkpoint()
     var connection: HttpURLConnection? = null
     return try {
@@ -122,16 +161,17 @@ object Http {
       ToolsWork.checkpoint()
       configure(c)
       ToolsWork.checkpoint()
+      val code = c.responseCode
       val result =
-          if (c.responseCode in 200..299) read(c)
+          if (code in 200..299) read(c)
           else null.also { logFailure(method, url, c) }
       ToolsWork.checkpoint()
-      result
+      Outcome(code, result)
     } catch (e: Throwable) {
       ToolsWork.checkpoint()
       if (ToolsWork.ownsCurrentRequest() && e is CancellationException) throw e
       Log.w(TAG, "$method ${logSafeUrl(url)} -> ${e.javaClass.simpleName}: ${logSafeMessage(e.message, url)}")
-      null
+      Outcome(NO_RESPONSE, null)
     } finally {
       runCatching { connection?.let(ToolsWork::disconnect) }
     }
