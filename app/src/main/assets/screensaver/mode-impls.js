@@ -910,6 +910,10 @@
   }};
 
   // ---- 04 Living gallery wall (justified rows + swaps) ----------------------
+  // The doodle tile at 1x (Portal), 1.125x (Portal+) and 2x: the same pixels as the vector at that
+  // scale, decoded once instead of re-rasterised per tile (styles.css .gallery-wall).
+  const GALLERY_DOODLE = 'image-set(url("photo-doodles-dark-480.png") 1x, ' +
+    'url("photo-doodles-dark-540.png") 1.125x, url("photo-doodles-dark-960.png") 2x)';
   MODES.galleryWall = { name: "Living Gallery Wall", run(ctx, deck) {
     const t = makeTimers(ctx), wall = el("ss-wall gallery-wall", ctx.root), cells = [];
     let disposed = false;
@@ -918,7 +922,7 @@
       const img = cell.dissolve.next();
       bg(img, url, "contain"); img.style.animation = "none"; img.style.willChange = "auto";
       // The opaque photo owner also covers outgoing pixels in its letterbox.
-      img.style.backgroundImage += ', url("photo-doodles-dark.svg")';
+      img.style.backgroundImage += ", " + GALLERY_DOODLE;
       img.style.backgroundSize = "contain, 480px 360px";
       img.style.backgroundPosition = "center, left top";
       img.style.backgroundRepeat = "no-repeat, repeat";

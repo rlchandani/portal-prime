@@ -8,6 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import { GALLERY_DOODLE } from './helpers/slideshow_scene_fixture.mjs';
 
 const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url);
 const modes = ['kenBurns', 'diptych', 'framed', 'galleryWall', 'push', 'memories',
@@ -47,7 +48,7 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
           // A Portal+ portrait pair draws two prepared photos in one hero.
           const pair = match && this.classList.contains('ss-hero') && /^, url\("([^"]*)"\)$/.exec(match[2]);
           if (match) assert.ok(match[2] === '' || (
-            this.classList.contains('gallery-photo') && match[2] === ', url("photo-doodles-dark.svg")'
+            this.classList.contains('gallery-photo') && match[2] === ', ' + GALLERY_DOODLE
           ) || (pair && this.classList.contains('ss-hero') && pair[1] !== 'photo-doodles-dark.svg'),
           'Only Gallery Wall may add the fixed bundled doodle below its prepared photo');
           [match?.[1], pair?.[1]].filter(Boolean).forEach(url => writes.push({ node: this, url, prepared: decoded.has(url) }));
