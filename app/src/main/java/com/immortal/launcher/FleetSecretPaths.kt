@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.memory.MemoryProfileStore
 import java.io.File
 
 /**
@@ -17,7 +18,9 @@ import java.io.File
  * `no_backup/guest`, Grandma mode's auto-answer rules ([AutoAnswerRepository]) under
  * `no_backup/hearthpane_grandma`, Calling's video messages ([CallMessageStore]) under
  * `no_backup/hearthpane_vmsg` and `no_backup/hearthpane_vmsg_out`, the phone outbox, and Who's
- * there's face templates ([WhosThereStore]) under `no_backup/whos_there`.
+ * there's face templates ([WhosThereStore]) under `no_backup/whos_there`, and the household key
+ * ([HouseholdKey]) under `no_backup/household`, and personalization profiles
+ * ([MemoryProfileStore]) under `no_backup/memory`.
  *
  * [isPrivate] (`/fs/list`, `/fs/read` and `/fs/write`) refuses more: the app's whole private data
  * directory (`shared_prefs`, `databases`, `files`, `no_backup`, `app_*`, `cache`), which holds the
@@ -40,7 +43,11 @@ internal object FleetSecretPaths {
       // Messages waiting for a paired phone to collect them (transit-sealed).
       listOf("no_backup", CallPhoneOutbox.DIR),
       // Who's there templates and people (sealed) plus the audit file.
-      listOf("no_backup", WhosThereStore.DIR)) +
+      listOf("no_backup", WhosThereStore.DIR),
+      // The household key, sealed with its Keystore key ([HouseholdKey]).
+      listOf("no_backup", HouseholdKey.DIR),
+      // Personalization profiles, one sealed file per scope ([MemoryProfileStore]).
+      listOf("no_backup", MemoryProfileStore.DIR)) +
       // Retired cross-home calling's sealed leftovers, until RetiredHomeLinkCleanup has removed them.
       RetiredHomeLinkCleanup.DIRS.map { listOf("no_backup", it) }
 
