@@ -301,8 +301,11 @@ internal object ControlCenterBanners {
     orientation = LinearLayout.VERTICAL
     if (preview) addView(previewTag(ctx, 18f), LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
         LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = px(ctx, 8) })
-    addView(TextView(ctx).apply { text = alert.title; setTextColor(Color.WHITE); textSize = titleSp; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD); maxLines = 1 })
-    addView(TextView(ctx).apply { text = alert.body; setTextColor(DinnerCardOverlay.SECONDARY); textSize = lineSp; maxLines = 2 })
+    addView(TextView(ctx).apply { text = alert.title; setTextColor(Color.WHITE); textSize = titleSp; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+      // Narrow (the Mini upright leaves ~260 dp beside View and Dismiss): two lines, then an ellipsis — never cut mid-word.
+      maxLines = 2; ellipsize = android.text.TextUtils.TruncateAt.END })
+    addView(TextView(ctx).apply { text = alert.body; setTextColor(DinnerCardOverlay.SECONDARY); textSize = lineSp; maxLines = 2
+      ellipsize = android.text.TextUtils.TruncateAt.END })
   }
 
   private fun button(ctx: Context, label: String, solid: Boolean, onClick: () -> Unit): View = TextView(ctx).apply {

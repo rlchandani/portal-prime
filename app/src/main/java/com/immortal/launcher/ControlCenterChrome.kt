@@ -11,10 +11,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -145,7 +147,13 @@ internal data class CcHeaderSlice(
 @Composable
 internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
-  Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).ccRegionLayer(c.bg).padding(horizontal = 34.dp),
+  // The Mini turned: the pills shorten so the screen title keeps its room ([CcCompactHeaderPills]).
+  // The Portal+ keeps every pill in full, as shipped.
+  val compact = currentLayoutClass().compact
+  BoxWithConstraints(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight)) {
+  val plan = if (compact) rememberCcPillPlan(h, CcCompactHeaderPills.rowPillBudget(maxWidth.value.toDouble()),
+      CcCompactHeaderPills.ROW_GAP) else null
+  Row(Modifier.fillMaxSize().ccRegionLayer(c.bg).padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
@@ -153,24 +161,29 @@ internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJa
     }
     val home = h.people.filter { it.state == "home" }
     if (h.people.isNotEmpty()) CcPill(CcSpeech.people(home.map { it.name }, h.people.size), onClick = { ui.go(CcScreen.SECURITY) }) {
-      CcAvatars(home.ifEmpty { h.people }.take(4))
-      Text(if (home.isEmpty()) "Nobody home" else "${home.size} home", color = c.text, fontSize = 22.sp)
+      val avatars = plan?.avatars ?: CcCompactHeaderPills.MAX_AVATARS
+      if (avatars > 0) CcAvatars(home.ifEmpty { h.people }.take(avatars))
+      Text(if (home.isEmpty()) "Nobody home" else "${home.size} home", color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
     }
     h.alarm?.let { a ->
       val armed = a.state.startsWith("armed")
-      CcPill(CcSpeech.alarm(alarmLabel(a.state)), onClick = { ui.go(CcScreen.SECURITY) }) {
+      val label = alarmLabel(a.state)
+      CcPill(CcSpeech.alarm(label), onClick = { ui.go(CcScreen.SECURITY) }) {
         CcIcon(if (armed) "shieldck" else "shield", if (armed) c.green else c.text, 28.dp)
-        Text(alarmLabel(a.state), color = if (armed) c.green else c.text, fontSize = 22.sp)
+        Text(if (plan?.alarmShort == true) CcCompactHeaderPills.shortAlarm(label) else label,
+            color = if (armed) c.green else c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
       }
     }
     if (h.weatherTemp != null || h.weatherText != null) {
       val weather = listOfNotNull(h.weatherTemp?.let { "$it°" }, h.weatherText).joinToString(" · ")
       CcPill("Weather $weather") {
         CcIcon(if (h.night) "moon" else "sun", c.text, 28.dp)
-        Text(weather, color = c.text, fontSize = 22.sp)
+        Text(plan?.weather ?: weather, color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
       }
     }
-    h.debug?.let { label -> CcPill(label) { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
+    h.debug?.let { label ->
+      CcPill(label) { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp, maxLines = 1, softWrap = false) }
+    }
     CcLivePill(h.phase)
     val jarvis = !h.phase.blocksHome
     Row(Modifier.height(72.dp).alpha(if (jarvis) 1f else CC_DISABLED_ALPHA)
@@ -178,8 +191,9 @@ internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJa
         .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(enabled = jarvis, role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
         .padding(start = 18.dp, end = 28.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       Box(Modifier.size(40.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFFF7EA), Color(0xFFFFD3A1), CcStyle.Ember))))
-      Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
+      Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
     }
+  }
   }
 }
 
@@ -187,29 +201,37 @@ internal fun CcHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcUi, onJa
 @Composable
 private fun CcHeaderTitle(inputs: CcHeadingInputs, ui: CcUi) {
   val c = LocalCc.current
-  CcHeadingText(inputs, ui, CcHeadingLine(c.text, 46.sp, CcStyle.Serif, lineHeight = 48.sp),
+  CcHeadingText(inputs, ui, CcHeadingLine(c.text, 46.sp, CcStyle.Serif, lineHeight = 48.sp, overflow = TextOverflow.Ellipsis),
       CcHeadingLine(c.sec, 21.sp, overflow = TextOverflow.Ellipsis))
+}
+
+/** The connection pill's label (also measured by [CcCompactHeaderPills]). */
+internal fun ccLiveLabel(phase: CcPhase): String = when (phase) {
+  CcPhase.LIVE -> "Live"
+  CcPhase.STALE -> "Reconnecting"
+  CcPhase.CONNECTING -> "Connecting"
+  CcPhase.UNREACHABLE -> "HA unreachable"
+  CcPhase.AUTH_FAILED -> "Token expired"
+  CcPhase.OFFLINE -> "Portal offline"
+  CcPhase.NOT_CONFIGURED -> "Not set up"
 }
 
 /** "Live" / "Stale · 2 min" / "HA unreachable" pill with its status dot. */
 @Composable
 internal fun CcLivePill(phase: CcPhase) {
   val c = LocalCc.current
-  val (color, label) = when (phase) {
-    CcPhase.LIVE -> c.green to "Live"
-    CcPhase.STALE -> c.amber to "Reconnecting"
-    CcPhase.CONNECTING -> c.amber to "Connecting"
-    CcPhase.UNREACHABLE -> c.red to "HA unreachable"
-    CcPhase.AUTH_FAILED -> c.red to "Token expired"
-    CcPhase.OFFLINE -> c.red to "Portal offline"
-    CcPhase.NOT_CONFIGURED -> c.red to "Not set up"
+  val label = ccLiveLabel(phase)
+  val color = when (phase) {
+    CcPhase.LIVE -> c.green
+    CcPhase.STALE, CcPhase.CONNECTING -> c.amber
+    CcPhase.UNREACHABLE, CcPhase.AUTH_FAILED, CcPhase.OFFLINE, CcPhase.NOT_CONFIGURED -> c.red
   }
   CcPill("Home Assistant: $label") {
     Box(Modifier.size(22.dp), contentAlignment = Alignment.Center) {
       Box(Modifier.size(22.dp).clip(CircleShape).background(color.copy(alpha = 0.22f)))
       Box(Modifier.size(12.dp).clip(CircleShape).background(color))
     }
-    Text(label, color = c.text, fontSize = 22.sp)
+    Text(label, color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
   }
 }
 
