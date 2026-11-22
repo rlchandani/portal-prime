@@ -326,37 +326,63 @@ internal fun NavRow(
             it()
             Spacer(Modifier.size(20.dp))
         }
-        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
-            Text(
-                text = title,
-                color = IosLabel,
-                fontSize = Sizes.rowTitle,
-                lineHeight = 34.sp,
-            )
-            val help = subLabel.ifEmpty { LocalApprovedSettingsHelp.current.orEmpty() }
-            if (help.isNotEmpty()) {
-                Text(
-                    text = help,
-                    color = IosSecondary,
-                    fontSize = Sizes.rowSub,
-                    lineHeight = 28.sp,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+        val screenWidthDp = LocalConfiguration.current.screenWidthDp
+        val singlePane = LocalSettingsSinglePane.current
+        val valueCap = settingsRowValueMaxWidthDp(screenWidthDp, singlePane)
+        val help = subLabel.ifEmpty { LocalApprovedSettingsHelp.current.orEmpty() }
+        val compact = SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane))
+        if (settingsRowStacksHelp(compact, hasHelp = help.isNotEmpty(), hasValue = value.isNotEmpty())) {
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SettingsTitleValueLayout(valueCap, Modifier.weight(1f)) {
+                        NavRowTitle(title, Modifier.padding(end = 24.dp))
+                        NavRowValue(value)
+                    }
+                    ApprovedSettingsChevron()
+                }
+                NavRowHelp(help)
             }
+        } else {
+            SettingsTitleValueLayout(valueCap, Modifier.weight(1f)) {
+                Column(modifier = Modifier.padding(end = 24.dp)) {
+                    NavRowTitle(title)
+                    if (help.isNotEmpty()) NavRowHelp(help)
+                }
+                if (value.isNotEmpty()) NavRowValue(value)
+            }
+            ApprovedSettingsChevron()
         }
-        if (value.isNotEmpty()) {
-            Text(
-                text = value,
-                color = IosSecondary,
-                fontSize = Sizes.rowValue,
-                maxLines = 2,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.widthIn(max = settingsRowValueMaxWidthDp(
-                    LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current).dp).padding(end = 20.dp),
-            )
-        }
-        ApprovedSettingsChevron()
     }
+}
+
+/**
+ * On the Mini's cards a row with both help and a trailing value puts the value on the title's line
+ * and lets the help take the card's width; beside the value the help was a nine-line column.
+ */
+internal fun settingsRowStacksHelp(compactCards: Boolean, hasHelp: Boolean, hasValue: Boolean): Boolean =
+    compactCards && hasHelp && hasValue
+
+@Composable
+private fun NavRowTitle(title: String, modifier: Modifier = Modifier) {
+    Text(text = title, color = IosLabel, fontSize = Sizes.rowTitle, lineHeight = 34.sp, modifier = modifier)
+}
+
+@Composable
+private fun NavRowHelp(help: String) {
+    Text(text = help, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 28.sp,
+        modifier = Modifier.padding(top = 8.dp))
+}
+
+@Composable
+private fun NavRowValue(value: String) {
+    Text(
+        text = value,
+        color = IosSecondary,
+        fontSize = Sizes.rowValue,
+        maxLines = 2,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        modifier = Modifier.padding(end = 20.dp),
+    )
 }
 
 /** A row's trailing value takes at most this much of the card so the title keeps its line. */

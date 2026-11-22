@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -265,13 +267,17 @@ private fun ActionButton(label: String, primary: Boolean, onClick: () -> Unit) {
   Surface(
       color = if (primary) IosBlue else IosRed,
       shape = RoundedCornerShape(14.dp),
-      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
+      modifier = Modifier.fillMaxWidth().heightIn(min = ActionButtonMinHeight)
+          .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
   ) {
     Text(label, color = if (primary) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError,
         fontSize = Sizes.actionButton, fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
+        textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(vertical = 14.dp))
   }
 }
+
+/** At least the 64 dp touch target; the same height as Night & Sleep's timer button. */
+private val ActionButtonMinHeight = 68.dp
 
 @Suppress("DEPRECATION")
 private fun localIp(context: Context): String = runCatching {

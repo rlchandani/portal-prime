@@ -92,7 +92,7 @@ internal fun AlmanacSettingsContent() {
     }
   }
   if (failed) {
-    Text("Almanac settings could not be updated. Try again.", color = IosSecondary)
+    FooterNote("Almanac settings could not be updated. Try again.")
     ActionPill("Try again", enabled = !saving) { failed = false; retry++ }
   }
 }

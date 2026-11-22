@@ -228,13 +228,14 @@ class SettingsVisibilityPreparationTest {
         val domain = domain(specs, sections = mapOf("cacheEnabled" to "Power", "mode" to "Photos",
             "showNowPlaying" to "Playback", "fit" to "Photos"))
         val expanded = prepare(domain, Unit, advanced = true)
-        assertEquals(listOf("screensaver.enabled", "screensaver:gap:\u0000",
-            "screensaver:header:Advanced options", "screensaver.cacheEnabled", "screensaver:gap:Advanced options",
-            "screensaver:header:Photos", "screensaver.mode", "screensaver.fit", "screensaver:gap:Photos",
-            "screensaver:header:Playback", "screensaver.showNowPlaying", "screensaver:gap:Playback"),
+        // Headers carry the section gap, so no gap item sits before them and none trails.
+        assertEquals(listOf("screensaver.enabled",
+            "screensaver:header:Advanced options", "screensaver.cacheEnabled",
+            "screensaver:header:Photos", "screensaver.mode", "screensaver.fit",
+            "screensaver:header:Playback", "screensaver.showNowPlaying"),
             expanded.projection.items.map { it.id })
-        assertEquals(mapOf("screensaver.enabled" to 0, "screensaver.cacheEnabled" to 3,
-            "screensaver.mode" to 6, "screensaver.fit" to 7, "screensaver.showNowPlaying" to 10),
+        assertEquals(mapOf("screensaver.enabled" to 0, "screensaver.cacheEnabled" to 2,
+            "screensaver.mode" to 4, "screensaver.fit" to 5, "screensaver.showNowPlaying" to 7),
             expanded.projection.controlIndices)
         val rows = expanded.projection.items.filter { it.kind == ApprovedSettingsLazyKind.CONTROL }
         assertEquals(listOf(true, true, true, false, true), rows.map { it.firstRow })
@@ -247,8 +248,8 @@ class SettingsVisibilityPreparationTest {
         assertEquals(listOf("enabled", "mode", "fit", "showNowPlaying"), controls(simple))
         assertEquals(listOf("Photos", "Playback"),
             simple.projection.items.filter { it.kind == ApprovedSettingsLazyKind.HEADER }.map { it.section })
-        assertEquals(mapOf("screensaver.enabled" to 0, "screensaver.mode" to 3,
-            "screensaver.fit" to 4, "screensaver.showNowPlaying" to 7), simple.projection.controlIndices)
+        assertEquals(mapOf("screensaver.enabled" to 0, "screensaver.mode" to 2,
+            "screensaver.fit" to 3, "screensaver.showNowPlaying" to 5), simple.projection.controlIndices)
         assertTrue(simple.showAdvancedHint)
     }
 }

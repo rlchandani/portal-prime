@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -308,20 +307,22 @@ internal fun ApprovedSourcesInfoRow(title: String, value: String) {
     val palette = LocalApprovedPalette.current
     Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp)
         .padding(horizontal = 28.dp, vertical = 22.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(28.dp)) {
-        Text(title, color = palette.text, fontSize = 26.sp, lineHeight = 34.sp,
-            modifier = Modifier.weight(1f))
-        Text(value, color = palette.secondary, fontSize = 23.sp, lineHeight = 30.sp,
-            textAlign = TextAlign.End, modifier = Modifier.widthIn(max = settingsRowValueMaxWidthDp(
-                LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current).dp))
+        verticalAlignment = Alignment.CenterVertically) {
+        SettingsTitleValueLayout(settingsRowValueMaxWidthDp(LocalConfiguration.current.screenWidthDp,
+            LocalSettingsSinglePane.current), Modifier.weight(1f)) {
+            Text(title, color = palette.text, fontSize = 26.sp, lineHeight = 34.sp,
+                modifier = Modifier.padding(end = 28.dp))
+            Text(value, color = palette.secondary, fontSize = 23.sp, lineHeight = 30.sp, textAlign = TextAlign.End)
+        }
     }
 }
 
 @Composable
 internal fun ApprovedSourcesPreviewFooter(topGap: Dp = 34.dp, onPreview: () -> Unit) {
     val palette = LocalApprovedPalette.current
+    // The same trim as every Settings Card, so it keeps its edge on the light page.
     Surface(color = palette.surface, shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(ApprovedOutlineWidth, palette.outline),
         modifier = Modifier.fillMaxWidth().padding(top = topGap)) {
         Row(Modifier.padding(horizontal = 28.dp, vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically,

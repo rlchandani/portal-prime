@@ -18,6 +18,35 @@ class SettingsRowValueWidthTest {
         assertEquals(239, settingsRowValueMaxWidthDp(1280, singlePane = false))
     }
 
+    @Test fun aValueBesideAShortTitleTakesTheFreeRoomInsteadOfWrapping() {
+        // Mini turned, Photo Sources › Selected: 691 px row, "Selected" 160 px, value 330 px, cap 239 px.
+        assertEquals(330, settingsRowValueWidthPx(availablePx = 691, textIntrinsicPx = 160, valueIntrinsicPx = 330, capPx = 239))
+    }
+
+    @Test fun longHelpTextStillKeepsAllButTheCap() {
+        // Photo Frame › Style: help is far wider than the row, so the value keeps the cap and wraps.
+        assertEquals(239, settingsRowValueWidthPx(availablePx = 691, textIntrinsicPx = 2400, valueIntrinsicPx = 420, capPx = 239))
+    }
+
+    @Test fun theValueGetsWhateverTheTitleLeavesWhenThatIsMoreThanTheCap() {
+        assertEquals(400, settingsRowValueWidthPx(availablePx = 700, textIntrinsicPx = 300, valueIntrinsicPx = 900, capPx = 239))
+    }
+
+    @Test fun aShortValueKeepsItsOwnWidthAndNoValueTakesNothing() {
+        assertEquals(60, settingsRowValueWidthPx(availablePx = 700, textIntrinsicPx = 2400, valueIntrinsicPx = 60, capPx = 239))
+        assertEquals(0, settingsRowValueWidthPx(availablePx = 700, textIntrinsicPx = 100, valueIntrinsicPx = 0, capPx = 239))
+        assertEquals(0, settingsRowValueWidthPx(availablePx = 0, textIntrinsicPx = 100, valueIntrinsicPx = 50, capPx = 239))
+    }
+
+    @Test fun onlyTheMinisRowsWithHelpAndAValueStackTheHelpUnderBoth() {
+        val miniCards = SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(800, singlePane = true))
+        val portalCards = SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(1920))
+        org.junit.Assert.assertTrue(settingsRowStacksHelp(miniCards, hasHelp = true, hasValue = true))
+        org.junit.Assert.assertFalse(settingsRowStacksHelp(portalCards, hasHelp = true, hasValue = true))
+        org.junit.Assert.assertFalse(settingsRowStacksHelp(miniCards, hasHelp = false, hasValue = true))
+        org.junit.Assert.assertFalse(settingsRowStacksHelp(miniCards, hasHelp = true, hasValue = false))
+    }
+
     @Test fun unknownWidthFallsBackToTheFixedCap() {
         assertEquals(ROW_VALUE_MAX_DP, settingsRowValueMaxWidthDp(0, singlePane = true))
     }
@@ -50,5 +79,19 @@ class SettingsSidebarCompactTest {
         org.junit.Assert.assertTrue(SettingsSplitMetrics.sidebarCompact(1280, singlePane = false))
         // Upright the list is the whole window, so its rows keep the full size.
         org.junit.Assert.assertFalse(SettingsSplitMetrics.sidebarCompact(800, singlePane = true))
+    }
+}
+
+class SettingsSinglePaneTitleTest {
+    @org.junit.Test fun aShortBackLabelLeavesTheLongTitleItsWidth() {
+        // Mini upright: 760 dp bar, 228 dp back cap. "Back" is 134 dp, so the title gets 476 dp.
+        org.junit.Assert.assertEquals(476, settingsSinglePaneTitleMaxWidthDp(760, 228, "Back"))
+        // "Advanced" (190 dp) still keeps the title clear of it on both sides.
+        org.junit.Assert.assertEquals(364, settingsSinglePaneTitleMaxWidthDp(760, 228, "Advanced"))
+    }
+
+    @org.junit.Test fun aLongBackLabelUsesAtMostItsCapAndNoBackButtonNone() {
+        org.junit.Assert.assertEquals(288, settingsSinglePaneTitleMaxWidthDp(760, 228, "People & Recognition"))
+        org.junit.Assert.assertEquals(744, settingsSinglePaneTitleMaxWidthDp(760, 228, null))
     }
 }

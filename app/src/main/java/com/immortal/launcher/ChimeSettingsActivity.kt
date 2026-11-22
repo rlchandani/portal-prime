@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -139,7 +141,8 @@ internal fun ChimeSettingsContent() {
   val latestApply = rememberUpdatedState<(String, Any) -> Unit>(::apply)
   val onApply = remember { { key: String, value: Any -> latestApply.value(key, value) } }
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    // No arrangement spacing: headers, cards and footers carry the shared SettingsSpacing gaps.
+    Column {
       // Scalar controls (toggles, volumes, quiet times, sunrise sound) render from the `chime`
       // registry domain - the same specs the phone remote uses. Apply routes through the domain so
       // its onApplied (ChimeScheduler.reschedule) fires here too, not just from the remote.
@@ -157,6 +160,8 @@ internal fun ChimeSettingsContent() {
         })
       }
 
+      // The status note reads as the rows' header, so it keeps the header gap above their card.
+      Spacer(Modifier.height(SettingsSpacing.HEADER_GAP_DP.dp))
       // Rows go straight into the page's list (no nested list), each precomposed on its own.
       Column {
         SettingsRows(SettingsDomains.chime, settings, exclude = setOf("spokenVoice"),

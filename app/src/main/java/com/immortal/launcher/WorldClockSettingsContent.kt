@@ -121,11 +121,7 @@ internal fun WorldClockContent() {
         }
       }
       }
-      Text(
-          "Tip: resize the widget to see more clocks. Re-pick a city to move it to the end of the order.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-      )
+      FooterNote(
+          "Tip: resize the widget to see more clocks. Re-pick a city to move it to the end of the order.")
     }
 }

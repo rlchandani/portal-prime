@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -113,7 +112,7 @@ internal fun MultiRoomContent() {
 
   Column {
       Card {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(horizontal = CardInset, vertical = 18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
           Text(
               "Connect Music Assistant for browsing and playback; use Snapcast for multi-room audio:",
@@ -134,10 +133,10 @@ internal fun MultiRoomContent() {
                   "Music Assistant player ID.")
         }
       }
-      Spacer(Modifier.size(26.dp))
+      SettingsCardGap()
       Card {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = CardInset, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
@@ -162,7 +161,7 @@ internal fun MultiRoomContent() {
         if (enabled) {
           Divider()
           Row(
-              modifier = Modifier.fillMaxWidth().padding(18.dp),
+              modifier = Modifier.fillMaxWidth().padding(horizontal = CardInset, vertical = 18.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             OutlinedTextField(
@@ -195,7 +194,7 @@ internal fun MultiRoomContent() {
               label = { Text("Music Assistant port (default 8095)") },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 4.dp)
+                      .padding(start = CardInset, end = CardInset, top = 4.dp)
                       .focusRequester(portFocus),
           )
           OutlinedTextField(
@@ -213,7 +212,7 @@ internal fun MultiRoomContent() {
               },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 8.dp)
+                      .padding(start = CardInset, end = CardInset, top = 8.dp)
                       .focusRequester(tokenFocus),
           )
           OutlinedTextField(
@@ -228,7 +227,7 @@ internal fun MultiRoomContent() {
               placeholder = { Text("Raw player_id; blank leaves selection unset") },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 8.dp)
+                      .padding(start = CardInset, end = CardInset, top = 8.dp)
                       .focusRequester(playerFocus),
           )
           Text(
@@ -238,10 +237,10 @@ internal fun MultiRoomContent() {
                   "Assistant server.",
               color = IosSecondary,
               fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 8.dp),
+              modifier = Modifier.padding(start = CardInset, end = CardInset, top = 8.dp),
           )
           Row(
-              modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 10.dp),
+              modifier = Modifier.fillMaxWidth().padding(start = CardInset, end = CardInset, top = 10.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             ActionPill("Test connection") { if (applyConnection()) MaControl.testLogin(context) }
@@ -256,22 +255,21 @@ internal fun MultiRoomContent() {
             }
           }
           // Live relay status — gives Apply visible feedback (Connecting… → Connected).
-          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)) }
+          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(horizontal = CardInset, vertical = 18.dp)) }
           Text(
               MultiRoomStatus.text.ifBlank { "Starting…" },
               color = IosBlue,
               fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
+              modifier = Modifier.padding(start = CardInset, end = CardInset, bottom = 16.dp),
           )
         }
       }
-      Text(
+      FooterNote(
           "Join this Portal to the same Snapcast group as your other rooms, then point it " +
               "at your Music Assistant server. Audio is played by the Snapcast app; timing depends " +
-              "on the server, network and speaker setup.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-      )
+              "on the server, network and speaker setup.")
     }
 }
+
+/** Card content starts on the Settings row-text inset, like every registry row. */
+private val CardInset = SettingsSpacing.TEXT_INSET_DP.dp

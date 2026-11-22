@@ -149,7 +149,7 @@ internal fun WelcomeSettingsContent() {
   }
 
       Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
-        SectionLabel("Show")
+        SectionLabel("Show", leading = true)
         Card {
           ToggleRow("Greeting message", settings.showGreeting) {
             SettingsDomains.welcome.apply(context, JSONObject().put("showGreeting", it))
@@ -174,7 +174,6 @@ internal fun WelcomeSettingsContent() {
           }
         }
 
-        Spacer(Modifier.size(26.dp))
 
         if (advanced && settings.enableTts) {
         SectionLabel("Voice")
@@ -205,7 +204,6 @@ internal fun WelcomeSettingsContent() {
             previewEnabled = !voiceLoading && !voiceLoadFailed && ttsEngine.value != null,
         )
 
-        Spacer(Modifier.size(26.dp))
         }
 
         SectionLabel("Greeting")
@@ -238,7 +236,6 @@ internal fun WelcomeSettingsContent() {
           }
         }
 
-        Spacer(Modifier.size(26.dp))
 
         // Timing & look share one card, as in the approved mock; duration and opacity stay ADV.
         SectionLabel("Timing & look")

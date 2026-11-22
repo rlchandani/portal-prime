@@ -16,12 +16,14 @@ data class ApprovedPalette(
     val selected: Color, val green: Color, val dark: Boolean,
     val error: Color = Color(0xFFD33D4C),
     /** Slim trim around cards and round chrome buttons so they hold their edge on the page. */
-    val outline: Color = divider)
+    val outline: Color = divider,
+    /** Track of a switch that is off: on light cards it must stay visible behind the white thumb. */
+    val switchOffTrack: Color = surface2)
 
 val ApprovedLightPalette = ApprovedPalette(
     Color(0xFFF2F3F7), Color(0xFFE9EDF3), Color.White, Color(0xFFE5EBF2),
     Color(0xFF182C39), Color(0xFF536674), Color(0xFFDCE3EB), Color(0xFF176ABB),
-    Color(0xFFD7E7F8), Color(0xFF288B61), false, outline = Color(0xFFC9D2DC))
+    Color(0xFFD7E7F8), Color(0xFF288B61), false, outline = Color(0xFFC9D2DC), switchOffTrack = Color(0xFFB4BFCC))
 val ApprovedDarkPalette = ApprovedPalette(
     Color(0xFF14161B), Color(0xFF14161B), Color(0xFF2B2B2B), Color(0xFF363636),
     Color.White, Color(0xFFB8B8B8), Color(0xFF484848), Color.White,

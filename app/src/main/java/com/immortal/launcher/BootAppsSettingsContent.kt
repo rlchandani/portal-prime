@@ -202,6 +202,7 @@ internal fun BootAppsContent() {
     }
     if (applying) FooterNote("Saving your choice…")
     if (loading && apps != null) FooterNote("Refreshing startup apps…")
+    SettingsCardGap()
     Card {
       val list = apps
       if (list == null) {
@@ -257,8 +258,7 @@ internal fun BootAppsContent() {
         }
       }
     }
-    Text("These apps relaunch automatically after a reboot — handy for players like Music " +
-        "Assistant that don't restart themselves.", color = IosSecondary,
-        fontSize = Sizes.rowSub, modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp))
+    FooterNote("These apps relaunch automatically after a reboot — handy for players like Music " +
+        "Assistant that don't restart themselves.")
   }
 }

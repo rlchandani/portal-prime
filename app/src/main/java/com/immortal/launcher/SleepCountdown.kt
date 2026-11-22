@@ -92,7 +92,8 @@ internal fun SleepCountdownCard(timerEnabled: Boolean, minutes: Int, onStart: ()
         }
     }
     Card {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.padding(horizontal = SettingsSpacing.TEXT_INSET_DP.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("Sleep timer", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
                 val shown = SleepCountdown.display(endsAt, now, minutes)

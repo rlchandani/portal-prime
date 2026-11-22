@@ -14,6 +14,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
@@ -104,7 +107,10 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
     val gap = SettingsSpacing.CARD_GAP_DP.dp
     Column(verticalArrangement = Arrangement.spacedBy(gap)) {
         tiles.chunked(columns).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(gap)) { row.forEach { tile -> tile(Modifier.weight(1f)) } }
+            // Tiles of one row share the tallest one's height, so a three-line description doesn't stagger it.
+            Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(gap)) {
+                row.forEach { tile -> tile(Modifier.weight(1f).fillMaxHeight()) }
+            }
         }
     }
     if (settings.source != ScreensaverConfig.SOURCE_DEFAULT) {
@@ -159,7 +165,7 @@ private fun SourceTile(
         modifier = modifier.defaultMinSize(minHeight = 180.dp)
             .semantics { this.selected = selected }
             .tvFocusable(shape, focusScale = 1f, ringColor = palette.accent, onClick = onClick)) {
-        Row(Modifier.padding(30.dp), horizontalArrangement = Arrangement.spacedBy(23.dp),
+        Row(Modifier.fillMaxHeight().padding(30.dp), horizontalArrangement = Arrangement.spacedBy(23.dp),
             verticalAlignment = Alignment.CenterVertically) {
             // A fixed tile colour: the dark theme's accent is white, which hid the white glyph.
             Surface(color = androidx.compose.ui.graphics.Color(tileColor), shape = RoundedCornerShape(17.dp)) {
