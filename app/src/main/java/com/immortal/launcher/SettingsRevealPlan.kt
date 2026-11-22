@@ -16,6 +16,12 @@ internal object SettingsRevealPlan {
     /** About 9 ms of Text work, so the switch frame stays well inside the 40 ms target. */
     const val FIRST_FRAME_TEXT_BUDGET = 8
 
+    /**
+     * Rows a long in-card list (Start on boot's apps) adds per frame when its data arrives after the
+     * page settled, so that frame never composes the whole list (two Texts and a switch per row).
+     */
+    const val LIST_ROWS_PER_FRAME = 2
+
     /** Never composed in the switch frame: a block's cost is its whole editor. */
     const val DEFERRED = Int.MAX_VALUE
 
@@ -73,4 +79,8 @@ internal object SettingsRevealPlan {
         }
         return keys
     }
+
+    /** How many of a late list's [total] rows show next frame, given [shown] now. */
+    fun nextListRowCount(shown: Int, total: Int, perFrame: Int = LIST_ROWS_PER_FRAME): Int =
+        (shown.coerceAtLeast(0) + perFrame.coerceAtLeast(1)).coerceAtMost(total.coerceAtLeast(0))
 }

@@ -11,6 +11,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ShouldPauseCallback
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -186,6 +188,50 @@ internal fun rememberFrameAfter(ready: Boolean): Boolean {
         }
     }
     return after
+}
+
+/**
+ * How many of a [total]-row in-card list to compose now. While the page's first wave runs, every
+ * row is there (each row's own [SettingsDeferredSlot] spreads them over frames); once the page has
+ * settled, or outside a split-view page, a list that arrives or grows later is revealed
+ * [SettingsRevealPlan.LIST_ROWS_PER_FRAME] rows per frame instead of all in its arrival frame.
+ */
+@Composable
+internal fun rememberStagedRowCount(total: Int): Int {
+    val scheduler = LocalSettingsComposition.current
+    var staged by remember { mutableIntStateOf(0) }
+    LaunchedEffect(total) {
+        if (scheduler != null && !scheduler.isSettled) {
+            staged = total
+            return@LaunchedEffect
+        }
+        // A list that shrank (a narrower search) restages from its new size when it grows again.
+        staged = staged.coerceAtMost(total)
+        while (staged < total) {
+            staged = SettingsRevealPlan.nextListRowCount(staged, total)
+            withFrameNanos { }
+        }
+    }
+    // isSettled is a plain field: reading it here never recomposes the list.
+    return if (scheduler != null && !scheduler.isSettled) total else staged.coerceAtMost(total)
+}
+
+/**
+ * [items] as divided rows of the enclosing card. Each row is its own deferred slot (composed a few
+ * per frame while the page opens), and a list that arrives after the page settled is revealed a
+ * couple of rows per frame ([rememberStagedRowCount]), so no frame composes a whole long list.
+ */
+@Composable
+internal fun <T> SettingsStagedCardRows(items: List<T>, itemKey: (T) -> Any, row: @Composable (T) -> Unit) {
+    val shown = rememberStagedRowCount(items.size)
+    items.take(shown).forEachIndexed { index, item ->
+        key(itemKey(item)) {
+            SettingsDeferredSlot(Sizes.rowMinHeight) {
+                if (index > 0) Divider()
+                row(item)
+            }
+        }
+    }
 }
 
 /** Waits until the current page has settled (or one frame outside a split-view page). */

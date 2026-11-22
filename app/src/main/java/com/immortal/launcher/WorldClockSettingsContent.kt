@@ -8,10 +8,6 @@
 package com.immortal.launcher
 
 import android.app.Activity
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -75,53 +71,60 @@ internal fun WorldClockContent() {
   var selected by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
 
   Column {
-      Card {
-        LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
-        itemsIndexed(WORLD_CLOCK_CITIES, key = { _, city -> city.second }) { i, (label, zone) ->
-          if (i > 0) Divider()
-          val on = zone in selected
-          val rank = selected.indexOf(zone)
-          Row(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                      .tvFocusableRow(focusFill = IosFocusTint, role = null) {
-                        selected = if (on) selected - zone else selected + zone
-                        ImmortalSettings.setWorldClockZones(context, selected)
-                      }
-                      .semantics {
-                        role = Role.Switch
-                        toggleableState = ToggleableState(on)
-                      }
-                      .padding(horizontal = 28.dp, vertical = 22.dp),
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Column(modifier = Modifier.weight(1f)) {
-              Text(label, color = IosLabel, fontSize = Sizes.rowTitle)
-              Text(
-                  zone.replace('_', ' '),
-                  color = IosSecondary,
-                  fontSize = Sizes.rowSub,
-                  modifier = Modifier.padding(top = 2.dp),
-              )
-            }
-            if (on && rank in 0..3) {
-              Text(
-                  "#${rank + 1}",
-                  color = IosBlue,
-                  fontSize = Sizes.rowSub,
-                  fontWeight = FontWeight.SemiBold,
-                  modifier = Modifier.padding(end = 14.dp),
-              )
-            } else if (on) {
-              Text("hidden", color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(end = 14.dp))
-            }
-            ApprovedSettingsSwitch(on)
-          }
+    // Plain card rows in the page's own scroll (no bounded list that clips its last row), each its
+    // own deferred slot so the 13 cities are composed a few per frame when the page opens.
+    Card {
+      SettingsStagedCardRows(WORLD_CLOCK_CITIES, itemKey = { it.second }) { (label, zone) ->
+        WorldClockCityRow(label, zone, selected) { next ->
+          selected = next
+          ImmortalSettings.setWorldClockZones(context, next)
         }
       }
-      }
-      FooterNote(
-          "Tip: resize the widget to see more clocks. Re-pick a city to move it to the end of the order.")
     }
+    FooterNote(
+        "Tip: resize the widget to see more clocks. Re-pick a city to move it to the end of the order.")
+  }
+}
+
+/** One city: tapping toggles it; a chosen city shows its place in the widget (or "hidden" past four). */
+@Composable
+private fun WorldClockCityRow(label: String, zone: String, selected: List<String>, onChange: (List<String>) -> Unit) {
+  val on = zone in selected
+  val rank = selected.indexOf(zone)
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .defaultMinSize(minHeight = Sizes.rowMinHeight)
+              .tvFocusableRow(focusFill = IosFocusTint, role = null) {
+                onChange(if (on) selected - zone else selected + zone)
+              }
+              .semantics {
+                role = Role.Switch
+                toggleableState = ToggleableState(on)
+              }
+              .padding(horizontal = 28.dp, vertical = 22.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Column(modifier = Modifier.weight(1f)) {
+      Text(label, color = IosLabel, fontSize = Sizes.rowTitle)
+      Text(
+          zone.replace('_', ' '),
+          color = IosSecondary,
+          fontSize = Sizes.rowSub,
+          modifier = Modifier.padding(top = 2.dp),
+      )
+    }
+    if (on && rank in 0..3) {
+      Text(
+          "#${rank + 1}",
+          color = IosBlue,
+          fontSize = Sizes.rowSub,
+          fontWeight = FontWeight.SemiBold,
+          modifier = Modifier.padding(end = 14.dp),
+      )
+    } else if (on) {
+      Text("hidden", color = IosSecondary, fontSize = Sizes.rowSub, modifier = Modifier.padding(end = 14.dp))
+    }
+    ApprovedSettingsSwitch(on)
+  }
 }

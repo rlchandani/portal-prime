@@ -539,7 +539,7 @@ class SettingsDomainTest {
 
   @Test
   fun quickbarRegistry_coversEveryPersistedField() {
-    // quickbar now has a real QuickBarConfig.Settings snapshot (so it renders through SettingsList on
+    // quickbar now has a real QuickBarConfig.Settings snapshot (so it renders through SettingsRows on
     // both surfaces) — give it the same reflection tripwire as screensaver/immortal.
     val fields =
         com.immortal.launcher.QuickBarConfig.Settings::class.java.declaredFields

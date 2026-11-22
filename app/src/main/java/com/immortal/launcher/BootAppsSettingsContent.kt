@@ -11,10 +11,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.awaitCancellation
@@ -212,26 +208,9 @@ internal fun BootAppsContent() {
         Text("No other apps installed yet.", color = IosSecondary,
             fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp))
       } else {
-        LazyColumn(Modifier.heightIn(max = (LocalConfiguration.current.screenHeightDp - 400).coerceAtLeast(400).dp)) {
-          itemsIndexed(list, key = { _, app -> app.pkg }) { i, app ->
-            if (i > 0) Divider()
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .defaultMinSize(minHeight = Sizes.rowMinHeight)
-                    .tvFocusableRow(focusFill = IosFocusTint, enabled = canEdit, role = null) { onSelectionChange(app.pkg, false) }
-                    .semantics {
-                      role = Role.Switch
-                      toggleableState = ToggleableState(app.pkg in selected)
-                    }
-                    .padding(horizontal = 28.dp, vertical = 22.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(42.dp))
-              Text(app.label, color = IosLabel, fontSize = Sizes.rowTitle,
-                  modifier = Modifier.weight(1f).padding(start = 14.dp))
-              ApprovedSettingsSwitch(app.pkg in selected, enabled = canEdit)
-            }
-          }
+        // Plain card rows in the page's own scroll: no bounded inner list that clips its last row.
+        SettingsStagedCardRows(list, itemKey = { it.pkg }) { app ->
+          BootAppRow(app, app.pkg in selected, canEdit) { onSelectionChange(app.pkg, false) }
         }
       }
     }
@@ -240,25 +219,47 @@ internal fun BootAppsContent() {
       FooterNote("These startup choices are saved, but their apps aren't shown above. " +
           "Remove a choice to stop trying to start it after a reboot.")
       Card {
-        LazyColumn(Modifier.heightIn(max = 280.dp)) {
-          itemsIndexed(unlisted, key = { _, pkg -> pkg }) { index, pkg ->
-            if (index > 0) Divider()
-            Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 18.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-              Text(pkg, color = IosLabel, fontSize = Sizes.rowSub,
-                  maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                  modifier = Modifier.weight(1f))
-              ActionPill("Remove", enabled = canEdit,
-                  modifier = Modifier.semantics { contentDescription = "Remove startup entry $pkg" }) {
-                onSelectionChange(pkg, true)
-              }
-            }
-          }
+        SettingsStagedCardRows(unlisted, itemKey = { it }) { pkg ->
+          UnlistedBootAppRow(pkg, canEdit) { onSelectionChange(pkg, true) }
         }
       }
     }
     FooterNote("These apps relaunch automatically after a reboot — handy for players like Music " +
         "Assistant that don't restart themselves.")
+  }
+}
+
+@Composable
+private fun BootAppRow(app: BootAppOption, on: Boolean, enabled: Boolean, onToggle: () -> Unit) {
+  Row(
+      modifier = Modifier.fillMaxWidth()
+          .defaultMinSize(minHeight = Sizes.rowMinHeight)
+          .tvFocusableRow(focusFill = IosFocusTint, enabled = enabled, role = null) { onToggle() }
+          .semantics {
+            role = Role.Switch
+            toggleableState = ToggleableState(on)
+          }
+          .padding(horizontal = 28.dp, vertical = 22.dp),
+      verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Image(bitmap = app.icon, contentDescription = null, modifier = Modifier.size(42.dp))
+    Text(app.label, color = IosLabel, fontSize = Sizes.rowTitle,
+        modifier = Modifier.weight(1f).padding(start = 14.dp))
+    ApprovedSettingsSwitch(on, enabled = enabled)
+  }
+}
+
+@Composable
+private fun UnlistedBootAppRow(pkg: String, enabled: Boolean, onRemove: () -> Unit) {
+  Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 18.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+    Text(pkg, color = IosLabel, fontSize = Sizes.rowSub,
+        maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f))
+    ActionPill("Remove", enabled = enabled,
+        modifier = Modifier.semantics { contentDescription = "Remove startup entry $pkg" }) {
+      onRemove()
+    }
   }
 }

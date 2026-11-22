@@ -16,10 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +37,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 private val ROW_MIN_HEIGHT = 100.dp
-private val LIST_MAX_HEIGHT = 520.dp
 
 /**
  * Settings › Home Assistant › Doorbell: choose the doorbell button, the door camera and optional
@@ -112,22 +108,24 @@ private fun PickerSection(
   SectionLabel(title)
   Card {
     if (options.isEmpty()) ApprovedEditorsEmpty(empty)
-    else LazyColumn(Modifier.fillMaxWidth().heightIn(max = LIST_MAX_HEIGHT)) {
-      items(options, key = { it.entityId }) { option ->
-        val picked = option.entityId in chosen
-        Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = ROW_MIN_HEIGHT)
-            .tvFocusableRow(focusFill = IosFocusTint, onClick = { onPick(option.entityId) })
-            .padding(horizontal = 28.dp, vertical = 21.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-          Column(Modifier.weight(1f)) {
-            Text(option.name, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp)
-            Text(option.entityId, color = IosSecondary, fontSize = 21.sp, lineHeight = 29.sp)
-          }
-          Text(if (picked) "Chosen ✓" else "Choose", color = if (picked) IosSecondary else IosBlue,
-              fontSize = 24.sp, lineHeight = 32.sp)
-        }
-        Divider()
-      }
+    // Plain card rows in the page's own scroll: no bounded inner list that clips its last row.
+    else SettingsStagedCardRows(options, itemKey = { it.entityId }) { option ->
+      DoorbellOptionRow(option, picked = option.entityId in chosen) { onPick(option.entityId) }
     }
+  }
+}
+
+@Composable
+private fun DoorbellOptionRow(option: DoorbellDiscovery.Option, picked: Boolean, onPick: () -> Unit) {
+  Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = ROW_MIN_HEIGHT)
+      .tvFocusableRow(focusFill = IosFocusTint, onClick = onPick)
+      .padding(horizontal = 28.dp, vertical = 21.dp),
+      verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.weight(1f)) {
+      Text(option.name, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp)
+      Text(option.entityId, color = IosSecondary, fontSize = 21.sp, lineHeight = 29.sp)
+    }
+    Text(if (picked) "Chosen ✓" else "Choose", color = if (picked) IosSecondary else IosBlue,
+        fontSize = 24.sp, lineHeight = 32.sp)
   }
 }
