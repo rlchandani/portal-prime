@@ -1,0 +1,53 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 99406176 Realtime: 99406176
+
+** MEMINFO in pid 16440 [com.immortal.launcher.debug] **
+                   Pss  Private  Private  SwapPss     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------
+  Native Heap    26528    26444        0       69    31132    27736     3395
+  Dalvik Heap    19355    19312        0       77    33910    16955    16955
+ Dalvik Other     3178     3176        0        0                           
+        Stack      284      284        0        0                           
+       Ashmem      168      160        0        0                           
+      Gfx dev    11140    11140        0        0                           
+    Other dev       64        0       64        0                           
+     .so mmap    10562      120     2604       38                           
+    .jar mmap     5454        0     2532        0                           
+    .apk mmap    33303      644    31712        0                           
+    .ttf mmap      376        0      340        0                           
+    .dex mmap    18254       20    18232        0                           
+    .oat mmap     3028        0      988        0                           
+    .art mmap     2923     2188        4       86                           
+   Other mmap     5051     1272     1016        0                           
+   EGL mtrack    24624    24624        0        0                           
+    GL mtrack    11308    11308        0        0                           
+      Unknown     5869     5856        0        6                           
+        TOTAL   181745   106548    57492      276    65042    44691    20350
+ 
+ App Summary
+                       Pss(KB)
+                        ------
+           Java Heap:    21504
+         Native Heap:    26444
+                Code:    57192
+               Stack:      284
+            Graphics:    47072
+       Private Other:    11544
+              System:    17705
+ 
+               TOTAL:   181745       TOTAL SWAP PSS:      276
+ 
+ Objects
+               Views:       10         ViewRootImpl:        2
+         AppContexts:       12           Activities:        1
+              Assets:        7        AssetManagers:        0
+       Local Binders:       55        Proxy Binders:       50
+       Parcel memory:       31         Parcel count:       90
+    Death Recipients:        6      OpenSSL Sockets:        5
+            WebViews:        0
+ 
+ SQL
+         MEMORY_USED:        0
+  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
+ 

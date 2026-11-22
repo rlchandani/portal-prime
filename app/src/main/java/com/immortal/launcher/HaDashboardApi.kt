@@ -13,21 +13,20 @@ import org.json.JSONObject
 
 /**
  * The HA dashboard's data layer, extending [HaClient]'s widget-sized REST surface with what a
- * full-room dashboard needs: the house's area→entities map, rich per-domain attributes
- * (brightness, climate temps/action, media track), service calls with data payloads
- * (brightness %, target temperature), and sensor history for sparklines.
+ * full-room dashboard needs: the whole house (areas, their entities with rich attributes, and the
+ * `scene.*` entities) in ONE `POST /api/template` call, service calls with data payloads, and
+ * sensor history for sparklines.
  *
- * Areas come from HA's template endpoint (`POST /api/template`) because the REST API has no
- * native /api/areas — the template below asks HA to serialize its own area registry. One call,
- * standard install, no custom integration needed.
- *
- * Same conventions as [HaClient]: blocking calls through [Http], null/empty on failure, pure
- * JSON parsing split out and unit-tested ([HaDashboardApiTest]).
+ * Reads return [HaResult] so the screen can tell "sign in again" from "can't reach it" from "no
+ * rooms" (it used to get an empty list for all three). If an older HA rejects the rich template
+ * (HTTP 400) the legacy ids-only template plus one `/api/states/<id>` per entity is used instead.
+ * Pure JSON parsing lives in [HaDashboardParse] and is unit-tested.
  */
 object HaDashboardApi {
 
-  /** One HA area with the entity ids assigned to it (directly or via its devices). */
-  data class Area(val id: String, val name: String, val entityIds: List<String>)
+  /** One HA area with its entity ids and (from the rich template) their details. */
+  data class Area(val id: String, val name: String, val entityIds: List<String>,
+      val details: List<Detail> = emptyList())
 
   /** Rich entity detail for dashboard tiles; nulls where a domain doesn't apply. */
   data class Detail(
@@ -35,33 +34,68 @@ object HaDashboardApi {
       val domain: String,
       val friendlyName: String,
       val state: String,
-      val brightnessPct: Int?,      // light
+      val brightnessPct: Int?,      // light (null = not dimmable)
       val currentTemp: Float?,      // climate
       val targetTemp: Float?,       // climate
       val hvacAction: String?,      // climate: "heating"/"cooling"/"idle"
       val mediaTitle: String?,      // media_player
       val mediaArtist: String?,     // media_player
       val unit: String,             // sensor
+      val deviceClass: String? = null,
+      val tempStep: Float? = null,  // climate target_temp_step
   )
+
+  /** A `scene.*` entity HA actually has. */
+  data class Scene(val id: String, val name: String)
+
+  /** Everything the dashboard shows, fetched in one call. */
+  data class House(val areas: List<Area>, val scenes: List<Scene>)
 
   internal const val MAX_ENTITIES_PER_ROOM = 12
 
-  // area_entities() returns plain entity_id strings — filter by matching the domain prefix,
-  // then reject noisy diagnostic suffixes (LED indicators, consumption sensors, motion, etc.).
-  // This keeps only the controllable/meaningful entities the dashboard can actually render,
-  // typically 5-15 per room vs the raw 50-190 a large HA install has.
-  private const val AREAS_TEMPLATE = """[{% for a in areas() %}{"id":{{ a | tojson }},"name":{{ area_name(a) | tojson }},"entities":{{ area_entities(a) | select("match","^(light|switch|climate|media_player|fan|cover|lock|input_boolean)\\.") | reject("match",".*_(led|motion_sensor|occupancy|tamper|battery|rssi|consumption|voltage|current|energy|power)$") | list | tojson }}}{{ "," if not loop.last }}{% endfor %}]"""
+  private const val DOMAINS = "^(light|switch|climate|media_player|fan|cover|lock|input_boolean|sensor|binary_sensor)\\."
+  private const val NOISE =
+      ".*_(led|motion_sensor|occupancy|tamper|battery|rssi|consumption|voltage|current|energy|power|signal_strength|linkquality)$"
+  private const val KEYS =
+      """["brightness","current_temperature","temperature","hvac_action","media_title","media_artist","unit_of_measurement","device_class","target_temp_step"]"""
+
+  // area_entities() lists plain ids; keep the domains the dashboard renders and drop diagnostic
+  // suffixes. Attributes are emitted only when set, so a plain light never looks dimmable.
+  private val HOUSE_TEMPLATE =
+      """{"areas":[{% for a in areas() %}{% set ents = area_entities(a) | select("match","$DOMAINS") | reject("match","$NOISE") | list %}""" +
+          """{"id":{{ a | tojson }},"name":{{ area_name(a) | tojson }},"entities":[{% for e in ents %}""" +
+          """{"entity_id":{{ e | tojson }},"state":{{ states(e) | tojson }},"attributes":{"friendly_name":{{ (state_attr(e,"friendly_name") or e) | tojson }}""" +
+          """{% for k in $KEYS %}{% set v = state_attr(e,k) %}{% if v is not none %},{{ k | tojson }}:{{ v | tojson }}{% endif %}{% endfor %}""" +
+          """{% set cm = state_attr(e,"supported_color_modes") %}{% if cm %},"supported_color_modes":{{ cm | list | tojson }}{% endif %}}}""" +
+          """{{ "," if not loop.last }}{% endfor %}]}{{ "," if not loop.last }}{% endfor %}],""" +
+          """"scenes":[{% for s in states.scene %}{"id":{{ s.entity_id | tojson }},"name":{{ s.name | tojson }}}{{ "," if not loop.last }}{% endfor %}]}"""
+
+  // The pre-1.327 ids-only template, kept as the fallback for installs that reject the one above.
+  private const val LEGACY_AREAS_TEMPLATE = """[{% for a in areas() %}{"id":{{ a | tojson }},"name":{{ area_name(a) | tojson }},"entities":{{ area_entities(a) | select("match","^(light|switch|climate|media_player|fan|cover|lock|input_boolean)\\.") | reject("match",".*_(led|motion_sensor|occupancy|tamper|battery|rssi|consumption|voltage|current|energy|power)$") | list | tojson }}}{{ "," if not loop.last }}{% endfor %}]"""
+
+  private const val HTTP_BAD_REQUEST = 400
 
   // --- reads ------------------------------------------------------------------
 
-  /** The house's rooms (areas with ≥1 entity). Blocking; empty on failure/unconfigured. */
-  fun fetchAreas(context: Context): List<Area> {
-    if (!HaConfig.isConfigured(context)) return emptyList()
-    val url = "${HaConfig.baseUrl(context)}/api/template"
-    val body = JSONObject().put("template", AREAS_TEMPLATE).toString()
-    val resp = Http.postString(url, body, headers = HaConfig.authHeaders(context)) ?: return emptyList()
-    return parseAreas(resp)
+  /** The whole house. Blocking. */
+  fun fetchHouse(context: Context): HaResult<House> {
+    if (!HaConfig.isConfigured(context)) return HaResult.NotConfigured
+    val rich = template(context, HOUSE_TEMPLATE)
+    if (rich.code != HTTP_BAD_REQUEST) return HaResult.of(rich) { HaDashboardParse.house(it) }
+    return fetchLegacyHouse(context)
   }
+
+  private fun fetchLegacyHouse(context: Context): HaResult<House> {
+    val ids = HaResult.of(template(context, LEGACY_AREAS_TEMPLATE)) { parseAreas(it) }
+    if (ids !is HaResult.Ok) return ids.cast()
+    val areas = ids.value.map { a -> a.copy(details = a.entityIds.mapNotNull { fetchDetail(context, it) }) }
+    val anyAnswered = areas.isEmpty() || areas.any { it.details.isNotEmpty() }
+    return if (anyAnswered) HaResult.Ok(House(areas, emptyList())) else HaResult.Unreachable
+  }
+
+  private fun template(context: Context, template: String): Http.Outcome<String> =
+      Http.postForOutcome("${HaConfig.baseUrl(context)}/api/template",
+          JSONObject().put("template", template).toString(), HaConfig.authHeaders(context))
 
   /** Rich detail for one entity. Blocking; null on failure. */
   fun fetchDetail(context: Context, entityId: String): Detail? {
@@ -71,15 +105,11 @@ object HaDashboardApi {
     return runCatching { parseDetail(JSONObject(body)) }.getOrNull()
   }
 
-  /** Rich details for several entities, dropping failures. Blocking. */
-  fun fetchDetails(context: Context, entityIds: List<String>): List<Detail> =
-      entityIds.mapNotNull { fetchDetail(context, it) }
-
   /**
    * A sensor's recent numeric history for a sparkline (default: last 24h, minimal response).
-   * Blocking; empty on failure.
+   * Blocking; empty on failure (a sparkline is decoration, its absence needs no message).
    */
-  fun fetchHistory(context: Context, entityId: String, hours: Int = 24): List<Float> {
+  fun fetchHistory(context: Context, entityId: String): List<Float> {
     if (!HaConfig.isConfigured(context)) return emptyList()
     val url =
         "${HaConfig.baseUrl(context)}/api/history/period" +
@@ -108,7 +138,7 @@ object HaDashboardApi {
     return Http.postString(url, body, headers = HaConfig.authHeaders(context)) != null
   }
 
-  // --- pure parsing (unit-tested) ----------------------------------------------
+  // --- pure parsing (unit-tested; see HaDashboardParse) -------------------------
 
   internal fun parseAreas(body: String): List<Area> =
       runCatching {
@@ -123,24 +153,7 @@ object HaDashboardApi {
           }
           .getOrDefault(emptyList())
 
-  internal fun parseDetail(o: JSONObject): Detail {
-    val id = o.optString("entity_id", "")
-    val attrs = o.optJSONObject("attributes") ?: JSONObject()
-    val brightness = if (attrs.has("brightness")) attrs.optInt("brightness", 0) else null
-    return Detail(
-        entityId = id,
-        domain = id.substringBefore('.', ""),
-        friendlyName = attrs.optString("friendly_name", "").ifBlank { id },
-        state = o.optString("state", ""),
-        brightnessPct = brightness?.let { Math.round(it * 100f / 255f) },
-        currentTemp = if (attrs.has("current_temperature")) attrs.optDouble("current_temperature").toFloat() else null,
-        targetTemp = if (attrs.has("temperature")) attrs.optDouble("temperature").toFloat() else null,
-        hvacAction = attrs.optString("hvac_action", "").ifBlank { null },
-        mediaTitle = attrs.optString("media_title", "").ifBlank { null },
-        mediaArtist = attrs.optString("media_artist", "").ifBlank { null },
-        unit = attrs.optString("unit_of_measurement", ""),
-    )
-  }
+  internal fun parseDetail(o: JSONObject): Detail = HaDashboardParse.detail(o)
 
   internal fun parseHistory(body: String): List<Float> =
       runCatching {
