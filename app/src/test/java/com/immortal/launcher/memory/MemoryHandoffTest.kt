@@ -86,6 +86,15 @@ class MemoryHandoffTest {
     assertTrue(facts().isEmpty())
   }
 
+  @Test fun someoneElseRecognisedByTheEndMeansNobodyLearns() {
+    access = MemoryAccess.On(MemoryScope.Person("p1"), "Alex", false)
+    open("c1")
+    access = MemoryAccess.On(MemoryScope.Person("p2"), "Sam", false)
+    assertTrue(end("c1", "I follow the Warriors").getBoolean("ignored"))
+    assertTrue(facts(MemoryScope.Person("p1")).isEmpty())
+    assertTrue(facts(MemoryScope.Person("p2")).isEmpty())
+  }
+
   @Test fun pausedConversationsAreNotHandedOver() {
     store.runtime.update(MemoryScope.Household) { MemoryLearner.setPaused(it, true) }
     assertFalse(open("c1").getBoolean("learning"))

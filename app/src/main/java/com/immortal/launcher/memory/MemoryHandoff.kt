@@ -55,7 +55,9 @@ internal class MemoryHandoff(
     val frozen = synchronized(lock) { conversations.accessFor(digest.conversationId, nowMs) } ?: accessNow()
     val current = accessNow()
     val on = frozen as? MemoryAccess.On
-    if (on == null || current is MemoryAccess.Off) {
+    // Someone else recognised by the end: the words may be theirs, so they go to nobody's profile.
+    val someoneElse = current is MemoryAccess.On && current.scope is MemoryScope.Person && current.scope != on?.scope
+    if (on == null || current is MemoryAccess.Off || someoneElse) {
       synchronized(lock) { conversations = conversations.finished(digest.conversationId, null, emptySet(), nowMs) }
       return JSONObject().put("learned", JSONArray()).put("ignored", true)
     }
@@ -91,8 +93,10 @@ internal class MemoryHandoff(
 
   /** `hearthpane.memory`, scoped to the conversation under way (or to who is there now). */
   fun tool(show: () -> Unit): MemoryTool = MemoryTool(
-      access = { synchronized(lock) { conversations.liveAccess(now()) }?.takeIf { accessNow() !is MemoryAccess.Off }
-          ?: accessNow() },
+      access = {
+        val current = accessNow()
+        if (current is MemoryAccess.Off) current else synchronized(lock) { conversations.liveAccess(now()) } ?: current
+      },
       profile = runtime::profile,
       update = { scope, change -> runtime.update(scope, immediate = true, change = change) },
       dictionary = dictionary,

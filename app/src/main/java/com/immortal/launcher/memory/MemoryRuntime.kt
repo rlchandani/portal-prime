@@ -64,7 +64,10 @@ internal class MemoryRuntime(
     scheduleWrite()
   }
 
-  fun usage(): UsageCounts = synchronized(lock) { usage ?: loadUsage().also { usage = it } }
+  /** The usage counts within their retention window (pruned on read, so a long quiet spell leaves nothing stale). */
+  fun usage(): UsageCounts = synchronized(lock) {
+    (usage ?: loadUsage()).pruned(now(), java.time.ZoneId.systemDefault()).also { usage = it }
+  }
 
   /** Writes everything changed since the last write. */
   fun flush() {
