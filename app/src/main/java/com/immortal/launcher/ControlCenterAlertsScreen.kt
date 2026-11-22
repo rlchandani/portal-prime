@@ -13,10 +13,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -93,7 +93,7 @@ private fun CcAlertsBody(cards: CcAlertCards, warnAfterMin: Int, warnings: Boole
       items(items, key = { "${it.alert.id}:${it.active}" }) { AlertCard(it, onOp) }
     }
     val set = remember(ui) { { key: String, v: Boolean -> com.immortal.launcher.settings.ControlCenterSettings.set(ui.context, key, v); Unit } }
-    Column(Modifier.width(520.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Column(Modifier.width(CcAlertsLayout.SIDE_WIDTH.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
       BannersCard(warnAfterMin, warnings, info, set, Modifier.fillMaxWidth())
       BannerPreviewCard(Modifier.fillMaxWidth())
     }
@@ -169,13 +169,13 @@ private fun SmallButton(label: String, spoken: String, danger: Boolean, enabled:
 @Composable
 private fun BannersCard(warnAfterMin: Int, warnings: Boolean, info: Boolean, set: (String, Boolean) -> Unit, modifier: Modifier) {
   val c = LocalCc.current
-  Column(modifier.ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
-    CcSectionLabel("Portal-wide banners", Modifier.padding(bottom = 14.dp))
-    BannerRow("Critical — leak, smoke, CO", "Every Portal, full screen with sound, even kids & do-not-disturb", divider = true) { CcTag("Always", CcTone.RED) }
-    BannerRow("Warnings — garage, doors, windows", "Full Portals · after $warnAfterMin min", divider = true) {
+  Column(modifier.ccCard().padding(horizontal = CcAlertsLayout.CARD_PADDING.dp, vertical = 24.dp)) {
+    CcSectionLabel(CcAlertsLayout.BANNERS_TITLE, Modifier.padding(bottom = 14.dp))
+    BannerRow(CcAlertsLayout.CRITICAL.title, "Every Portal, full screen with sound, even kids & do-not-disturb", divider = true) { CcTag("Always", CcTone.RED) }
+    BannerRow(CcAlertsLayout.WARNINGS.title, "Full Portals · after $warnAfterMin min", divider = true) {
       CcToggle(warnings, { set("bannersWarnings", it) }, label = "Warning banners")
     }
-    BannerRow("Info — washer, dryer, dishwasher", "Full Portals · never in quiet hours", divider = true) {
+    BannerRow(CcAlertsLayout.INFO.title, "Full Portals · never in quiet hours", divider = true) {
       CcToggle(info, { set("bannersInfo", it) }, label = "Info banners")
     }
     Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -185,17 +185,28 @@ private fun BannersCard(warnAfterMin: Int, warnings: Boolean, info: Boolean, set
   }
 }
 
-/** PREVIEW A BANNER ON PORTAL HOME: one chip per severity; silent, never touches Home Assistant. */
-@OptIn(ExperimentalLayoutApi::class)
+/** PREVIEW A HOME BANNER: one chip per severity, in an even grid; silent, never touches Home Assistant. */
 @Composable
 private fun BannerPreviewCard(modifier: Modifier) {
   // The Control Center's window: the preview's fallback when the accessibility overlay host isn't bound.
   val activity = LocalContext.current.ccActivity()
-  Column(modifier.ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
-    CcSectionLabel("Preview a banner on Portal home", Modifier.padding(bottom = 14.dp))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-      CcBannerPreview.samples.forEach { sample ->
-        CcButton(sample.label, { ControlCenterBanners.preview(activity, sample.alert) }, icon = sample.icon, height = PREVIEW_CHIP_HEIGHT)
+  val fontScale = LocalDensity.current.fontScale
+  Column(modifier.ccCard().padding(horizontal = CcAlertsLayout.CARD_PADDING.dp, vertical = 24.dp)) {
+    CcSectionLabel(CcAlertsLayout.PREVIEW_TITLE, Modifier.padding(bottom = 14.dp))
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+      val samples = CcBannerPreview.samples
+      val columns = remember(maxWidth, fontScale) {
+        CcAlertsLayout.chipColumns(samples.map { it.label }, maxWidth.value.toDouble(), fontScale)
+      }
+      Column(verticalArrangement = Arrangement.spacedBy(CcAlertsLayout.CHIP_GAP.dp)) {
+        samples.chunked(columns).forEach { row ->
+          Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(CcAlertsLayout.CHIP_GAP.dp)) {
+            row.forEach { sample ->
+              CcButton(sample.label, { ControlCenterBanners.preview(activity, sample.alert) }, Modifier.weight(1f),
+                  icon = sample.icon, height = PREVIEW_CHIP_HEIGHT)
+            }
+          }
+        }
       }
     }
   }

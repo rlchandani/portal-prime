@@ -34,9 +34,15 @@ internal fun ApprovedThemeButton() {
         .tvFocusable(CircleShape, focusScale = 1f, ringColor = palette.accent) {
             toggleApprovedTheme(context, palette.dark)
         }, contentAlignment = Alignment.Center) {
-        ApprovedIcon(if (palette.dark) "theme_day" else "theme_night", tint = palette.text)
+        ApprovedIcon(approvedThemeIcon(palette.dark), tint = palette.text)
     }
 }
+
+/**
+ * The theme toggle's glyph. Dark shows the sun it switches to; light shows the appearance glyph
+ * (a half-filled circle), not a moon: the header's Sleep button beside it is already a moon.
+ */
+internal fun approvedThemeIcon(dark: Boolean): String = if (dark) "theme_day" else "theme_appearance"
 
 /** Flips the saved appearance through the registry (the header button and the compact "⋯" menu). */
 internal fun toggleApprovedTheme(context: android.content.Context, dark: Boolean) {

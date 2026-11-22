@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2026 Starbright Lab.
+
+    This source code is licensed under the MIT license found in the
+    LICENSE file in the root directory of this source tree.
+-->
+<!-- Appearance (light/dark): a half-filled circle, so it never reads as the Sleep moon beside it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M12,3a9,9 0,1 1,0 18a9,9 0,1 1,0 -18z" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,3a9,9 0,0 1,0 18z" />
+</vector>

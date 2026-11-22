@@ -78,7 +78,7 @@ internal fun HomeHeaderOverflowButton(size: Dp, status: String, onRemote: () -> 
             Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(1.dp).background(ApprovedHomePalette.Border))
             OverflowRow("remote", "Connect your phone") { open = false; onRemote() }
             OverflowRow("sleep", "Sleep screen") { open = false; onSleep() }
-            OverflowRow(if (palette.dark) "theme_day" else "theme_night",
+            OverflowRow(approvedThemeIcon(palette.dark),
                 if (palette.dark) "Switch to day theme" else "Switch to night theme") {
               open = false
               toggleApprovedTheme(context, palette.dark)

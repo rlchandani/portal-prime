@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -150,13 +151,15 @@ internal fun DinnerGlyph(name: String, size: Int, tint: Color = DinnerColors.Gly
 
 @Composable
 private fun SheetHeader(title: String, line: String, lineIcon: String, warn: Boolean, trailing: @Composable () -> Unit) {
+  val layout = currentLayoutClass()
   val lineRow: @Composable (Modifier) -> Unit = { m ->
     Icon(painterResource(DinnerIcons.resource(lineIcon)), null, tint = if (warn) DinnerColors.Bad else ApprovedHomePalette.Secondary,
         modifier = Modifier.size(28.dp))
     Text(line, color = if (warn) DinnerColors.Bad else ApprovedHomePalette.Secondary, fontSize = 24.sp,
-        modifier = m, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        lineHeight = if (layout.compactPortrait) DinnerSheetHeaderLayout.LINE_HEIGHT_SP.sp else TextUnit.Unspecified,
+        modifier = m, maxLines = DinnerSheetHeaderLayout.lineMaxLines(layout), overflow = TextOverflow.Ellipsis)
   }
-  if (currentLayoutClass().compactPortrait) {
+  if (layout.compactPortrait) {
     // The Mini upright: who it reaches gets its own line under the title instead of ~200 dp beside it.
     Column(Modifier.fillMaxWidth().padding(bottom = 28.dp)) {
       Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -164,7 +167,8 @@ private fun SheetHeader(title: String, line: String, lineIcon: String, warn: Boo
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         trailing()
       }
-      Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+      // Top-aligned: a two-line line keeps its icon beside the first line.
+      Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.Top) {
         lineRow(Modifier.weight(1f).padding(start = 14.dp))
       }
     }
@@ -180,6 +184,24 @@ private fun SheetHeader(title: String, line: String, lineIcon: String, warn: Boo
     }
     trailing()
   }
+}
+
+/**
+ * Who a call reaches, under or beside the sheet title (pure, JVM-tested). On the Mini upright it has
+ * its own full-width line, so a long one ("Living Area is in quiet hours, so it shows without
+ * sound") wraps to a second line there instead of ending in "…". Beside the title it keeps one line.
+ */
+internal object DinnerSheetHeaderLayout {
+  /** Upright only: two lines of 24 sp a touch apart; elsewhere the shipped single line is unchanged. */
+  const val LINE_HEIGHT_SP = 32
+
+  fun lineMaxLines(cls: LayoutClass): Int = if (cls.compactPortrait) 2 else 1
+
+  /** The upright line's width in a window [windowDp] wide: sheet margins 24, padding 40, icon 28 + 14. */
+  fun uprightLineRoom(windowDp: Int): Int = windowDp - 2 * 24 - 2 * 40 - 28 - 14
+
+  /** 24 sp regular, generously 0.55 em a character. */
+  val LINE = CompactRowFit.Spec(charDp = 24 * 0.55, chromeDp = 0.0)
 }
 
 /**

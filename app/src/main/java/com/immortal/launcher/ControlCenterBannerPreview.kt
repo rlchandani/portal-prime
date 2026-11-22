@@ -9,8 +9,8 @@ package com.immortal.launcher
 import androidx.compose.runtime.Immutable
 
 /**
- * The Alerts screen's "Preview a banner on Portal home" (mock `.chips`): one sample per severity,
- * shown through [ControlCenterBanners.preview]. A preview is local and cosmetic: never an entity,
+ * The Alerts screen's "Preview a Home banner" (mock `.chips`; the mock's longer "Preview a banner on
+ * Portal home" left "Home" alone on a second line): one sample per severity, shown through [ControlCenterBanners.preview]. A preview is local and cosmetic: never an entity,
  * never a sound (quiet hours or not), never a wake, never sent to the household, never counted by
  * [CcAlertGate] or the alert history, and it always gives way to a real alert ([CcBannerSlot]).
  */
