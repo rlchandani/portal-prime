@@ -15,6 +15,9 @@ MEMINFO_AFTER_S = 5
 POLL_GAP_S = 0.2
 TAB_LABELS = frozenset({"Home", "Apps", "Tools"})
 SIMPLEPERF_HZ = 4000
+# simpleperf needs a moment to start recording; without it a step's first ~200 ms (a Control
+# Center open's first frame) were never sampled.
+SIMPLEPERF_START_S = 0.6
 ATRACE_BUFFER_KB = 16384
 
 
@@ -318,7 +321,10 @@ class Session:
             self._open_screen(screen)
             self.d.runner.sleep(3)
             top = self.d.resumed_short()
-            nodes = uidump.parse(self.d.ui_dump())
+            text = self.d.ui_dump()
+            # Kept for accessibility diffs between builds (node text, order, flags, bounds).
+            self._save(f"{label}-r{rep}-{screen}.uidump.txt", text)
+            nodes = uidump.parse(text)
             found = uidump.overflow(nodes)
             self.audits.append({"build": label, "rep": rep, "screen": screen, "top": top, "nodes": len(nodes),
                                 "screen_size": list(uidump.screen_size(nodes)), "findings": found})
@@ -346,6 +352,7 @@ class Session:
         if self.opts.simpleperf:
             self.d.shell(f"simpleperf record --app {PACKAGE} -g -f {SIMPLEPERF_HZ} --duration 2 "
                          f"-o {TMP_PREFIX}.data >/dev/null 2>&1 &")
+            self.d.runner.sleep(SIMPLEPERF_START_S)
 
     def _trace_stop(self, tag):
         if tag is None:
