@@ -116,7 +116,7 @@ internal fun AlarmContent() {
     }
   }
 
-  Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+  Column {
       // One card, as in the approved mock: the switch, its time and its days belong together.
       ApprovedSettingsSectionLabel("Alarm")
       Card {
@@ -138,11 +138,10 @@ internal fun AlarmContent() {
       val next = remember(config, ClockChangeAlarms.revision) {
         AlarmConfig.nextTrigger(config)
       }
-      Text(
+      SettingsStatusLine(
           if (next != null)
               "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
                   .format(java.util.Date(next))
-          else "Alarm is off.",
-          color = IosBlue, fontSize = Sizes.rowValue)
+          else "Alarm is off.")
     }
 }

@@ -61,10 +61,7 @@ private val SWITCH_THUMB_RING = Color(0x26000000)
 internal val LocalApprovedSettingsHelp = staticCompositionLocalOf<String?> { null }
 
 @Composable
-internal fun ApprovedSettingsSectionLabel(text: String) {
-    Text(text, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp,
-        modifier = Modifier.padding(start = 6.dp, end = 6.dp, bottom = 12.dp))
-}
+internal fun ApprovedSettingsSectionLabel(text: String) = SettingsCaptionTitle(text)
 
 @Composable
 internal fun ApprovedSettingsLabel(title: String, help: String?, modifier: Modifier = Modifier) {

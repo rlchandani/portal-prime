@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +66,9 @@ internal fun SettingsChoiceTilesRow(
     enabled: Boolean = true,
     onSelect: (Int) -> Unit,
 ) {
-    val stacked = SettingsChoicePolicy.stacked(tiles.map { it.label })
+    val cardWidth = SettingsSplitMetrics.pageContentWidthDp(LocalConfiguration.current.screenWidthDp,
+        LocalSettingsSinglePane.current)
+    val stacked = SettingsChoicePolicy.stacked(tiles.map { it.label }, title, cardWidth, help)
     val padding = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
         .padding(horizontal = RowPaddingH, vertical = RowPaddingV)
     if (stacked) {

@@ -45,7 +45,7 @@ internal fun MusicSettingsContent() {
     MusicSettings.domain.apply(context, JSONObject().put(key, value))
     settings = MusicNightConfig.load(context)
   }
-  SectionLabel("Rooms")
+  SectionLabel("Rooms", leading = true)
   FollowMeSettingsSection()
   SectionLabel("Quiet hours")
   Card {
@@ -65,7 +65,7 @@ internal fun MusicSettingsContent() {
 @Composable
 private fun LevelRow(level: Int, onChange: (Int) -> Unit) {
   var shown by remember(level) { mutableStateOf(level.toFloat()) }
-  Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight).padding(horizontal = 16.dp, vertical = 10.dp),
+  Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight).padding(horizontal = 28.dp, vertical = 10.dp),
       verticalAlignment = Alignment.CenterVertically) {
     Text("Loudest music", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.width(LEVEL_LABEL_WIDTH))
     Slider(value = shown, onValueChange = { shown = it }, onValueChangeFinished = { onChange(shown.roundToInt()) },

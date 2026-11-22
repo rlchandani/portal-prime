@@ -159,10 +159,15 @@ internal fun SettingsDeferredSlot(placeholderHeight: Dp, modifier: Modifier = Mo
             val width = if (constraints.hasBoundedWidth) constraints.maxWidth else constraints.minWidth
             layout(width, placeholderPx.coerceIn(constraints.minHeight, constraints.maxHeight)) {}
         } else {
-            val placeables = subcompose(SLOT_ID, slot).map { it.measure(constraints) }
+            // Stacked like a lazy item's own children: a row group (one entry, several rows) must not
+            // draw its rows over each other once it is precomposed.
+            val placeables = subcompose(SLOT_ID, slot).map { it.measure(constraints.copy(minHeight = 0)) }
             val width = placeables.maxOfOrNull { it.width } ?: constraints.minWidth
-            val height = placeables.maxOfOrNull { it.height } ?: constraints.minHeight
-            layout(width, height) { placeables.forEach { it.place(0, 0) } }
+            val height = placeables.sumOf { it.height }.coerceAtLeast(constraints.minHeight)
+            layout(width, height) {
+                var y = 0
+                placeables.forEach { it.place(0, y); y += it.height }
+            }
         }
     }
 }

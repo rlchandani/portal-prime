@@ -20,7 +20,7 @@ import java.text.DateFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private val OTA_CARD_GAP = 20.dp
+private val OTA_CARD_GAP = SettingsSpacing.CARD_GAP_DP.dp
 
 /**
  * "Hearthpane 1.228 · Up to date · Checked 3:12 PM · [Check for updates]" at the top of About &

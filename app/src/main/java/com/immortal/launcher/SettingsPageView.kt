@@ -53,7 +53,12 @@ internal fun SettingsPageView(
     // Only the note itself recomposes the page, not every peer heartbeat in the status.
     val syncStatus = SettingsSync.status.collectAsState()
     val syncNote by remember { derivedStateOf { settingsSyncPageNote(syncStatus.value) } }
-    val layout = remember(page, advanced, screensaverOn, syncNote) { settingsPageLayout(page, advanced, screensaverOn, syncNote) }
+    val context = LocalContext.current
+    // Recomputed with the snapshots (a few gate checks); the layout only changes when the set does.
+    val emptyRows = settingsEmptyRowItems(page, states, context, advanced)
+    val layout = remember(page, advanced, screensaverOn, syncNote, emptyRows) {
+        settingsPageLayout(page, advanced, screensaverOn, syncNote, emptyRows)
+    }
     val highlight = rememberBriefHighlight(control, onHighlightShown)
     val highlightIndex = highlight?.let { layout.controlIndex[it] }
     val listState = rememberApprovedSettingsLazyScrollState(page)
@@ -106,7 +111,9 @@ private fun SettingsPageEntryContent(
             val block = (entry.item as SettingsBlockItem).block
             // Jarvis pointing at a control this block draws (Night Shift, Touch sounds…) rings the block.
             Box(Modifier.jarvisPulse(SettingsJarvisPulse.blockPulses(block, LocalJarvisPulse.current))) {
-                SettingsBlockHighlight(highlighted) { SettingsBlockContent(block) }
+                SettingsCardGapsIfDrawn(entry.gapBefore, entry.gapAfter) {
+                    SettingsBlockHighlight(highlighted) { SettingsBlockContent(block) }
+                }
             }
         }
         SettingsEntryKind.LINK -> {
@@ -122,7 +129,8 @@ private fun SettingsPageEntryContent(
                 launchSettingsExternal(context, external)
             }
         }
-        SettingsEntryKind.FOOTER -> SettingsSectionFooter(entry.text.orEmpty())
+        SettingsEntryKind.FOOTER -> if (entry.key == SETTINGS_SYNC_NOTE_KEY) SettingsPageNote(entry.text.orEmpty())
+            else SettingsSectionFooter(entry.text.orEmpty())
         SettingsEntryKind.NOTICE -> SettingsNotice(entry.text.orEmpty())
         SettingsEntryKind.ADVANCED_HINT -> SettingsAdvancedHintRow()
         SettingsEntryKind.GAP -> SettingsSectionGap()

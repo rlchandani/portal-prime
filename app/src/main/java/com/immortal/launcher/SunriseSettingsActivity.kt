@@ -124,19 +124,7 @@ internal fun SunriseContent() {
   fun apply(key: String, value: Any) = submit { writes.submit(key, value) }
   val weekdayNames = remember { java.text.DateFormatSymbols().weekdays }
 
-  Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-    Column(Modifier.semantics { contentDescription = when {
-      applying -> "Saving Sunrise settings"
-      saveState.failed -> "Sunrise save unavailable"
-      else -> "Sunrise settings ready"
-    } }) {
-      FooterNote(when {
-        applying -> "Saving changes…"
-        saveState.failed -> "Some changes couldn't be saved. Try again."
-        !settings.enabled -> "Turn on Sunrise alarm to set your wake time, days and light ramp."
-        else -> "Choose your wake time and gradual light ramp."
-      })
-    }
+  Column {
     // One card, as in the approved mock; rows below the switch follow the same parent gates.
     ApprovedSettingsSectionLabel("Sunrise wake")
     Card {
@@ -177,22 +165,27 @@ internal fun SunriseContent() {
         ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
       }
     }
+    Column(Modifier.semantics { contentDescription = when {
+      applying -> "Saving Sunrise settings"
+      saveState.failed -> "Sunrise save unavailable"
+      else -> "Sunrise settings ready"
+    } }) {
+      FooterNote(when {
+        applying -> "Saving changes…"
+        saveState.failed -> "Some changes couldn't be saved. Try again."
+        !settings.enabled -> "Turn on Sunrise alarm to set your wake time, days and light ramp."
+        else -> "Choose your wake time and gradual light ramp."
+      })
+    }
     val next = remember(settings, ClockChangeAlarms.revision) { SunriseConfig.nextTrigger(settings) }
-    Text(if (next != null)
+    SettingsStatusLine(if (next != null)
         "Next: " + java.text.SimpleDateFormat("EEE d MMM, HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date(next)) else "Alarm is off.",
-        color = IosBlue, fontSize = Sizes.rowValue)
-    Surface(color = IosBlue, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().heightIn(min = 68.dp)
-            .then(if (applying) Modifier.semantics { disabled() } else
-                Modifier.tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-                  context.startActivity(Intent(context, WakeLightActivity::class.java)
-                      .putExtra(WakeLightActivity.EXTRA_RAMP_MIN, 1)
-                      .putExtra(WakeLightActivity.EXTRA_CHIME, settings.chime))
-                })) {
-      Text("Preview (1-min ramp)", color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
-          fontSize = 24.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center,
-          modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth())
+            .format(java.util.Date(next)) else "Sunrise is off.")
+    SettingsCardGap()
+    PrimaryPillButton("Preview (1-min ramp)", enabled = !applying) {
+      context.startActivity(Intent(context, WakeLightActivity::class.java)
+          .putExtra(WakeLightActivity.EXTRA_RAMP_MIN, 1)
+          .putExtra(WakeLightActivity.EXTRA_CHIME, settings.chime))
     }
   }
 }
