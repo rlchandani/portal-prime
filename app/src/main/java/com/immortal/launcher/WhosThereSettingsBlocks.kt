@@ -182,10 +182,7 @@ private fun LockedRow(title: String, help: String, locked: Boolean = true) {
       Text(title, color = IosLabel, fontSize = Sizes.rowTitle, lineHeight = 34.sp)
       Text(help, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 28.sp, modifier = Modifier.padding(top = 6.dp))
     }
-    if (locked) Row(verticalAlignment = Alignment.CenterVertically) {
-      WhosThereGlyph(WtGlyph.LOCK, IosSecondary, 22.dp)
-      Text("Always", color = IosSecondary, fontSize = Sizes.rowValue, modifier = Modifier.padding(start = 8.dp))
-    }
+    if (locked) SettingsLockedValue()
   }
 }
 

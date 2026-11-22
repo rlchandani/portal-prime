@@ -94,7 +94,7 @@ internal fun UrlEntryScreen(
                 }
                 ApprovedEditorsButton("Cancel", onClick = cancel)
                 if (initial.isNotBlank() && removeLabel != null && onRemove != null) {
-                    ApprovedSettingsTextButton(removeLabel) { if (!complete) remove = true }
+                    SettingsRemoveButton(removeLabel, enabled = !complete) { if (!complete) remove = true }
                 }
             }
         }) {
@@ -114,7 +114,7 @@ internal fun UrlEntryScreen(
             help = removeHelp) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 ApprovedEditorsButton("Cancel") { remove = false }
-                ApprovedEditorsButton(removeLabel ?: "Remove", primary = true) {
+                SettingsRemoveButton(removeLabel ?: "Remove") {
                     remove = false
                     if (!complete && activity?.isFinishing != true && activity?.isDestroyed != true) {
                         complete = true

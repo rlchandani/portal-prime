@@ -121,14 +121,34 @@ internal fun ApprovedManagedSettingsPage() {
               .padding(horizontal = 28.dp, vertical = 22.dp), verticalAlignment = Alignment.CenterVertically) {
             ApprovedSettingsLabel(meta?.optString("title") ?: spec.key,
                 "Managed by the existing app · preserved without a new switch", Modifier.weight(1f))
-            Text(meta?.optString("display")?.takeIf { it.isNotBlank() }
-                ?: meta?.opt("value")?.toString().orEmpty(), color = IosSecondary, fontSize = Sizes.rowValue)
+            Text(managedValueLabel(meta), color = IosSecondary, fontSize = Sizes.rowValue)
           }
         }
       }
     }
   }
   FooterNote("Legacy appearance values remain stored and unchanged.")
+}
+
+/**
+ * A managed value as a person reads it: the spec's own display text, a choice's option label,
+ * On/Off for a switch, never a raw stored value like "true" or "classic".
+ */
+internal fun managedValueLabel(meta: org.json.JSONObject?): String {
+  if (meta == null) return ""
+  meta.optString("display").takeIf { it.isNotBlank() }?.let { return it }
+  val value = meta.opt("value") ?: return ""
+  if (value is Boolean) return if (value) "On" else "Off"
+  val options = meta.optJSONArray("options")
+  if (options != null) {
+    for (i in 0 until options.length()) {
+      val option = options.optJSONObject(i) ?: continue
+      if (option.opt("value")?.toString() == value.toString()) {
+        option.optString("label").takeIf { it.isNotBlank() }?.let { return it }
+      }
+    }
+  }
+  return value.toString()
 }
 
 // ---------------------------------------------------------------------------

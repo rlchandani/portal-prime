@@ -111,7 +111,7 @@ private fun TodoRemoveDialog(
     ApprovedSettingsDialog("Remove $name?", onDismiss = onCancel, help = error) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ApprovedEditorsButton("Cancel", onClick = onCancel)
-            ApprovedEditorsButton("Remove", primary = true, onClick = onRemove)
+            SettingsRemoveButton(onClick = onRemove)
         }
     }
 }

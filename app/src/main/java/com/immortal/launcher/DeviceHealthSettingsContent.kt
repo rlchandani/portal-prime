@@ -264,36 +264,32 @@ private fun DeviceHealthChecks() {
             fontSize = Sizes.rowSub,
             modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, end = SettingsSpacing.TEXT_INSET_DP.dp, bottom = 10.dp),
         )
-        Text(
+        SettingsRemoveButton(
             if (disablingAdmin) "Removing screen-lock permission…"
             else if (confirmingDisable) "Tap again to confirm — automatic screen-off will stop"
             else "Remove screen-lock permission",
-            color = if (checking || health.failed) IosSecondary else IosRed,
-            fontSize = Sizes.actionButton,
-            fontWeight = if (confirmingDisable) FontWeight.SemiBold else FontWeight.Normal,
-            modifier =
-                Modifier.tvFocusable(RoundedCornerShape(8.dp), enabled = !disablingAdmin && !checking && !health.failed) {
-                      // Reject burst input immediately, before the disabled row can recompose.
-                      if (!advanced || disablingAdmin || recheckRequested || reconnectingControls || !health.canRemoveAdmin) return@tvFocusable
-                      // Two-tap arm: a single stray remote press shouldn't tear down device admin
-                      // (which silently breaks screensaver sleep + the HA screen-off control).
-                      if (confirmingDisable) {
-                        confirmingDisable = false
-                        disablingAdmin = true
-                        scope.launch {
-                          try {
-                            withContext(Dispatchers.IO) { ScreenControl.deactivateAdmin(context) }
-                            refresh++
-                          } finally {
-                            disablingAdmin = false
-                          }
-                        }
-                      } else {
-                        confirmingDisable = true
-                      }
-                    }
-                    .padding(start = SettingsSpacing.TEXT_INSET_DP.dp, top = 2.dp, bottom = 4.dp),
-        )
+            modifier = Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, top = 2.dp, bottom = 4.dp),
+            enabled = !disablingAdmin && !checking && !health.failed,
+        ) {
+            // Reject burst input immediately, before the disabled row can recompose.
+            if (!advanced || disablingAdmin || recheckRequested || reconnectingControls || !health.canRemoveAdmin) return@SettingsRemoveButton
+            // Two-tap arm: a single stray remote press shouldn't tear down device admin
+            // (which silently breaks screensaver sleep + the HA screen-off control).
+            if (confirmingDisable) {
+              confirmingDisable = false
+              disablingAdmin = true
+              scope.launch {
+                try {
+                  withContext(Dispatchers.IO) { ScreenControl.deactivateAdmin(context) }
+                  refresh++
+                } finally {
+                  disablingAdmin = false
+                }
+              }
+            } else {
+              confirmingDisable = true
+            }
+        }
       }
     }
 }

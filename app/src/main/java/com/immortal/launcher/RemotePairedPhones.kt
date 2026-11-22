@@ -78,6 +78,7 @@ internal fun PairedPhonesSection() {
           title = phone.label,
           subtitle = PairedPhoneCopy.subtitle(phone, now),
           actionLabel = if (confirm) "Confirm" else "Remove",
+          destructive = true,
       ) {
         if (confirm) {
           RemotePairing.revokeSession(context, phone.id)

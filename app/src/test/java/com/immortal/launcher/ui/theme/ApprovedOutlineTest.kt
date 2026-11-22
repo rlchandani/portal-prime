@@ -32,15 +32,20 @@ class ApprovedOutlineTest {
     assertTrue("button ${contrast(outline, surface2)}", contrast(outline, surface2) >= 1.25)
   }
 
-  /** An off switch on a white card: the track and its white thumb must both read (was 1.2:1). */
+  /**
+   * An off switch on a white card: the track and its white thumb must both meet the 3:1 non-text
+   * contrast of WCAG 1.4.11 (was 1.2:1, then 1.9:1), and the track stays lighter than secondary text.
+   */
   @Test fun dayOffSwitchTrackIsVisibleOnCardsAndBehindTheWhiteThumb() = with(ApprovedLightPalette) {
-    assertTrue("card ${contrast(switchOffTrack, surface)}", contrast(switchOffTrack, surface) >= 1.6)
-    assertTrue("thumb ${contrast(switchOffTrack, Color.White)}", contrast(switchOffTrack, Color.White) >= 1.6)
-    assertTrue(contrast(switchOffTrack, surface) < contrast(secondary, surface) / 2)
+    assertTrue("card ${contrast(switchOffTrack, surface)}", contrast(switchOffTrack, surface) >= 3.0)
+    assertTrue("thumb ${contrast(switchOffTrack, Color.White)}", contrast(switchOffTrack, Color.White) >= 3.0)
+    assertTrue("page ${contrast(switchOffTrack, background)}", contrast(switchOffTrack, background) >= 2.5)
+    assertTrue(lum(switchOffTrack) > lum(secondary))
   }
 
   @Test fun nightOffSwitchKeepsItsTrack() = with(ApprovedDarkPalette) {
     assertTrue(switchOffTrack == surface2)
+    assertTrue(switchOffTrack == Color(0xFF363636))
   }
 
   @Test fun dayOutlineStaysALightTrimNotADarkLine() = with(ApprovedLightPalette) {

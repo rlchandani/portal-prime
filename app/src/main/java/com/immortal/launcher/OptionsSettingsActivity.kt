@@ -87,8 +87,8 @@ internal fun OptionsSettingsContent() {
                 }
             }
             // Scan parameters can also be saved when the existing ticker list needs no changes.
-            Row(Modifier.padding(vertical = 12.dp)) {
-                ApprovedSettingsTextButton("Save scan settings") { saveScan() }
+            Row(Modifier.padding(start = SettingsSpacing.TEXT_INSET_DP.dp, top = 12.dp, bottom = 12.dp)) {
+                ApprovedEditorsButton("Save scan settings") { saveScan() }
             }
             if (status.isNotEmpty()) FooterNote(status)
         }) {
