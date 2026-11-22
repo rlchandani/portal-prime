@@ -37,6 +37,8 @@ on:
       - "provisioning/test_fleet_sealed_restore.py"
       - "provisioning/fleet-restore.sh"
       - "provisioning/test_fleet_restore.py"
+      - "provisioning/config.env"
+      - "provisioning/test_debloat_config.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
   push:
@@ -62,6 +64,8 @@ on:
       - "provisioning/test_fleet_sealed_restore.py"
       - "provisioning/fleet-restore.sh"
       - "provisioning/test_fleet_restore.py"
+      - "provisioning/config.env"
+      - "provisioning/test_debloat_config.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
 
@@ -103,6 +107,7 @@ jobs:
           python provisioning/test_room_fleet.py -v
           python provisioning/test_deploy_snapshot.py -v
           python provisioning/test_room_registry_encoding.py -v
+          python provisioning/test_debloat_config.py -v
 
       - name: Install the sealed backup dependency
         run: python -m pip install cryptography

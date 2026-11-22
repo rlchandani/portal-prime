@@ -2,8 +2,13 @@
 
 A provisioned Portal still runs Meta's whole "aloha" service stack: about 33 processes and
 roughly 1 GB of memory (PSS) on a Portal+. Hearthpane replaces Meta's home and screensaver,
-so some of those apps no longer do anything useful. `provision.sh --debloat` turns a short,
+so some of those apps no longer do anything useful. `provision.sh --debloat` turns a
 device-tested list of them off. It is **opt-in** and fully reversible.
+
+The owner's rule (2026-11-22): of Meta's own software, the Portals only need **WhatsApp and
+Messenger calling** (the original calling feature, reached from Calls → "Messenger &
+WhatsApp"). Anything of Meta's that calling, Hearthpane or Android itself doesn't need may
+be turned off.
 
 ```bash
 ./provision.sh --debloat      # disable the apps in DEBLOAT_PACKAGES (config.env)
@@ -25,7 +30,9 @@ package on that list, even if someone adds it to `DEBLOAT_PACKAGES`.
 
 ## What gets disabled, and why
 
-Measured PSS is from a stock Portal+ on Hearthpane 1.279, 15 minutes after boot.
+Measured PSS for the first five is from a stock Portal+ on Hearthpane 1.279, 15 minutes
+after boot. The second round (the last four rows) was added on 2026-11-22; its PSS comes
+from Family on 1.327 after two days of uptime.
 
 | Package | PSS | What it is | Why it's safe to disable |
 | --- | --- | --- | --- |
@@ -34,8 +41,14 @@ Measured PSS is from a stock Portal+ on Hearthpane 1.279, 15 minutes after boot.
 | `com.facebook.alohaapps.bugreporter` | 38 MB | Meta's internal bug reporter | Its floating pill is already hidden by provisioning. Nothing binds to it. |
 | `com.facebook.alohaapps.personaluser` | 29 MB | Personal Facebook-account features | Nothing on the device binds to it, and only one other process ever mentions it in the logs. |
 | `com.facebook.aloha.analytics` | 14 MB | Meta audio and usage analytics (system UID) | Telemetry only. Nothing binds to it. |
+| `com.facebook.alohaservices.player2` | 29 MB | Meta's media player: a foreground `PlayerService`, a MediaBrowser for Bluetooth AVRCP, `OPEN_VIDEO`, and 12 scheduled jobs | Calling doesn't use it: nothing binds to it, and its media session is inactive. Hearthpane's Music has its own player. The cost: the Portal may stop acting as a Bluetooth speaker with Meta's now-playing controls. |
+| `com.facebook.aloha.app.cameraeditor` | 0 (idle) | Meta's avatar and camera-effects editor | Hearthpane already hides it as dead. It has a `BOOT_COMPLETED` receiver, so turning it off stops it waking at boot. Calls use aiservice's camera, not this app. |
+| `com.facebook.aloha.websafety` | 0 (idle) | Meta's web-safety filter for its own browser | Nothing binds to it and Hearthpane doesn't use Meta's browser. |
+| `com.facebook.alohaservices.abilities.pages` | 0 (idle) | The Facebook Pages "ability" (a tile in Meta's home) | Not part of calling. Meta's home only logs "Package name is not found" for its missing tile. |
 
-Together that is about 167 MB of PSS and 5 processes, plus portalfeed's background CPU.
+Together the first five are about 167 MB of PSS and 5 processes, plus portalfeed's background
+CPU. Round 2 adds player2's process (about 29 MB) and its jobs and alarms. The three idle
+apps free no memory at rest; they are off so nothing can start them.
 
 ## What stays on, and why
 
@@ -56,16 +69,33 @@ depends on in its own code.
 | `com.facebook.alohaservices.abilitymanager`, `com.facebook.alohaappmanager` | Kept (Calls handoff) | The stock home reads its app tiles from the abilitymanager provider, and abilitymanager reads from appmanager. |
 | `com.facebook.alohasdk.pushnotification` | Kept (Calls handoff) | Push delivery for incoming calls. |
 | `com.facebook.aloha.app.ttsservice` | Required | The only active text-to-speech engine. Hearthpane's spoken features (for example the bedtime story) use it. |
-| `com.facebook.alohaservices.player2` | Unknown, kept | The media browser for Bluetooth AVRCP and A2DP sink (the Portal as a Bluetooth speaker). That path couldn't be tested here. |
 | `com.facebook.alohaapps.controlcenter` | Required | Meta's system Control Center (volume, brightness and privacy UI). Persistent. |
 | `com.facebook.alohaapps.settings` | Required | Android settings pages, including the OS dream settings. |
 | `com.facebook.portal.webview` | Required | The system WebView provider. |
 | `com.facebook.alohasdk.bluetooth`, `com.facebook.alohasdk.location` | Required | Bluetooth, and the network location that time and time zone depend on. |
 | `com.facebook.aloha.state`, `platformmobileconfig`, `deviceidentity`, `alohasdk.platformsecurestate` | Required | Platform plumbing that the other services bind to. Each is about 5 MB. |
-| `com.facebook.aloha.wifidiagnostic`, `com.facebook.aloha.cnshealthmonitor` | Unknown, kept | Persistent system-UID services. wifidiagnostic handles captive-portal and data-stall logic, and a failure there might only show up days later. Each is about 5 MB, so there is little to gain. |
+| `com.facebook.aloha.wifidiagnostic`, `com.facebook.aloha.cnshealthmonitor` | Kept (Wi-Fi), protected | Persistent system-UID services. wifidiagnostic handles captive-portal and data-stall logic, and a failure there might only show up days later. Each is about 5 MB, so there is little to gain. |
+| `com.facebook.aloha.system.nativelibs`, `com.facebook.portal.sdk`, `com.facebook.alohasdk.settings` | Kept (platform), protected | Shared native libraries, the Portal SDK and the platform settings service that other Meta apps load or bind. They don't run on their own. |
+| `com.facebook.aloha.dpc`, `com.facebook.alohaservices.deviceadmin` | Kept (device policy), protected | Device-owner and device-admin plumbing. Turning them off risks the device policy state, for no memory gain. |
+| `com.facebook.aloha.fbttsservice`, `com.facebook.aloha.disv2`, `com.facebook.portal.dummybp`, `com.facebook.portal.dummymk` | Kept, idle | They don't run. fbttsservice is a second TTS engine; leaving it on keeps the TTS fallback unchanged. |
 
-Packages that don't run in the background (`cameraeditor`, `websafety`, `alohainstaller`,
-`dpc`, the `rro` overlays and so on) are left alone. Disabling them frees nothing.
+The `rro` overlays, `appverifier`, `devicesetup` and the OTA apps are handled by other
+provisioning steps and are not on the debloat list. `--undebloat` re-enables the whole
+list, so it must never include a package that another step turns off on purpose.
+`provisioning/test_debloat_config.py` checks that, keeps the two lists disjoint, and checks
+that every calling-critical package is in `DEBLOAT_PROTECTED`.
+
+No Amazon or Alexa package is installed on the stock image (the Alexa client only comes
+back through `--alexa`), and no Meta voice-interaction or assistant service is set
+(`voice_interaction_service` and `assistant` are empty). The only live microphone client
+at idle is Hearthpane's own `VOICE_RECOGNITION` capture.
+
+The biggest remaining Meta processes are the calling stack itself: aiservice (about
+170–185 MB), messenger (85–145 MB), whatsapp (50–115 MB), system.services, alohausers,
+abilitymanager plus appmanager (about 105 MB together) and alohaapps.settings (up to
+100 MB after it has been opened). abilitymanager and appmanager are the next candidates,
+but Meta's home builds the Calls handoff screen from them, and it can't be proven safe
+without a real call.
 
 ## Measured gain
 
@@ -95,6 +125,46 @@ moves. On an idle Portal+, roughly 2 of its 8 cores go to Meta's camera presence
 Calling and Who's there need that loop, so it stays. Frame times and boot time didn't
 change measurably. Each figure is one run per state, and frame times vary from run to run
 by more than any difference here.
+
+## Round 2 (2026-11-22, Family, Hearthpane 1.327)
+
+The four new packages were turned off with `provision.sh --debloat`, then the Portal was
+rebooted once.
+
+| Metric | Before (5 off, 2 days up) | After (9 off, 15 min after boot) |
+| --- | --- | --- |
+| Meta processes | 27 | 27 (player2 gone; contacts, started by the handoff test, now resident) |
+| player2 | 29 MB PSS, foreground service, 12 jobs, 2 alarms | not running |
+| Meta total PSS | 934 MB | 1045 MB |
+| MemAvailable | 905 MB | 848 MB |
+
+The whole-device numbers are **not a clean A/B**. The "before" figure comes from two days
+of uptime, with most of Meta's memory swapped out. The "after" figure was taken right after
+the Calls handoff test opened Meta's home and Contacts, and those two alone held about
+170 MB. The real saving is player2's process (about 29 MB), its jobs and alarms, and one
+less boot receiver (cameraeditor). Most of Meta's remaining memory is the calling stack.
+
+Checked after the reboot, with no calls placed:
+
+- Hearthpane Home resumes, stays the default home, and its photo dream starts when idle.
+- Calls → "Messenger & WhatsApp" opens Meta's home with its people row. Contacts →
+  "See all" opens `AlohaContactsMainActivity`, and both the Messenger and the WhatsApp tabs
+  load. No crashes or ANRs. Meta's home logs "Package name is not found" for the removed
+  tiles. Contacts logs `WA_CONTACT_RULE_BROKEN` and still loads the WhatsApp repo; there is
+  no earlier log to compare that line with.
+- Messenger and WhatsApp have no launcher activity of their own (`monkey` finds nothing).
+  Their processes keep running in the background for incoming calls.
+- Camera: aiservice holds the physical camera and runs `CameraService`, and the virtual
+  camera service runs. Camera 0 wasn't opened in this round.
+- Presence: `aloha.UserPresenceManager` keeps logging availability.
+- Microphone: Hearthpane's `VOICE_RECOGNITION` capture is live and not silenced. Jarvis's
+  `AssistantService` runs in the foreground.
+- The key-event, touch, `BarWatchService` and `InstallConfirmService` accessibility
+  services stay bound.
+
+Still to check by hand: a real incoming and outgoing call on both WhatsApp and Messenger
+(ringing, camera and audio), and the Portal as a Bluetooth speaker. If calling breaks,
+run `--undebloat` and move the suspect package into `DEBLOAT_PROTECTED`.
 
 ## What was checked
 
