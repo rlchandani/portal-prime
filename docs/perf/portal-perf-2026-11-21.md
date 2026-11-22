@@ -1124,3 +1124,78 @@ keep Customize composed (zero-width, unplaced off Home) so its text is not re-la
 their own layers so a header re-layout does not re-record every icon; cache each page as a layer during the slide
 (RenderThread). Portal Mini (800×1280): same code paths (`LauncherScreen`'s compact header is in the same
 `HomeRecomposeScope`, same dock and tab host); not measured.
+
+## Screensaver doodle tiles in every mode, and Gallery Wall upload warm-up (branch `ss-tiles`)
+
+**Status: partial.** Device work was stopped early at the owner's request: the test source had been on the Family Portal too long. The doodle-tile part is measured. The Gallery Wall warm-up part has one household change and an untraced remainder.
+
+### 1. Every doodle is a pre-rasterised tile
+
+**Users found.** The tiled SVG doodles were still painted by Diptych (`.ss-frame`, `styles.css:38`), Framed (`.ss-room` / `.ss-art`, light, `:56`), Mosaic (`.mosaic-wall`, light, `:104`), Panorama (`.panorama-drift`, `:147`), Polaroid (`.ss-table::before`, `:156`) and Cinema (`.ss-scope`, `.cinema-layer`, `.ss-bar`, `:198`). Hero + Sidebar and Memories never paint a doodle, so they are unchanged.
+
+**Change.**
+- Each rule above now uses the Gallery Wall `image-set` tile (dark), or new light tiles `photo-doodles-{480,540,960}.png` (12–30 KB, transparent, from `photo-doodles.svg`).
+- `scripts/generate_doodle_tiles.mjs` now renders both themes. A rerun gives the existing dark tiles byte for byte.
+- Colours, tile size (480 × 360 CSS px), repeat, position and layout are unchanged.
+
+**Tests.** `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 540 tests, 521 pass, 19 browser tests skipped, 0 fail. `:app:testDebugUnitTest` passes.
+- Each affected mode's golden hash (`slideshow_photo_motion.test.mjs`) is unchanged once each tile value is mapped back to the SVG it replaced (`vectorDoodleSnapshot`). So the doodle source is the only thing that changed.
+- `slideshow_gallery_doodle.test.mjs` adds two tests. The light candidates are RGBA PNGs at 480 × 360 × scale. No style or mode references a doodle SVG, and all 7 doodle rules use one of the two tile values at 480 × 360.
+- `slideshow_framed_lifecycle.test.mjs` pins the light tile.
+
+**Visual check** (desktop Chromium, real `styles.css` from `main` vs branch, each doodle-bearing rule full screen; channel values; device scale = dpr 1.125):
+
+| Mode | dpr 1.125 identical / max diff | dpr 1 | dpr 2 |
+|---|---|---|---|
+| Diptych | 99.4 % / 6 | 99.2 % / 1 | 99.7 % / 3 |
+| Framed | 99.0 % / 5 | 99.3 % / 1 | 99.6 % / 3 |
+| Mosaic | 99.3 % / 6 | 99.2 % / 1 | 99.6 % / 3 |
+| Panorama | 99.4 % / 6 | 99.2 % / 1 | 99.7 % / 3 |
+| Polaroid | 99.4 % / 7 | 99.2 % / 1 | 99.7 % / 4 |
+| Cinema | 98.8 % / 6 | 99.2 % / 1 | 99.6 % / 4 |
+
+- The differing values are doodle-stroke edges: mean difference about 1 / 255, and ≤ 0.025 % of values differ by more than 2.
+- Cinema at dpr 1.125 is 98.8 %. Its scope starts at 11 % of the height, a fractional device-pixel phase, so the tile is resampled where the vector was rasterised in place.
+- No device screenshots were taken. Scratch renders were deleted.
+
+**Microbenchmark.** Test source pinned per mode at 15 s, generated scenes, 6 changes forced by a left swipe (`next()`), `photo_beat` attribution (0.5 s before to 3 s after), start beat excluded. O = official 1.317 (sha256 verified), B = branch, one run each.
+
+| Mode | O worst frame per change, ms | B worst | O frames > 60 ms (total) | B | O sum > 32 ms per change (mean) | B |
+|---|---|---|---|---|---|---|
+| Diptych | 43–56 | 25–61 | 0 | 1 | 137 ms | 68 ms |
+| Framed | 36–61 | 25–37 | 1 | 0 | 130 ms | 46 ms |
+| Mosaic | 34–51 | 22–51 | 0 | 0 | 129 ms | 78 ms |
+| Panorama | 31–72 | 24–48 | 2 | 0 | 127 ms | 129 ms |
+| Polaroid | 58–94 | 70–91 | 15 | 16 | 282 ms | 302 ms |
+| Cinema | 55–81 | 33–59 | 10 | 0 | 234 ms | 135 ms |
+
+- Cinema paints the doodle on three full-width layers, and it gains the most: no frame over 60 ms, against 10 on official.
+- Diptych, Framed and Mosaic roughly halve their sum of frames over 32 ms.
+- Panorama is within noise.
+- Polaroid is unchanged. It paints the doodle once on a full-screen pseudo-element, so its change cost is elsewhere (most likely the 64 px print shadow; not traced).
+- These are single runs. The household long-window A/B was not run.
+
+### 2. Gallery Wall on household photos: upload warm-up
+
+**Trace** (household shuffle, real dream, atrace gfx/view/webview/sched/freq/memreclaim, branch build whose Gallery Wall equals 1.317). At the wall's first draw, two `WebViewFunctor::drawGl` frames took 75 and 125 ms (`DrawFrame` 80 and 131 ms). `Chrome_InProcGpuThread` ran 25 / 40 / 65 / 57 ms in four consecutive 100 ms buckets, about 190 ms of raster and upload for the ten tile photos.
+- In the same window `kswapd0` ran ≤ 4 ms per 100 ms, and there were two direct reclaims of under 1.5 ms each. Memory pressure is not the cause.
+- The box-shadow was not implicated: no frame was long after the upload burst inside the 0.6 s the trace covered.
+
+**Change** (`cf8f02b4`).
+- `lib-engine.js:225–270` adds `SS.warmImages`. Before a wall is published, each photo is drawn once, one per 2 frames (`SS.WARM_FRAMES_PER_IMAGE`), at its contain size (`containBox`, `mode-impls.js:918`).
+- The photos are drawn in a 1 px window at 0.001 opacity, below one 8-bit step (`.ss-warm`, `styles.css:241–243`, the same window as the unmerged `engine-upload`). So the wall's first frame finds them uploaded.
+- In Gallery Wall (`mode-impls.js:1008–1018`) the warm window goes at the first tile swap or at cleanup (`:924`). The wall publishes about 20 frames later. Transitions, timing and layout are unchanged, and the Gallery golden hash is unchanged.
+- New `slideshow_gallery_warm.test.mjs` (7 tests): one photo per 2 frames at its drawn CSS size; release mid-way; abandonment; no body; the hidden-window CSS; warm before render, released at swap and cleanup; `containBox`.
+
+**Result so far.**
+- Household, one Gallery Wall change on the branch: worst frame 87 ms, 7 frames over 60 ms, 29 over 32 ms, 1.49 s summed. On 1.316 (`gallery-wall` B run 4) the two changes were 143 / 103 ms, 11 / 5, 32 / 36 and 1.76 / 1.69 s.
+- So the 100+ ms first-draw frames are gone in that one sample. The sustained 33–87 ms frames through the fade remain.
+- Pinned Gallery Wall micro (generated scenes, 6 forced changes): official 1.317 worst 45–81 ms, 7 frames over 60 ms, 429 ms mean summed over 32 ms. Branch 41–69 ms, 6 over 60 ms, 466 ms. That is within noise: the generated scenes are small and cheap to upload.
+- Both builds had 2 of 6 changes with 19–22 frames over 32 ms. The sustained-frame signature reproduces on generated scenes, so the next trace can use the pinned micro and needs no household dream.
+
+**Not done.** The 1.5 s of 33–87 ms frames through the fade is not traced. Two household trace dumps lost their buffer (a 24 MB circular buffer that overflowed, and a dump that came too early). A pinned-micro trace was started and then stopped when device work was halted. The memory-release question (is the old wall freed before the new one uploads?) was not measured. The warm-up should not merge until a trace shows where the sustained frames go and a repeat household A/B confirms it.
+
+**Device** at the end: official 1.317 (on-device sha256 `4db51aa3…`, matching `hearthpane-latest.json`), Home on top and default, test source off (`active: false`), dev mode off (`fleetctl info`: `devMode: false`), STREAM_MUSIC 3, lock released.
+
+
+> Note: only the doodle-tile part (56652441) of `ss-tiles` shipped; the Gallery Wall warm-up (cf8f02b4) is not merged.
