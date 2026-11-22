@@ -13,7 +13,8 @@ import org.json.JSONObject
  * The tools Hearthpane gives Jarvis through Jarvis's tool-provider contract: `hearthpane.screen_context` (what the
  * screen in front shows, as text — never pixels), `hearthpane.highlight` (pulse one of that screen's controls) and
  * `hearthpane.home_control` (do something in the house through the Control Center, see
- * [com.immortal.launcher.CcJarvisHome]) and `hearthpane.reminders` ([HearthpaneReminders]).
+ * [com.immortal.launcher.CcJarvisHome]), `hearthpane.reminders` ([HearthpaneReminders]) and the household tools
+ * ([HearthpaneAnnounce], [HearthpaneLists], [HearthpaneAlarms], [HearthpaneBriefing], [HearthpaneCall]).
  * Pure apart from its two seams, so every rule is JVM-tested: arguments are untrusted (from the model, via Jarvis),
  * and a highlight must name a target of the screen that is actually in front.
  */
@@ -24,6 +25,8 @@ internal class HearthpaneTools(
     private val homeControl: (argsJson: String?) -> JSONObject = { JSONObject().put("error", "home control unavailable") },
     /** `hearthpane.reminders` with its raw (untrusted) arguments ([HearthpaneReminders]). */
     private val reminders: (argsJson: String?) -> JSONObject = { JSONObject().put("error", "reminders unavailable") },
+    /** The household tools (announce, lists, alarms, briefing, call) by name, each with its raw (untrusted) arguments. */
+    private val household: Map<String, (argsJson: String?) -> JSONObject> = emptyMap(),
     /** Settings rows anywhere that match a few words ("dark mode"), best first. */
     private val search: (query: String) -> List<ScreenContext.Match> = { emptyList() },
 ) {
@@ -32,7 +35,8 @@ internal class HearthpaneTools(
     HIGHLIGHT -> highlight(args(argsJson))
     HOME_CONTROL -> runCatching { homeControl(argsJson) }.getOrElse { error("home control failed") }
     REMINDERS -> runCatching { reminders(argsJson) }.getOrElse { error("reminders failed") }
-    else -> error("unknown tool: ${name.orEmpty().take(MAX_NAME)}")
+    else -> household[name]?.let { tool -> runCatching { tool(argsJson) }.getOrElse { error("$name failed") } }
+        ?: error("unknown tool: ${name.orEmpty().take(MAX_NAME)}")
   }
 
   private fun screenContext(query: String): JSONObject {

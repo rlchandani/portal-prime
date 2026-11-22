@@ -84,13 +84,18 @@ internal object DinnerCall {
     HouseholdBus.send(context, DinnerWire.HELLO, DinnerWire.encode(selfHello(context, ask = true)))
   }
 
-  /** From this Portal's sheet: every other Portal (rows for known ones; unknown ackers add rows). */
-  fun sendFromPortal(context: Context, message: DinnerMessage): DinnerSend? {
+  /**
+   * From this Portal (its sheet, or Jarvis): every other Portal when [rooms] is null (rows for known ones; unknown
+   * ackers add rows), else only those other rooms.
+   */
+  fun sendFromPortal(context: Context, message: DinnerMessage, rooms: List<String>? = null): DinnerSend? {
     val self = selfId(context) ?: return null
-    val rows = mutablePeers.value.filter { it.id != self }.map { DinnerRow(it.id, it.name, DinnerStatus.SENDING) }
+    val rows = mutablePeers.value.filter { it.id != self && (rooms == null || it.id in rooms) }
+        .map { DinnerRow(it.id, it.name, DinnerStatus.SENDING) }
     val send = DinnerSend(newSendId(), message, selfName(context), false, clock(), rows)
     mutableBook.update { it.start(send) }
-    dispatch(context, DinnerWire.Call(send.id, message, send.senderName, false, self, null), rows.map { it.roomId })
+    val to = rooms?.filter { it != self }
+    dispatch(context, DinnerWire.Call(send.id, message, send.senderName, false, self, to), to ?: rows.map { it.roomId })
     return mutableBook.value.find(send.id)
   }
 
