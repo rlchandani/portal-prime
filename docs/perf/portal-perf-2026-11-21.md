@@ -785,3 +785,99 @@ round, 4 rounds per build (off, off, v1, v1, v2, off, v2, off), `framestats` of 
   as 1.313; only the clock text and the camera's "just now / under a minute ago" differ (dumps 2 min apart).
 - Device incident: after the last benchmark → official reinstall the HOME intent resolved to the chooser
   (`ResolverActivity`); restored with `cmd package set-home-activity …/HomeActivity` (Home on top, default again).
+
+## Control Center screen switch: semantics off the switch frame, 1.314 vs `cc-a11y`
+
+**Device:** Family Portal+ (no floor plan: Map is the "Build your floor plan" card plus the side column). Plain
+`adb install -r -d`, no force-stop. STREAM_MUSIC 0 during each stint, restored to 3. No screenshots, no debug props.
+Ended on official 1.315 (released meanwhile, no Control Center code; on-device sha256 `229e6741…`, matching
+`hearthpane-latest.json`), Home on top and default, dev mode off.
+
+**Builds:** official 1.314 (sha256 `e06ce483…`, the A/B baseline); `cc-a11y` `assemblePerformance`: v1 = changes 1–2
+below (`55b40d55…`), v2 = v1 + the `cc-return` camera deferral cherry-picked (`aacf835e…`), v3 = v2 + change 3
+(`6dc7d607…`); `assembleBenchmark` of v2 for simpleperf.
+
+**Method:** as before: Map → Alerts via the read-only "door is open" row, BACK to return; warm-up + 4 measured taps per
+round, `framestats` of the Control Center window. Stint 1: off, v1, v1, v2, v2, off; stint 2: v2, v2, v1, v1, off, off
+(4 rounds = 16 taps each way per build). Accessibility: full uiautomator dump of Map and Alerts per build, and
+`uiautomator events` (6 s) around one tap and one BACK per build. atrace `gfx view` 2 taps + 3 BACKs on v2 and on 1.314;
+simpleperf 4 kHz around 4 BACKs and 3 taps on the v2 benchmark build.
+
+**Where the switch went on 1.313/1.314 (from the `cc-return` profile):** switch frame main thread 27–37 ms =
+composition 13–17 ms (camera tile going live 2.5–4, Map re-run 1.5–2.5, header title 1.25–3.25), semantics rebuild
+2–6 ms (up to 15) triggered in the switch frame by Alerts leaving the tree, the header's spoken title and the rail's
+"selected", apply 2–2.5, measure 1–3; RenderThread 13–15 ms.
+
+**Changes (`cc-a11y`):**
+1. `ControlCenterNav.kt:94` `CcUi.spokenScreen` (+ `spoke`): the screen accessibility services are told about.
+   `ControlCenterScreenSlots.kt:119` `LaunchedEffect(current)` sets it 2 frames after a switch (~35 ms, inside Compose's
+   100 ms event batching). Everything a switch changes for accessibility follows it, so it all lands on that one
+   quiet frame: the parked screen leaving the tree and the shown one joining (`ccSlotSemantics(spoken)`, one shared
+   `UNSPOKEN` clear-semantics modifier so a recomposed unspoken slot keeps an equal modifier), the header heading's
+   text and bounds, and every tab's "selected" (`ControlCenterSelection.kt:81` `CcTabSelection(shown, spoken)`; the
+   looks still follow `shown` at once, `ccSpeakTab` observes `spoken`; `ControlCenterChrome.kt:67`
+   `rememberCcTabSelected`).
+2. `ControlCenterHeadingText.kt` (new) `CcHeadingText`, used by `CcHeaderTitle` (`ControlCenterChrome.kt:188`) and the
+   Mini's `CompactTitle`: the title and subtitle are drawn from prepared `TextLayoutResult`s. Layouts for every
+   screen are prepared on quiet frames (one per frame after the inputs change); the drawn heading reads
+   `ui.screen` while drawing, so the switch frame re-draws the header and composes / lays out no text. Painted as
+   `BasicText` paints (`ccPaintText`, shared with `CcTabText`). The node (text, heading flag, bounds = the wider line
+   by both heights, as the old `Column`) follows the spoken screen. `rememberCcHeading` removed (unused).
+3. Tried, not kept (v3): slots stay placed at the origin and parking is a layer translation (`placeWithLayer`, one
+   block per screen reading the shown screen), so a switch moves no node. See the results below.
+- Cherry-picked `cc-return` (`ce0272b8`): a shown screen's cameras / loaders start 3 frames after the switch.
+
+| Map → Alerts (tap) | official 1.314 (16 taps) | v1 (16) | v2 (16) |
+|---|---|---|---|
+| Frames over 32 ms per tap | 3 ×1, 2 ×8, 1 ×3, 0 ×4 (22) | 2 ×1, 1 ×4, 0 ×11 (6) | 2 ×1, 1 ×3, 0 ×12 (5) |
+| Worst frame, median ms | 38 | 30 | 28 |
+| Sum of frames over 32 ms, median ms | 71 | 0 | 0 |
+| Frames over 16 ms, total | 71 | 79 | 73 |
+
+| Alerts → Map (BACK) | official 1.314 (16) | v1 (16) | v2 (16) |
+|---|---|---|---|
+| Frames over 32 ms per tap | 2 ×10, 1 ×3, 0 ×3 (23) | 3 ×1, 2 ×4, 1 ×8, 0 ×3 (19) | 1 ×9, 0 ×7 (9) |
+| Worst frame, median ms | 42 | 34 | 33 |
+| Sum of frames over 32 ms, median ms | 75 | 34 | 33 |
+| Frames over 16 ms, total | 68 | 72 | 80 |
+
+- Graphics memory after leaving: 46–47 MB on every build (1.314 45.6–47.1, v1 46.4–48.0, v2 46.3–47.1).
+- **The tap is fixed for most taps** (12 of 16 with no frame over 32 ms on v2, 4 of 16 on 1.314). The return went from
+  two long frames per tap to at most one, and the camera deferral is what makes the difference on the return
+  (v1 19 → v2 9 frames over 32 ms): with the semantics moved, the camera start was the next-biggest item on the
+  return's switch frame. Frames over 16 ms do not drop: the work moved to the following frames, it did not vanish.
+- simpleperf (v2 benchmark, per frame of 4 BACKs and 3 taps): **no semantics work in the switch frame any more**
+  (0 ms in all 7). But the frame right after the switch still has a semantics rebuild of 4–8.5 ms, and the spoken
+  frame a second, smaller one (2.5–4 ms). The first is not a semantics change: Compose's
+  `onLayoutChange` marks the accessibility tree stale for **any** node that moves, and the slots are parked by
+  placement (the shown screen moves from the park offset to 0, the parked one away), so the bounds loop rebuilds and
+  re-sorts the tree after the switch frame. That is what v3 tried to remove.
+- atrace (v2 BACK): switch frame main thread 16–23 ms (composition 5–13 ms, traversal 10–11.5 ms), RenderThread
+  17.5–29 ms: the header texture (2011 × 122, the title) re-rendered (`drawLayer` 1.4–3.4 ms, `flush layers` 2.4–5.6 ms),
+  `flush commands` 5–10 ms (the window with the returning Map), swap 2–3.3 ms.
+- Accessibility (full uiautomator dumps, Map 50 nodes and Alerts 76, each build vs 1.314): same nodes, order, classes,
+  flags, selected state and bounds; the only differences are the clock in the heading ("3:58 pm" → "4:03 pm", the
+  heading's right edge moving 1–3 px with the digits) and "Open 26 min" → "Open 30 min" on the open-door row.
+- Accessibility events (`uiautomator events`, one tap and one BACK each): the same events arrive on both builds in
+  the same order: `VIEW_SELECTED` (the tab), `WINDOW_CONTENT_CHANGED` with `CONTENT_DESCRIPTION` (the heading),
+  and the `SUBTREE` changes (1.314: selection, then the heading 40 ms later; branch: selection, then the heading
+  22–28 ms later). So TalkBack still hears the newly selected tab and the new heading after every switch.
+- **v3 (parking by layer translation) did not help; not kept.** Measured after the house changed (an open door
+  closed, nobody home), with one official round in that state. Frames over 32 ms per tap: v3 tap 9 / 16 (0.56 per
+  tap), BACK 12 / 16 (0.75); official in the same state tap 4 / 4 taps, BACK 8 / 4 (2 per BACK); v2 tap 5 / 16,
+  BACK 9 / 16. The frame after the switch did get short (15–21 ms, v2 27–32 ms) but the switch frame got longer
+  (BACK 38–47 ms, v2 33–38 ms), so no long frame was removed. Its accessibility dump matched the official one in the
+  same house state.
+- Device incident: one reinstall of 1.314 left the system chooser (`ResolverActivity`) on top although the HOME
+  intent still resolved to Hearthpane; the stint stopped there (the script then only checked the resolution), and the
+  next stint set the home activity and pressed Home first. Every install now checks both.
+
+**Against the target (no switch frame over 32 ms either way): not met, but close on the tap.** v2 (merged here):
+tap 12 of 16 taps with no frame over 32 ms (1.314: 4 of 16), worst frame median 28 ms; return 7 of 16 with none
+(1.314: 3 of 16), at most one long frame per BACK (1.314: two), worst median 33 ms (42).
+
+**What is left on the return's long frame (v2):** main thread 16–23 ms (Map's composition with the fresh snapshot,
+measure) plus RenderThread 17–29 ms: the header texture re-rendered for the title, the window's `flush commands` with
+the returning Map, swap. Next candidates: draw the title outside the header's cached texture (a layer inside it still
+re-renders the texture; the heading is now one drawn node, so drawing it elsewhere need not add a node), and find
+what of the returning Map's `flush commands` is avoidable.
