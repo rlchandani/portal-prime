@@ -114,11 +114,11 @@ class OtaRun:
         status = (reply.get("ota") or {}).get("status")
         available = (reply.get("ota") or {}).get("available") or {}
         self.ota["check_reply"] = reply.get("ota")
-        if status == "up_to_date" or not available:
+        if status == "up_to_date":
             self.status = "not-behind"
-            self.ota.update(outcome="not-behind", note=f"check answered {status}; nothing to install")
+            self.ota.update(outcome="not-behind", note="check answered up_to_date; nothing to install")
             return
-        if status != "available":
+        if status != "available" or not available:
             raise ScenarioError(f"check answered {status}: {json.dumps(reply)[:200]}")
         self.ota["size_bytes"] = available.get("size")
         self._mark("install-sent")
@@ -143,6 +143,8 @@ class OtaRun:
     def _post(self, body):
         for _ in range(BUSY_RETRIES):
             reply = self.d.raw_json("POST", OTA_PATH, body)
+            if not reply:
+                raise ScenarioError(f"{body['action']}: fleet {OTA_PATH} gave no JSON reply")
             if reply.get("error") == "dev_mode":
                 raise ScenarioError("developer mode is still on; the updater refuses (not forcing)")
             if reply.get("error") != "busy":
