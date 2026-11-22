@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.horizontalScroll
@@ -194,8 +195,9 @@ private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) ->
 }
 
 /**
- * Compact header (the Mini, either way up): back, title and settings on the first row; the
- * Rooms/Recent tabs and the Messenger hand-off on the second (scrolls sideways if it must).
+ * Compact header (the Mini, either way up): back, title and settings on the first row; below it the
+ * tabs and the Messenger hand-off in full-width rows that never scroll sideways ([CallsHeaderLayout]).
+ * Upright the tabs span the width with the hand-off on its own row; turned they share one row.
  */
 @Composable
 private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit,
@@ -203,7 +205,12 @@ private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (Calls
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
-  Column(Modifier.fillMaxWidth().padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+  val configuration = LocalConfiguration.current
+  val labels = CallsTab.entries.map(badges::label)
+  val rows = CallsHeaderLayout.rows(currentLayoutClass(), configuration.screenWidthDp, labels,
+      BuildConfig.PORTAL_CALL_LOOPBACK, configuration.fontScale).orEmpty()
+  Column(Modifier.fillMaxWidth().padding(horizontal = CallsHeaderLayout.SIDE_PADDING_DP.dp, vertical = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(14.dp)) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
       CallRoundButton("back", "Back", onBack, surface = surface)
       Column(Modifier.weight(1f)) {
@@ -213,12 +220,27 @@ private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (Calls
       CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
           surface = surface)
     }
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      CallsSegmented(CallsTab.entries.map(badges::label),
-          tab.ordinal) { onTab(CallsTab.entries[it]) }
-      if (BuildConfig.PORTAL_CALL_LOOPBACK) CallsTestPills(onLoopback, onTestMessage, surface)
-      CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
+    rows.forEach { row ->
+      val hasTabs = CallsHeaderLayout.Item.TABS in row
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(CallsHeaderLayout.GAP_DP.dp)) {
+        row.forEach { item ->
+          // With the tabs in the row they take the rest; without them the pills share it equally.
+          val share = if (hasTabs) Modifier else Modifier.weight(1f)
+          when (item) {
+            CallsHeaderLayout.Item.TABS -> CallsSegmented(labels, tab.ordinal, Modifier.weight(1f),
+                CallsHeaderLayout.tabWeights(labels,
+                    CallsHeaderLayout.tabsTrackDp(row, configuration.screenWidthDp, labels, configuration.fontScale),
+                    configuration.fontScale)) { onTab(CallsTab.entries[it]) }
+            CallsHeaderLayout.Item.LOOPBACK_TEST -> CallPill(CallsHeaderLayout.LOOPBACK_LABEL, onLoopback, share, icon = "video",
+                surface = surface, size = CallButtonSize.SM)
+            CallsHeaderLayout.Item.TEST_MESSAGE -> CallPill(CallsHeaderLayout.TEST_MESSAGE_LABEL, onTestMessage, share, icon = "msg",
+                surface = surface, size = CallButtonSize.SM)
+            CallsHeaderLayout.Item.HANDOFF -> CallPill(CallsHeaderLayout.HANDOFF_LABEL, { PortalHomeBridge.launch(context) }, share,
+                icon = "phone", surface = surface, size = CallButtonSize.SM)
+          }
+        }
+      }
     }
   }
 }
@@ -232,14 +254,17 @@ private fun CallsTestPills(onLoopback: () -> Unit, onTestMessage: () -> Unit, su
 
 /** `.seg`: surf2 track, white pill on the selected item. */
 @Composable
-internal fun CallsSegmented(labels: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+internal fun CallsSegmented(labels: List<String>, selected: Int, modifier: Modifier = Modifier,
+                            /** Stretched (compact): one weight per tab; null keeps the natural widths. */
+                            weights: List<Float>? = null, onSelect: (Int) -> Unit) {
   val p = LocalApprovedPalette.current
-  Row(Modifier.background(p.surface2, RoundedCornerShape(50)).padding(6.dp)) {
+  Row(modifier.background(p.surface2, RoundedCornerShape(50)).padding(6.dp)) {
     labels.forEachIndexed { i, label ->
       val on = i == selected
-      Box(Modifier.height(76.dp).background(if (on) p.surface else Color.Transparent, RoundedCornerShape(50))
+      val width = weights?.getOrNull(i)?.let { Modifier.weight(it) } ?: Modifier
+      Box(width.height(76.dp).background(if (on) p.surface else Color.Transparent, RoundedCornerShape(50))
           .callClick(label, true) { onSelect(i) }.padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
-        Text(label, color = if (on) p.text else p.secondary, fontSize = 25.5.sp, fontWeight = FontWeight.SemiBold)
+        Text(label, color = if (on) p.text else p.secondary, fontSize = 25.5.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
       }
     }
   }
