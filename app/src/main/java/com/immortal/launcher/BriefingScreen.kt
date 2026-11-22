@@ -55,7 +55,14 @@ internal fun BriefingScreen(briefing: Briefing?, onDismiss: () -> Unit) {
     val (left, right) = briefing.sections.partition {
       it.kind == BriefingSectionKind.WEATHER || it.kind == BriefingSectionKind.CALENDAR
     }
-    Row(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
+    if (currentLayoutClass().compactPortrait) {
+      // The Mini upright: one full-width column (two would leave ~290 dp per card and cut lines short).
+      Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
+          verticalArrangement = Arrangement.spacedBy(SectionGap)) {
+        SectionColumn(left, Modifier.fillMaxWidth())
+        SectionColumn(right, Modifier.fillMaxWidth())
+      }
+    } else Row(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(SectionGap)) {
       SectionColumn(left, Modifier.weight(1f))
       SectionColumn(right, Modifier.weight(1f))
@@ -78,8 +85,10 @@ private fun BriefingNote(note: String) {
 private fun BriefingHeader(briefing: Briefing?, onDismiss: () -> Unit) {
   Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
+      // Upright on the Mini the greeting may take a second line rather than lose the name.
       Text(briefing?.title ?: BriefingCopy.CARD_TITLE, color = ApprovedHomePalette.Text, fontSize = 52.sp,
-          lineHeight = 58.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+          lineHeight = 58.sp, fontWeight = FontWeight.Bold, maxLines = if (currentLayoutClass().compactPortrait) 2 else 1,
+          overflow = TextOverflow.Ellipsis,
           modifier = Modifier.semantics { heading() })
       briefing?.subtitle?.let {
         Text(it, color = ApprovedHomePalette.Secondary, fontSize = 26.sp, lineHeight = 34.sp,

@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
@@ -52,11 +53,14 @@ internal fun ApprovedHomeDialog(
   androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss,
       properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) { ProvideHearthpaneTouchTargets {
     CompositionLocalProvider(LocalApprovedHomePopup provides true) {
-    ApprovedHomeSurface(Modifier.widthIn(max = 880.dp).fillMaxWidth(.8f).heightIn(max = 1096.dp), radius = 28.dp) {
+    // Compact (the Mini): the shared 24 dp side margin instead of 80%, so content gets 752 dp, not 640.
+    val frame = if (currentLayoutClass().compact) compactDialogFrame(880, 1096)
+        else Modifier.widthIn(max = 880.dp).fillMaxWidth(.8f).heightIn(max = 1096.dp)
+    ApprovedHomeSurface(frame, radius = 28.dp) {
       Column(Modifier.padding(36.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
           Text(title, color = ApprovedHomePalette.Text, fontSize = 32.sp, lineHeight = 42.sp,
-              fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+              fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
           ApprovedHomeTextButton("Close", onClick = onDismiss)
         }
         content()
