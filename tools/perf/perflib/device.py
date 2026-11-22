@@ -61,6 +61,16 @@ class Device:
             reply = {}
         return reply if isinstance(reply, dict) else {}
 
+    def raw_json(self, method, path, body=None, timeout=60):
+        """fleetctl raw METHOD path [json]; the parsed reply dict, or {} when it is not JSON."""
+        args = ["raw", method, path] + ([json.dumps(body)] if body is not None else [])
+        p = self.fleet(args, timeout=timeout)
+        try:
+            reply = json.loads(p.out.strip() or "{}")
+        except ValueError:
+            reply = {}
+        return reply if isinstance(reply, dict) else {}
+
     # ---- state ---------------------------------------------------------------------------------
     def connected(self):
         p = self.runner.run(["adb", "devices"], timeout=15)  # host-side listing, touches no device

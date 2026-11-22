@@ -23,6 +23,11 @@ def line(result, tag, started_epoch=None, released=True):
     else:
         bad = [s["step"] for s in r.get("steps", []) if not s["ok"]] or [r.get("skipped", "not run")]
         final = f"RESTORE INCOMPLETE ({', '.join(bad)}) - check the Portal."
+    ota = result.get("ota")
+    if ota:
+        total = next((t["seconds"] for t in ota.get("totals", []) if t["total"].startswith("whole")), None)
+        final = (f"OTA {ota.get('mode')} via fleet /update/ota check+install (dev off for it): "
+                 f"{ota.get('outcome')}, whole update {total} s. " + final)
     return (f"{time.strftime('%a %b %d %H:%M:%S %Z %Y')} {tag} {start}-{end} ({'released' if released else 'held'}, "
             f"{result.get('status')}): perf-bench {result.get('scenario')} x{result.get('reps')} "
             f"order {' '.join(result.get('order', []))}; dev on; plain adb install -r of {builds or 'nothing'}; "

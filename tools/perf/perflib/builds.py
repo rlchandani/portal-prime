@@ -32,10 +32,11 @@ class Build:
     sha256: str = ""
     version_name: str = ""
     tag: str = ""
+    version_code: int = 0
 
     def as_dict(self):
         return {"label": self.label, "kind": self.kind, "apk": self.apk, "dm": self.dm, "sha256": self.sha256,
-                "versionName": self.version_name, "tag": self.tag}
+                "versionName": self.version_name, "versionCode": self.version_code, "tag": self.tag}
 
 
 def sha256_file(path):
@@ -93,7 +94,21 @@ class OfficialSource:
         meta = json.loads(self._gh(["release", "view", "--repo", self.repo, "--json", "tagName,isPrerelease,isDraft"]))
         if meta.get("isPrerelease") or meta.get("isDraft"):
             raise BuildError("the latest release is not an official release")
-        tag = meta["tagName"]
+        self._build = self.release(meta["tagName"], label)
+        return self._build
+
+    def previous(self, label="P"):
+        """The official release published just before the latest one (for the OTA scenario)."""
+        latest = self.latest()
+        listing = json.loads(self._gh(["release", "list", "--repo", self.repo, "--limit", "20", "--json",
+                                       "tagName,isLatest,isPrerelease,isDraft,publishedAt"]))
+        tag = previous_official_tag(listing, latest.tag)
+        if not tag:
+            raise BuildError(f"no official release before {latest.tag}")
+        return self.release(tag, label)
+
+    def release(self, tag, label):
+        """Release [tag]'s APK, downloaded once into the cache and verified against its own manifest."""
         manifest = parse_manifest(self._gh(["release", "download", tag, "--repo", self.repo,
                                             "-p", RELEASE_MANIFEST_ASSET, "-O", "-"]))
         folder = os.path.join(self.cache, "official", tag)
@@ -105,8 +120,18 @@ class OfficialSource:
         got = sha256_file(apk) if os.path.isfile(apk) else ""
         if got != manifest["sha256"]:
             raise BuildError(f"official {tag} sha256 mismatch ({got[:12]} vs {manifest['sha256'][:12]})")
-        self._build = Build(label, "official", apk, None, got, manifest["versionName"], tag)
-        return self._build
+        return Build(label, "official", apk, None, got, manifest["versionName"], tag, manifest["versionCode"])
+
+
+def previous_official_tag(listing, latest_tag):
+    """The newest non-draft, non-prerelease tag published before [latest_tag] in a `gh release list` JSON."""
+    official = sorted((r for r in listing if not r.get("isDraft") and not r.get("isPrerelease")),
+                      key=lambda r: r.get("publishedAt") or "", reverse=True)
+    tags = [r["tagName"] for r in official]
+    if latest_tag not in tags:
+        return None
+    rest = tags[tags.index(latest_tag) + 1:]
+    return rest[0] if rest else None
 
 
 def install(device, build, log=print):
