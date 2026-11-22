@@ -64,11 +64,11 @@ internal fun GuestCardScreen(
       else -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(48.dp),
           verticalAlignment = Alignment.CenterVertically) {
         GuestQr(content.network, size = dims.qr.dp)
-        // The Mini turned: the details keep clear of the close button and use the compact type so
-        // the whole card fits the 740 dp height instead of scrolling the last choice out of view.
-        Column(Modifier.weight(1f).padding(end = dims.detailsEndPadding.dp).verticalScroll(rememberScrollState()),
+        // The Mini turned: the welcome line keeps clear of the close button and the details use the
+        // compact type so the whole card fits the 740 dp height instead of scrolling the last choice away.
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(dims.detailsGap.dp)) {
-          GuestCardDetails(content, compact = dims.compactDetails)
+          GuestCardDetails(content, compact = dims.compactDetails, headingEnd = dims.detailsEndPadding.dp)
           GuestModeControls(mode, onStart, onEnd)
         }
       }

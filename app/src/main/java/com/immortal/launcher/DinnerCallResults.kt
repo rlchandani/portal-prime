@@ -61,13 +61,13 @@ internal fun DinnerComposePane(targets: List<String>, onCancel: () -> Unit, onSe
   val message = DinnerMessage.custom(text)
   LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
   Column(Modifier.fillMaxSize()) {
-    val who = "${targets.joinToString(" and ")} shows it and says it once"
+    val who = DinnerInput.reach(targets)
     if (currentLayoutClass().compact) {
       // The Mini: the title and the two buttons fill the row, so who it reaches goes on the line below.
       Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text("Type a message", color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium,
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        ApprovedHomePillButton("Cancel", onClick = onCancel)
+        DinnerSolidButton("Cancel", tonal = true, onClick = onCancel)
         Spacer(Modifier.width(16.dp))
         DinnerSolidButton("Send", enabled = message != null) { message?.let(onSend) }
       }
@@ -77,7 +77,7 @@ internal fun DinnerComposePane(targets: List<String>, onCancel: () -> Unit, onSe
       Text("Type a message", color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium)
       Text(who, color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
           modifier = Modifier.weight(1f).padding(horizontal = 32.dp), maxLines = 1)
-      ApprovedHomePillButton("Cancel", onClick = onCancel)
+      DinnerSolidButton("Cancel", tonal = true, onClick = onCancel)
       Spacer(Modifier.width(16.dp))
       DinnerSolidButton("Send", enabled = message != null) { message?.let(onSend) }
     }
@@ -104,6 +104,12 @@ internal fun DinnerComposePane(targets: List<String>, onCancel: () -> Unit, onSe
 
 /** Typing stops at the limit (counted in code points so emoji aren't split). */
 internal object DinnerInput {
+  /** Who a typed message reaches, the verbs agreeing: "Kitchen shows it and says it once", "A and B show it and say it once". */
+  fun reach(targets: List<String>): String {
+    val one = targets.size == 1
+    return "${targets.joinToString(" and ")} ${if (one) "shows" else "show"} it and ${if (one) "says" else "say"} it once"
+  }
+
   fun limit(next: String): String {
     val single = next.replace('\n', ' ')
     return if (single.codePointCount(0, single.length) <= DinnerMessage.MAX_CUSTOM) single
@@ -112,12 +118,16 @@ internal object DinnerInput {
 }
 
 @Composable
-internal fun DinnerSolidButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
+/** The sheet's action button; [tonal] for the quiet partner (Cancel) at the same size and shape. */
+internal fun DinnerSolidButton(label: String, enabled: Boolean = true, tonal: Boolean = false, onClick: () -> Unit) {
   val shape = RoundedCornerShape(40.dp)
-  Box(Modifier.heightIn(min = 80.dp).clip(shape).background(ApprovedHomePalette.Text.copy(alpha = if (enabled) 1f else .3f))
-      .tvFocusable(shape, enabled = enabled, onClick = onClick).padding(horizontal = 44.dp, vertical = 18.dp),
+  val fill = if (tonal) ApprovedHomePalette.Chrome else ApprovedHomePalette.Text.copy(alpha = if (enabled) 1f else .3f)
+  Box(Modifier.heightIn(min = 80.dp).clip(shape).background(fill)
+      .tvFocusable(shape, enabled = enabled, ringColor = if (tonal) ApprovedHomePalette.Accent else Color.White, onClick = onClick)
+      .padding(horizontal = 44.dp, vertical = 18.dp),
       contentAlignment = Alignment.Center) {
-    Text(label, color = ApprovedHomePalette.Background, fontSize = 30.sp, fontWeight = FontWeight.Medium)
+    Text(label, color = if (tonal) ApprovedHomePalette.Text else ApprovedHomePalette.Background, fontSize = 30.sp,
+        fontWeight = FontWeight.Medium)
   }
 }
 

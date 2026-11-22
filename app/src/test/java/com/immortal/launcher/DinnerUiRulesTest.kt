@@ -17,6 +17,12 @@ class DinnerUiRulesTest {
     assertEquals("a b", DinnerInput.limit("a\nb"))
   }
 
+  @Test fun theComposeLineAgreesWithHowManyRoomsItReaches() {
+    assertEquals("Kitchen shows it and says it once", DinnerInput.reach(listOf("Kitchen")))
+    assertEquals("Rohit Office and Living Area show it and say it once",
+        DinnerInput.reach(listOf("Rohit Office", "Living Area")))
+  }
+
   @Test fun longTitlesStepDown() {
     assertTrue(DinnerCopy.titleSize("Bedtime") > DinnerCopy.titleSize("Come downstairs now"))
     assertTrue(DinnerCopy.titleSize("Come downstairs now") > DinnerCopy.titleSize("Lights out in 5 minutes, everyone"))

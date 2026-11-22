@@ -83,13 +83,17 @@ internal fun GuestQr(network: GuestWifi.Network, size: Dp = 400.dp) {
   }
 }
 
-/** Welcome, network, password, door code and the house basics; [compact] for the setup preview. */
+/**
+ * Welcome, network, password, door code and the house basics; [compact] for the setup preview and
+ * the Mini turned. [headingEnd] keeps the welcome line clear of a close button at the top end.
+ */
 @Composable
-internal fun GuestCardDetails(content: GuestCardContent, compact: Boolean = false) {
+internal fun GuestCardDetails(content: GuestCardContent, compact: Boolean = false, headingEnd: Dp = 0.dp) {
   val settings = content.settings
   if (settings.welcome.isNotBlank()) {
     Text(settings.welcome, color = ApprovedHomePalette.Text, fontSize = if (compact) 30.sp else 40.sp,
-        lineHeight = if (compact) 38.sp else 50.sp, fontWeight = FontWeight.Medium, modifier = Modifier.semantics { heading() })
+        lineHeight = if (compact) 38.sp else 50.sp, fontWeight = FontWeight.Medium,
+        modifier = Modifier.padding(end = headingEnd).semantics { heading() })
   }
   GuestLine("Wi-Fi network", settings.ssid.ifBlank { "Not chosen yet" }, large = !compact)
   if (!settings.wifiSecurity.needsPassword) {
