@@ -72,16 +72,12 @@ internal fun CcCompactHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcU
   }
 }
 
-/** Title + subtitle: the only part of the header a screen (or floor) switch recomposes. */
+/** Title + subtitle ([CcHeadingText]): a screen switch only redraws them. */
 @Composable
 private fun RowScope.CompactTitle(inputs: CcHeadingInputs, ui: CcUi) {
   val c = LocalCc.current
-  val h = rememberCcHeading(inputs, ui)
-  Column(Modifier.weight(1f).ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
-    Text(h.title, color = c.text, fontSize = 42.sp, fontFamily = CcStyle.Serif, maxLines = 1, overflow = TextOverflow.Ellipsis,
-        lineHeight = 46.sp)
-    Text(h.subtitle, color = c.sec, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-  }
+  CcHeadingText(inputs, ui, CcHeadingLine(c.text, 42.sp, CcStyle.Serif, lineHeight = 46.sp, overflow = TextOverflow.Ellipsis),
+      CcHeadingLine(c.sec, 20.sp, overflow = TextOverflow.Ellipsis), Modifier.weight(1f))
 }
 
 @Composable
@@ -151,7 +147,7 @@ internal fun CcCompactNavBar(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
 
 /** One bottom-bar tab ([CcTab]): a fixed tree; [selected] is read only by layer alphas and the semantics. */
 @Composable
-private fun RowScope.NavItem(icon: String, label: String, selected: State<Boolean>, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
+private fun RowScope.NavItem(icon: String, label: String, selected: CcTabSelection, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
   CcTab(Modifier.weight(1f).fillMaxHeight(), NAV_ITEM, selected, if (badge > 0) "$label, $badge" else label, enabled, onClick,
       overlay = {

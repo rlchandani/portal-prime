@@ -42,20 +42,34 @@ class ControlCenterSlotDrawTest {
     assertEquals(setOf(CcScreen.MAP, CcScreen.ALERTS), CC_KEEP_RECORDED)
   }
 
-  /** A shown screen is live at once; a parked one only after it stops lingering; a prewarmed one never. */
-  @Test fun aScreenIsLiveWhileShownOrLingering() {
-    assertEquals(true, ccSlotLive(active = true, lingering = false))
-    assertEquals(true, ccSlotLive(active = true, lingering = true))
-    assertEquals(true, ccSlotLive(active = false, lingering = true))
-    assertEquals(false, ccSlotLive(active = false, lingering = false))
+  /** A shown screen's cameras start once it is awake (a few frames in); a parked one's stop once it stops lingering; a prewarmed one never starts. */
+  @Test fun aScreenIsLiveOnceAwakeAndUntilItStopsLingering() {
+    assertEquals(true, ccSlotLive(active = true, awake = true, lingering = true))
+    assertEquals(false, ccSlotLive(active = true, awake = false, lingering = true))
+    assertEquals(false, ccSlotLive(active = true, awake = false, lingering = false))
+    assertEquals(true, ccSlotLive(active = false, awake = false, lingering = true))
+    assertEquals(false, ccSlotLive(active = false, awake = false, lingering = false))
   }
 
-  /** A parked screen leaves the accessibility tree at once; a shown one joins it once exposed (a few frames in). */
-  @Test fun aScreenIsInTheSemanticsTreeOnlyWhileShownAndExposed() {
-    assertEquals(true, ccSlotSemantics(active = true, exposed = true))
-    assertEquals(false, ccSlotSemantics(active = true, exposed = false))
-    assertEquals(false, ccSlotSemantics(active = false, exposed = true))
-    assertEquals(false, ccSlotSemantics(active = false, exposed = false))
+  /** Animations run at once on a shown screen and until a parked one stops lingering. */
+  @Test fun aScreenMovesWhileShownOrLingering() {
+    assertEquals(true, ccSlotMoving(active = true, lingering = false))
+    assertEquals(true, ccSlotMoving(active = true, lingering = true))
+    assertEquals(true, ccSlotMoving(active = false, lingering = true))
+    assertEquals(false, ccSlotMoving(active = false, lingering = false))
+  }
+
+  /** Only a parked, recording screen is transparent; a shown one is opaque (a detached one draws nothing anyway). */
+  @Test fun onlyARecordingSlotIsTransparent() {
+    assertEquals(1f, ccSlotAlpha(CcSlotDraw.SHOWN))
+    assertEquals(0f, ccSlotAlpha(CcSlotDraw.RECORDING))
+    assertEquals(1f, ccSlotAlpha(CcSlotDraw.DETACHED))
+  }
+
+  /** A screen is in the accessibility tree exactly while it is the spoken screen: shown or parked, the switch frame changes nothing. */
+  @Test fun aScreenIsInTheSemanticsTreeOnlyWhileSpoken() {
+    assertEquals(true, ccSlotSemantics(spoken = true))
+    assertEquals(false, ccSlotSemantics(spoken = false))
   }
 
   /** A parked screen holds no region textures (they'd re-render while hidden); a shown one caches once ready. */

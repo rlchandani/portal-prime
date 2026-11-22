@@ -101,7 +101,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
   }
 }
 
-/** False for a kept-alive screen that isn't showing: cameras stop polling, nothing animates. */
+/** False for a kept-alive screen that isn't showing, or just shown (see [ccSlotLive]): cameras and loaders stop polling. */
 internal val LocalCcScreenActive = compositionLocalOf { true }
 
 /** The current screen plus the kept-alive ones (see [CcScreenSlots]). */

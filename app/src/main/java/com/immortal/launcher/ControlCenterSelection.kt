@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,8 +72,18 @@ import kotlin.math.roundToInt
  * semantics update per changed tab, and composes nothing.
  */
 
+/**
+ * A tab's selection: [shown] drives its look (layer alphas, at once on a switch); [spoken] drives its
+ * "selected" state for accessibility services, which follows [CcUi.spokenScreen] a few frames later
+ * so the switch frame changes no semantics (see [CcScreenSlots]).
+ */
+@Stable
+internal class CcTabSelection(val shown: State<Boolean>, val spoken: State<Boolean>)
+
+private val NEVER: State<Boolean> = object : State<Boolean> { override val value = false }
+
 /** Never selected (Leave kids). */
-internal val CcNeverSelected: State<Boolean> = object : State<Boolean> { override val value = false }
+internal val CcNeverSelected = CcTabSelection(NEVER, NEVER)
 
 /** The selected tab's `.card` behind the tab, always composed; [selected] only toggles its layer's alpha. */
 @Composable
@@ -88,15 +99,16 @@ internal fun BoxScope.CcSelectionCard(shape: Shape, selected: State<Boolean>) {
  * drawn, see [CcTabText]), so the tab is still one node saying [description].
  */
 @Composable
-internal fun CcTab(modifier: Modifier, shape: Shape, selected: State<Boolean>, description: String, enabled: Boolean,
+internal fun CcTab(modifier: Modifier, shape: Shape, selection: CcTabSelection, description: String, enabled: Boolean,
                    onClick: () -> Unit, overlay: @Composable BoxScope.() -> Unit = {}, content: @Composable BoxScope.(Color) -> Unit) {
   val c = LocalCc.current
+  val selected = selection.shown
   Box(modifier.ccDisabledLayer(enabled)) {
     Box(Modifier.matchParentSize().ccRegionLayer(c.rail).clip(shape)) { content(c.sec) }
     CcSelectionCard(shape, selected)
     Box(Modifier.matchParentSize().graphicsLayer { alpha = ccLookAlpha(selected.value); this.shape = shape; clip = true }) { content(c.text) }
     Box(Modifier.matchParentSize().clip(shape).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
-        .ccSpeakTab(description, selected), content = overlay)
+        .ccSpeakTab(description, selection.spoken), content = overlay)
   }
 }
 
@@ -120,7 +132,7 @@ internal fun CcTabText(text: String, color: Color, fontSize: TextUnit, overflow:
   val style = LocalTextStyle.current.merge(TextStyle(fontSize = fontSize))
   val measurer = rememberTextMeasurer(cacheSize = 1)
   val laid = remember { CcLaidText() }
-  Layout(Modifier.drawBehind { laid.result?.let { ccPaintTabText(it, color, overflow) } }) { _, constraints ->
+  Layout(Modifier.drawBehind { laid.result?.let { ccPaintText(it, color, overflow) } }) { _, constraints ->
     val result = measurer.measure(text, style, overflow, softWrap = true, maxLines = 1, constraints = constraints)
     laid.result = result
     layout(result.size.width, result.size.height) {}
@@ -131,7 +143,7 @@ internal fun CcTabText(text: String, color: Color, fontSize: TextUnit, overflow:
 private class CcLaidText { var result: TextLayoutResult? = null }
 
 /** `BasicText`'s paint: clipped only when the text overflows its box, no shadow / decoration, filled. */
-private fun DrawScope.ccPaintTabText(result: TextLayoutResult, color: Color, overflow: TextOverflow) {
+internal fun DrawScope.ccPaintText(result: TextLayoutResult, color: Color, overflow: TextOverflow) {
   val canvas = drawContext.canvas
   val clip = result.hasVisualOverflow && overflow != TextOverflow.Visible
   if (clip) { canvas.save(); canvas.clipRect(0f, 0f, result.size.width.toFloat(), result.size.height.toFloat()) }
