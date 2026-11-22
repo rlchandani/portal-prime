@@ -237,12 +237,13 @@ private fun StoreBrowse(
   val categories = remember(filtered) { filtered.groupBy { it.category } }
   val layoutClass = currentLayoutClass()
   val sidePadding = storeSidePaddingDp(layoutClass).dp
-  androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(storeGridColumns(layoutClass)), horizontalArrangement = Arrangement.spacedBy(20.dp), state = listState, modifier = Modifier.fillMaxSize().padding(horizontal = sidePadding), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
+  val top = StoreBrowseLayout.of(layoutClass)
+  androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(storeGridColumns(layoutClass)), horizontalArrangement = Arrangement.spacedBy(20.dp), state = listState, modifier = Modifier.fillMaxSize().padding(horizontal = sidePadding), contentPadding = PaddingValues(top = top.topPadding.dp, bottom = 24.dp)) {
     item("hero", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
       val dark = LocalApprovedPalette.current.dark
       Column(Modifier.fillMaxWidth()) {
         Surface(color = if (dark) Color(0xFF26463E) else Color(0xFFDCECE4), shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, if (dark) Color(0xFF44675D) else Color(0xFFC2DBD0)), modifier = Modifier.fillMaxWidth()) {
-          if (layoutClass.compactPortrait) CompactStoreHero() else Row(Modifier.heightIn(min = 245.dp).padding(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+          if (layoutClass.compactPortrait) CompactStoreHero() else if (top.strip) StoreHeroStrip() else Row(Modifier.heightIn(min = 245.dp).padding(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
             Column(Modifier.weight(1.35f)) {
               Text("More life for your Portal.", color = IosLabel, fontSize = 46.sp, lineHeight = 58.sp, fontWeight = FontWeight.Medium)
               Text("The actual Hearthpane catalog. Installed apps and optional downloads are distinct.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
@@ -253,13 +254,23 @@ private fun StoreBrowse(
             }
           }
         }
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(top.bannerGap.dp))
         if (InstallDaemon.installPaused(context)) { StorePausedBanner(); Spacer(Modifier.height(24.dp)) }
-        ApprovedAppsSearch(query, onQuery, if (loaded) "Search all ${apps.size} apps" else "Search catalog")
-        Spacer(Modifier.height(24.dp))
-        StoreActionsRow(layoutClass.compact) {
+        val placeholder = if (loaded) "Search all ${apps.size} apps" else "Search catalog"
+        val actions: @Composable () -> Unit = {
           ApprovedAppsButton("Updates", onClick = onUpdates)
           if (advanced) ApprovedAppsButton("Install an APK") { context.startActivity(Intent(context, ApkBrowserActivity::class.java)) }
+        }
+        if (top.searchBesideActions) {
+          // The Mini turned: one toolbar row, so the catalog starts a row higher.
+          Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            ApprovedAppsSearch(query, onQuery, placeholder, Modifier.weight(1f))
+            actions()
+          }
+        } else {
+          ApprovedAppsSearch(query, onQuery, placeholder)
+          Spacer(Modifier.height(StoreBrowseLayout.ACTION_GAP.dp))
+          StoreActionsRow(layoutClass.compact) { actions() }
         }
       }
     }
@@ -273,7 +284,7 @@ private fun StoreBrowse(
       }
       filtered.isEmpty() -> item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { Text("No apps found.", color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 30.dp)) }
       else -> categories.forEach { (category, group) ->
-        item("heading:$category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { Text(category, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 6.dp, top = 28.dp, bottom = 12.dp)) }
+        item("heading:$category", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { Text(category, color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 6.dp, top = StoreBrowseLayout.headingTopPadding(top).dp, bottom = 12.dp)) }
         items(group.size, key = { group[it].packageName }, contentType = { "catalog-app" }) { index ->
           val app = group[index]
           Box(Modifier.padding(bottom = 20.dp)) {
@@ -306,6 +317,23 @@ private fun CompactStoreHero() {
       ApprovedAppsIcon("org.videolan.vlc", "VLC", 96.dp)
       ApprovedAppsIcon("io.homeassistant.companion.android.minimal", "Home Assistant", 96.dp)
     }
+  }
+}
+
+/** The Mini turned: the banner as one strip, its title over its line and the featured icons at the end. */
+@Composable
+private fun StoreHeroStrip() {
+  val l = StoreBrowseLayout
+  Row(Modifier.padding(horizontal = 28.dp, vertical = l.STRIP_PADDING.dp), verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(l.STRIP_LINE_GAP.dp)) {
+      Text("More life for your Portal.", color = IosLabel, fontSize = l.STRIP_TITLE_SP.sp, lineHeight = l.STRIP_TITLE_LINE.sp,
+          fontWeight = FontWeight.Medium, maxLines = 1)
+      Text("The actual Hearthpane catalog. Installed apps and optional downloads are distinct.", color = IosSecondary,
+          fontSize = l.STRIP_LINE_SP.sp, lineHeight = l.STRIP_LINE_LINE.sp, maxLines = 2)
+    }
+    ApprovedAppsIcon("org.videolan.vlc", "VLC", l.STRIP_ICON.dp)
+    ApprovedAppsIcon("io.homeassistant.companion.android.minimal", "Home Assistant", l.STRIP_ICON.dp)
   }
 }
 
