@@ -1,6 +1,6 @@
 {
-  "versionCode": 321,
-  "versionName": "1.327",
+  "versionCode": 322,
+  "versionName": "1.328",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Redesigned Home Assistant dashboard: matches Control Center, real scenes, a greeting that follows the time of day, proper loading/offline/error screens, and locks and covers now show Unlocked/Open correctly. Adds the automated Portal benchmark tool."
+  "notes": "Settings polish (consistent Remove and lock styles, a proper Save button, aligned chips, readable values, its own Wallpaper icon, About header, clearer light-theme switches) and smoother Polaroid screensaver changes."
 }
