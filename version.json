@@ -1,6 +1,6 @@
 {
-  "versionCode": 319,
-  "versionName": "1.325",
+  "versionCode": 320,
+  "versionName": "1.326",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Settings polish, second pass: even gaps above headers, aligned text and footers, no orphaned last words, values no longer squeeze titles on the Mini, and clearer switches and buttons in light theme."
+  "notes": "Settings lists (World clock, Start on boot, Almanac, Clock, Music, Home Assistant and more) now scroll with the page, so no row is cut off at a card's edge."
 }
