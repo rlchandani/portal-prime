@@ -58,6 +58,8 @@ class HomeActivity : ComponentActivity() {
 
   /** Read-only navigation diagnostics; never simulate Android lifecycle callbacks to read state. */
   internal fun approvedCurrentTab(): ApprovedLauncherTab = launcherTab
+  // One instance, read inside LauncherScreen: setContent does not read the tab, so a switch recomposes only its readers.
+  private val launcherTabReader: () -> ApprovedLauncherTab = { launcherTabState }
 
   /** Media keys drive the YouTube player (it has no MediaSession); see [MusicMediaKeys]. */
   override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean =
@@ -89,7 +91,7 @@ class HomeActivity : ComponentActivity() {
             appsSearchOpenRequest = appsSearchOpenRequest,
             musicOpenRequest = musicOpenRequest,
             onOpenMusic = { musicOpenRequest++ },
-            selectedTab = launcherTab,
+            selectedTab = launcherTabReader,
             onSelectTab = { launcherTab = it },
             onLaunch = { cn ->
               runCatching {

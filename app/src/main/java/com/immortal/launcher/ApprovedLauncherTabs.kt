@@ -142,6 +142,7 @@ internal fun ApprovedLauncherTabs(
     modifier: Modifier = Modifier,
     contentActive: Boolean = true,
     prefetch: List<ApprovedLauncherTab> = emptyList(),
+    spoken: State<ApprovedLauncherTab>? = null,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
@@ -214,7 +215,7 @@ internal fun ApprovedLauncherTabs(
                 }
               }
             } finally { input.endTouch() }
-          }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })) {
+          }.then(launcherPageSemantics(contentActive && tab == (spoken?.value ?: selected)))) {
         CompositionLocalProvider(
             LocalApprovedLauncherPageActive provides active,
             LocalApprovedLauncherHostOwner provides hostOwner,
@@ -226,6 +227,16 @@ internal fun ApprovedLauncherTabs(
     }
   }
 }
+
+/** One shared modifier for every hidden page, so a recomposed hidden page keeps an equal chain. */
+private val UNSPOKEN_PAGE: Modifier = Modifier.clearAndSetSemantics { }
+
+/**
+ * Which page accessibility services see. With a [ApprovedLauncherTabs] `spoken` state (Home,
+ * [rememberHomeSpokenTab]) this follows it a few frames after a switch, so the page leaving and the
+ * page joining the tree land on a quiet frame instead of the switch frame; otherwise it follows `active`.
+ */
+internal fun launcherPageSemantics(exposed: Boolean): Modifier = if (exposed) Modifier else UNSPOKEN_PAGE
 
 private class LauncherPageOwner : LifecycleOwner {
   val registry = LifecycleRegistry(this).apply { currentState = Lifecycle.State.CREATED }
