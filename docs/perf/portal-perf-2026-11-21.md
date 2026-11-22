@@ -1296,3 +1296,45 @@ Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 
 - These are single runs, about 6 changes each. A difference of about 20 % in the summed time is within the spread seen between rounds elsewhere in this doc. The household long-window A/B was not run.
 
 **Visual check on device** (branch, one screenshot, taken only after confirming that `PhotoFramePreviewActivity` was on top, the test source was active and pinned to `polaroid@…`, and the frame showed "TEST SCENE … generated"; 2160 × 1440, inspected at 100 % crop, then deleted). The shadow ramps are smooth on every print, with no 9-slice seams, no stretched or doubled corners, and no hard edge where the ramp meets the table. The tilt is drawn cleanly. The paper corners are rounded and the shadow follows them. The bottom row's paper looks greyer than the top row's. That is the global `#chrome-scrim` bottom gradient (`styles.css:232–233`), which this branch does not change. No screenshot of official was taken, so this check is against the desktop comparison above, not against a device capture of `main`.
+
+## Screensaver beat change: one raster per beat, before its dissolve (branch `ss-finish`, 1.326)
+
+**Trace finding.**
+- Desktop headless Chromium 1223 ran the real engine (seeded `Math.random`, generated 3000–4000 px photos, 1920 × 1280 at dpr 1.125). Gallery Wall and Polaroid were pinned, and each change was forced with `next()`, as the bench does. `RasterTask` was summed per 100 ms, and the composited layers were read through CDP `LayerTree`.
+- Mid-fade, the incoming `.ss-beat` is its own layer (`ActiveOpacityAnimation`) and `#stage`'s layer holds the outgoing beat. When the dissolve ends the incoming beat loses its layer, is painted into `#stage` (paint count 1 → 3), and **the whole screen is rasterised again**. That second raster was about half of each change's raster: Gallery Wall 194 ms per 2 changes, Polaroid 243 ms.
+- The device framestats fit this (official 1.326, bench `screensaver-pinned`, frames > 32 ms, offset from `photo_beat`). There are two clusters per change: 3 frames of 40–91 ms at +0.02–0.08 s (incoming raster and upload), and on Gallery Wall up to 14 frames of 33–56 ms at +1.63–2.1 s (the fade end). Polaroid has one 34–50 ms frame at +1.64 s.
+- The bench's `--atrace` was not usable. Its ring buffer kept 1261 of 64278 entries, only the tail of each step.
+
+**Change** (`13788fd3`).
+- `styles.css`: every `.ss-beat` has `will-change: opacity`, so a beat keeps its layer when its dissolve ends.
+- A beat that will dissolve over the current one is built at `.ss-beat.prewarm` (opacity .001, below half an 8-bit step), so it is rasterised while it is laid out. `scheduler.js` `present` then waits `PREWARM_FRAMES` (3) frames before the dissolve. A commit waits for the previous tree's raster, so the last frame lands after the raster. The dissolve runs from .001 to 1. First scenes and native Filmstrip handoffs are unchanged.
+- Desktop after the change: no raster at the fade end, and none in the 100 ms after the dissolve starts (Gallery Wall 194 → 66–76 ms raster per 2 changes).
+- The unproven Gallery Wall warm-up `cf8f02b4` is not carried over.
+
+**Pixel diff** (desktop Chromium, `main` vs branch, same seeded layout, the beat transition paused at 800 ms through CDP `Animation` for the mid-fade shot):
+- Rest and settled shots: 100 % identical at dpr 1, 1.125 and 2 for both modes.
+- Mid-fade: Gallery Wall 100 %. Polaroid 100 % at dpr 1.125, and 66.3 % at dpr 1 and 2 with max 1 / 255. That is blend rounding with the outgoing beat on its own layer.
+- A prewarm beat held indefinitely over the current scene was 100 % identical to the scene alone.
+
+**A/B** (bench `screensaver-pinned`, Family Portal+, `--official` + branch `assemblePerformance`, 4 reps × 5 changes, interleaved; the tool's verdict is "noise" on every metric because O's spread is wide):
+
+| Mode | Build | Changes | > 32 ms total | > 60 ms total | Worst median | Sum > 32 median | Janky % median |
+|---|---|---|---|---|---|---|---|
+| Polaroid | O 1.326 | 21 | 105 | 19 | 56 | 222 ms | 97 |
+| Polaroid | branch | 22 | 58 | 4 | 44 | 85 ms | 7.2 |
+| Gallery Wall | O 1.326 | 23 | 197 | 11 | 48 | 349 ms | 96 |
+| Gallery Wall | branch | 22 | 153 | 24 | 54 | 269 ms | 53 |
+
+- **Polaroid:** the 40–93 ms burst at the dissolve start is gone. What remains is 1–4 frames of 33–57 ms between −0.5 s and 0 s (the prewarm raster, while the screen does not change), and one 39–47 ms frame at +1.73 s, when the outgoing beat is disposed (`finishFade`, `XFADE_MS + 100`).
+- **Gallery Wall:** the start burst is mostly gone, but the fade-end cluster stays. It moved from +1.63 s to +1.75 s, which is again the outgoing disposal, not a re-raster: 8–13 frames of 33–72 ms in 11 of 22 changes. One sample (A r4 change 5) reached 129 ms. Three samples had 100–104 ms prewarm frames before the beat. Frames over 60 ms rose 11 → 24, so Gallery Wall is not a clear win.
+- **Target (no frame > 32 ms) not met in either mode.**
+
+**Next.**
+- Gallery Wall's remaining cost follows the outgoing wall's disposal (`dissolve.cleanup` of 10 cells and `layer.remove`, freeing ~20 photo textures in one frame). Candidates: release the old wall's cells a few per frame after the dissolve, or hide the outgoing beat (`visibility: hidden`) one frame before removing it, to separate damage from texture frees.
+- This needs a device trace with `webview` and `sched` and a larger buffer than the bench's `gfx view` capture.
+
+**Tests.**
+- `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 542 tests, 523 pass, 19 browser tests skipped, 0 fail. The new `slideshow_beat_prewarm.test.cjs` has 5 tests (first beat not prewarmed; a dissolve starts 3 frames after ready, from prewarm; a superseded prewarm beat never dissolves; pause holds; the CSS layer and opacity bound). 4 of them fail without the change. Two native-Filmstrip tests now advance 48 ms for a WebView-to-WebView dissolve.
+- `:app:testDebugUnitTest`: 9058 tests, 0 failures.
+- `ci-local.sh --clean-checkout`: 11 passed, 0 failed, 1 skipped (PowerShell provisioning).
+- The device was restored by the bench to official 1.326 (`restore OK, verify: ok`).
