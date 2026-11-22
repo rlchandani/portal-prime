@@ -176,7 +176,7 @@ internal fun CcSetHomeAssistant(slice: CcSetSlice, ui: CcUi) {
   FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     CcButton("Connection settings", { ui.context.openApprovedHomeSettings("ha") }, icon = "link")
     CcButton("Rebuild plan", { ui.go(CcScreen.EDIT) }, icon = "plan")
-    CcButton("Home dashboard", {
+    CcButton("Home Assistant dashboard", {
       runCatching { ui.context.startApprovedInternalActivity(Intent(ui.context, HaDashboardActivity::class.java)) }
     }, icon = "grid")
   }
