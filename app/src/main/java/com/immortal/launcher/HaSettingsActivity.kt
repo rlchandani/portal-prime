@@ -23,8 +23,6 @@ import com.immortal.launcher.settings.SettingsDomains
 import org.json.JSONObject
 
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.Lifecycle
@@ -230,41 +228,12 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
             Card {
                 if (filtering) ApprovedEditorsEmpty("Searching…")
                 else if (groups.isEmpty()) ApprovedEditorsEmpty("No entities match \"$query\".")
-                else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 640.dp)) {
-                    groups.forEach { group ->
-                        item(key = "group:${group.domain}", contentType = "group") {
-                            ApprovedEditorsHaGroupRow(group, searching = query.isNotBlank()) {
-                                expandedGroups = if (group.domain in expandedGroups)
-                                    expandedGroups - group.domain else expandedGroups + group.domain
-                            }
-                        }
-                        items(group.shown, key = { "entity:${it.id}" }, contentType = { "entity" }) { entity ->
-                            Divider()
-                            val already = entity.id in pinnedIds
-                            val pin = {
-                                HaConfig.addEntity(context, entity.id, entity.name)
-                                pinned = HaConfig.entities(context)
-                            }
-                            val interaction = if (already) Modifier else Modifier.tvFocusableRow(
-                                focusFill = IosFocusTint, onClick = pin)
-                            Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp)
-                                .then(interaction)
-                                .padding(horizontal = 28.dp, vertical = 21.dp),
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(entity.name, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp)
-                                    Text(entity.id, color = IosSecondary, fontSize = 21.sp, lineHeight = 29.sp)
-                                }
-                                Text(if (already) "Pinned ✓" else "+ Pin",
-                                    color = if (already) IosSecondary else IosBlue,
-                                    fontSize = 24.sp, lineHeight = 32.sp)
-                            }
-                        }
-                        if (group.hidden > 0) item(key = "more:${group.domain}", contentType = "hint") {
-                            ApprovedEditorsEmpty("+${group.hidden} more — search to narrow")
-                        }
-                        item(key = "end:${group.domain}", contentType = "divider") { Divider() }
-                    }
+                else HaEntityGroupRows(groups, pinnedIds, searching = query.isNotBlank(), onToggleGroup = { group ->
+                    expandedGroups = if (group.domain in expandedGroups)
+                        expandedGroups - group.domain else expandedGroups + group.domain
+                }) { entity ->
+                    HaConfig.addEntity(context, entity.id, entity.name)
+                    pinned = HaConfig.entities(context)
                 }
             }
         }
@@ -284,7 +253,7 @@ private fun HomeDashboardSettings(): Boolean {
     var snapshot by remember { mutableStateOf(HomeDashboardConfig.load(context)) }
     var error by remember { mutableStateOf<String?>(null) }
     Column {
-        SettingsList(SettingsDomains.homeDashboard, snapshot, onApply = { key, value ->
+        SettingsRows(SettingsDomains.homeDashboard, snapshot, deferRows = true, onApply = { key, value ->
             val applied = SettingsDomains.homeDashboard.apply(context, JSONObject().put(key, value))
             error = if (key in applied) null else "Enter a complete http:// or https:// dashboard address."
             snapshot = HomeDashboardConfig.load(context)
@@ -339,3 +308,50 @@ private fun haGroupLabel(domain: String): String =
       "sun" -> "Sun"
       else -> domain.replaceFirstChar { it.uppercase() }
     }
+
+/**
+ * The discovered entities as plain rows of the enclosing card, in the page's own scroll (an inner
+ * bounded list clipped its last row). Groups cap what they show ([approvedEditorsHaGroups]) and the
+ * entity rows are revealed a couple per frame, so a broad search never composes in one frame.
+ */
+@Composable
+private fun HaEntityGroupRows(
+    groups: List<ApprovedEditorsHaGroup>,
+    pinnedIds: Set<String>,
+    searching: Boolean,
+    onToggleGroup: (ApprovedEditorsHaGroup) -> Unit,
+    onPin: (ApprovedEditorsEntity) -> Unit,
+) {
+    var remaining = rememberStagedRowCount(groups.sumOf { it.shown.size })
+    groups.forEach { group ->
+        key("group:${group.domain}") {
+            ApprovedEditorsHaGroupRow(group, searching) { onToggleGroup(group) }
+            group.shown.take(remaining.coerceAtLeast(0)).forEach { entity ->
+                key("entity:${entity.id}") {
+                    Divider()
+                    HaEntityRow(entity, pinned = entity.id in pinnedIds) { onPin(entity) }
+                }
+            }
+            remaining -= group.shown.size
+            if (group.hidden > 0) ApprovedEditorsEmpty("+${group.hidden} more — search to narrow")
+            Divider()
+        }
+    }
+}
+
+@Composable
+private fun HaEntityRow(entity: ApprovedEditorsEntity, pinned: Boolean, onPin: () -> Unit) {
+    val interaction = if (pinned) Modifier else Modifier.tvFocusableRow(focusFill = IosFocusTint, onClick = onPin)
+    Row(Modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp)
+        .then(interaction)
+        .padding(horizontal = 28.dp, vertical = 21.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(entity.name, color = IosLabel, fontSize = 26.sp, lineHeight = 34.sp)
+            Text(entity.id, color = IosSecondary, fontSize = 21.sp, lineHeight = 29.sp)
+        }
+        Text(if (pinned) "Pinned ✓" else "+ Pin",
+            color = if (pinned) IosSecondary else IosBlue,
+            fontSize = 24.sp, lineHeight = 32.sp)
+    }
+}

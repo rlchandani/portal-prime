@@ -183,7 +183,7 @@ internal fun DeviceNameSection() {
       stop()
     }
   }
-  SettingsList(SettingsDomains.fleet, settings) { key, value ->
+  SettingsRows(SettingsDomains.fleet, settings, deferRows = true) { key, value ->
     SettingsDomains.fleet.apply(context, JSONObject().put(key, value))
   }
   SettingsCardGap()
@@ -231,7 +231,7 @@ internal fun QuickButtonsSection() {
   // Rendered from the `quickbar` registry domain (the same specs the phone remote uses), so the
   // toggle and its gated "Always show" can't drift from the remote's version. Apply routes through
   // the domain so its onApplied (reconcile + overlay refresh) fires here too.
-  SettingsList(SettingsDomains.quickbar, settings) { k, v ->
+  SettingsRows(SettingsDomains.quickbar, settings, deferRows = true) { k, v ->
     SettingsDomains.quickbar.apply(context, JSONObject().put(k, v))
   }
   FooterNote(

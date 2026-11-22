@@ -65,4 +65,23 @@ class SettingsRevealPlanTest {
                 entries.none { it.key in keys && it.kind == SettingsEntryKind.BLOCK })
         }
     }
+
+    @Test fun aLateListRevealsAFewRowsPerFrameUpToItsSize() {
+        val step = SettingsRevealPlan.LIST_ROWS_PER_FRAME
+        assertEquals(step, SettingsRevealPlan.nextListRowCount(0, 40))
+        assertEquals(2 * step, SettingsRevealPlan.nextListRowCount(step, 40))
+        assertEquals(40, SettingsRevealPlan.nextListRowCount(39, 40))
+        assertEquals(2, SettingsRevealPlan.nextListRowCount(0, 2))
+    }
+
+    @Test fun aShrunkOrEmptyListNeverRevealsMoreThanItHas() {
+        assertEquals(0, SettingsRevealPlan.nextListRowCount(0, 0))
+        assertEquals(5, SettingsRevealPlan.nextListRowCount(12, 5))
+        assertEquals(SettingsRevealPlan.LIST_ROWS_PER_FRAME, SettingsRevealPlan.nextListRowCount(-4, 40))
+    }
+
+    @Test fun aLateListStaysInsideTheDeferredFrameBudget() {
+        // Two Texts and a switch per row, about 1.15 ms per Text: well under the 6 ms frame share.
+        assertTrue(SettingsRevealPlan.LIST_ROWS_PER_FRAME * 2 * 1.15 <= SETTINGS_DEFERRED_BUDGET_MS)
+    }
 }

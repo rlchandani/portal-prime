@@ -98,7 +98,7 @@ internal fun ClockSettingsContent() {
       Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
         // Clock preferences render from the `digitalclock` registry domain. Apply routes through
         // the domain so its onApplied (reaffirm the dream when `enabled` toggles) fires here too.
-        SettingsList(SettingsDomains.digitalclock, clockConfig) { k, v ->
+        SettingsRows(SettingsDomains.digitalclock, clockConfig, deferRows = true) { k, v ->
           SettingsDomains.digitalclock.apply(context, JSONObject().put(k, v))
           clockConfig = DigitalClockConfig.load(context)
         }

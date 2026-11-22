@@ -74,7 +74,7 @@ internal fun AlmanacSettingsContent() {
   if (current == null && !failed) FooterNote("Loading Almanac settings…")
   if (current != null) {
     SettingsSectionGap()
-    SettingsList(domain, current, editsEnabled = !saving) { key, value ->
+    SettingsRows(domain, current, editsEnabled = !saving, deferRows = true) { key, value ->
       if (!saving) {
         saving = true
         failed = false

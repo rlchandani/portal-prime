@@ -823,10 +823,10 @@ object SettingsDomains {
    * doesn't reconnect the broker per keystroke; each apply resyncs the service once.
    *
    * WARNING — Context-as-snapshot: because the snapshot is the Context (live reads), it never
-   * "changes" on apply, so rendering this domain through the on-device [SettingsList] would NOT
+   * "changes" on apply, so rendering this domain through the on-device [com.immortal.launcher.SettingsRows] would NOT
    * recompose after a toggle (the value updates on disk but Compose sees no state change). It's
    * served on-device by the bespoke `MqttScreen` (which holds its own `mutableStateOf`); only the
-   * remote renders it generically. Give it a real snapshot `Settings` before pointing `SettingsList`
+   * remote renders it generically. Give it a real snapshot `Settings` before pointing `SettingsRows`
    * at it.
    */
   val mqtt: SettingsDomain<Context> =
@@ -913,7 +913,7 @@ object SettingsDomains {
   /**
    * The floating quick-button cluster ([QuickBarConfig]). Backed by an immutable
    * [QuickBarConfig.Settings] snapshot, so both the phone remote AND the on-device `QuickButtonsSection`
-   * render it through the generic pipeline ([SettingsList]) — one definition, no bespoke duplicate.
+   * render it through the generic pipeline ([com.immortal.launcher.SettingsRows]) — one definition, no bespoke duplicate.
    */
   val quickbar: SettingsDomain<QuickBarConfig.Settings> =
       SettingsDomain(

@@ -18,10 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material3.OutlinedTextField
@@ -44,7 +40,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -69,33 +64,6 @@ import com.immortal.launcher.settings.StringSpec
 import com.immortal.launcher.settings.effectiveScope
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-
-/**
- * Registry-driven native rows. Presentation filtering is additive to every existing parent
- * and hardware gate. No values are rewritten when Advanced is hidden. The caller applies
- * through the registry and reloads its snapshot; editors never predict a stored value.
- * Each spec composes lazily with a stable identity, in a bounded viewport even in legacy shells.
- */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun <S> SettingsList(
-    domain: SettingsDomain<S>,
-    snapshot: S,
-    exclude: Set<String> = emptySet(),
-    editsEnabled: Boolean = true,
-    onApply: (key: String, value: Any) -> Unit,
-) {
-    val model = prepareSettingsList(domain, snapshot, exclude, editsEnabled, onApply)
-    val scroll = rememberLazyListState()
-    val requestedIndex = model.requested?.let { model.projection.controlIndices[it] }
-    LaunchedEffect(model.requested, requestedIndex) {
-        if (requestedIndex != null) scroll.scrollToItem(requestedIndex)
-    }
-    val maxHeight = (LocalConfiguration.current.screenHeightDp - 360).coerceAtLeast(400).dp
-    LazyColumn(Modifier.fillMaxWidth().heightIn(max = maxHeight), state = scroll) {
-        settingsListItems(model)
-    }
-}
 
 /**
  * Emits a small registry projection directly into the caller's scrolling Column (no nested list).
@@ -158,18 +126,6 @@ internal fun <S> prepareSettingsList(
         ?: (context as? Activity)?.intent?.getStringExtra(APPROVED_SETTINGS_CONTROL)
     return PreparedSettingsList(domain, snapshot, advanced, visibility.projection, requested,
         visibility.showAdvancedHint, onApply, editsEnabled)
-}
-
-/** Emits rows into an existing scroll owner; creates no nested list or bounded viewport. */
-internal fun <S> LazyListScope.settingsListItems(model: PreparedSettingsList<S>) {
-    items(model.projection.items, key = { it.id }, contentType = { it.kind }) { item ->
-        SettingsProjectionItem(model, item)
-    }
-    if (model.showAdvancedHint) {
-        item(key = "${model.domain.id}:advanced-hint", contentType = "advanced-hint") {
-            SettingsAdvancedHint()
-        }
-    }
 }
 
 @Composable

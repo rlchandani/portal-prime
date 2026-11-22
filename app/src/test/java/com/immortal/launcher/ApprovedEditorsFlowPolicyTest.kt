@@ -34,6 +34,16 @@ class ApprovedEditorsFlowPolicyTest {
         assertTrue(approvedEditorsHaGroups(entities, "garage", setOf("light")).isEmpty())
     }
 
+    @Test fun haSearchShowsABoundedPageOfMatchesAndCountsTheRest() {
+        // The entity list is plain rows in the page's scroll (no inner list), so a broad search must
+        // not compose hundreds of rows: it shows a page of matches and asks to narrow for the rest.
+        val entities = (1..240).map { ApprovedEditorsEntity("sensor.s_$it", "Sensor $it") }
+        val searching = approvedEditorsHaGroups(entities, "sensor", emptySet()).single()
+        assertEquals(APPROVED_EDITORS_HA_SEARCH_SHOWN, searching.shown.size)
+        assertEquals(240 - APPROVED_EDITORS_HA_SEARCH_SHOWN, searching.hidden)
+        assertTrue(APPROVED_EDITORS_HA_SEARCH_SHOWN > APPROVED_EDITORS_HA_BROWSE_SHOWN)
+    }
+
     @Test fun haDomainsKeepExistingOrderAndUnknownDomains() {
         val entities = listOf(
             ApprovedEditorsEntity("sensor.temp", "Temperature"),

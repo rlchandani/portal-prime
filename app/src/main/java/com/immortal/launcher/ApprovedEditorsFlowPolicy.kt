@@ -43,6 +43,10 @@ private val APPROVED_EDITORS_HA_ORDER = listOf(
     "climate", "cover", "media_player", "binary_sensor", "sensor", "person",
     "device_tracker", "weather", "sun")
 
+/** Entities a group shows while browsing, and the most it shows for a search (narrow it for more). */
+internal const val APPROVED_EDITORS_HA_BROWSE_SHOWN = 12
+internal const val APPROVED_EDITORS_HA_SEARCH_SHOWN = 50
+
 internal fun approvedEditorsHaGroups(
     entities: List<ApprovedEditorsEntity>, query: String, expandedDomains: Set<String>,
 ): List<ApprovedEditorsHaGroup> {
@@ -54,7 +58,8 @@ internal fun approvedEditorsHaGroups(
         } }, { it.key })
     ).map { (domain, group) ->
         val expanded = q.isNotEmpty() || domain in expandedDomains
-        val shown = if (!expanded) emptyList() else if (q.isNotEmpty()) group else group.take(12)
+        val shown = if (!expanded) emptyList() else group.take(
+            if (q.isNotEmpty()) APPROVED_EDITORS_HA_SEARCH_SHOWN else APPROVED_EDITORS_HA_BROWSE_SHOWN)
         ApprovedEditorsHaGroup(domain, group.size, expanded, shown,
             if (expanded) group.size - shown.size else 0)
     }

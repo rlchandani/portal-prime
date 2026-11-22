@@ -20,7 +20,7 @@ import org.json.JSONObject
 internal fun FollowMeSettingsSection() {
   val context = LocalContext.current.applicationContext
   var followMe by remember(context) { mutableStateOf(FollowMeConfig.load(context)) }
-  SettingsList(FollowMeSettings.domain, followMe) { key, value ->
+  SettingsRows(FollowMeSettings.domain, followMe, deferRows = true) { key, value ->
     FollowMeSettings.domain.apply(context, JSONObject().put(key, value))
     followMe = FollowMeConfig.load(context)
   }
