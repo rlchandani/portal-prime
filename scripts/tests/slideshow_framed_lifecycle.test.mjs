@@ -6,7 +6,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSceneFixture as fixture } from './helpers/slideshow_scene_fixture.mjs';
+import { ROOM_DOODLE, createSceneFixture as fixture } from './helpers/slideshow_scene_fixture.mjs';
 
 function retired(r, print) {
   assert.equal(r.state(print).animation, 'none', 'Retirement stops the animation');
@@ -113,7 +113,7 @@ test('Framed Print admits an opaque first scene and fades only incoming scenes o
     breathing(r, first);
     assert.equal(r.state(first).opacity, 1, 'Ready must mean fully opaque initial content');
     assert.equal(r.computed(r.slot(first)).background,
-      '#ede9df url("photo-doodles.svg") repeat',
+      `#ede9df ${ROOM_DOODLE} repeat`,
       'Each full-viewport scene must cover differently sized outgoing frames with the same room');
     assert.equal(r.computed(r.slot(first)).inset, '0');
     for (let swap = 1; swap <= 8; swap++) {

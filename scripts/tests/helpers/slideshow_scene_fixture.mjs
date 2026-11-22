@@ -10,9 +10,16 @@ import vm from 'node:vm';
 
 const assets = new URL('../../../app/src/main/assets/screensaver/', import.meta.url);
 const css = readFileSync(new URL('styles.css', assets), 'utf8');
-// Gallery Wall's doodle tile: the vector pre-rasterised at 1x, 1.125x (Portal+) and 2x.
+// The doodle tiles: each vector pre-rasterised at 1x, 1.125x (Portal+) and 2x
+// (scripts/generate_doodle_tiles.mjs). Every dark-doodle mode uses GALLERY_DOODLE; Framed and Mosaic
+// use the light room tile.
 export const GALLERY_DOODLE = 'image-set(url("photo-doodles-dark-480.png") 1x, ' +
   'url("photo-doodles-dark-540.png") 1.125x, url("photo-doodles-dark-960.png") 2x)';
+export const ROOM_DOODLE = 'image-set(url("photo-doodles-480.png") 1x, ' +
+  'url("photo-doodles-540.png") 1.125x, url("photo-doodles-960.png") 2x)';
+// The vectors each tile replaced, for snapshots reviewed before the tiles.
+export const VECTOR_DOODLES = [[GALLERY_DOODLE, 'url("photo-doodles-dark.svg")'],
+  [ROOM_DOODLE, 'url("photo-doodles.svg")']];
 // Evaluate the real class/descendant declarations used by the retained-photo styles. This fixture does
 // not emulate rasterization; it checks the mode's DOM lifecycle and resulting CSS inputs.
 const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selectors, declarations]) => ({

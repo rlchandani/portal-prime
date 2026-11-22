@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { GALLERY_DOODLE, createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
+import { GALLERY_DOODLE, VECTOR_DOODLES, createSceneFixture } from './helpers/slideshow_scene_fixture.mjs';
 
 const steadyModes = ['kenBurns', 'diptych', 'framed', 'push', 'memories',
   'panorama', 'mosaic', 'cinema', 'heroSidebar'];
@@ -41,6 +41,19 @@ function snapshot(r) {
     loads: r.loads.map(load => load.url),
     timers: [...r.pending.values()].map(task => task.at),
   };
+}
+
+// Snapshots reviewed with the vector doodles: each tile value maps back to the vector it replaced, so
+// a hash still matches only if nothing but the doodle source changed.
+function vectorDoodleSnapshot(r) {
+  const state = snapshot(r);
+  const legacy = value => typeof value !== 'string' ? value
+    : VECTOR_DOODLES.reduce((text, [tile, vector]) => text.replaceAll(tile, vector), value);
+  for (const node of state.nodes) {
+    node.style = Object.fromEntries(Object.entries(node.style).map(([k, v]) => [k, legacy(v)]));
+    node.computed = Object.fromEntries(Object.entries(node.computed).map(([k, v]) => [k, legacy(v)]));
+  }
+  return state;
 }
 
 function galleryGoldenSnapshot(r) {
@@ -121,7 +134,7 @@ for (const [mode, selections, output] of legacyOutput) {
         const hash = createHash('sha256');
         for (const time of [0, 3500, 5000, 7500, 10000, 15000, 27500]) {
           await r.advanceTo(time);
-          hash.update(JSON.stringify(mode === 'galleryWall' ? galleryGoldenSnapshot(r) : snapshot(r)));
+          hash.update(JSON.stringify(mode === 'galleryWall' ? galleryGoldenSnapshot(r) : vectorDoodleSnapshot(r)));
         }
         assert.equal(draws, selections, 'Motion must not change random selection order');
         if (photoMotion !== false) assert.equal(hash.digest('hex'), output);

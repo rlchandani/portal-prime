@@ -7,13 +7,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { GALLERY_DOODLE } from './helpers/slideshow_scene_fixture.mjs';
+import { GALLERY_DOODLE, ROOM_DOODLE } from './helpers/slideshow_scene_fixture.mjs';
 
 const assets = new URL('../../app/src/main/assets/screensaver/', import.meta.url);
 const read = file => readFileSync(new URL(file, assets));
 const css = read('styles.css').toString('utf8');
 const impls = read('mode-impls.js').toString('utf8');
-const candidates = [...GALLERY_DOODLE.matchAll(/url\("([^"]+)"\) ([\d.]+)x/g)].map(m => ({ file: m[1], scale: Number(m[2]) }));
+const candidatesOf = tile => [...tile.matchAll(/url\("([^"]+)"\) ([\d.]+)x/g)].map(m => ({ file: m[1], scale: Number(m[2]) }));
+const candidates = candidatesOf(GALLERY_DOODLE);
 const pngSize = bytes => {
   assert.equal(bytes.subarray(0, 8).toString('latin1'), '\x89PNG\r\n\x1a\n');
   assert.equal(bytes.subarray(12, 16).toString('latin1'), 'IHDR');
@@ -42,4 +43,25 @@ test('Gallery Wall no longer paints the vector doodle', () => {
   assert.ok(start > 0 && end > start);
   assert.ok(!impls.slice(start, end).includes('photo-doodles-dark.svg'));
   assert.ok(!/gallery[^{]*\{[^}]*photo-doodles-dark\.svg/.test(css));
+});
+
+test('the light room tile has the same three RGBA candidates as the dark tile', () => {
+  const room = candidatesOf(ROOM_DOODLE);
+  assert.deepEqual(room.map(c => c.scale), [1, 1.125, 2]);
+  for (const { file, scale } of room) {
+    assert.deepEqual(pngSize(read(file)), { w: 480 * scale, h: 360 * scale, depth: 8, color: 6 }, file);
+  }
+});
+
+// Diptych, Framed, Mosaic, Panorama, Polaroid and Cinema painted the tiled SVG once or more per scene.
+test('no screensaver style paints a vector doodle; every doodle is a pre-rasterised tile', () => {
+  assert.ok(!/photo-doodles(-dark)?\.svg/.test(css), 'styles.css must not reference a doodle SVG');
+  assert.ok(!/photo-doodles(-dark)?\.svg/.test(impls), 'mode-impls.js must not reference a doodle SVG');
+  const doodles = [...css.matchAll(/image-set\(url\("photo-doodles[^;]*?2x\)/g)].map(m => m[0]);
+  // Diptych, Framed room/art, Gallery Wall, Mosaic, Panorama, Polaroid table, Cinema scope/layer/bars.
+  assert.equal(doodles.length, 7);
+  for (const value of doodles) assert.ok(value === GALLERY_DOODLE || value === ROOM_DOODLE, value);
+  for (const rule of css.matchAll(/\{([^}]*photo-doodles[^}]*)\}/g)) {
+    assert.match(rule[1], /background-size: 480px 360px/, 'each tile keeps the 480 x 360 CSS px repeat');
+  }
 });
