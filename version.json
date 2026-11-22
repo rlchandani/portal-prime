@@ -1,6 +1,6 @@
 {
-  "versionCode": 317,
-  "versionName": "1.323",
+  "versionCode": 318,
+  "versionName": "1.324",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Small UI polish: Control Center alert preview card reads cleanly with even buttons, the light-theme toggle no longer looks like the sleep button, the Store shows more apps on the Mini turned sideways, and Call everyone's header no longer cuts off."
+  "notes": "Smoother Home tab switches: switching to Apps has about half the slow frames, and switching to Tools has none."
 }
