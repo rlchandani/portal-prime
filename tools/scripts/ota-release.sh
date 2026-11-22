@@ -35,7 +35,9 @@ readonly VERIFY_ATTEMPTS=18  # GitHub can take over a minute to point latest/ at
 readonly VERIFY_DELAY_S=10
 readonly LATEST_BASE="https://github.com/$REPO/releases/latest/download"
 readonly GRADLE_GATE=(:app:testDebugUnitTest :app:assemblePerformance :app:lintVitalPerformance
-  --no-daemon -q -Dorg.gradle.jvmargs=-Xmx4g -Pkotlin.daemon.jvmargs=-Xmx3g)
+  --no-daemon -q -Dorg.gradle.jvmargs=-Xmx6g -Pkotlin.compiler.execution.strategy=in-process)
+# Same heap/compiler flags as .github/workflows/tests.yml and ci-local.sh: the 4g/3g split ran the
+# Kotlin compiler out of memory (GC overhead) on a cold performance build (1.318).
 
 die() { echo "✗ $*" >&2; exit 1; }
 step() { echo; echo "▸ $*"; }
