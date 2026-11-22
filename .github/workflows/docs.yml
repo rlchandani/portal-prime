@@ -36,14 +36,17 @@ jobs:
       - name: Build (strict)
         run: mkdocs build --strict
       - name: Upload site artifact
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.DOCS_PAGES_DEPLOY == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
-  # Only on push to main: publish the built site to GitHub Pages.
+  # Only on push to main, and only once GitHub Pages is enabled for this repo
+  # (Settings > Pages > Source: GitHub Actions) and the repository variable
+  # DOCS_PAGES_DEPLOY is set to "true". Without Pages the deploy step can only fail,
+  # so the strict build above stays the required check until then.
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.DOCS_PAGES_DEPLOY == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:

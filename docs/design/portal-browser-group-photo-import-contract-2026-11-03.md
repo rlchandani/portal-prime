@@ -16,21 +16,21 @@ text delimit the inspected behavior.
 
 | ID | Source |
 |---|---|
-| B1 | [Browser control center](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:3978), `chooseUpload`, lines 3978–4015 |
-| B2 | [Browser transfer](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:4016), cancellation, sending, acknowledgment and results, lines 4016–4158 |
-| B3 | [Browser room selection](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:681), lines 681–711; page exit cancellation at 6373–6383 |
-| B4 | [Browser core](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/core.mjs:36), roster 36–58, target capture 66–74, session ownership 103–145, request client 195–259, folder validation 480–495 |
-| B5 | [Browser photo controls](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:3559), lines 3559–3680; capability predicate at 345; settings target selection at 2382–2386 |
-| N1 | [Native group controller](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionGroup.kt:22), models 22–46, planning/retry/cancel 121–189, scheduling 198–229, execution 231–317 |
-| N2 | [Native repository](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:60), pairing guard 60–63, selection defaults 79–94, viewing 186–205, write-target capture and group photo upload 383–433 |
-| N3 | [Native photo preparation](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionPhotos.kt:27), lines 27–63 and 85–135 |
-| N4 | [Native upload client](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt:210), lines 210–237 |
-| N5 | [Native photo picker and panel](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/ControlCenterScreen.kt:168), picker 168–175, photo panel 478–503; captured picker targets declared at 142 |
-| N6 | [Native target menu](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/CompactPortalHeader.kt:140), lines 140–205 |
-| N7 | [Native group result UI](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/ManagePortalsPanel.kt:49), lines 49–99 |
-| S1 | [Portal upload implementation](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteCompanionPhotos.kt:23), path/name policy 23–49, publication 54–85, availability 129, upload 159–184 |
-| S2 | [Portal companion admission](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteCompanionRoutes.kt:30), authorization 30–32, capability advertisement at 77 |
-| S3 | [Portal HTTP preflight](~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FleetHttpServer.kt:155), CORS methods/headers 155–168, OPTIONS handling 221–227, response origin header at 354 |
+| B1 | Browser control center (`app/src/main/assets/remote/control-center.js:3978`), `chooseUpload`, lines 3978–4015 |
+| B2 | Browser transfer (`app/src/main/assets/remote/control-center.js:4016`), cancellation, sending, acknowledgment and results, lines 4016–4158 |
+| B3 | Browser room selection (`app/src/main/assets/remote/control-center.js:681`), lines 681–711; page exit cancellation at 6373–6383 |
+| B4 | Browser core (`app/src/main/assets/remote/core.mjs:36`), roster 36–58, target capture 66–74, session ownership 103–145, request client 195–259, folder validation 480–495 |
+| B5 | Browser photo controls (`app/src/main/assets/remote/control-center.js:3559`), lines 3559–3680; capability predicate at 345; settings target selection at 2382–2386 |
+| N1 | Native group controller (portal-toolkit `app/src/main/java/com/portalinstaller/data/companion/CompanionGroup.kt:22`), models 22–46, planning/retry/cancel 121–189, scheduling 198–229, execution 231–317 |
+| N2 | Native repository (portal-toolkit `app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:60`), pairing guard 60–63, selection defaults 79–94, viewing 186–205, write-target capture and group photo upload 383–433 |
+| N3 | Native photo preparation (portal-toolkit `app/src/main/java/com/portalinstaller/data/companion/CompanionPhotos.kt:27`), lines 27–63 and 85–135 |
+| N4 | Native upload client (portal-toolkit `app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt:210`), lines 210–237 |
+| N5 | Native photo picker and panel (portal-toolkit `app/src/main/java/com/portalinstaller/ui/controlcenter/ControlCenterScreen.kt:168`), picker 168–175, photo panel 478–503; captured picker targets declared at 142 |
+| N6 | Native target menu (portal-toolkit `app/src/main/java/com/portalinstaller/ui/controlcenter/CompactPortalHeader.kt:140`), lines 140–205 |
+| N7 | Native group result UI (portal-toolkit `app/src/main/java/com/portalinstaller/ui/controlcenter/ManagePortalsPanel.kt:49`), lines 49–99 |
+| S1 | Portal upload implementation (`app/src/main/java/com/immortal/launcher/RemoteCompanionPhotos.kt:23`), path/name policy 23–49, publication 54–85, availability 129, upload 159–184 |
+| S2 | Portal companion admission (`app/src/main/java/com/immortal/launcher/RemoteCompanionRoutes.kt:30`), authorization 30–32, capability advertisement at 77 |
+| S3 | Portal HTTP preflight (`app/src/main/java/com/immortal/launcher/FleetHttpServer.kt:155`), CORS methods/headers 155–168, OPTIONS handling 221–227, response origin header at 354 |
 
 ## Observations: factual parity map
 
@@ -38,7 +38,7 @@ text delimit the inspected behavior.
 the UI captures `CompanionTargets` before launching the picker (N5:483–486);
 its callback calls `uploadToTargets` (N5:168–173); the view model delegates to
 `uploadSelectedUris`
-([ControlCenterViewModel.kt:100–104](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/viewmodel/ControlCenterViewModel.kt:100));
+(ControlCenterViewModel.kt:100–104 (portal-toolkit `app/src/main/java/com/portalinstaller/viewmodel/ControlCenterViewModel.kt:100`));
 the repository calls `groups.photos` (N2:420–428); the controller creates one
 item per source per captured session and calls `client.uploadPhoto`
 (N1:144–157, 267–281). It is not merely grouped settings UI.
@@ -48,7 +48,7 @@ item per source per captured session and calls `client.uploadPhoto`
 | Viewing versus writing | `chooseUpload` captures the current viewing session and one destination. `startUpload` sends only to `ticket.room` (B1; B2:4028–4068). Settings already have separate scope capture, but photo import does not use it (B5:2382–2386). | “View Portal” radios and “Send changes to” checkboxes are independent (N6). Changing the viewed device retains `selectedTargetIds` and group results (N2:186–191). |
 | Target snapshot | Captures viewing room before the sheet opens; refuses a stale ticket at start (B1:3979; B2:4029). | Captures copied device/session data before the picker opens; later selection changes do not retarget the picker result (N2:400–401; N5). |
 | Destination | One editable folder. All-photo browsing defaults import to `/sdcard/Pictures/Immortal`; otherwise uses `photoPath` (B1:3980–3999). | Each captured device's saved `photoFolder`, with default `/sdcard/Pictures/Immortal` (N1:153–157, 275; N3:42). The menu shows each destination (N6:202). |
-| Destination persistence | Browser roster retains only `base`, `token`, `name`; `sanitizeRoster` discards additional fields (B4:36–58). No per-room import-folder identity is carried by this roster. | Browsing can save the per-device folder after an owned metadata read, so “saved folder” is a companion preference, not necessarily the Portal's current slideshow source ([CompanionRepository.kt:729–743](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:729)). |
+| Destination persistence | Browser roster retains only `base`, `token`, `name`; `sanitizeRoster` discards additional fields (B4:36–58). No per-room import-folder identity is carried by this roster. | Browsing can save the per-device folder after an owned metadata read, so “saved folder” is a companion preference, not necessarily the Portal's current slideshow source (CompanionRepository.kt:729–743 (portal-toolkit `app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:729`)). |
 | Fan-out and scheduling | One sequential file loop; one running transfer globally; results retained in an in-memory map by room base (B2:4029–4047). | Per-Portal FIFO across operations/retries; separate upload semaphore permits at most two group upload-lane tasks concurrently (N1:131–134, 198–221). |
 | File preparation | Browser `File` body, supported extensions, nonempty and at most 20 MiB, name/path validation (B1; B2:4056–4078). | Fresh preparation for each room/file attempt; URI streams with known size, or bounded private-disk staging for unknown size; cleanup in `finally` (N3:85–135; N1:267–287). |
 | Stored confirmation | Requires `ok === true`, exact destination plus filename, and exact file byte count (B2:4080–4084). | Client checks positive-response acknowledgment types, exact path and numeric byte count; group success follows successful client return (N4:222–233; N1:280–292). |
@@ -147,13 +147,13 @@ selected files, upload jobs or outcome ledgers.
 
 Existing native test source corroborates the intended boundaries, but was not run:
 
-- [CompanionGroupTest.kt:182–234](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionGroupTest.kt:182)
+- CompanionGroupTest.kt:182–234 (portal-toolkit `app/src/test/java/com/portalinstaller/data/companion/CompanionGroupTest.kt:182`)
   covers captured exact per-room folders, fresh streams, failure-only retry,
   bounded fan-out and queued cancellation retaining posted confirmations.
-- [CompanionPhotoUploadAcknowledgmentTest.kt:48–153](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:48)
+- CompanionPhotoUploadAcknowledgmentTest.kt:48–153 (portal-toolkit `app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:48`)
   covers acknowledgment shape and transport-loss uncertainty, including exclusion
   of unconfirmed group items from retry.
-- [CompanionPhotoUploadAcknowledgmentTest.kt:188–283](~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:188)
+- CompanionPhotoUploadAcknowledgmentTest.kt:188–283 (portal-toolkit `app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:188`)
   covers mixed confirmed/unconfirmed/rejected results and preserving outcomes
   when local cleanup fails.
 

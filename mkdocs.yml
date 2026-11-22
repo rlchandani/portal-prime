@@ -1,13 +1,13 @@
-site_name: Calder
+site_name: Hearthpane
 site_description: >-
   A custom home screen, screensaver, and app store that keeps discontinued
   Meta Portal devices alive.
 # The docs are served from GitHub Pages today. When we're ready to point
 # savemyportal.com at them, set the custom domain in the repo's Pages settings
 # (or add docs/CNAME) and update site_url to match.
-site_url: https://starbrightlab.github.io/immortal/
-repo_url: https://github.com/starbrightlab/immortal
-repo_name: starbrightlab/immortal
+site_url: https://rlchandani.github.io/portal-prime/
+repo_url: https://github.com/rlchandani/portal-prime
+repo_name: rlchandani/portal-prime
 edit_uri: edit/main/docs/
 copyright: >-
   Immortal is an independent community project — not affiliated with, endorsed
