@@ -63,6 +63,7 @@ class FakeSealedPortal:
         self.export_key = None  # seal exports to this public key instead of the enrolled one
         self.last_call = {}  # (path, method, op) -> time, for the agent's per-route minimum gap
         self.rate_limited = 0
+        self.force_rate_limit = {}  # (path, method, op) -> how many next calls answer 429 regardless of time
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), self._handler())
         self.port = self.server.server_address[1]
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
@@ -116,6 +117,11 @@ class FakeSealedPortal:
             return False
         key = (path, method, body.get("op") if isinstance(body, dict) else None)
         now = time.monotonic()
+        if self.force_rate_limit.get(key, 0) > 0:
+            self.force_rate_limit[key] -= 1
+            self.rate_limited += 1
+            self.last_call[key] = now
+            return True
         if now - self.last_call.get(key, -10.0) < 2.0:
             self.rate_limited += 1
             return True

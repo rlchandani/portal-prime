@@ -119,7 +119,9 @@ class SealedRestoreTest(unittest.TestCase):
 
     def test_a_rate_limited_step_is_retried_after_its_wait(self):
         portal = self.change_portal()
-        portal.last_call[("/backup/import", "POST", "begin")] = time.monotonic()
+        # Deterministic: the first begin is refused however long the restore script takes to start
+        # (a wall-clock gap flaked under load in ci-local, 2026-11-22).
+        portal.force_rate_limit[("/backup/import", "POST", "begin")] = 1
         code, output = self.restore(SERIAL, "--prefs")
         self.assertEqual(code, 0, output)
         self.assertEqual(portal.rate_limited, 1)
