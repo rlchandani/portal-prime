@@ -70,7 +70,7 @@ def run_session(*, serial, scenario_name, builds, options, out_dir, lock, fleetc
         "summary": scenario["summary"], "screenshots_allowed": scenario["screenshots"],
         "builds": [b.as_dict() for b in builds], "reps": options.reps, "interleave": options.interleave,
         "order": build_order([b.label for b in builds], options.reps, options.interleave),
-        "options": {k: getattr(options, k) for k in ("meminfo", "atrace", "simpleperf", "screenshots", "poll_s")},
+        "options": {k: getattr(options, k) for k in ("meminfo", "atrace", "atrace_categories", "atrace_buffer_kb", "simpleperf", "screenshots", "poll_s")},
         "started": started, "status": "running", "lock_owner": lock.tag,
     }
     previous = {s: signal.getsignal(s) for s in _SIGNALS}

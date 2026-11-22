@@ -23,7 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from perflib import DEFAULT_FLEETCTL, DEFAULT_QUEUE_ROOT, DEFAULT_RESULTS_ROOT  # noqa: E402
 from perflib import compare, jobqueue, report, scenarios  # noqa: E402
 from perflib.builds import BuildError, OfficialSource, parse_apk_spec  # noqa: E402
-from perflib.engine import Options  # noqa: E402
+from perflib.engine import (ATRACE_BUFFER_KB, ATRACE_BUFFER_KB_RANGE, ATRACE_CATEGORIES, Options,  # noqa: E402
+                            check_atrace_buffer_kb, parse_atrace_categories)
 from perflib.lock import DeviceLock, HeldLock, holder  # noqa: E402
 from perflib.session import default_out_dir, resolve_builds, run_session  # noqa: E402
 from perflib.worker import HELD_LOCK_ENV, Worker, wait_for  # noqa: E402
@@ -48,6 +49,12 @@ def _job_args(p):
                    help="A,B,B,A order (default on); --no-interleave runs all A then all B")
     p.add_argument("--meminfo", action="store_true", help="dumpsys meminfo before/after every rep")
     p.add_argument("--atrace", action="store_true", help="atrace gfx/view around every measured step")
+    p.add_argument("--atrace-categories", default=None, metavar="CATS",
+                   help="with --atrace: comma/space-separated atrace categories (default 'gfx,view'), "
+                        "e.g. 'gfx,view,webview,sched,freq'")
+    p.add_argument("--atrace-buffer-kb", type=int, default=None, metavar="KB",
+                   help=f"with --atrace: trace buffer per CPU in KB (default {ATRACE_BUFFER_KB}, "
+                        f"{ATRACE_BUFFER_KB_RANGE[0]}-{ATRACE_BUFFER_KB_RANGE[1]})")
     p.add_argument("--simpleperf", action="store_true", help="simpleperf (app, 4 kHz, -g) per measured step")
     p.add_argument("--screenshots", action="store_true",
                    help="allow captures where the scenario permits AND the screen is allow-listed")
@@ -98,6 +105,12 @@ def _validate(args):
         raise ValueError(f"--reps must be {MIN_REPS}..{MAX_REPS}")
     if not args.apk and not args.official:
         raise ValueError("give --official and/or --apk")
+    if (args.atrace_categories is not None or args.atrace_buffer_kb is not None) and not args.atrace:
+        raise ValueError("--atrace-categories / --atrace-buffer-kb need --atrace")
+    if args.atrace_categories is not None:
+        parse_atrace_categories(args.atrace_categories)
+    if args.atrace_buffer_kb is not None:
+        check_atrace_buffer_kb(args.atrace_buffer_kb)
     if len(args.apk) > 8:
         raise ValueError("at most 8 --apk builds")
     for spec in args.apk:
@@ -111,6 +124,9 @@ def _job_from_args(args):
     return {"device": args.device, "scenario": args.scenario,
             "apks": [",".join(filter(None, parse_apk_spec(x))) for x in args.apk], "official": args.official,
             "reps": args.reps, "interleave": args.interleave, "meminfo": args.meminfo, "atrace": args.atrace,
+            "atrace_categories": list(parse_atrace_categories(args.atrace_categories))
+            if args.atrace_categories is not None else list(ATRACE_CATEGORIES),
+            "atrace_buffer_kb": args.atrace_buffer_kb if args.atrace_buffer_kb is not None else ATRACE_BUFFER_KB,
             "simpleperf": args.simpleperf, "screenshots": args.screenshots, "poll_s": args.poll_s,
             "results_root": args.results_root}
 
@@ -131,6 +147,8 @@ def cmd_run(args):
         job = _job_from_args(args)
     serial = job["device"]
     opts = Options(reps=job["reps"], interleave=job["interleave"], meminfo=job["meminfo"], atrace=job["atrace"],
+                   atrace_categories=parse_atrace_categories(" ".join(job.get("atrace_categories") or ATRACE_CATEGORIES)),
+                   atrace_buffer_kb=check_atrace_buffer_kb(job.get("atrace_buffer_kb", ATRACE_BUFFER_KB)),
                    simpleperf=job["simpleperf"], screenshots=job["screenshots"], poll_s=job.get("poll_s"))
     out = args.out or default_out_dir(job.get("results_root") or DEFAULT_RESULTS_ROOT, job["scenario"])
     os.makedirs(out, exist_ok=True)

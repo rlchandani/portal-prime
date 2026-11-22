@@ -3,7 +3,7 @@
 import os
 import re
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from . import PACKAGE, framestats, meminfo, uidump
 from .builds import install
@@ -16,6 +16,38 @@ POLL_GAP_S = 0.2
 TAB_LABELS = frozenset({"Home", "Apps", "Tools"})
 SIMPLEPERF_HZ = 4000
 ATRACE_BUFFER_KB = 16384
+ATRACE_CATEGORIES = ("gfx", "view")
+ATRACE_BUFFER_KB_RANGE = (1024, 262144)
+ATRACE_MAX_CATEGORIES = 24
+_ATRACE_CATEGORY = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
+
+
+def parse_atrace_categories(text):
+    """'gfx,view webview' -> ('gfx', 'view', 'webview'). Each name is a plain atrace category
+    (lower-case letters, digits, '_'), because it is put into an adb shell command line."""
+    names = tuple(n for n in re.split(r"[,\s]+", (text or "").strip()) if n)
+    if not names:
+        raise ValueError("--atrace-categories: give at least one category")
+    if len(names) > ATRACE_MAX_CATEGORIES:
+        raise ValueError(f"--atrace-categories: at most {ATRACE_MAX_CATEGORIES} categories")
+    for name in names:
+        if not _ATRACE_CATEGORY.match(name):
+            raise ValueError(f"--atrace-categories: not an atrace category name: {name!r}")
+    return tuple(dict.fromkeys(names))
+
+
+def check_atrace_buffer_kb(value):
+    lo, hi = ATRACE_BUFFER_KB_RANGE
+    if isinstance(value, bool) or not isinstance(value, int) or not lo <= value <= hi:
+        raise ValueError(f"--atrace-buffer-kb: an integer from {lo} to {hi}")
+    return value
+
+
+def atrace_start_command(categories, buffer_kb):
+    """The atrace start line for a step; inputs are re-validated so a hand-written job cannot inject."""
+    names = parse_atrace_categories(" ".join(categories))
+    kb = check_atrace_buffer_kb(buffer_kb)
+    return f"atrace --async_start -b {kb} -a {PACKAGE} {' '.join(names)} >/dev/null 2>&1"
 
 
 class ScenarioError(Exception):
@@ -28,6 +60,8 @@ class Options:
     interleave: bool = True
     meminfo: bool = False
     atrace: bool = False
+    atrace_categories: Tuple[str, ...] = ATRACE_CATEGORIES
+    atrace_buffer_kb: int = ATRACE_BUFFER_KB
     simpleperf: bool = False
     screenshots: bool = False
     poll_s: Optional[float] = None  # overrides a poll step's window (e.g. a shorter household run)
@@ -342,7 +376,7 @@ class Session:
         if tag is None:
             return
         if self.opts.atrace:
-            self.d.shell(f"atrace --async_start -b {ATRACE_BUFFER_KB} -a {PACKAGE} gfx view >/dev/null 2>&1")
+            self.d.shell(atrace_start_command(self.opts.atrace_categories, self.opts.atrace_buffer_kb))
         if self.opts.simpleperf:
             self.d.shell(f"simpleperf record --app {PACKAGE} -g -f {SIMPLEPERF_HZ} --duration 2 "
                          f"-o {TMP_PREFIX}.data >/dev/null 2>&1 &")
