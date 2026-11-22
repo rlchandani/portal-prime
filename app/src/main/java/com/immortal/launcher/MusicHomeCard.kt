@@ -72,19 +72,7 @@ internal object MusicHomeCardDims {
   private const val DISABLED_ALPHA = 0.32f
   fun alpha(enabled: Boolean) = if (enabled) 1f else DISABLED_ALPHA
 
-  /** The narrowest the side column (title, transport, volume) gets: three transport buttons and gaps. */
-  const val SIDE_MIN = 280
-
-  /**
-   * The card's side column for an area [areaWidth] dp wide with [inset] dp each side: [SIDE_W],
-   * narrowed so the card stays inside the window (the 800 dp Mini upright gets 304; never below
-   * [SIDE_MIN]). The player itself never shrinks below YouTube's minimum.
-   */
-  fun sideWidth(areaWidth: Int, inset: Int): Int =
-      (areaWidth - 2 * inset - (WIDTH - SIDE_W)).coerceIn(SIDE_MIN, SIDE_W)
-
-  fun widthOf(mode: MusicHomeCardMode, sideW: Int = SIDE_W) =
-      if (mode == MusicHomeCardMode.CARD) WIDTH - SIDE_W + sideW else TILE_W
+  fun widthOf(mode: MusicHomeCardMode) = if (mode == MusicHomeCardMode.CARD) WIDTH else TILE_W
   fun heightOf(mode: MusicHomeCardMode) = if (mode == MusicHomeCardMode.CARD) HEIGHT else TILE_H
 }
 
@@ -105,7 +93,6 @@ internal fun MusicHomeCardBody(
     room: String,
     onOpenMusic: () -> Unit,
     modifier: Modifier = Modifier,
-    sideW: Int = MusicHomeCardDims.SIDE_W,
 ) {
   val palette = rememberMusicStagePalette(track, now.isAd)
   val dark = LocalApprovedPalette.current.dark
@@ -116,7 +103,7 @@ internal fun MusicHomeCardBody(
       .border(1.dp, ink.line, shape).padding(MusicHomeCardDims.PAD.dp) else Modifier
   val gap = if (card) MusicHomeCardDims.GAP else MusicHomeCardDims.RAIL_GAP
   MusicStageTheme(ink, MusicStageDims.COMPACT) {
-    Row(modifier.width(MusicHomeCardDims.widthOf(mode, sideW).dp).height(MusicHomeCardDims.heightOf(mode).dp).then(frame),
+    Row(modifier.width(MusicHomeCardDims.widthOf(mode).dp).height(MusicHomeCardDims.heightOf(mode).dp).then(frame),
         horizontalArrangement = Arrangement.spacedBy(gap.dp)) {
       val playerShape = RoundedCornerShape(MusicHomeCardDims.PLAYER_RADIUS.dp)
       val playerSize = if (card) Modifier.size(MusicHomeCardDims.PLAYER_W.dp, MusicHomeCardDims.PLAYER_H.dp)
@@ -125,7 +112,7 @@ internal fun MusicHomeCardBody(
         YouTubePlayerSurface(MusicPlayerHostKind.HOME_CARD, Modifier.fillMaxSize())
       }
       if (card) {
-        Column(Modifier.width(sideW.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+        Column(Modifier.width(MusicHomeCardDims.SIDE_W.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
           CardHeader(track, now, onOpenMusic)
           CardTransport(now)
           MusicV3StageVolume(room)
@@ -230,7 +217,7 @@ internal fun rememberMusicHomeCardShown(musicOpen: Boolean, customizing: Boolean
 }
 
 /** Dp side padding for Home's bottom toasts so they centre beside the card ([MusicCardAvoidance]). */
-internal data class MusicToastPadding(val start: Dp, val end: Dp, val bottom: Dp = 0.dp)
+internal data class MusicToastPadding(val start: Dp, val end: Dp)
 
 @Composable
 internal fun rememberMusicToastInsets(cardShown: Boolean): MusicToastPadding {
@@ -239,9 +226,8 @@ internal fun rememberMusicToastInsets(cardShown: Boolean): MusicToastPadding {
   val card = placement.takeIf { cardShown }
   return remember(card, density) {
     with(density) {
-      val px = MusicCardAvoidance.toastInsets(card, MusicHomeFloatDims.TOAST_BAND.toPx(), MusicHomeFloatDims.TOAST_GAP.toPx(),
-          MusicHomeFloatDims.TOAST_MIN_WIDTH.toPx())
-      MusicToastPadding(px.start.toDp(), px.end.toDp(), px.bottom.toDp())
+      val px = MusicCardAvoidance.toastInsets(card, MusicHomeFloatDims.TOAST_BAND.toPx(), MusicHomeFloatDims.TOAST_GAP.toPx())
+      MusicToastPadding(px.start.toDp(), px.end.toDp())
     }
   }
 }

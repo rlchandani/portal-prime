@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -123,13 +122,13 @@ private fun Details(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, cha
   val added = car.energyAddedKwh?.let { "${CcTeslaText.kwh(it)} kWh" } ?: "—"
   Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
     if (car.charging) {
-      Tile(car.powerKw?.let { "${CcTeslaText.kw(it)} kW" } ?: "—", CcTeslaTileCopy.POWER)
-      Tile(added, CcTeslaTileCopy.ADDED)
-      Tile(CcTeslaText.toFull(car.fullAt, s.now) ?: "—", CcTeslaTileCopy.TO_FULL)
+      Tile(car.powerKw?.let { "${CcTeslaText.kw(it)} kW" } ?: "—", "charging power")
+      Tile(added, "added this session")
+      Tile(CcTeslaText.toFull(car.fullAt, s.now) ?: "—", "to full")
     } else {
       val idle = remember(car, charger, ids.model) { CcTeslaIdle.of(car, charger, ids.model) }
       IdleTile(idle)
-      Tile(added, CcTeslaTileCopy.LAST)
+      Tile(added, "last charge")
     }
     LimitTile(s, ui, ids, car, canAct)
   }
@@ -151,31 +150,9 @@ private fun RowScope.IdleTile(idle: CcIdleCharge) {
 @Composable
 private fun RowScope.Tile(value: String, label: String) {
   val c = LocalCc.current
-  // The Mini's tiles are ~130 units inside: a tighter value and the short label, never a clipped one.
-  val compact = currentLayoutClass().compact
-  Column(Modifier.weight(1f).clip(TILE).background(c.surface2)
-      .padding(horizontal = if (compact) 14.dp else 20.dp, vertical = 16.dp)) {
-    Text(value, color = c.text, fontSize = if (compact) 24.sp else 30.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-        overflow = TextOverflow.Ellipsis)
-    Text(if (compact) CcTeslaTileCopy.short(label) else label, color = c.sec, fontSize = 18.sp, maxLines = 1,
-        overflow = TextOverflow.Ellipsis)
-  }
-}
-
-/** The Tesla detail tiles' labels and their compact forms (pure, JVM-tested). */
-internal object CcTeslaTileCopy {
-  const val POWER = "charging power"
-  const val ADDED = "added this session"
-  const val TO_FULL = "to full"
-  const val LAST = "last charge"
-  const val LIMIT = "charge limit"
-
-  /** The short label a Mini tile shows; each still reads beside its value ("7.2 kW · power"). */
-  fun short(label: String): String = when (label) {
-    POWER -> "power"
-    ADDED -> "added"
-    LIMIT -> "limit"
-    else -> label
+  Column(Modifier.weight(1f).clip(TILE).background(c.surface2).padding(horizontal = 20.dp, vertical = 16.dp)) {
+    Text(value, color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    Text(label, color = c.sec, fontSize = 18.sp, maxLines = 1)
   }
 }
 
@@ -194,11 +171,8 @@ private fun RowScope.LimitTile(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcC
   Row(Modifier.weight(LIMIT_WEIGHT).clip(TILE).background(c.surface2).padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
       verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
-      val compact = currentLayoutClass().compact
-      Text(shown?.let { "$it%" } ?: "—", color = c.text, fontSize = if (compact) 24.sp else 30.sp, fontWeight = FontWeight.SemiBold,
-          maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Text(if (compact) CcTeslaTileCopy.short(CcTeslaTileCopy.LIMIT) else CcTeslaTileCopy.LIMIT, color = c.sec, fontSize = 18.sp,
-          maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(shown?.let { "$it%" } ?: "—", color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+      Text("charge limit", color = c.sec, fontSize = 18.sp, maxLines = 1)
     }
     if (number != null && shown != null && !s.settings.kids) {
       val step = { up: Boolean -> pending = CcTeslaCalls.stepLimit(shown, up, car.limitMin, car.limitMax) }

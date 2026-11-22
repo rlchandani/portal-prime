@@ -7,7 +7,6 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,48 +70,25 @@ internal fun MusicV3DetailHeader(
 ) {
   val ink = LocalMusicStageInk.current
   val dims = LocalMusicStageDims.current
-  val enabled = tracks.isNotEmpty()
-  val actionsRow: @Composable () -> Unit = {
+  Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+    MusicV3RoundButton(backLabel, size = dims.target.dp, fill = ink.fill2, onClick = onBack) {
+      ApprovedIcon("back", Modifier.size(30.dp), ink.ink)
+    }
+    if (art != null) MusicV3Thumb(art, Modifier.size(DETAIL_ART), if (round) CircleShape else RoundedCornerShape(20.dp), DETAIL_ART)
+    Column(Modifier.weight(1f)) {
+      Text(title, color = ink.ink, fontSize = dims.heading.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+          overflow = TextOverflow.Ellipsis)
+      Text(subtitle, color = ink.muted, fontSize = dims.small.sp, maxLines = 1, modifier = Modifier.padding(top = 4.dp))
+    }
     toggle?.let { (text, run) -> MusicStagePill(text, onClick = run) }
+    val enabled = tracks.isNotEmpty()
     MusicStagePill("Play", style = MusicPillStyle.SOLID, glyph = MusicV3Glyph.PLAY, enabled = enabled) {
       actions.playAll(tracks, label, shuffle = false)
     }
     MusicStagePill("Shuffle", glyph = MusicV3Glyph.SHUFFLE, enabled = enabled) { actions.playAll(tracks, label, shuffle = true) }
   }
-  val fontScale = LocalDensity.current.fontScale
-  BoxWithConstraints(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 12.dp)) {
-    val fixed = dims.target + if (art != null) DETAIL_ART.value + DETAIL_GAP_DP else 0f
-    val pills = listOfNotNull(toggle?.let { MusicPillFit.pill(it.first, dims, fontScale = fontScale) },
-        MusicPillFit.pill("Play", dims, glyph = true, fontScale = fontScale),
-        MusicPillFit.pill("Shuffle", dims, glyph = true, fontScale = fontScale))
-    // Narrow (the Mini upright, a toggle on): the actions get their own row under the title.
-    val beside = MusicPillFit.actionsBeside(maxWidth.value.toDouble(), fixed + DETAIL_GAP_DP.toDouble(), DETAIL_TITLE_MIN_DP,
-        pills, DETAIL_GAP_DP.toDouble())
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(DETAIL_GAP_DP.dp)) {
-        MusicV3RoundButton(backLabel, size = dims.target.dp, fill = ink.fill2, onClick = onBack) {
-          ApprovedIcon("back", Modifier.size(30.dp), ink.ink)
-        }
-        if (art != null) MusicV3Thumb(art, Modifier.size(DETAIL_ART), if (round) CircleShape else RoundedCornerShape(20.dp), DETAIL_ART)
-        Column(Modifier.weight(1f)) {
-          Text(title, color = ink.ink, fontSize = dims.heading.sp, fontWeight = FontWeight.Bold, maxLines = 1,
-              overflow = TextOverflow.Ellipsis)
-          Text(subtitle, color = ink.muted, fontSize = dims.small.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.padding(top = 4.dp))
-        }
-        if (beside) actionsRow()
-      }
-      if (!beside) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DETAIL_GAP_DP.dp)) {
-        actionsRow()
-      }
-    }
-  }
 }
-
-private const val DETAIL_GAP_DP = 20f
-/** The title keeps at least this beside the actions (~12 characters at the compact heading size). */
-private const val DETAIL_TITLE_MIN_DP = 220.0
 
 /**
  * Rows for library/search lists; a tap plays from that song, ⋯ offers Play next / Add to queue.

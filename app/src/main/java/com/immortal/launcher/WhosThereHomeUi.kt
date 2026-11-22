@@ -286,14 +286,11 @@ internal fun WhosThereHiChip(modifier: Modifier = Modifier) {
       enter = fadeIn(tween(300)) + slideInVertically(tween(450)) { -it / 2 },
       exit = fadeOut(tween(400)) + slideOutVertically(tween(400)) { -it / 3 }) {
     val shape = RoundedCornerShape(40.dp)
-    // Never wider than the window (three names on the Mini): the names ellipsize, the note stays.
-    Row(Modifier.padding(horizontal = LauncherEdge).height(80.dp).clip(shape).background(ApprovedHomePalette.Card)
-        .approvedOutline(shape).padding(horizontal = 8.dp),
+    Row(Modifier.height(80.dp).clip(shape).background(ApprovedHomePalette.Card).approvedOutline(shape).padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
       WhosThereAvatar(names.firstOrNull(), 64.dp)
       val text = if (names.size > 1) "Hi " + names.joinToString(" & ") { it.name } else "Hi ${names.first().name}"
-      Text(text, color = ApprovedHomePalette.Text, fontSize = 27.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-          overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+      Text(text, color = ApprovedHomePalette.Text, fontSize = 27.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
       Text(if (names.size > 1) "· shared things only" else "· showing your Home", color = ApprovedHomePalette.Secondary,
           fontSize = 21.sp, maxLines = 1, modifier = Modifier.padding(end = 20.dp))
     }

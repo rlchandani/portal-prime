@@ -134,16 +134,14 @@ private fun SheetButton(label: String, solid: Boolean, enabled: Boolean, onClick
 internal fun RoutineHomeToast(modifier: Modifier = Modifier) {
   val t = RoutineEngine.toast ?: return
   if (RoutineEngine.screen != null || RoutineEngine.cheer != null) return
-  Row(modifier.padding(start = LauncherEdge, end = LauncherEdge, bottom = 140.dp).clip(RoundedCornerShape(40.dp)).background(RoutineColors.Sheet)
+  Row(modifier.padding(bottom = 140.dp).clip(RoundedCornerShape(40.dp)).background(RoutineColors.Sheet)
       .border(1.dp, RoutineColors.Border, RoundedCornerShape(40.dp)).padding(horizontal = 34.dp, vertical = 20.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Text("✓", color = RoutineColors.Green, fontSize = 30.sp)
-    // A long routine name wraps (two lines at most) instead of pushing Undo off the toast.
     Text(buildAnnotatedString {
       withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(t.name) }
       append(t.rest)
-    }, color = RoutineColors.Text, fontSize = 28.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.weight(1f, fill = false))
+    }, color = RoutineColors.Text, fontSize = 28.sp)
     t.undoRid?.let { rid ->
       Text("Undo", color = RoutineColors.Green, fontSize = 28.sp, fontWeight = FontWeight.SemiBold,
           modifier = Modifier.clickable(role = Role.Button) { RoutineEngine.undoClose(rid) }.padding(8.dp))

@@ -61,21 +61,9 @@ internal fun DinnerComposePane(targets: List<String>, onCancel: () -> Unit, onSe
   val message = DinnerMessage.custom(text)
   LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
   Column(Modifier.fillMaxSize()) {
-    val who = "${targets.joinToString(" and ")} shows it and says it once"
-    if (currentLayoutClass().compact) {
-      // The Mini: the title and the two buttons fill the row, so who it reaches goes on the line below.
-      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text("Type a message", color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium,
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        ApprovedHomePillButton("Cancel", onClick = onCancel)
-        Spacer(Modifier.width(16.dp))
-        DinnerSolidButton("Send", enabled = message != null) { message?.let(onSend) }
-      }
-      Text(who, color = ApprovedHomePalette.Secondary, fontSize = 24.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-          modifier = Modifier.padding(top = 10.dp, bottom = 28.dp))
-    } else Row(Modifier.fillMaxWidth().padding(bottom = 32.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(bottom = 32.dp), verticalAlignment = Alignment.CenterVertically) {
       Text("Type a message", color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium)
-      Text(who, color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
+      Text("${targets.joinToString(" and ")} shows it and says it once", color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
           modifier = Modifier.weight(1f).padding(horizontal = 32.dp), maxLines = 1)
       ApprovedHomePillButton("Cancel", onClick = onCancel)
       Spacer(Modifier.width(16.dp))

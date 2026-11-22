@@ -69,7 +69,7 @@ internal fun MusicV3AccountsPanel(
 private fun AccountList(accounts: List<YtAccount>, active: YtAccount?, actions: MusicV3AccountActions) {
   Row(Modifier.fillMaxWidth().padding(bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
     Text("Accounts on this Portal", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Bold,
-        maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        maxLines = 1, modifier = Modifier.weight(1f))
     MusicV3RoundButton("Close", size = 72.dp, fill = ApprovedHomePalette.Chrome, onClick = actions.close) {
       ApprovedIcon("close", Modifier.size(28.dp), ApprovedHomePalette.Text)
     }
@@ -98,8 +98,7 @@ private fun AccountRow(account: YtAccount, inUse: Boolean, actions: MusicV3Accou
     }
     if (inUse) {
       MusicV3GlyphIcon(MusicV3Glyph.CHECK, ApprovedHomePalette.Accent, Modifier.size(26.dp))
-      // The compact card (560 dp) keeps the name readable: the check alone says it (and is spoken).
-      if (LocalMusicStageDims.current != MusicStageDims.COMPACT) Text("In use", color = ApprovedHomePalette.Accent, fontSize = 23.sp)
+      Text("In use", color = ApprovedHomePalette.Accent, fontSize = 23.sp)
     }
     MusicV3Button("Sign out") { actions.askSignOut(account) }
   }

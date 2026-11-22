@@ -24,7 +24,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -441,75 +440,32 @@ internal fun HomeAddShapeBar(
     modifier: Modifier = Modifier,
 ) {
   val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
-  val dims = HomeAddBarLayout.of(LocalConfiguration.current.screenWidthDp)
   ApprovedHomeSurface(modifier.height(128.dp), radius = 34.dp) {
-    Row(Modifier.fillMaxHeight().padding(horizontal = HomeAddBarLayout.SIDE_PADDING_DP.dp), verticalAlignment = Alignment.CenterVertically) {
-      Row(Modifier.heightIn(min = 80.dp).widthIn(max = HomeAddBarLayout.BACK_MAX_DP.dp)
+    Row(Modifier.fillMaxHeight().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+      Row(Modifier.heightIn(min = 80.dp).widthIn(max = 300.dp)
           .semantics { contentDescription = "Back to widgets, ${draft.label}" }
           .tvFocusable(RoundedCornerShape(18.dp), focusScale = 1f, ringColor = palette.accent, onClick = onBack)
-          .padding(horizontal = HomeAddBarLayout.BACK_PADDING_DP.dp), verticalAlignment = Alignment.CenterVertically,
+          .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         ApprovedHomeIcon("back", Modifier.size(28.dp), ApprovedHomePalette.Secondary)
-        // Narrow windows: the back control is the arrow alone; it still says the widget's name.
-        if (dims.backLabel) Text(draft.label, color = ApprovedHomePalette.Text, fontSize = 28.sp, lineHeight = 36.sp,
+        Text(draft.label, color = ApprovedHomePalette.Text, fontSize = 28.sp, lineHeight = 36.sp,
             fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
       }
       HomeBarDivider()
-      Row(horizontalArrangement = Arrangement.spacedBy(HomeAddBarLayout.SHAPE_GAP_DP.dp),
-          modifier = Modifier.padding(horizontal = HomeAddBarLayout.SHAPE_GAP_DP.dp)) {
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(horizontal = 12.dp)) {
         HomeSlots.SHAPES.forEach { shape ->
-          HomeShapeButton(shape, dims.shapeWidth, selected = shape == draft.span, enabled = shape in fitting) { onShape(shape) }
+          HomeShapeButton(shape, selected = shape == draft.span, enabled = shape in fitting) { onShape(shape) }
         }
       }
       HomeBarDivider()
-      Box(Modifier.padding(start = HomeAddBarLayout.ADD_START_DP.dp).height(88.dp).widthIn(min = dims.addMinWidth.dp)
-          .clip(RoundedCornerShape(44.dp))
+      Box(Modifier.padding(start = 20.dp).height(88.dp).widthIn(min = 150.dp).clip(RoundedCornerShape(44.dp))
           .background(palette.text)
           .semantics { contentDescription = "Add ${draft.label}" }
           .tvFocusable(RoundedCornerShape(44.dp), focusScale = 1f, ringColor = palette.accent, onClick = onAdd)
-          .padding(horizontal = dims.addPadding.dp), contentAlignment = Alignment.Center) {
-        Text("Add", color = palette.background, fontSize = 30.sp, lineHeight = 38.sp, fontWeight = FontWeight.SemiBold,
-            maxLines = 1, softWrap = false)
+          .padding(horizontal = 40.dp), contentAlignment = Alignment.Center) {
+        Text("Add", color = palette.background, fontSize = 30.sp, lineHeight = 38.sp, fontWeight = FontWeight.SemiBold)
       }
     }
-  }
-}
-
-/**
- * The place-and-size bar's sizes for a window [of] a given width (pure, JVM-tested): the shipped
- * bar wherever it fits (the Portal+, the Mini turned); below [FULL_MIN_WIDTH_DP] (the Mini upright)
- * the back control drops its label and the shape buttons and Add tighten, so nothing is pushed
- * past the window edge.
- */
-internal object HomeAddBarLayout {
-  data class Dims(val backLabel: Boolean, val shapeWidth: Int, val addMinWidth: Int, val addPadding: Int)
-
-  const val SIDE_PADDING_DP = 20
-  const val BACK_MAX_DP = 300
-  const val BACK_PADDING_DP = 16
-  const val BACK_ICON_DP = 28
-  const val DIVIDER_DP = 17
-  const val SHAPE_GAP_DP = 12
-  const val ADD_START_DP = 20
-  /** The "Add" label at 30 sp semibold, generously. */
-  const val ADD_LABEL_DP = 60
-
-  val FULL = Dims(backLabel = true, shapeWidth = 112, addMinWidth = 150, addPadding = 40)
-  val NARROW = Dims(backLabel = false, shapeWidth = 92, addMinWidth = 128, addPadding = 28)
-
-  /** The bar needs its full width plus this margin each side of the window. */
-  const val WINDOW_MARGIN_DP = 24
-
-  val FULL_MIN_WIDTH_DP: Int get() = width(FULL) + 2 * WINDOW_MARGIN_DP
-
-  fun of(windowWidthDp: Int): Dims = if (windowWidthDp <= 0 || windowWidthDp >= FULL_MIN_WIDTH_DP) FULL else NARROW
-
-  /** Estimated bar width with the back label at its widest ([BACK_MAX_DP]). */
-  fun width(d: Dims): Int {
-    val back = if (d.backLabel) BACK_MAX_DP else BACK_PADDING_DP * 2 + BACK_ICON_DP
-    val shapes = 4 * d.shapeWidth + 3 * SHAPE_GAP_DP + 2 * SHAPE_GAP_DP
-    val add = ADD_START_DP + maxOf(d.addMinWidth, 2 * d.addPadding + ADD_LABEL_DP)
-    return 2 * SIDE_PADDING_DP + back + 2 * DIVIDER_DP + shapes + add
   }
 }
 
@@ -526,7 +482,7 @@ private fun shapeName(shape: Pair<Int, Int>): String = when (shape) {
 }
 
 @Composable
-private fun HomeShapeButton(shape: Pair<Int, Int>, width: Int, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun HomeShapeButton(shape: Pair<Int, Int>, selected: Boolean, enabled: Boolean, onClick: () -> Unit) {
   val accent = ApprovedHomePalette.Accent
   val color = when {
     selected -> accent
@@ -534,7 +490,7 @@ private fun HomeShapeButton(shape: Pair<Int, Int>, width: Int, selected: Boolean
     else -> ApprovedHomePalette.Secondary.copy(alpha = .25f)
   }
   val shapeOutline = RoundedCornerShape(18.dp)
-  Box(Modifier.size(width = width.dp, height = 92.dp).clip(shapeOutline)
+  Box(Modifier.size(width = 112.dp, height = 92.dp).clip(shapeOutline)
       .background(if (selected) ApprovedHomePalette.Chrome else Color.Transparent)
       .then(if (selected) Modifier.border(2.dp, accent, shapeOutline) else Modifier)
       .semantics { contentDescription = shapeName(shape); this.selected = selected }

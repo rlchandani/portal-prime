@@ -43,8 +43,6 @@ internal object MusicHomeFloatDims {
   /** Home's bottom toasts' band, and their gap beside the card ([MusicCardAvoidance]). */
   val TOAST_BAND = 220.dp
   val TOAST_GAP = 24.dp
-  /** The narrowest a bottom toast is placed beside the card; narrower, it rises above the card. */
-  val TOAST_MIN_WIDTH = 480.dp
 }
 
 /**
@@ -80,14 +78,13 @@ internal fun MusicHomeFloatingPlayer(
       MusicFloatArea(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat(), sideInset.toPx(),
           MusicHomeFloatDims.TOP.toPx(), sideInset.toPx(), bottomInset.toPx())
     }
-    val sideW = MusicHomeCardDims.sideWidth(maxWidth.value.toInt(), sideInset.value.toInt())
     val size = with(density) {
-      MusicFloatSize(MusicHomeCardDims.widthOf(mode, sideW).dp.toPx(), MusicHomeCardDims.heightOf(mode).dp.toPx())
+      MusicFloatSize(MusicHomeCardDims.widthOf(mode).dp.toPx(), MusicHomeCardDims.heightOf(mode).dp.toPx())
     }
     val position = rememberFloatPosition(mode, size, area)
     MusicHomeCardBody(mode, track, now, room, onOpenMusic,
         Modifier.offset { position.value.let { IntOffset(it.x.roundToInt(), it.y.roundToInt()) } }
-            .floatDrag(mode, size, area, position), sideW = sideW)
+            .floatDrag(mode, size, area, position))
   }
 }
 

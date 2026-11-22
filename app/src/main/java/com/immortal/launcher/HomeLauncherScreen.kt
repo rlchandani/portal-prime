@@ -568,7 +568,7 @@ internal fun LauncherScreen(
           }
           // Household overlays: share toasts / chime bubble and the routine "closed" toast.
           // Bottom toasts centre beside the (draggable) Now Playing card so they never overlap the player.
-          val toastSides = Modifier.padding(start = toastInsets.start, end = toastInsets.end, bottom = toastInsets.bottom)
+          val toastSides = Modifier.padding(start = toastInsets.start, end = toastInsets.end)
           ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 96.dp))
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))

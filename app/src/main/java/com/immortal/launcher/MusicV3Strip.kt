@@ -7,10 +7,8 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -19,8 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,18 +44,15 @@ internal data class MusicV3StripInputs(
 internal fun MusicV3Strip(now: MusicNowSlice, inputs: MusicV3StripInputs, modifier: Modifier = Modifier) {
   val dims = LocalMusicStageDims.current
   val compact = dims == MusicStageDims.COMPACT
-  val gap = if (compact) 16 else 28
-  BoxWithConstraints(modifier, contentAlignment = Alignment.CenterStart) {
-  val width = maxWidth.value.toDouble()
-  Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(gap.dp)) {
+  Row(modifier, verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(if (compact) 16.dp else 28.dp)) {
     val follow = inputs.follow
     when {
       follow != null -> {
         StripText(follow.line, follow.title, null, inputs.searching, Modifier.weight(1f), MusicV3Glyph.FOLLOW, ember = true)
-        // Beside the player with the sheet open (Mini upright, ~344 dp) the answers turn into round buttons.
-        val fontScale = LocalDensity.current.fontScale
-        MusicFollowAnswers(follow, MusicPillFit.answer(width, dims, gap.toDouble(), keepDp = STRIP_TEXT_MIN_DP, fontScale = fontScale))
+        MusicStagePill(MusicV3StageCopy.CONTINUE, style = MusicPillStyle.EMBER, glyph = MusicV3Glyph.PLAY,
+            onClick = { MusicV3FollowMeInScreen.answer(follow, continueHere = true) })
+        MusicStagePill(MusicV3StageCopy.NOT_NOW, onClick = { MusicV3FollowMeInScreen.answer(follow, continueHere = false) })
       }
       now.idle -> {
         StripText(null, MusicV3StageCopy.NOTHING_PLAYING, "Pick something below", inputs.searching, Modifier.weight(1f))
@@ -69,30 +62,6 @@ internal fun MusicV3Strip(now: MusicNowSlice, inputs: MusicV3StripInputs, modifi
       }
       else -> Playing(now, inputs, compact, Modifier.weight(1f))
     }
-  }
-  }
-}
-
-/** What the strip's song text keeps beside the Follow-me answers before they turn into icons. */
-private const val STRIP_TEXT_MIN_DP = 160.0
-
-/** Continue / Not now for a Follow-me offer, as pills or (when [answer] says so) round icon buttons. */
-@Composable
-internal fun MusicFollowAnswers(follow: MusicFollowAsk, answer: MusicPillFit.Answer) {
-  val ink = LocalMusicStageInk.current
-  val dims = LocalMusicStageDims.current
-  val onContinue = { MusicV3FollowMeInScreen.answer(follow, continueHere = true) }
-  val onNotNow = { MusicV3FollowMeInScreen.answer(follow, continueHere = false) }
-  if (answer == MusicPillFit.Answer.ICONS) {
-    MusicV3RoundButton(MusicV3StageCopy.CONTINUE, size = dims.target.dp, fill = HearthpaneMark.Ember, onClick = onContinue) {
-      MusicV3GlyphIcon(MusicV3Glyph.PLAY, Color(0xFF2A1406), Modifier.size(30.dp))
-    }
-  } else {
-    MusicStagePill(MusicV3StageCopy.CONTINUE, style = MusicPillStyle.EMBER, glyph = MusicV3Glyph.PLAY, onClick = onContinue)
-  }
-  if (answer == MusicPillFit.Answer.PILLS) MusicStagePill(MusicV3StageCopy.NOT_NOW, onClick = onNotNow)
-  else MusicV3RoundButton(MusicV3StageCopy.NOT_NOW, size = dims.target.dp, fill = ink.fill2, onClick = onNotNow) {
-    MusicV3GlyphIcon(MusicV3Glyph.CLOSE, ink.muted, Modifier.size(26.dp))
   }
 }
 

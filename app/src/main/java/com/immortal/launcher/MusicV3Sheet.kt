@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.paneTitle
@@ -146,15 +144,11 @@ private fun Tabs(selected: MusicSheetTab, inputs: MusicV3SheetInputs, modifier: 
   val ink = LocalMusicStageInk.current
   val dims = LocalMusicStageDims.current
   val compact = dims == MusicStageDims.COMPACT
-  BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
+  Box(modifier, contentAlignment = Alignment.Center) {
     val group = RoundedCornerShape(999.dp)
-    // The centred tabs stay clear of the close button on the right (and so of an equal margin on the
-    // left); when they would reach it (the Mini upright) "Recently played" reads "Recent".
-    val clear = maxWidth.value.toDouble() - 2.0 * (dims.target + TABS_CLOSE_GAP_DP)
-    val short = compact && MusicPillFit.shortTabs(clear, dims, LocalDensity.current.fontScale)
     Row((if (compact) Modifier else Modifier.clip(group).background(ink.fill2).border(1.dp, ink.line, group).padding(6.dp)),
-        horizontalArrangement = Arrangement.spacedBy(if (compact) MusicPillFit.TAB_GAP.dp else 4.dp)) {
-      MusicSheetTab.entries.forEach { tab -> TabButton(tab, tab == selected, compact, short) { inputs.onTab(tab) } }
+        horizontalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 4.dp)) {
+      MusicSheetTab.entries.forEach { tab -> TabButton(tab, tab == selected, compact) { inputs.onTab(tab) } }
     }
     MusicV3RoundButton(MusicV3StageCopy.CLOSE_SHEET, Modifier.align(Alignment.CenterEnd), size = dims.target.dp,
         fill = ink.fill2, onClick = inputs.onClose) {
@@ -164,7 +158,7 @@ private fun Tabs(selected: MusicSheetTab, inputs: MusicV3SheetInputs, modifier: 
 }
 
 @Composable
-private fun TabButton(tab: MusicSheetTab, on: Boolean, compact: Boolean, short: Boolean, onClick: () -> Unit) {
+private fun TabButton(tab: MusicSheetTab, on: Boolean, compact: Boolean, onClick: () -> Unit) {
   val ink = LocalMusicStageInk.current
   val dims = LocalMusicStageDims.current
   val shape = RoundedCornerShape(999.dp)
@@ -183,10 +177,6 @@ private fun TabButton(tab: MusicSheetTab, on: Boolean, compact: Boolean, short: 
       .clip(shape).background(fill).tvFocusable(shape, focusScale = 1f, ringColor = ink.ember, onClick = onClick, role = null)
       .semantics { role = Role.Tab; selected = on }.padding(horizontal = if (compact) 22.dp else 34.dp),
       contentAlignment = Alignment.Center) {
-    Text(if (short) tab.shortLabel else tab.label, color = text, fontSize = dims.tabText.sp, fontWeight = FontWeight.SemiBold,
-        maxLines = 1)
+    Text(tab.label, color = text, fontSize = dims.tabText.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
   }
 }
-
-/** Kept between the centred sheet tabs and the close button. */
-private const val TABS_CLOSE_GAP_DP = 12f
