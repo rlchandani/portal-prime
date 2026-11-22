@@ -8,6 +8,7 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +57,12 @@ jobs:
         run: python3 -m unittest discover -s scripts -p 'test_portal_*.py'
 
       - name: Run unit tests
-        run: ./gradlew :app:testDebugUnitTest --no-daemon
+        # compileDebugKotlin runs out of heap under gradle.properties' 2 GB default (the
+        # Kotlin daemon inherits it). Compile in-process with a 6 GB Gradle heap; the
+        # runner has 16 GB. Same flags as tools/scripts/ci-local.sh.
+        run: >-
+          ./gradlew :app:testDebugUnitTest --no-daemon
+          -Dorg.gradle.jvmargs=-Xmx6g -Pkotlin.compiler.execution.strategy=in-process
 
       - name: Upload test report
         if: always()
