@@ -13,6 +13,15 @@
     const stage = opts.stage, deck = window.shuffled(window.PHOTOS.slice()), cursor = { i: 0 };
     const intervalMs = Math.min(600, Math.max(5, Number(opts.intervalSec) || 30)) * 1000;
     const XFADE_MS = 1600, MOTION_OVERLAP_MS = 2400;
+    // A beat that will dissolve over the current one is built at .001 opacity (.ss-beat.prewarm,
+    // below one 8-bit step), so Chromium rasterises and uploads it while it is laid out, not in the
+    // dissolve's first frames. Once it is ready, the dissolve waits this many frames: a commit waits
+    // for the previous tree's raster, so the last of them lands only after the beat is rasterised.
+    const PREWARM_FRAMES = 3;
+    // Modes where a layered, prewarmed beat is measured as a win on the Portal+ (bench
+    // screensaver-pinned, docs/perf/portal-perf-2026-11-21.md). Every other mode keeps the plain beat:
+    // Gallery Wall's fade-end frames rose with it.
+    const LAYERED_MODES = new Set(["polaroid"]);
     // Rotation mid-show (mock): hold the beat, dim to 20 %, wait 400 ms, re-lay the same beat for
     // the new screen, then reveal over 500 ms. ScreensaverLayout.ROTATION_* holds the native values.
     const ROTATION_DIM = 0.2, ROTATION_DIM_MS = 400, ROTATION_REVEAL_MS = 500;
@@ -75,7 +84,7 @@
       if (!outgoing || scene.relay) scene.layer.classList.add("first-scene");
       // Any scene laid out after a turn (the re-lay, or a navigation that replaced it) reveals.
       dim(false);
-      scene.layer.classList.remove("freeze");
+      scene.layer.classList.remove("freeze", "prewarm");
       scene.layer.classList.add("on");
       try { console.info("photo_beat " + scene.modeId); } catch (_) {}
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
@@ -176,7 +185,16 @@
     }
     function present(scene) {
       if (promotionFrame != null) cancelAnimationFrame(promotionFrame);
-      promotionFrame = requestAnimationFrame(() => { promotionFrame = null; promote(scene); });
+      // A native Filmstrip handoff keeps its own timing and fades; its WebView beat is not prewarmed.
+      const native = !!(scene.cleanup && scene.cleanup.nativeToken) ||
+        !!(current && current.cleanup && current.cleanup.nativeToken);
+      if (native) scene.layer.classList.remove("prewarm");
+      let frames = scene.layer.classList.contains("prewarm") ? PREWARM_FRAMES : 1;
+      const step = () => {
+        if (--frames > 0) { promotionFrame = requestAnimationFrame(step); return; }
+        promotionFrame = null; promote(scene);
+      };
+      promotionFrame = requestAnimationFrame(step);
     }
     function beatDeck() {
       let watching = false;
@@ -207,7 +225,8 @@
       // Replaying a beat replays its deck order, early-shown pair photos included.
       if (target) { cursor.i = target.start; cursor.ahead = []; }
       const layer = document.createElement("div");
-      layer.className = "ss-beat freeze";
+      const layered = LAYERED_MODES.has(modeId);
+      layer.className = "ss-beat freeze" + (layered ? " layered" : "") + (layered && current ? " prewarm" : "");
       layer.style.setProperty("--motion-duration", (intervalMs + MOTION_OVERLAP_MS) + "ms");
       stage.appendChild(layer);
       const scene = { layer, modeId, start: cursor.i, historyIndex: targetIndex, live: true, ready: false,

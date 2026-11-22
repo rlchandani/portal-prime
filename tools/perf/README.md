@@ -24,7 +24,7 @@ holds it.
 | Command | What it does |
 |---|---|
 | `scenarios` | lists scenarios and their screenshot policy |
-| `submit --device S --scenario N [--official] [--apk A.apk[,A.dm]]... [--reps N] [--no-interleave] [--meminfo] [--atrace] [--simpleperf] [--screenshots] [--poll-s SEC] [--cap-min M]` | writes a job to `scratch-tmp/perf-queue/<serial>/pending/`, prints its id |
+| `submit --device S --scenario N [--official] [--apk A.apk[,A.dm]]... [--reps N] [--no-interleave] [--meminfo] [--atrace [--atrace-categories CATS] [--atrace-buffer-kb KB]] [--simpleperf] [--screenshots] [--poll-s SEC] [--cap-min M]` | writes a job to `scratch-tmp/perf-queue/<serial>/pending/`, prints its id |
 | `worker --device S [--once] [--exit-when-empty]` | serves that Portal's queue (refuses to start if another worker is alive) |
 | `wait JOB_ID [--timeout-min M] [--json]` | blocks until the job is done; exit 0 only if it ran and restored cleanly |
 | `run` (same flags as submit, plus `--no-wait`, `--out DIR`) | runs immediately in this process; takes the lock itself (waits) |
@@ -44,6 +44,21 @@ frame carries Flags 1 (its window became visible) and flags 0 alone shows an emp
 
 Verdict rule: B **wins** a metric only when B's median is lower than A's median by more than A's
 spread (max - min over A's samples); **loss** if higher by more than that spread; otherwise **noise**.
+
+### atrace
+
+`--atrace` captures `gfx view` with a 16384 KB buffer around every measured step, saved as
+`raw/<build>-r<rep>-<step>.atrace.txt`. For WebView or scheduler work, widen it:
+
+```bash
+python3 -I $B submit --device 2221B01C7T01C0 --scenario screensaver-pinned:galleryWall --official \
+  --apk /abs/branch.apk --reps 2 --atrace --atrace-categories gfx,view,webview,sched,freq --atrace-buffer-kb 65536
+```
+
+- `--atrace-categories`: comma- or space-separated atrace category names (lower-case letters, digits and `_`, at most 24). Anything else is refused, because the names go into an adb shell line.
+- `--atrace-buffer-kb`: the per-CPU buffer, 1024–262144 KB.
+- Both need `--atrace`, and both are recorded in the job and in `result.json` `options`.
+- Check the header `entries-in-buffer/entries-written` of a saved trace. If fewer entries were kept than written, the ring buffer wrapped: raise the buffer or narrow the categories.
 
 ## Scenarios
 

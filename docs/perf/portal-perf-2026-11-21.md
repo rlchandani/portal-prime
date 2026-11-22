@@ -1296,3 +1296,79 @@ Per pass (8 switches; frames over 32 ms Apps / Tools / Home): official 16 / 2 / 
 - These are single runs, about 6 changes each. A difference of about 20 % in the summed time is within the spread seen between rounds elsewhere in this doc. The household long-window A/B was not run.
 
 **Visual check on device** (branch, one screenshot, taken only after confirming that `PhotoFramePreviewActivity` was on top, the test source was active and pinned to `polaroid@…`, and the frame showed "TEST SCENE … generated"; 2160 × 1440, inspected at 100 % crop, then deleted). The shadow ramps are smooth on every print, with no 9-slice seams, no stretched or doubled corners, and no hard edge where the ramp meets the table. The tilt is drawn cleanly. The paper corners are rounded and the shadow follows them. The bottom row's paper looks greyer than the top row's. That is the global `#chrome-scrim` bottom gradient (`styles.css:232–233`), which this branch does not change. No screenshot of official was taken, so this check is against the desktop comparison above, not against a device capture of `main`.
+
+## Screensaver beat change: one raster per beat, before its dissolve (branch `ss-finish`, 1.326)
+
+**Trace finding.**
+- Desktop headless Chromium 1223 ran the real engine (seeded `Math.random`, generated 3000–4000 px photos, 1920 × 1280 at dpr 1.125). Gallery Wall and Polaroid were pinned, and each change was forced with `next()`, as the bench does. `RasterTask` was summed per 100 ms, and the composited layers were read through CDP `LayerTree`.
+- Mid-fade, the incoming `.ss-beat` is its own layer (`ActiveOpacityAnimation`) and `#stage`'s layer holds the outgoing beat. When the dissolve ends the incoming beat loses its layer, is painted into `#stage` (paint count 1 → 3), and **the whole screen is rasterised again**. That second raster was about half of each change's raster: Gallery Wall 194 ms per 2 changes, Polaroid 243 ms.
+- The device framestats fit this (official 1.326, bench `screensaver-pinned`, frames > 32 ms, offset from `photo_beat`). There are two clusters per change: 3 frames of 40–91 ms at +0.02–0.08 s (incoming raster and upload), and on Gallery Wall up to 14 frames of 33–56 ms at +1.63–2.1 s (the fade end). Polaroid has one 34–50 ms frame at +1.64 s.
+- The bench's `--atrace` was not usable. Its ring buffer kept 1261 of 64278 entries, only the tail of each step.
+
+**Change** (`13788fd3`).
+- `styles.css`: every `.ss-beat` has `will-change: opacity`, so a beat keeps its layer when its dissolve ends.
+- A beat that will dissolve over the current one is built at `.ss-beat.prewarm` (opacity .001, below half an 8-bit step), so it is rasterised while it is laid out. `scheduler.js` `present` then waits `PREWARM_FRAMES` (3) frames before the dissolve. A commit waits for the previous tree's raster, so the last frame lands after the raster. The dissolve runs from .001 to 1. First scenes and native Filmstrip handoffs are unchanged.
+- Desktop after the change: no raster at the fade end, and none in the 100 ms after the dissolve starts (Gallery Wall 194 → 66–76 ms raster per 2 changes).
+- The unproven Gallery Wall warm-up `cf8f02b4` is not carried over.
+
+**Pixel diff** (desktop Chromium, `main` vs branch, same seeded layout, the beat transition paused at 800 ms through CDP `Animation` for the mid-fade shot):
+- Rest and settled shots: 100 % identical at dpr 1, 1.125 and 2 for both modes.
+- Mid-fade: Gallery Wall 100 %. Polaroid 100 % at dpr 1.125, and 66.3 % at dpr 1 and 2 with max 1 / 255. That is blend rounding with the outgoing beat on its own layer.
+- A prewarm beat held indefinitely over the current scene was 100 % identical to the scene alone.
+
+**A/B** (bench `screensaver-pinned`, Family Portal+, `--official` + branch `assemblePerformance`, 4 reps × 5 changes, interleaved; the tool's verdict is "noise" on every metric because O's spread is wide):
+
+| Mode | Build | Changes | > 32 ms total | > 60 ms total | Worst median | Sum > 32 median | Janky % median |
+|---|---|---|---|---|---|---|---|
+| Polaroid | O 1.326 | 21 | 105 | 19 | 56 | 222 ms | 97 |
+| Polaroid | branch | 22 | 58 | 4 | 44 | 85 ms | 7.2 |
+| Gallery Wall | O 1.326 | 23 | 197 | 11 | 48 | 349 ms | 96 |
+| Gallery Wall | branch | 22 | 153 | 24 | 54 | 269 ms | 53 |
+
+- **Polaroid:** the 40–93 ms burst at the dissolve start is gone. What remains is 1–4 frames of 33–57 ms between −0.5 s and 0 s (the prewarm raster, while the screen does not change), and one 39–47 ms frame at +1.73 s, when the outgoing beat is disposed (`finishFade`, `XFADE_MS + 100`).
+- **Gallery Wall:** the start burst is mostly gone, but the fade-end cluster stays. It moved from +1.63 s to +1.75 s, which is again the outgoing disposal, not a re-raster: 8–13 frames of 33–72 ms in 11 of 22 changes. One sample (A r4 change 5) reached 129 ms. Three samples had 100–104 ms prewarm frames before the beat. Frames over 60 ms rose 11 → 24, so Gallery Wall is not a clear win.
+- **Target (no frame > 32 ms) not met in either mode.**
+
+**Next.**
+- Gallery Wall's remaining cost follows the outgoing wall's disposal (`dissolve.cleanup` of 10 cells and `layer.remove`, freeing ~20 photo textures in one frame). Candidates: release the old wall's cells a few per frame after the dissolve, or hide the outgoing beat (`visibility: hidden`) one frame before removing it, to separate damage from texture frees.
+- This needs a device trace with `webview` and `sched` and a larger buffer than the bench's `gfx view` capture.
+
+**Tests.**
+- `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 542 tests, 523 pass, 19 browser tests skipped, 0 fail. The new `slideshow_beat_prewarm.test.cjs` has 5 tests (first beat not prewarmed; a dissolve starts 3 frames after ready, from prewarm; a superseded prewarm beat never dissolves; pause holds; the CSS layer and opacity bound). 4 of them fail without the change. Two native-Filmstrip tests now advance 48 ms for a WebView-to-WebView dissolve.
+- `:app:testDebugUnitTest`: 9058 tests, 0 failures.
+- `ci-local.sh --clean-checkout`: 11 passed, 0 failed, 1 skipped (PowerShell provisioning).
+- The device was restored by the bench to official 1.326 (`restore OK, verify: ok`).
+
+### Round 2: staged release of the old beat, staggered Gallery Wall prewarm (not kept)
+
+**Change tried** (not committed; patch kept as `scratch-tmp/ss-finish/v2-retire-stagger.patch` plus `slideshow_gallery_prewarm.test.mjs`):
+- `scheduler.js` `retire`: at the fade end the old beat dropped to opacity 0 (`.ss-beat.retiring`). Its texture owners (Gallery cells, Polaroid prints) then left 3 per frame, and only after that did the mode clean up and the layer go.
+- Gallery Wall in a `.prewarm` beat added 2 cells per frame (`GALLERY_PREWARM_CELLS`).
+- Native handoffs were unchanged.
+- Desktop pixel diff was 100 % identical at rest, mid-fade and settled, at dpr 1, 1.125 and 2. JS 547 tests, 528 pass, 19 skipped, 0 fail. `:app:testDebugUnitTest` passed.
+
+**Bench** (official 1.327 vs this build, `screensaver-pinned`, 4 reps):
+
+| Mode | Build | Changes | > 32 ms total | > 60 ms total | Worst median | Sum > 32 median | Janky % median |
+|---|---|---|---|---|---|---|---|
+| Polaroid | O 1.327 | 20 | 90 | 14 | 57 | 205 ms | 98 |
+| Polaroid | round 2 | 20 | 79 | 9 | 55 | 183 ms | 25 |
+| Gallery Wall | O 1.327 | 20 | 148 | 7 | 48 | — | 96 |
+| Gallery Wall | round 2 | 20 | 127 | 12 | 50 | — | 23 |
+
+- **Staged release made Polaroid worse than round 1.** The single 39–47 ms frame at +1.73 s became 2–3 frames of 45–67 ms at +1.72–1.76 s (round 1: 58 frames over 32 ms and 4 over 60 ms).
+- **It did not move Gallery Wall's fade-end cluster.** That is still 8–19 frames of 33–70 ms at +1.75–2.1 s in about half the changes.
+- So that cost is not the old wall's texture frees. It starts on the frame the old beat stops being drawn, whether by removal (round 1) or by opacity 0 (round 2). It is not reproduced on desktop, where no raster follows.
+- One hypothesis: with two full-screen beats and 20 photos, WebView is over its tile memory budget during the fade. The incoming wall would then be drawn from partial or low-resolution tiles, and re-rastered at full resolution once the old beat's memory frees. This needs a device trace with `webview` and `sched` and a larger buffer than the bench's `gfx view` capture.
+- **The staggered build did remove the 100–104 ms pre-raster frames.** In round 2 the worst Gallery frame before the beat was 68 ms, mostly 35–50 ms. It is a candidate to keep once the fade-end cost is solved. It was not measured on its own.
+- **Not ship-ready:** Gallery Wall frames over 60 ms rise in both rounds (11 → 24, 7 → 12). The branch stays at round 1 (`13788fd3`).
+
+### Round 3: Polaroid only (shipped candidate)
+
+- `scheduler.js` `LAYERED_MODES = {"polaroid"}`. Polaroid beats get `.ss-beat.layered` (`will-change: opacity`). A Polaroid beat that dissolves over a current beat also gets `.prewarm` and the `PREWARM_FRAMES` (3) wait.
+- Every other mode, Gallery Wall included, is back on the official plain beat with one-frame promotion. The native Filmstrip test timings are back to the official values.
+- **Bench:** a pinned Polaroid change runs the same code path as round 1, so round 1's result stands: 105 → 58 frames over 32 ms and 19 → 4 over 60 ms, janky median 97 → 7.2 %. The round-3 build itself was not benched for Polaroid. That job was withdrawn when Family was reserved, and device work then stopped.
+- A Gallery Wall check of the round-3 build (job `20261122-111954-01C0-615c`) was still running at the time of writing. In round 3 Gallery Wall runs the official CSS and scheduler path.
+- **Pixel diff** (desktop, vs `main`, dpr 1, 1.125 and 2): rest and settled shots are 100 % identical. Mid-fade, Polaroid at dpr 1.125 is 66.5 % identical with max 1 / 255, and the other scales are 100 %. Gallery Wall at dpr 1 is 64 % identical with max 1 / 255. That is capture noise, because its code path is official.
+- **Tests:** JS 546 tests, 527 pass, 19 skipped, 0 fail. `slideshow_beat_prewarm.test.cjs` has 10 tests, covering Polaroid layered and prewarmed, and Gallery Wall, Ken Burns and Mosaic plain. `:app:testDebugUnitTest`: 9058 tests, 0 failures. `ci-local.sh --clean-checkout` on the merged HEAD (`a71dbbe6`): 12 passed, 0 failed, 1 skipped.
+- **Screensaver performance work stops here** at the owner's direction. The Gallery Wall fade-end cost (round 2) is open. `tools/perf` now takes `--atrace-categories` / `--atrace-buffer-kb` for a future `webview` / `sched` trace.
