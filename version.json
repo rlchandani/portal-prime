@@ -1,6 +1,6 @@
 {
-  "versionCode": 324,
-  "versionName": "1.330",
+  "versionCode": 325,
+  "versionName": "1.331",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Hey Jarvis hears you as soon as the screensaver starts (no 2-minute gap), a Home Assistant tile on the Apps tab, and a slimmer Meta background (more unused Meta apps switched off)."
+  "notes": "Privacy groundwork: the household sync key is now also kept in the Portal's encrypted key store, and an encrypted store is in place for what Jarvis will learn."
 }
