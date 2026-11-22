@@ -149,7 +149,7 @@ internal fun ApprovedLauncherTabs(
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
-  val wake = rememberWokenTab(selected, wakeFrames)
+  val woken = rememberWokenTab(selected, wakeFrames)
   val transition = remember { ApprovedHomeTabTransition(selected) }
   val clock = remember { Animatable(0f) }
   var animation by remember { mutableStateOf<ApprovedHomeTabAnimation?>(null) }
@@ -194,10 +194,8 @@ internal fun ApprovedLauncherTabs(
       key(tab) {
       val active = contentActive && tab == selected
       // Page work (lifecycle, producers, cameras, LocalApprovedLauncherPageActive readers) follows
-      // the woken tab; input opens only once both agree and closes on the switch itself.
-      // The page it replaced stays awake while it slides out and sleeps once the slide settles,
-      // so a wake and a sleep never share a frame.
-      val awake = contentActive && launcherPageAwake(tab, wake, selected, tab in visible)
+      // [woken]; input opens only once both agree and closes on the switch itself.
+      val awake = contentActive && tab == woken
       val drawing = contentActive && tab in visible
       val input = remember(hostOwner) { LauncherPageInputGate() }
       val moving = animation?.takeIf { motion -> motion.plan.motions.any { it.tab == tab } }
@@ -237,33 +235,19 @@ internal fun ApprovedLauncherTabs(
   }
 }
 
-/** The woken tab and the one it replaced (null with no wake delay). */
-internal data class LauncherPageWake(val woken: ApprovedLauncherTab, val replaced: ApprovedLauncherTab?)
-
-/**
- * Whether [tab]'s page is awake: it is the woken tab, or the one it replaced while that page is
- * still [visible] and sliding out (not [selected] again). Without a wake delay only the woken one.
- */
-internal fun launcherPageAwake(tab: ApprovedLauncherTab, wake: LauncherPageWake, selected: ApprovedLauncherTab,
-                               visible: Boolean): Boolean =
-    tab == wake.woken || (visible && tab == wake.replaced && tab != selected)
-
 /**
  * The tab whose page is awake: [selected] itself with no [wakeFrames], else [selected] that many
  * frames after it changed (Home: [HOME_TAB_WAKE_FRAMES]), so a switch frame starts and stops no page work.
  */
 @Composable
-private fun rememberWokenTab(selected: ApprovedLauncherTab, wakeFrames: Int): LauncherPageWake {
-  if (wakeFrames <= 0) return LauncherPageWake(selected, null)
-  val wake = remember { mutableStateOf(LauncherPageWake(selected, null)) }
+private fun rememberWokenTab(selected: ApprovedLauncherTab, wakeFrames: Int): ApprovedLauncherTab {
+  if (wakeFrames <= 0) return selected
+  val woken = remember { mutableStateOf(selected) }
   val latest = rememberUpdatedState(selected)
   LaunchedEffect(wakeFrames) {
-    followAfterFrames(snapshotFlow { latest.value }, wakeFrames) {
-      val now = wake.value
-      if (it != now.woken) wake.value = LauncherPageWake(it, now.woken)
-    }
+    followAfterFrames(snapshotFlow { latest.value }, wakeFrames) { woken.value = it }
   }
-  return wake.value
+  return woken.value
 }
 
 /** One shared modifier for every hidden page, so a recomposed hidden page keeps an equal chain. */
