@@ -1,6 +1,6 @@
 {
-  "versionCode": 323,
-  "versionName": "1.329",
+  "versionCode": 324,
+  "versionName": "1.330",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Hey Jarvis now listens on the screensaver as well as Home (with a small listening dot, pausing when muted or on a call); Jarvis can announce to rooms, manage the shopping/to-do list, set alarms, read the briefing and call rooms in the house."
+  "notes": "Hey Jarvis hears you as soon as the screensaver starts (no 2-minute gap), a Home Assistant tile on the Apps tab, and a slimmer Meta background (more unused Meta apps switched off)."
 }
