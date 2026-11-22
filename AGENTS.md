@@ -25,6 +25,8 @@ Always run the relevant check below after a change and fix failures before finis
 | Validate the store catalog | `python3 scripts/validate_catalog.py --network` |
 | Lint provisioning scripts | `bash -n provisioning/provision.sh` |
 | Build the fleet CLI | `cd provisioning && rustc -O fleet.rs -o fleetctl` |
+| Run every CI workflow locally (gate pushes on it) | `tools/scripts/ci-local.sh` |
+| Bump the version (gradle + version.json) | `tools/scripts/bump-version.sh <versionName> "<notes>"` |
 
 CI workflows live in [`.github/workflows/`](.github/workflows/): `tests.yml` (unit tests),
 `catalog.yml` (catalog schema + network checks), `provisioning.yml` (bash/PowerShell parse +
@@ -239,8 +241,11 @@ Quick reference (run from `provisioning/`):
   touching that path.
 - **Catalog changes** (`catalog.json`) must pass `scripts/validate_catalog.py`; keep the bundled
   fallback at `app/src/main/assets/catalog.json` in mind.
-- **Releases:** the self-update asset must be named `immortal.apk`; bump `version.json`. See
-  [`docs/releasing.md`](docs/releasing.md) and `scripts/cut-release.sh`.
+- **Releases:** this fork ships OTA updates as `hearthpane.apk` + `hearthpane-latest.json` on
+  rlchandani/portal-prime via `tools/scripts/ota-release.sh`. Bump with
+  `tools/scripts/bump-version.sh` so `version.json` stays in lockstep with
+  `app/build.gradle.kts`. Upstream's `scripts/cut-release.sh` flow is described in
+  [`docs/releasing.md`](docs/releasing.md).
 
 ## Hardware limits (don't try to "fix" these)
 

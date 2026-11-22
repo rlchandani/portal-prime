@@ -42,6 +42,20 @@ release build hits on a dev device: a feature branch is always a lower `versionC
 dev APK in `provisioning/apks/` and run provisioning as usual, then iterate with
 `adb install -r -d`. Validate the true `release` artifact before shipping.
 
+### Run CI locally before pushing
+
+`tools/scripts/ci-local.sh` runs the same checks as every workflow in
+`.github/workflows/` (JS and Python regression guards, catalog validation, version sync,
+`mkdocs build --strict`, provisioning/fleet tests, the Playwright pairing test and
+`:app:testDebugUnitTest`) and exits non-zero if any fails. Gate every push to `main` on it:
+
+    tools/scripts/ci-local.sh && git push origin main
+
+`--skip-gradle`, `--skip-browser` and `--offline` trim it for quick iterations; tool
+dependencies are cached in `CI_LOCAL_CACHE` (default `~/.cache/portal-ci-local`). Bump the
+version with `tools/scripts/bump-version.sh <versionName> "<notes>"`, which updates
+`app/build.gradle.kts` and `version.json` together (the Release guard rejects drift).
+
 A few things worth knowing:
 
 - **Release builds must be signed with the same key every time** — in-place

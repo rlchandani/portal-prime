@@ -2,6 +2,14 @@
 
 Immortal is hosted from its own GitHub repo. Two files drive what devices see.
 
+!!! note "Hearthpane fork (rlchandani/portal-prime)"
+    This fork publishes wireless updates with `tools/scripts/ota-release.sh`
+    (`hearthpane.apk` + `hearthpane-latest.json`). Bump first with
+    `tools/scripts/bump-version.sh <versionName> "<notes>"`, which moves `versionCode`,
+    `versionName` and `version.json` together; `scripts/check-version-sync.sh` (the Release
+    guard) defaults to this repo and `hearthpane.apk`. Run `tools/scripts/ci-local.sh` before
+    pushing. The `scripts/cut-release.sh` flow below is upstream's `immortal.apk` process.
+
 ## Check local readiness without publishing
 
 Use the separate local checker when building or verifying a candidate:
