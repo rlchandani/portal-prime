@@ -8,7 +8,9 @@ An entry:
   setup          actions at the start of every rep (not measured)
   warmup         unmeasured passes of [steps] at the start of every rep
   inner          measured passes of [steps] per rep
-  steps          measured steps; each: name, do (actions), and either
+  steps          measured steps; each: name, do (actions), optional pre (unmeasured lead-in actions,
+                 e.g. a turn) + pre_wait (s from the lead-in to the window), frame_ms (keep each frame's
+                 time in the sample), and either
                    wait (s) -> one framestats window, or
                    poll (s) -> framestats polled back to back, de-duplicated; with beats=True each
                                photo_beat (0.5 s before .. 3 s after) is one sample, the first skipped
@@ -38,6 +40,18 @@ AUDIT_SCREENS = ("home", "apps", "tools", "control_center", "settings", "calls",
 
 def _tab(label, name):
     return {"name": name, "do": [("tap_label", label)], "wait": 2.5, "expect": HOME}
+
+
+# rotation-tab-after: a turn, then the next Home tab tapped TAB_AFTER_TURN_S after it; the window opens
+# at the tap (the turn's own frames are not in it). Each delay gets both turns and three different tabs;
+# a pass ends where it started (landscape, Home tab).
+_TAB_AFTER_PLAN = (("portrait", 0.6, "Apps"), ("landscape", 3.0, "Tools"), ("portrait", 3.0, "Home"),
+                   ("landscape", 0.6, "Apps"), ("portrait", 0.6, "Tools"), ("landscape", 3.0, "Home"))
+
+
+def _tab_after_turn(turn, delay, label):
+    return {"name": f"tab-{delay:g}s", "pre": [("orientation", turn)], "pre_wait": delay,
+            "do": [("tap_label", label)], "wait": 2.5, "expect": HOME, "frame_ms": True}
 
 
 BASE = {
@@ -114,6 +128,21 @@ BASE = {
             {"name": "to-portrait", "do": [("orientation", "portrait")], "wait": 3.5, "expect": HOME},
             {"name": "to-landscape", "do": [("orientation", "landscape")], "wait": 3.5, "expect": HOME},
         ],
+        "teardown": [("orientation", "forget"), ("sleep", 2)],
+    },
+    "rotation-tab-after": {
+        "summary": "Mini emulation (1280x800 @160): turn, then tap the next Home tab 0.6 s / 3 s after the turn; "
+                   "frame times of the tab switch",
+        "screenshots": False,
+        "start": HOME,
+        "session": [("mini", "landscape")],
+        # Tab targets for both turns, located while nothing is measured (the tab bar moves on a turn).
+        "setup": [("orientation", "portrait"), ("sleep", 3.5), ("expect", HOME), ("locate", "Home"),
+                  ("orientation", "landscape"), ("sleep", 3.5), ("expect", HOME), ("locate", "Home"),
+                  ("tap_label", "Home"), ("sleep", 2)],
+        "warmup": 0,
+        "inner": 2,
+        "steps": [_tab_after_turn(*plan) for plan in _TAB_AFTER_PLAN],
         "teardown": [("orientation", "forget"), ("sleep", 2)],
     },
     "ota-update": {

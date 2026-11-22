@@ -5,7 +5,7 @@ import signal
 import time
 import traceback
 
-from . import notes, report, scenarios
+from . import awake, notes, report, scenarios
 from .builds import BuildError, OfficialSource, local_build
 from .device import Device
 from .engine import Options, ScenarioError, Session, build_order
@@ -38,9 +38,10 @@ def resolve_builds(apk_specs, official_flag, official_source, scenario_name=None
     return builds
 
 
-def preflight(device, priors, log):
+def preflight(device, priors, log, out_dir=None):
     """Checks the Portal and records into [priors] what restore must put back (before changing
-    anything, so an interrupt mid-preflight still restores them). Then lowers STREAM_MUSIC to 0."""
+    anything, so an interrupt mid-preflight still restores them; also saved as priors.json in
+    [out_dir]). Then keeps the Portal awake for the job (awake.py) and lowers STREAM_MUSIC to 0."""
     if not device.connected():
         raise ScenarioError(f"{device.serial} is not connected over adb")
     priors.update({
@@ -54,6 +55,8 @@ def preflight(device, priors, log):
     })
     log(f"preflight: top={priors['top']} wake={priors['wakefulness']} music={priors['music_volume']} "
         f"version={priors['version_name']}")
+    awake.save_priors(out_dir, priors)
+    awake.hold(device, priors, out_dir, log)
     p = device.fleet(["dev", "on"])
     if p.rc != 0:
         raise ScenarioError(f"fleetctl dev on failed (rc {p.rc})")
@@ -85,7 +88,7 @@ def run_session(*, serial, scenario_name, builds, options, out_dir, lock, fleetc
     priors = {}  # filled by preflight; restore reads it (music volume, rotation)
     try:
         lock.check()
-        preflight(device, priors, log)
+        preflight(device, priors, log, out_dir)
         if scenario.get("ota"):
             from .ota import OtaRun
             session = OtaRun(device, builds, out_dir, log)

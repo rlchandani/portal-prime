@@ -7,15 +7,16 @@ Order (each step runs even when an earlier one failed; each is recorded):
   4. the latest OFFICIAL release installed (gh release download, sha256 verified on the Mac and on device)
   5. fleet: orientation forget, screensaver test source off, cc_debug cleared (retried while the app restarts)
   6. STREAM_MUSIC back to its prior value
-  7. Home as the default and on top (set-home-activity + HOME intent; a dream is woken, never tapped)
-  8. fleetctl dev off
-  9. final check: on-device sha == release manifest, Home resumed + default, dev mode off
+  7. keep-awake off: screen_off_timeout back to its exact prior (awake.py)
+  8. Home as the default and on top (set-home-activity + HOME intent; a dream is woken, never tapped)
+  9. fleetctl dev off
+  10. final check: on-device sha == release manifest, Home resumed + default, dev mode off
 """
 
 import json
 import re
 
-from . import HOME_COMPONENT
+from . import HOME_COMPONENT, awake
 from .builds import install
 from .device import TMP_PREFIX
 
@@ -92,6 +93,9 @@ def restore(device, official, priors, log=print):
         device.set_music_volume(prior)
         return f"STREAM_MUSIC -> {prior} (now {device.music_volume()})"
 
+    def keep_awake_off():
+        return awake.release(device, priors)
+
     def home():
         device.go_home()
         sleep(3)
@@ -136,6 +140,7 @@ def restore(device, official, priors, log=print):
     for name, body in FLEET_CLEANUP:
         _step(steps, name, fleet_cleanup(body), log)
     _step(steps, "music volume", music, log)
+    _step(steps, "keep-awake off", keep_awake_off, log)
     _step(steps, "home", home, log)
     _step(steps, "dev off", dev_off, log)
     _step(steps, "verify", verify, log)

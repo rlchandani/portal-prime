@@ -46,3 +46,4 @@ system_services.apk
 # scratch artifacts
 .playwright-mcp/
 mock-frame.png
+__pycache__/

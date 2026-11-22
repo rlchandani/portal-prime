@@ -33,7 +33,9 @@ holds it.
 Builds: `--official` is the latest official release (label **O**, always first); each `--apk` is
 **A**, **B**, … in order. The first build is the baseline for `compare`. With `--interleave`
 (default) the order is A,B,B,A,A,B…; every build gets `--reps` measured reps, each install is
-followed by a 25 s settle and one unmeasured warm-up rep.
+followed by a 25 s settle, a HOME intent (always: the install kills the app but leaves a stale
+"resumed" HomeActivity record with no window, which read as 0 frames and empty dumps; the run aborts
+if gfxinfo still lists no Home window after two tries) and one unmeasured warm-up rep.
 
 Results: `scratch-tmp/perf-results/<timestamp>-<scenario>/result.json` (every sample, per-window
 counts, HWUI summary, memory, installs, priors, restore steps) and `result.md` (tables), raw dumps
@@ -72,6 +74,7 @@ python3 -I $B submit --device 2221B01C7T01C0 --scenario screensaver-pinned:galle
 | `screensaver-pinned:<mode>` | test source pinned at 15 s; 5 forced changes (left swipe) polled 12 s each, attributed by `photo_beat` | test-source frame only |
 | `screensaver-household` | real dream (`Somnambulator`), household settings, 300 s polled window (`--poll-s`), one sample per `photo_beat` (first beat = start, skipped); warm-up dream 40 s | never |
 | `rotation` | Mini emulation (1280x800 @160, auto-rotate off): fleet orientation portrait / landscape, 3.5 s each | never |
+| `rotation-tab-after` | Mini emulation as `rotation`; per pass 6 turns, each followed by a tap on the next Home tab 0.6 s or 3 s after the turn (`tab-0.6s`, `tab-3s`). The window opens at the tap, so only the tab switch is measured; `frame_ms` keeps every frame's time and `do_after_s` the real turn-to-tap delay. Tab targets for both turns are located in setup | never |
 | `mini-size:<portrait\|landscape>:<scenario>` | any scenario at 800x1280 / 1280x800, density 160, auto-rotate off | as the inner scenario |
 | `ota-update` | one wireless update, previous official -> latest, through fleet `/update/ota` check + install; phase table, what restarted (see below) | never |
 | `uiautomator-overflow[:screen,...]` | dumps home, apps, tools, control_center, settings, calls, store; flags nodes wider than the screen, past its edge, or horizontally scrollable | never |
@@ -124,10 +127,19 @@ filtered logcat. Restore is the usual one (official latest, Home on top, dev off
 - **Hard cap per job** (default 20 min, max 30, the protocol's longest hold): the worker's watchdog
   sends SIGTERM (the run restores), then SIGKILL after 5 min; if the run could not restore, the worker
   restores itself before releasing the lock.
+- **Kept awake for the whole job** ([`perflib/awake.py`](perflib/awake.py)): since 1.329 Home's idle timer
+  opens the photo frame (PhotoFramePreviewActivity) 10 s before the screen timeout, and the system starts
+  PhotoDreamService at it. Either one covers Home during untouched waits (rotation windows with 0 frames,
+  "expected HomeActivity", tabs not found). The preflight records `screen_off_timeout` (Settings.System) in
+  the priors and in `priors.json` *before* setting it to never (Integer.MAX_VALUE; the idle timer and the
+  system both treat it as never), and every step starts with one no-op key (left Shift, outside the measured
+  window) that restarts Home's idle count. `stay_on_while_plugged_in` is not used (the Portal resets it
+  within seconds) and Settings.Secure is never touched.
 - **Always restored**, in a `finally` (errors, SIGTERM/SIGINT/SIGHUP): official latest release
   (`gh release download`, sha256 verified on the Mac and on the device), `wm size/density reset`,
   auto-rotate back + fleet `orientation forget`, screensaver test source off, `cc_debug` cleared,
-  STREAM_MUSIC back to its prior value, Home default and on top (`cmd package set-home-activity …`,
+  STREAM_MUSIC back to its prior value, `screen_off_timeout` back to its exact prior (deleted if it was
+  unset; a worker restoring after a killed child reads `priors.json`), Home default and on top (`cmd package set-home-activity …`,
   a dream is woken, never tapped), `fleetctl dev off`, then a verification step.
 - **Never**: force-stop, reboot, `pm clear/uninstall`, `kill`, `svc power`, `logcat -c`; the
   generic shell refuses `screencap`/`screenrecord`.

@@ -5,12 +5,14 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from . import PACKAGE, framestats, meminfo, uidump
+from . import PACKAGE, awake, framestats, meminfo, uidump
 from .builds import install
 from .device import TMP_PREFIX
 from .safety import SafetyRefusal, back_allowed
 
 SETTLE_AFTER_INSTALL_S = 25
+HOME_RELAUNCH_S = 4
+HOME_WINDOW = "/com.immortal.launcher.HomeActivity/android.view.ViewRootImpl"
 MEMINFO_AFTER_S = 5
 POLL_GAP_S = 0.2
 TAB_LABELS = frozenset({"Home", "Apps", "Tools"})
@@ -97,6 +99,10 @@ class Session:
         self.screenshots = []
         self.installs = []
         self.targets = {}
+        # Tap targets per fleet orientation (the tab bar moves when the screen turns); [targets] is the
+        # current orientation's dict. None = whatever the screen was before any orientation request.
+        self._target_sets = {None: self.targets}
+        self._orientation = None
         self.test_source_active = False
         self._screen = None
         self._back_checked = False
@@ -124,8 +130,9 @@ class Session:
         self.installs.append({"build": label, "sha256": sha, "verified": sha == build.sha256,
                               "versionName": self.d.version_name()})
         self.d.runner.sleep(self.opts.settle_s)
+        self._relaunch_home()
         self._ensure_start()
-        self.targets = {}
+        self._forget_targets()
         self._screen = None
         self._actions(self.sc.get("session", []))
 
@@ -151,13 +158,22 @@ class Session:
 
     def _step(self, step, label, rep, n):
         measured = n is not None
-        self._prepare(step["do"])
+        self._prepare(step["do"], after=step.get("pre", ()))
+        awake.nudge(self.d)  # outside the window: keeps the idle frame / dream off Home
         tag = f"{label}-r{rep}-{step['name']}-{n}" if measured else None
         if "poll" in step:
             self._poll_step(step, label, rep, n, tag)
         else:
+            extra = {}
+            if step.get("pre"):
+                # Unmeasured lead-in (e.g. a turn); the window opens [pre_wait] s after it returned.
+                self._actions(step["pre"])
+                turned = self.d.runner.now()
+                self.d.runner.sleep(step.get("pre_wait", 0))
             self.d.gfx_reset()
             self._trace_start(tag)
+            if step.get("pre"):
+                extra["do_after_s"] = round(self.d.runner.now() - turned, 2)
             self._actions(step["do"])
             self.d.runner.sleep(step["wait"])
             text = self.d.framestats()
@@ -165,9 +181,12 @@ class Session:
             if measured:
                 flags = tuple(step.get("flags", (0,)))
                 frames = framestats.parse_frames(text, flags=flags)
+                extra["flags"] = list(flags)
+                if step.get("frame_ms"):
+                    extra["frame_ms"] = [round(f.total_ms, 1) for f in frames]
                 self._sample(label, rep, step["name"], n, framestats.summarize(frames),
                              framestats.parse_hwui(text), self._save(tag + ".framestats.txt", text),
-                             extra={"flags": list(flags)})
+                             extra=extra)
         self._expect(step.get("expect"), step["name"])
         if measured:
             self._actions(step.get("after", []), once_key=f"{label}-{step['name']}")
@@ -226,9 +245,18 @@ class Session:
                 raise ScenarioError(f"unknown action {verb}")
             handler(arg)
 
-    def _prepare(self, actions):
+    def _prepare(self, actions, after=()):
         """Locates tap targets and checks BACK BEFORE the gfxinfo reset, so neither a uiautomator dump
-        nor a dumpsys lands inside a measured window."""
+        nor a dumpsys lands inside a measured window. With [after] (a step's lead-in that turns the
+        screen) the taps happen in the orientation it turns to: their targets must already be known
+        (located in setup), because there is no time for a dump between the turn and the tap."""
+        turn = next((arg for verb, arg in after if verb == "orientation"), None)
+        if turn is not None:
+            known = self._target_sets.get(turn, {})
+            missing = [arg for verb, arg in actions if verb in ("tap_label", "tap_desc") and arg not in known]
+            if missing:
+                raise ScenarioError(f"{missing} not located for {turn} (locate them in setup after turning)")
+            return
         if ("key", "BACK") in actions:
             ok, why = back_allowed(self.d.resumed())
             if not ok:
@@ -295,6 +323,13 @@ class Session:
 
     def _a_orientation(self, request):
         self._a_fleet({"action": "orientation", "request": request})
+        self._orientation = request if request in ("portrait", "landscape") else None
+        self.targets = self._target_sets.setdefault(self._orientation, {})
+
+    def _forget_targets(self):
+        self.targets = {}
+        self._target_sets = {None: self.targets}
+        self._orientation = None
 
     def _a_mini(self, orientation):
         size = {"portrait": "800x1280", "landscape": "1280x800"}[orientation]
@@ -302,7 +337,7 @@ class Session:
         self.d.put_setting("system", "user_rotation", "0")
         self.d.shell(f"wm size {size}; wm density 160")
         self.d.runner.sleep(4)
-        self.targets = {}
+        self._forget_targets()
         self._screen = None
         self._ensure_start()
 
@@ -338,6 +373,20 @@ class Session:
             self.d.go_home()
             self.d.runner.sleep(4)
         self._expect(start, "start")
+
+    def _relaunch_home(self):
+        """The install kills the app, but the activity stack keeps a "resumed" HomeActivity record. The
+        process comes back as a service only, so that record looks fine to `mResumedActivity` while no
+        Home window exists: 0 frames, empty uiautomator dumps. A HOME intent recreates it; the check is
+        that this process really has a Home window (gfxinfo lists it)."""
+        if self.sc.get("start", "HomeActivity") != "HomeActivity":
+            return
+        for _ in range(2):
+            self.d.go_home()
+            self.d.runner.sleep(HOME_RELAUNCH_S)
+            if HOME_WINDOW in self.d.framestats():
+                return
+        raise ScenarioError("after the install no HomeActivity window is drawn by the app process; aborting")
 
     def _expect(self, activity, where):
         if activity is None:

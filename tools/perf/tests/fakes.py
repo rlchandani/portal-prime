@@ -13,6 +13,9 @@ BRANCH_SHA = "b" * 64
 
 
 class FakePortal:
+    TRACKED = frozenset({"screen_off_timeout"})
+    relaunches_home = True  # False: a HOME intent never brings the Home window back
+
     def __init__(self, sha=BRANCH_SHA, music=3, top=HOME_COMPONENT, fail=()):
         self.state = {"sha": sha, "music": music, "top": top, "dev": True, "wm": "2160x1440"}
         self.calls = []        # every argv
@@ -22,6 +25,11 @@ class FakePortal:
         self.slept = 0.0
         self.clock = 1000.0
         self.pending_install_sha = sha
+        # settings the harness may read/write: (namespace, key) -> value; absent = "null"
+        self.settings = {("system", "screen_off_timeout"): "60000"}
+        # gfxinfo lists a Home window once a HOME intent has (re)created it after an install
+        self.home_window = True
+        self.home_intents = 0
 
     # Runner protocol --------------------------------------------------------------------------
     def run(self, argv, timeout=60, cwd=None):
@@ -33,6 +41,7 @@ class FakePortal:
         if argv[0] == "adb" and argv[3] in ("install", "install-multiple"):
             apk = argv[-1] if argv[3] == "install" else argv[-2]
             self.state["sha"] = OFFICIAL_SHA if "official" in apk else BRANCH_SHA
+            self.home_window = False  # the install kills the app; the stale Home record stays "resumed"
             return Proc(0, "Performing Streamed Install\nSuccess\n")
         if argv[0].endswith("fleetctl"):
             return self._fleet(argv[1:-2])
@@ -73,9 +82,22 @@ class FakePortal:
             return Proc(0, "priority=0 preferredOrder=0\n" + HOME_COMPONENT + "\n")
         if "android.intent.category.HOME" in cmd and cmd.startswith("am start"):
             s["top"] = HOME_COMPONENT
+            self.home_intents += 1
+            self.home_window = self.relaunches_home
             return Proc(0, "Starting: Intent")
+        if cmd.endswith("framestats") and "gfxinfo" in cmd:
+            window = f"\t{HOME_COMPONENT}/android.view.ViewRootImpl@1 (visibility=0)\n" if self.home_window else ""
+            return Proc(0, "** Graphics info for pid 4242 [com.immortal.launcher.debug] **\n" + window)
         if "mWakefulness" in cmd:
             return Proc(0, "  mWakefulness=Awake\n")
+        m = re.fullmatch(r"settings (get|put|delete) (\w+) (\w+)(?: (\S+))?", cmd)
+        if m and (m.group(2), m.group(3)) in self.settings or m and m.group(3) in self.TRACKED:
+            verb, ns, key, value = m.groups()
+            if verb == "put":
+                self.settings[(ns, key)] = value
+            elif verb == "delete":
+                self.settings.pop((ns, key), None)
+            return Proc(0, (self.settings.get((ns, key), "null") + "\n") if verb == "get" else "")
         if cmd.startswith("settings get"):
             return Proc(0, "1\n" if "accelerometer" in cmd else "0\n")
         if cmd.startswith("wm size reset"):

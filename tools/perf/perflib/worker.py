@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 
-from . import DEFAULT_FLEETCTL, DEFAULT_RESULTS_ROOT, jobqueue, notes, report
+from . import DEFAULT_FLEETCTL, DEFAULT_RESULTS_ROOT, awake, jobqueue, notes, report
 from .builds import OfficialSource
 from .device import Device
 from .lock import RETRY_S, DeviceLock, holder
@@ -104,7 +104,9 @@ class Worker:
             if result is None or not (result.get("restore") or {}).get("ok"):
                 self.log(f"job {job_id}: child restore missing/incomplete; worker restores the Portal")
                 device = Device(self.serial, lock, self.fleetctl, log=self.log)
-                worker_restore = restore(device, OfficialSource(), (result or {}).get("priors") or {}, self.log)
+                # A child killed before writing result.json still left priors.json (awake.py).
+                priors = (result or {}).get("priors") or awake.load_priors(out_dir)
+                worker_restore = restore(device, OfficialSource(), priors, self.log)
             status = "timeout" if timed_out else (result or {}).get("status", f"crashed (rc {rc})")
             restore_ok = (worker_restore or (result or {}).get("restore") or {}).get("ok", False)
             note_src = dict(result or {"scenario": job["scenario"], "reps": job.get("reps"), "builds": []})

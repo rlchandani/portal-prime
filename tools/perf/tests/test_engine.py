@@ -78,6 +78,31 @@ class EngineTest(unittest.TestCase):
         self.assertTrue(all(not c[3:4] == ["shell"] or "force-stop" not in c[4] for c in portal.calls))
         self.assertTrue(os.path.isdir(os.path.join(s.out, "raw")))
 
+    def test_install_relaunches_home_although_the_stale_record_reads_resumed(self):
+        # after an install the activity stack still says HomeActivity is resumed, but the app has no
+        # Home window until a HOME intent recreates it (0 frames / empty dumps since 1.329 on Family)
+        portal = HomeTabsPortal(sha=OFFICIAL_SHA)
+        s = self._session(portal, "home-tabs", reps=1)
+        s._install("O")
+        self.assertTrue(portal.home_window)
+        self.assertEqual(portal.home_intents, 1)
+        install_at = next(i for i, c in enumerate(portal.calls) if c[3:4] == ["install"])
+        shells_after = [c[4] for c in portal.calls[install_at:] if c[3:4] == ["shell"]]
+        i_intent = next(i for i, c in enumerate(shells_after) if c.startswith("am start") and "HOME" in c)
+        i_check = next(i for i, c in enumerate(shells_after) if c.endswith("framestats"))
+        self.assertLess(i_intent, i_check)
+
+    def test_install_aborts_when_home_never_draws(self):
+        from perflib.engine import ScenarioError
+
+        portal = HomeTabsPortal(sha=OFFICIAL_SHA)
+        portal.relaunches_home = False
+        s = self._session(portal, "home-tabs", reps=1)
+        with self.assertRaises(ScenarioError) as e:
+            s._install("O")
+        self.assertIn("no HomeActivity window", str(e.exception))
+        self.assertEqual(portal.home_intents, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -33,7 +33,7 @@ class RestoreSequenceTest(unittest.TestCase):
         self.assertTrue(r["ok"], r)
         self.assertEqual([s["step"] for s in r["steps"]],
                          ["stop captures", "wm reset", "auto-rotate", "official release", "orientation forget",
-                          "screensaver test source off", "cc_debug cleared", "music volume", "home", "dev off",
+                          "screensaver test source off", "cc_debug cleared", "music volume", "keep-awake off", "home", "dev off",
                           "verify"])
         sh = self.portal.shells
         self.assertIn("wm size reset; wm density reset", sh)
