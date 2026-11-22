@@ -35,6 +35,9 @@ internal fun <T> approvedSettingsLazyProjection(
     groups.forEach { (section, controls) ->
         if (controls.isEmpty()) return@forEach
         val groupId = section ?: "\u0000"
+        // A headed group is spaced by its header (the section gap); only a headerless group after
+        // another needs a card gap. No trailing gap: what follows the rows brings its own spacing.
+        if (section == null && groupIndex > 0) items += ApprovedSettingsLazyItem("$domain:gap:$groupId", ApprovedSettingsLazyKind.GAP)
         if (section != null) items += ApprovedSettingsLazyItem(
             "$domain:header:$groupId", ApprovedSettingsLazyKind.HEADER,
             section = section, firstGroup = groupIndex == 0,
@@ -48,7 +51,6 @@ internal fun <T> approvedSettingsLazyProjection(
                 firstRow = index == 0, lastRow = index == controls.lastIndex,
             )
         }
-        items += ApprovedSettingsLazyItem("$domain:gap:$groupId", ApprovedSettingsLazyKind.GAP)
         groupIndex++
     }
     return ApprovedSettingsLazyProjection(items, indices)

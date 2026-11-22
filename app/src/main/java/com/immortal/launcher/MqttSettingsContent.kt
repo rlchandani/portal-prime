@@ -120,7 +120,7 @@ internal fun MqttContent() {
 
   Column {
       Card {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(horizontal = CardInset, vertical = 18.dp)) {
           Text("Setting it up", color = IosLabel, fontSize = Sizes.rowTitle)
           SetupStep(
               "1",
@@ -137,7 +137,7 @@ internal fun MqttContent() {
       SettingsCardGap()
       Card {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = CardInset, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
           Column(modifier = Modifier.weight(1f)) {
@@ -161,7 +161,7 @@ internal fun MqttContent() {
         if (enabled) {
           Divider()
           Row(
-              modifier = Modifier.fillMaxWidth().padding(18.dp),
+              modifier = Modifier.fillMaxWidth().padding(horizontal = CardInset, vertical = 18.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             OutlinedTextField(
@@ -191,7 +191,7 @@ internal fun MqttContent() {
               label = { Text("Port (default 1883, or 8883 for TLS)") },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 4.dp)
+                      .padding(start = CardInset, end = CardInset, top = 4.dp)
                       .focusRequester(portFocus),
           )
           OutlinedTextField(
@@ -208,7 +208,7 @@ internal fun MqttContent() {
               label = { Text("Username (optional)") },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 8.dp)
+                      .padding(start = CardInset, end = CardInset, top = 8.dp)
                       .focusRequester(userFocus),
           )
           OutlinedTextField(
@@ -225,11 +225,11 @@ internal fun MqttContent() {
               label = { Text("Password (optional)") },
               modifier =
                   Modifier.fillMaxWidth()
-                      .padding(start = 18.dp, end = 18.dp, top = 8.dp)
+                      .padding(start = CardInset, end = CardInset, top = 8.dp)
                       .focusRequester(passFocus),
           )
           Row(
-              modifier = Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 16.dp),
+              modifier = Modifier.fillMaxWidth().padding(start = CardInset, end = CardInset, top = 16.dp),
               verticalAlignment = Alignment.CenterVertically,
           ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -255,22 +255,21 @@ internal fun MqttContent() {
           // no on-device row. It stays applied and the phone remote can still turn it off for a
           // self-signed broker on a trusted network.
           // Live connection status — gives Apply visible feedback (Connecting… → Connected).
-          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)) }
+          error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub, modifier = Modifier.padding(horizontal = CardInset, vertical = 18.dp)) }
           Text(
               status.ifBlank { "Starting…" },
               color = IosBlue,
               fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 12.dp, bottom = 16.dp),
+              modifier = Modifier.padding(start = CardInset, end = CardInset, top = 12.dp, bottom = 16.dp),
           )
         }
       }
-      Text(
+      FooterNote(
           "Connects to a broker on your LAN over plain MQTT or TLS. Your Portal shows up in " +
               "Home Assistant automatically as a device with presence, screen, battery, " +
-              "now-playing and a few controls — no configuration.yaml editing.",
-          color = IosSecondary,
-          fontSize = Sizes.rowSub,
-          modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-      )
+              "now-playing and a few controls — no configuration.yaml editing.")
     }
 }
+
+/** Card content starts on the Settings row-text inset, like every registry row. */
+private val CardInset = SettingsSpacing.TEXT_INSET_DP.dp

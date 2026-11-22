@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.BorderStroke
+import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.ProvideHearthpaneTouchTargets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -89,7 +90,7 @@ internal fun ApprovedSettingsSwitch(
 ) {
     val shape = RoundedCornerShape(20.dp)
     val track = when {
-        colors == null -> if (checked) IosGreen else IosSegmentTrack
+        colors == null -> if (checked) IosGreen else LocalApprovedPalette.current.switchOffTrack
         enabled -> if (checked) colors.checkedTrackColor else colors.uncheckedTrackColor
         checked -> colors.disabledCheckedTrackColor
         else -> colors.disabledUncheckedTrackColor

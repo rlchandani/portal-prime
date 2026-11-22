@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -193,7 +195,8 @@ internal fun SettingsSplitShell(
     // Entry is staged over three frames (see [SettingsOpenStage]): the first frame is the shell's
     // own backdrops, then the master column, then the page. Each pane keeps its final position.
     CompositionLocalProvider(LocalApprovedEnableAdvanced provides { consent = true },
-        LocalSettingsSinglePane provides singlePane) {
+        LocalSettingsSinglePane provides singlePane,
+        LocalTextStyle provides LocalTextStyle.current.copy(lineBreak = SettingsLineBreak)) {
         if (!singlePane) {
             Row(Modifier.fillMaxSize().background(IosBackground)) {
                 if (stage.showsMaster) master(Modifier.width(sidebarWidth))
@@ -246,6 +249,25 @@ internal fun settingsBackLabel(parent: String?, widthDp: Int): String {
     return if (label.length * BACK_LABEL_DP_PER_CHAR + BACK_BUTTON_CHROME_DP <= widthDp) label else "Back"
 }
 
+/**
+ * Width (dp) of the single-pane title, centred between equal margins that clear the back button.
+ * The margin is the back label's own width (capped at [sideDp]), not the whole cap: once the label
+ * has become "Back", "Open when you tap to exit" fits instead of ending in "…".
+ */
+internal fun settingsSinglePaneTitleMaxWidthDp(widthDp: Int, sideDp: Int, backLabel: String?): Int {
+    val back = backLabel?.let { minOf(sideDp, it.length * BACK_LABEL_DP_PER_CHAR + BACK_BUTTON_CHROME_DP) } ?: 0
+    return (widthDp - back * 2 - TITLE_BACK_GAP_DP).coerceAtLeast(0)
+}
+
+/**
+ * Settings text breaks into balanced lines: a wrapped help, footer or title never leaves its last
+ * word alone on a line ("…share / link.", "…switch it back / on."). One-line text is unaffected.
+ */
+internal val SettingsLineBreak = LineBreak.Simple.copy(strategy = LineBreak.Strategy.Balanced)
+
+/** Air between the back button and the centred title (dp). */
+internal const val TITLE_BACK_GAP_DP = 16
+
 /** Back button with the parent's name (≤ 40%), and the page title centred (≤ 50%), like iPadOS. */
 @Composable
 private fun SettingsNavBar(heading: SettingsDetailHeading) {
@@ -255,13 +277,14 @@ private fun SettingsNavBar(heading: SettingsDetailHeading) {
         BoxWithConstraints(Modifier.fillMaxWidth().height(NavBarHeight).padding(horizontal = 20.dp),
             contentAlignment = Alignment.CenterStart) {
             val side = maxWidth * SINGLE_PANE_BACK_FRACTION
-            if (heading.onBack != null) {
-                ApprovedSettingsBackButton(settingsBackLabel(heading.backTitle, side.value.toInt()), Modifier.widthIn(max = side),
-                    heading.onBack)
+            val backLabel = heading.onBack?.let { settingsBackLabel(heading.backTitle, side.value.toInt()) }
+            if (heading.onBack != null && backLabel != null) {
+                ApprovedSettingsBackButton(backLabel, Modifier.widthIn(max = side), heading.onBack)
             }
             Text(heading.title, color = IosLabel, fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center).widthIn(max = maxWidth - side * 2 - 16.dp))
+                modifier = Modifier.align(Alignment.Center)
+                    .widthIn(max = settingsSinglePaneTitleMaxWidthDp(maxWidth.value.toInt(), side.value.toInt(), backLabel).dp))
         }
         return
     }

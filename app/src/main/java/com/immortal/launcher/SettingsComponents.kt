@@ -10,6 +10,7 @@ package com.immortal.launcher
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -326,37 +327,63 @@ internal fun NavRow(
             it()
             Spacer(Modifier.size(20.dp))
         }
-        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
-            Text(
-                text = title,
-                color = IosLabel,
-                fontSize = Sizes.rowTitle,
-                lineHeight = 34.sp,
-            )
-            val help = subLabel.ifEmpty { LocalApprovedSettingsHelp.current.orEmpty() }
-            if (help.isNotEmpty()) {
-                Text(
-                    text = help,
-                    color = IosSecondary,
-                    fontSize = Sizes.rowSub,
-                    lineHeight = 28.sp,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+        val screenWidthDp = LocalConfiguration.current.screenWidthDp
+        val singlePane = LocalSettingsSinglePane.current
+        val valueCap = settingsRowValueMaxWidthDp(screenWidthDp, singlePane)
+        val help = subLabel.ifEmpty { LocalApprovedSettingsHelp.current.orEmpty() }
+        val compact = SettingsSplitMetrics.compactCards(SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane))
+        if (settingsRowStacksHelp(compact, hasHelp = help.isNotEmpty(), hasValue = value.isNotEmpty())) {
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SettingsTitleValueLayout(valueCap, Modifier.weight(1f)) {
+                        NavRowTitle(title, Modifier.padding(end = 24.dp))
+                        NavRowValue(value)
+                    }
+                    ApprovedSettingsChevron()
+                }
+                NavRowHelp(help)
             }
+        } else {
+            SettingsTitleValueLayout(valueCap, Modifier.weight(1f)) {
+                Column(modifier = Modifier.padding(end = 24.dp)) {
+                    NavRowTitle(title)
+                    if (help.isNotEmpty()) NavRowHelp(help)
+                }
+                if (value.isNotEmpty()) NavRowValue(value)
+            }
+            ApprovedSettingsChevron()
         }
-        if (value.isNotEmpty()) {
-            Text(
-                text = value,
-                color = IosSecondary,
-                fontSize = Sizes.rowValue,
-                maxLines = 2,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.widthIn(max = settingsRowValueMaxWidthDp(
-                    LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current).dp).padding(end = 20.dp),
-            )
-        }
-        ApprovedSettingsChevron()
     }
+}
+
+/**
+ * On the Mini's cards a row with both help and a trailing value puts the value on the title's line
+ * and lets the help take the card's width; beside the value the help was a nine-line column.
+ */
+internal fun settingsRowStacksHelp(compactCards: Boolean, hasHelp: Boolean, hasValue: Boolean): Boolean =
+    compactCards && hasHelp && hasValue
+
+@Composable
+private fun NavRowTitle(title: String, modifier: Modifier = Modifier) {
+    Text(text = title, color = IosLabel, fontSize = Sizes.rowTitle, lineHeight = 34.sp, modifier = modifier)
+}
+
+@Composable
+private fun NavRowHelp(help: String) {
+    Text(text = help, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 28.sp,
+        modifier = Modifier.padding(top = 8.dp))
+}
+
+@Composable
+private fun NavRowValue(value: String) {
+    Text(
+        text = value,
+        color = IosSecondary,
+        fontSize = Sizes.rowValue,
+        maxLines = 2,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        modifier = Modifier.padding(end = 20.dp),
+    )
 }
 
 /** A row's trailing value takes at most this much of the card so the title keeps its line. */
@@ -566,13 +593,20 @@ internal fun Stepper(
     }
 }
 
+private val StepperButtonShape = RoundedCornerShape(9.dp)
+
 @Composable
 private fun StepperButton(glyph: String, rowFocused: Boolean, enabled: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(width = 68.dp, height = 68.dp)
-            .clip(RoundedCornerShape(9.dp))
-            .background(if (rowFocused) IosFocusTint else IosBackground)
+            .clip(StepperButtonShape)
+            // On a focused row the buttons take the card colour, not the row's tint, so they stay
+            // visible; in day theme they also carry the card trim (page grey on white was 1.1:1).
+            .background(if (rowFocused) IosCard else IosBackground)
+            .then(LocalApprovedPalette.current.let { palette ->
+                if (palette.dark) Modifier else Modifier.border(ApprovedOutlineWidth, palette.outline, StepperButtonShape)
+            })
             .focusProperties { canFocus = false }
             .then(if (enabled) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier.semantics { disabled() }),
         contentAlignment = Alignment.Center,

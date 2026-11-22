@@ -109,7 +109,8 @@ private fun WallpaperBackdrop(mode: String, photo: ImageBitmap?) {
 
 @Composable
 private fun MiniHome(time: String, greeting: String) {
-    Column(Modifier.fillMaxSize().padding(horizontal = 26.dp, vertical = 30.dp), verticalArrangement = Arrangement.SpaceBetween) {
+    Column(Modifier.fillMaxSize().padding(start = 26.dp, end = 26.dp, top = PreviewCaptionClearance, bottom = 30.dp),
+        verticalArrangement = Arrangement.SpaceBetween) {
         Row(Modifier.fillMaxWidth().fillMaxHeight(WIDGET_HEIGHT)) {
             Column(Modifier.weight(CLOCK_WIDGET_WEIGHT).fillMaxHeight().background(WidgetFill, WidgetShape)
                 .padding(horizontal = 20.dp, vertical = 14.dp)) {

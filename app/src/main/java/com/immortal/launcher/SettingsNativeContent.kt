@@ -234,11 +234,7 @@ internal fun QuickButtonsSection() {
   SettingsList(SettingsDomains.quickbar, settings) { k, v ->
     SettingsDomains.quickbar.apply(context, JSONObject().put(k, v))
   }
-  Text(
+  FooterNote(
       "Needs the accessibility-based top-bar watch enabled during setup. The switcher shows your " +
-          "recently used apps; tap one to switch.",
-      color = IosSecondary,
-      fontSize = Sizes.rowSub,
-      modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp),
-  )
+          "recently used apps; tap one to switch.")
 }

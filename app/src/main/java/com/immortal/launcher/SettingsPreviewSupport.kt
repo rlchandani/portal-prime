@@ -147,6 +147,9 @@ internal val PreviewShape = RoundedCornerShape(26.dp)
 private val PreviewBackdrop = Color(0xFF111111)
 private val PreviewChipFill = Color(0x73000000)
 private val PreviewChipShape = RoundedCornerShape(14.dp)
+/** Height a [PreviewStage] caption chip occupies from the stage's top edge (18 dp inset + chip + 12 dp air):
+ * content drawn as a miniature screen starts below it so the chip never covers a widget. */
+internal val PreviewCaptionClearance = 72.dp
 
 /** A rounded live-preview stage of [aspect], dark until its picture arrives, with a caption chip. */
 @Composable

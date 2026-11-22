@@ -43,7 +43,10 @@ internal const val SETTINGS_HIGHLIGHT_MS = 2_600L
 private const val SETTINGS_HIGHLIGHT_HOLD = .3f
 private const val HIGHLIGHT_ALPHA = .3f
 private val SectionInset = SettingsSpacing.TEXT_INSET_DP.dp
-private val AdvancedBadgeColor = Color(0xFFE8A23A)
+internal val AdvancedBadgeColor = Color(0xFFE8A23A)
+/** Day-theme badge text: 4.5:1 on the badge's amber wash over a white card (#C47D12 was 2.6:1). */
+internal val AdvancedBadgeDayText = Color(0xFF8F5A0B)
+internal const val ADVANCED_BADGE_FILL_ALPHA = .22f
 
 /** Section title above a card, with an ADV badge for Advanced-only sections. */
 @Composable
@@ -57,9 +60,9 @@ internal fun SettingsSectionHeader(text: String, advanced: Boolean) {
 
 @Composable
 internal fun SettingsAdvancedBadge() {
-    Text("ADV", color = if (LocalApprovedPalette.current.dark) AdvancedBadgeColor else Color(0xFFC47D12),
+    Text("ADV", color = if (LocalApprovedPalette.current.dark) AdvancedBadgeColor else AdvancedBadgeDayText,
         fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp,
-        modifier = Modifier.background(AdvancedBadgeColor.copy(alpha = .22f), RoundedCornerShape(7.dp))
+        modifier = Modifier.background(AdvancedBadgeColor.copy(alpha = ADVANCED_BADGE_FILL_ALPHA), RoundedCornerShape(7.dp))
             .padding(horizontal = 9.dp, vertical = 3.dp))
 }
 
