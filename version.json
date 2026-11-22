@@ -2,5 +2,5 @@
   "versionCode": 322,
   "versionName": "1.328",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Settings polish (consistent Remove and lock styles, a proper Save button, aligned chips, readable values, its own Wallpaper icon, About header, clearer light-theme switches) and smoother Polaroid screensaver changes."
+  "notes": "Settings polish (consistent Remove and lock styles, a proper Save button, aligned chips, readable values, its own Wallpaper icon, About header, clearer light-theme switches), smoother Polaroid screensaver changes, and Control Center opens with about half the stutter."
 }
