@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -65,11 +67,12 @@ internal fun MusicV3IdleResumeCard(layout: MusicStageLayout, inputs: MusicV3Idle
         }
         Kicker(MusicV3Glyph.FOLLOW, null, follow.line, ember = true)
         Title(follow.title)
-        Row(Modifier.padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-          MusicStagePill(MusicV3StageCopy.CONTINUE, style = MusicPillStyle.EMBER, glyph = MusicV3Glyph.PLAY) {
-            MusicV3FollowMeInScreen.answer(follow, continueHere = true)
+        // The compact card is ~270-320 dp inside: Not now turns into a round ✕ rather than being clipped.
+        BoxWithConstraints(Modifier.padding(top = 26.dp)) {
+          val answer = MusicPillFit.answer(maxWidth.value.toDouble(), dims, ANSWER_GAP_DP, fontScale = LocalDensity.current.fontScale)
+          Row(horizontalArrangement = Arrangement.spacedBy(ANSWER_GAP_DP.dp), verticalAlignment = Alignment.CenterVertically) {
+            MusicFollowAnswers(follow, answer)
           }
-          MusicStagePill(MusicV3StageCopy.NOT_NOW) { MusicV3FollowMeInScreen.answer(follow, continueHere = false) }
         }
       }
       last != null -> {
@@ -146,3 +149,5 @@ private fun Title(text: String) {
   Text(text, color = ink.ink, fontSize = (dims.title * 0.62f).sp, lineHeight = (dims.title * 0.68f).sp,
       fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 8.dp))
 }
+
+private const val ANSWER_GAP_DP = 14.0

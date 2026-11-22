@@ -150,13 +150,55 @@ internal fun DinnerGlyph(name: String, size: Int, tint: Color = DinnerColors.Gly
 
 @Composable
 private fun SheetHeader(title: String, line: String, lineIcon: String, warn: Boolean, trailing: @Composable () -> Unit) {
-  Row(Modifier.fillMaxWidth().padding(bottom = 32.dp), verticalAlignment = Alignment.CenterVertically) {
-    Text(title, color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+  val lineRow: @Composable (Modifier) -> Unit = { m ->
     Icon(painterResource(DinnerIcons.resource(lineIcon)), null, tint = if (warn) DinnerColors.Bad else ApprovedHomePalette.Secondary,
         modifier = Modifier.size(28.dp))
     Text(line, color = if (warn) DinnerColors.Bad else ApprovedHomePalette.Secondary, fontSize = 24.sp,
-        modifier = Modifier.padding(start = 14.dp, end = 32.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        modifier = m, maxLines = 1, overflow = TextOverflow.Ellipsis)
+  }
+  if (currentLayoutClass().compactPortrait) {
+    // The Mini upright: who it reaches gets its own line under the title instead of ~200 dp beside it.
+    Column(Modifier.fillMaxWidth().padding(bottom = 28.dp)) {
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium,
+            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        trailing()
+      }
+      Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        lineRow(Modifier.weight(1f).padding(start = 14.dp))
+      }
+    }
+    return
+  }
+  Row(Modifier.fillMaxWidth().padding(bottom = 32.dp), verticalAlignment = Alignment.CenterVertically) {
+    Text(title, color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+    lineRow(Modifier.padding(start = 14.dp, end = 32.dp))
     trailing()
+  }
+}
+
+/**
+ * The preset tiles' grid and size per window (pure, JVM-tested). The Portal+ keeps its 3 × 2 grid
+ * of tall tiles; the Mini upright gets 2 × 3 (three tiles left ~130 dp for 44 sp words), the Mini
+ * turned keeps 3 × 2 with the glyph beside the words (its ~100 dp tall tiles can't stack them).
+ */
+internal object DinnerPresetLayout {
+  data class Tile(val columns: Int, val padding: Int, val glyph: Int, val textSp: Int, val lineSp: Int, val glyphBeside: Boolean)
+
+  val LARGE = Tile(columns = 3, padding = 40, glyph = 132, textSp = 44, lineSp = 52, glyphBeside = false)
+  val PORTRAIT = Tile(columns = 2, padding = 28, glyph = 96, textSp = 36, lineSp = 44, glyphBeside = false)
+  val LANDSCAPE = Tile(columns = 3, padding = 18, glyph = 64, textSp = 30, lineSp = 36, glyphBeside = true)
+
+  fun of(cls: LayoutClass): Tile = when (cls) {
+    LayoutClass.LARGE -> LARGE
+    LayoutClass.COMPACT_PORTRAIT -> PORTRAIT
+    LayoutClass.COMPACT_LANDSCAPE -> LANDSCAPE
+  }
+
+  /** Width left for a tile's words in a pane [paneDp] wide with [gapDp] between tiles. */
+  fun textWidth(tile: Tile, paneDp: Int, gapDp: Int = 18): Int {
+    val tileW = (paneDp - gapDp * (tile.columns - 1)) / tile.columns
+    return tileW - 2 * tile.padding - if (tile.glyphBeside) tile.glyph + 18 else 0
   }
 }
 
@@ -175,26 +217,43 @@ private fun DinnerPresetPane(
 ) {
   Column(Modifier.fillMaxSize()) {
     SheetHeader("Call everyone", toLine, if (offline) "wifi" else "display", warn = offline) { RoundButton("x", "Close", onClose) }
-    DinnerPresets.all.chunked(3).forEach { row ->
+    val layout = currentLayoutClass()
+    val tile = DinnerPresetLayout.of(layout)
+    DinnerPresets.all.chunked(tile.columns).forEach { row ->
       Row(Modifier.fillMaxWidth().weight(1f).padding(bottom = 18.dp), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
         row.forEach { preset ->
           val message = DinnerMessage.preset(preset.id)!!
           val shape = RoundedCornerShape(30.dp)
-          Column(Modifier.weight(1f).fillMaxHeight().clip(shape).background(ApprovedHomePalette.Card)
+          val tileModifier = Modifier.weight(1f).fillMaxHeight().clip(shape).background(ApprovedHomePalette.Card)
               .border(1.dp, ApprovedHomePalette.Border, shape)
               .tvFocusable(shape, enabled = enabled, onLongClick = { onPreview(message) }) { onPreset(message) }
-              .padding(40.dp), verticalArrangement = Arrangement.Center) {
-            DinnerGlyph(preset.icon, 132)
-            Spacer(Modifier.height(30.dp))
-            Text(preset.text, color = ApprovedHomePalette.Text.copy(alpha = if (enabled) 1f else .4f), fontSize = 44.sp,
-                lineHeight = 52.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+              .padding(tile.padding.dp)
+          val words: @Composable () -> Unit = {
+            Text(preset.text, color = ApprovedHomePalette.Text.copy(alpha = if (enabled) 1f else .4f), fontSize = tile.textSp.sp,
+                lineHeight = tile.lineSp.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+          }
+          if (tile.glyphBeside) Row(tileModifier, verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+            DinnerGlyph(preset.icon, tile.glyph)
+            words()
+          } else Column(tileModifier, verticalArrangement = Arrangement.Center) {
+            DinnerGlyph(preset.icon, tile.glyph)
+            Spacer(Modifier.height(if (layout.compact) 20.dp else 30.dp))
+            words()
           }
         }
       }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-      CallRow("keyboard", "Type a message", "Up to ${DinnerMessage.MAX_CUSTOM} characters", enabled, Modifier.weight(1f), onCompose)
-      CallRow("bell", "Ping", "Just the chime, no words", enabled, Modifier.weight(1f), onPing)
+    val type: @Composable (Modifier) -> Unit = {
+      CallRow("keyboard", "Type a message", "Up to ${DinnerMessage.MAX_CUSTOM} characters", enabled, it, onCompose)
+    }
+    val ping: @Composable (Modifier) -> Unit = { CallRow("bell", "Ping", "Just the chime, no words", enabled, it, onPing) }
+    if (layout.compactPortrait) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+      type(Modifier.fillMaxWidth())
+      ping(Modifier.fillMaxWidth())
+    } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+      type(Modifier.weight(1f))
+      ping(Modifier.weight(1f))
     }
     Text("Touch and hold a message to hear it here first.", color = ApprovedHomePalette.Secondary, fontSize = 22.sp,
         modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 22.dp))
@@ -208,8 +267,9 @@ private fun CallRow(icon: String, title: String, detail: String, enabled: Boolea
       .padding(horizontal = 30.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically) {
     DinnerGlyph(icon, 76, tint = ApprovedHomePalette.Text, background = ApprovedHomePalette.Chrome)
     Column(Modifier.padding(start = 24.dp)) {
-      Text(title, color = ApprovedHomePalette.Text, fontSize = 30.sp, fontWeight = FontWeight.Medium)
-      Text(detail, color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
+      Text(title, color = ApprovedHomePalette.Text, fontSize = 30.sp, fontWeight = FontWeight.Medium,
+          maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(detail, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
   }
 }

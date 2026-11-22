@@ -8,15 +8,15 @@ package com.immortal.launcher
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +36,7 @@ private const val PAUSE_ONE_HOUR_MS = 60 * 60_000L
  * items stay hidden: a tap is not a face match), "Someone else" returns the shared Home.
  * Nothing here ever changes anyone's face template; corrections are counted in the audit only.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WhosThereNotYouSheet(onSettings: () -> Unit, onDismiss: () -> Unit) {
   val ui by rememberWhosThereUi()
@@ -45,7 +46,8 @@ internal fun WhosThereNotYouSheet(onSettings: () -> Unit, onDismiss: () -> Unit)
     Text(if (thought.isEmpty()) "Tap the right person. Nothing about anyone’s face data changes."
         else "Portal thought this was $thought. Tap the right person — nothing about anyone’s face data changes.",
         color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    // Everyone stays in view: the tiles wrap onto another row instead of scrolling off the edge.
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
       ui.people.forEach { p ->
         PersonTile(p.name, p.role.label, selected = p.id in shown, onClick = { WhosThere.correct(p.id); onDismiss() }) { WhosThereAvatar(p, 88.dp) }
       }
@@ -53,7 +55,7 @@ internal fun WhosThereNotYouSheet(onSettings: () -> Unit, onDismiss: () -> Unit)
         WhosThereAvatar(null, 88.dp)
       }
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       ApprovedHomePillButton("Don’t recognise me for 1 hour") { WhosThere.pauseShown(PAUSE_ONE_HOUR_MS); onDismiss() }
       ApprovedHomePillButton("Recognition settings") { onDismiss(); onSettings() }
     }

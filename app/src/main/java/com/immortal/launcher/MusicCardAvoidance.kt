@@ -20,8 +20,8 @@ internal data class MusicFloatRect(
   val centerY get() = y + height / 2f
 }
 
-/** Horizontal px insets for Home's bottom-centred toasts. */
-internal data class MusicToastInsets(val start: Float, val end: Float) {
+/** Px insets for Home's bottom-centred toasts: beside the card, or lifted above it by [bottom]. */
+internal data class MusicToastInsets(val start: Float, val end: Float, val bottom: Float = 0f) {
   companion object {
     val NONE = MusicToastInsets(0f, 0f)
   }
@@ -35,11 +35,14 @@ internal object MusicCardAvoidance {
   /**
    * Home's bottom toasts occupy the bottom [band] px. When the card reaches into that band they
    * centre in the wider free space left or right of it (with [gap]); otherwise they stay centred.
+   * When that space is narrower than [minWidth] they keep the full width and rise above the card.
    */
-  fun toastInsets(card: MusicFloatRect?, band: Float, gap: Float): MusicToastInsets {
+  fun toastInsets(card: MusicFloatRect?, band: Float, gap: Float, minWidth: Float = 0f): MusicToastInsets {
     if (card == null || card.bottom <= card.areaHeight - band) return MusicToastInsets.NONE
     val left = card.x
     val right = card.areaWidth - card.right
+    // Too narrow beside it (the card spans most of the Mini upright): the toasts sit above it instead.
+    if (maxOf(left, right) - gap < minWidth) return MusicToastInsets(0f, 0f, bottom = card.areaHeight - card.y + gap)
     return if (left >= right) MusicToastInsets(0f, (card.areaWidth - card.x + gap).coerceAtMost(card.areaWidth))
     else MusicToastInsets((card.right + gap).coerceAtMost(card.areaWidth), 0f)
   }

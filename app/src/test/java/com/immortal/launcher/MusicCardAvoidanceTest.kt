@@ -26,6 +26,23 @@ class MusicCardAvoidanceTest {
     assertEquals(MusicToastInsets(50f + 300f + 20f, 0f), MusicCardAvoidance.toastInsets(card(50f, 580f), 200f, 20f))
   }
 
+  @Test fun aCardSpanningTheMiniUprightLiftsToastsAboveItInsteadOfSqueezingThem() {
+    // 800 dp Mini upright (px = dp here): the 752 dp card at x = 24 leaves 24 dp beside it.
+    val mini = MusicFloatRect(24f, 900f, 752f, 256f, areaWidth = 800f, areaHeight = 1180f)
+    assertEquals(MusicToastInsets(0f, 0f, bottom = 1180f - 900f + 24f),
+        MusicCardAvoidance.toastInsets(mini, band = 220f, gap = 24f, minWidth = 480f))
+    // The Portal+ keeps toasts beside the card when the side is wide enough.
+    assertEquals(MusicToastInsets(0f, 1000f - 650f + 20f), MusicCardAvoidance.toastInsets(card(650f, 580f), 200f, 20f, minWidth = 480f))
+  }
+
+  @Test fun theHomeCardStaysInsideTheMiniUpright() {
+    val side = MusicHomeCardDims.sideWidth(areaWidth = 800, inset = 24)
+    assertEquals(MusicHomeCardDims.SIDE_W - 36, side)
+    assertTrue(MusicHomeCardDims.widthOf(MusicHomeCardMode.CARD, side) <= 800 - 2 * 24)
+    assertEquals("wide windows keep the shipped card", MusicHomeCardDims.SIDE_W, MusicHomeCardDims.sideWidth(1280, 24))
+    assertEquals(MusicHomeCardDims.SIDE_W, MusicHomeCardDims.sideWidth(1920, 24))
+  }
+
   @Test fun notificationsKeepTheirEdgeWithoutTheHomeCard() {
     assertTrue(MusicCardAvoidance.notificationAtBottom(true, null, card(0f, 580f)))
     assertTrue(MusicCardAvoidance.notificationAtBottom(true, MusicPlayerHostKind.MUSIC_SCREEN, card(0f, 580f)))

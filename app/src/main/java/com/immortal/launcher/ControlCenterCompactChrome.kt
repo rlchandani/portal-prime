@@ -11,10 +11,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -27,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -65,9 +69,13 @@ internal fun CcCompactHeader(h: CcHeaderSlice, heading: CcHeadingInputs, ui: CcU
       CompactTitle(heading, ui)
       CompactJarvis(enabled = !h.phase.blocksHome, onJarvis)
     }
-    Row(Modifier.fillMaxWidth().height(64.dp).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      HeaderPills(h, ui)
+    // The pills shorten to fit ([CcCompactHeaderPills]); the scroll is only a safety net.
+    BoxWithConstraints(Modifier.fillMaxWidth().height(64.dp)) {
+      val plan = rememberCcPillPlan(h, maxWidth.value.toDouble(), CcCompactHeaderPills.GAP)
+      Row(Modifier.fillMaxSize().horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(CcCompactHeaderPills.GAP.dp)) {
+        HeaderPills(h, ui, plan)
+      }
     }
   }
 }
@@ -80,27 +88,54 @@ private fun RowScope.CompactTitle(inputs: CcHeadingInputs, ui: CcUi) {
       CcHeadingLine(c.sec, 20.sp, overflow = TextOverflow.Ellipsis), Modifier.weight(1f))
 }
 
+/** Pill variants that fit [available] CC units with [gap] between pills. */
 @Composable
-private fun HeaderPills(h: CcHeaderSlice, ui: CcUi) {
+internal fun rememberCcPillPlan(h: CcHeaderSlice, available: Double, gap: Double): CcCompactHeaderPills.Plan {
+  val fontScale = LocalDensity.current.fontScale
+  return remember(h, available, gap, fontScale) {
+    CcCompactHeaderPills.plan(pillInput(h), available, fontScale, gap)
+  }
+}
+
+private fun CcHeaderSlice.homePeople() = people.filter { it.state == "home" }
+
+private fun pillInput(h: CcHeaderSlice): CcCompactHeaderPills.Input {
+  val home = h.homePeople()
+  return CcCompactHeaderPills.Input(
+      live = ccLiveLabel(h.phase),
+      people = if (h.people.isEmpty()) null else peopleLabel(home.size),
+      peopleAvatars = home.ifEmpty { h.people }.size,
+      alarm = h.alarm?.let { alarmLabel(it.state) },
+      weatherTemp = h.weatherTemp?.let { "$it°" },
+      weatherText = h.weatherText,
+      debug = h.debug)
+}
+
+private fun peopleLabel(home: Int) = if (home == 0) "Nobody home" else "$home home"
+
+@Composable
+private fun HeaderPills(h: CcHeaderSlice, ui: CcUi, plan: CcCompactHeaderPills.Plan) {
   val c = LocalCc.current
   CcLivePill(h.phase)
-  val home = h.people.filter { it.state == "home" }
+  val home = h.homePeople()
   if (h.people.isNotEmpty()) CcPill(CcSpeech.people(home.map { it.name }, h.people.size), onClick = { ui.go(CcScreen.SECURITY) }) {
-    CcAvatars(home.ifEmpty { h.people }.take(4))
-    Text(if (home.isEmpty()) "Nobody home" else "${home.size} home", color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
+    if (plan.avatars > 0) CcAvatars(home.ifEmpty { h.people }.take(plan.avatars))
+    Text(peopleLabel(home.size), color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
   }
   h.alarm?.let { a ->
     val armed = a.state.startsWith("armed")
-    CcPill(CcSpeech.alarm(alarmLabel(a.state)), onClick = { ui.go(CcScreen.SECURITY) }) {
+    val label = alarmLabel(a.state)
+    CcPill(CcSpeech.alarm(label), onClick = { ui.go(CcScreen.SECURITY) }) {
       CcIcon(if (armed) "shieldck" else "shield", if (armed) c.green else c.text, 28.dp)
-      Text(alarmLabel(a.state), color = if (armed) c.green else c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
+      Text(if (plan.alarmShort) CcCompactHeaderPills.shortAlarm(label) else label,
+          color = if (armed) c.green else c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
     }
   }
-  if (h.weatherTemp != null || h.weatherText != null) {
+  plan.weather?.let { shown ->
     val weather = listOfNotNull(h.weatherTemp?.let { "$it°" }, h.weatherText).joinToString(" · ")
     CcPill("Weather $weather") {
       CcIcon(if (h.night) "moon" else "sun", c.text, 28.dp)
-      Text(weather, color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
+      Text(shown, color = c.text, fontSize = 22.sp, maxLines = 1, softWrap = false)
     }
   }
   h.debug?.let { label ->
