@@ -80,6 +80,11 @@ class HomeSpokenTabTest {
     job.cancel()
   }
 
+  @Test fun pagesWakeOnTheirOwnFrameAfterTheAccessibilitySwap() {
+    assertEquals(HOME_TAB_EXPOSE_FRAMES + 1, HOME_TAB_WAKE_FRAMES)
+    assert(HOME_TAB_EXPOSE_FRAMES >= 1) { "The switch frame itself changes no semantics" }
+  }
+
   @Test fun theDockListsTheLauncherTabsInOrder() {
     assertEquals(ApprovedLauncherTab.entries.map { it.id }, HomeDockTabs.map { it.first })
     assertEquals(listOf("Home", "Apps", "Tools"), HomeDockTabs.map { it.second })

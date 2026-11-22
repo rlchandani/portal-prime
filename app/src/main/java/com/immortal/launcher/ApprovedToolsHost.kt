@@ -173,7 +173,7 @@ private fun ToolsLayer(visible: Boolean, content: @Composable () -> Unit) {
             } finally { input.endTouch() }
         }
         .then(if (visible) Modifier else Modifier.clearAndSetSemantics { })) {
-        ApprovedLauncherPageLifecycle(active, input, content)
+        ApprovedLauncherPageLifecycle(active, input, content = content)
     }
 }
 

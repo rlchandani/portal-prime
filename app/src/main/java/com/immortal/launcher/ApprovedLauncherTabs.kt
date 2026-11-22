@@ -21,6 +21,8 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.key
@@ -143,9 +145,11 @@ internal fun ApprovedLauncherTabs(
     contentActive: Boolean = true,
     prefetch: List<ApprovedLauncherTab> = emptyList(),
     spoken: State<ApprovedLauncherTab>? = null,
+    wakeFrames: Int = 0,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
+  val woken = rememberWokenTab(selected, wakeFrames)
   val transition = remember { ApprovedHomeTabTransition(selected) }
   val clock = remember { Animatable(0f) }
   var animation by remember { mutableStateOf<ApprovedHomeTabAnimation?>(null) }
@@ -189,6 +193,9 @@ internal fun ApprovedLauncherTabs(
     ApprovedLauncherTab.entries.filter { it in visited }.forEach { tab ->
       key(tab) {
       val active = contentActive && tab == selected
+      // Page work (lifecycle, producers, cameras, LocalApprovedLauncherPageActive readers) follows
+      // [woken]; input opens only once both agree and closes on the switch itself.
+      val awake = contentActive && tab == woken
       val drawing = contentActive && tab in visible
       val input = remember(hostOwner) { LauncherPageInputGate() }
       val moving = animation?.takeIf { motion -> motion.plan.motions.any { it.tab == tab } }
@@ -217,15 +224,30 @@ internal fun ApprovedLauncherTabs(
             } finally { input.endTouch() }
           }.then(launcherPageSemantics(contentActive && tab == (spoken?.value ?: selected)))) {
         CompositionLocalProvider(
-            LocalApprovedLauncherPageActive provides active,
+            LocalApprovedLauncherPageActive provides awake,
             LocalApprovedLauncherHostOwner provides hostOwner,
         ) {
-          ApprovedLauncherPageLifecycle(active, input) { content(tab) }
+          ApprovedLauncherPageLifecycle(awake, input, inputOpen = awake && active) { content(tab) }
         }
       }
       }
     }
   }
+}
+
+/**
+ * The tab whose page is awake: [selected] itself with no [wakeFrames], else [selected] that many
+ * frames after it changed (Home: [HOME_TAB_WAKE_FRAMES]), so a switch frame starts and stops no page work.
+ */
+@Composable
+private fun rememberWokenTab(selected: ApprovedLauncherTab, wakeFrames: Int): ApprovedLauncherTab {
+  if (wakeFrames <= 0) return selected
+  val woken = remember { mutableStateOf(selected) }
+  val latest = rememberUpdatedState(selected)
+  LaunchedEffect(wakeFrames) {
+    followAfterFrames(snapshotFlow { latest.value }, wakeFrames) { woken.value = it }
+  }
+  return woken.value
 }
 
 /** One shared modifier for every hidden page, so a recomposed hidden page keeps an equal chain. */
@@ -248,6 +270,7 @@ private class LauncherPageOwner : LifecycleOwner {
 internal fun ApprovedLauncherPageLifecycle(
     active: Boolean,
     input: LauncherPageInputGate? = null,
+    inputOpen: Boolean = active,
     content: @Composable () -> Unit,
 ) {
   val host = LocalLifecycleOwner.current
@@ -263,7 +286,7 @@ internal fun ApprovedLauncherPageLifecycle(
     }
   }
   SideEffect {
-    input?.update(active && foreground.isAtLeast(Lifecycle.State.STARTED))
+    input?.update(inputOpen && foreground.isAtLeast(Lifecycle.State.STARTED))
     val state = if (active || foreground <= Lifecycle.State.CREATED) foreground else Lifecycle.State.CREATED
     if (page.registry.currentState != state) page.registry.currentState = state
   }

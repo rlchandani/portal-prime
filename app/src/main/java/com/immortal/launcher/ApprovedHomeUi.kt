@@ -77,11 +77,12 @@ internal fun ApprovedHomeTabs(
     contentActive: Boolean = true,
     prefetch: List<ApprovedLauncherTab> = emptyList(),
     spoken: State<ApprovedLauncherTab>? = null,
+    wakeFrames: Int = 0,
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   // [selected] is read here, not by the caller: a switch recomposes only the tab host.
   if (!BuildConfig.PORTAL_NATIVE_HOME_TABS) {
-    ApprovedLauncherTabs(selected(), modifier, contentActive, prefetch, spoken, content)
+    ApprovedLauncherTabs(selected(), modifier, contentActive, prefetch, spoken, wakeFrames, content)
     return
   }
   val hostOwner = LocalLifecycleOwner.current

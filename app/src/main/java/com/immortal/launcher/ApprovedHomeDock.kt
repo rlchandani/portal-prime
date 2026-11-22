@@ -70,6 +70,12 @@ internal val HomeDockTabs: List<Pair<String, String>> =
 internal const val HOME_TAB_EXPOSE_FRAMES = 2
 
 /**
+ * Frames after a tab switch at which the shown page wakes and the hidden one sleeps (lifecycle,
+ * producers, cameras): one frame after the accessibility swap, so each lands on its own frame.
+ */
+internal const val HOME_TAB_WAKE_FRAMES = HOME_TAB_EXPOSE_FRAMES + 1
+
+/**
  * The tab accessibility services are told about: [shown] after [HOME_TAB_EXPOSE_FRAMES] frames, so a
  * switch frame changes no semantics. Every switch change that accessibility sees (the dock's
  * "selected", which page is in the tree) follows this one state, so it all lands on one quiet frame.
