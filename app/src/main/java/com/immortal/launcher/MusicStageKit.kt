@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -104,18 +106,32 @@ internal fun MusicStageHeading(
     title: String,
     modifier: Modifier = Modifier,
     detail: String? = null,
+    /** The [actions]' estimated widths ([MusicPillFit.pill]); given, they move under the title when they don't fit beside it. */
+    actionWidths: List<Double>? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
   val ink = LocalMusicStageInk.current
   val dims = LocalMusicStageDims.current
-  Row(modifier.fillMaxWidth().heightIn(min = dims.target.dp), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-    Text(title, color = ink.ink, fontSize = dims.heading.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-    Text(detail.orEmpty(), color = ink.muted, fontSize = dims.small.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.weight(1f))
-    actions?.let { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), content = it) }
+  BoxWithConstraints(modifier.fillMaxWidth()) {
+    val titleDp = MusicPillFit.headingWidth(title, dims, LocalDensity.current.fontScale)
+    val beside = actionWidths == null ||
+        MusicPillFit.actionsBeside(maxWidth.value.toDouble(), titleDp + HEADING_GAP_DP, HEADING_DETAIL_MIN_DP, actionWidths, 12.0)
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      Row(Modifier.fillMaxWidth().heightIn(min = dims.target.dp), verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(HEADING_GAP_DP.dp)) {
+        Text(title, color = ink.ink, fontSize = dims.heading.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(detail.orEmpty(), color = ink.muted, fontSize = dims.small.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f))
+        if (beside) actions?.let { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), content = it) }
+      }
+      if (!beside) actions?.let { Row(horizontalArrangement = Arrangement.spacedBy(12.dp), content = it) }
+    }
   }
 }
+
+private const val HEADING_GAP_DP = 16.0
+/** The heading's detail ("128 songs") keeps at least this beside the actions. */
+private const val HEADING_DETAIL_MIN_DP = 110.0
 
 /** Full-area, untinted tap catcher that closes a popover; it sits below the player in z-order. */
 @Composable

@@ -9,8 +9,8 @@ package com.immortal.launcher
 import kotlin.math.abs
 
 /** The pull-up sheet's tabs, in order. */
-internal enum class MusicSheetTab(val label: String) {
-  UP_NEXT("Up next"), LIBRARY("Library"), RECENT("Recently played"), SEARCH("Search"),
+internal enum class MusicSheetTab(val label: String, val shortLabel: String = label) {
+  UP_NEXT("Up next"), LIBRARY("Library"), RECENT("Recently played", "Recent"), SEARCH("Search"),
 }
 
 /** Cards that open over the closed Now Playing (never while the sheet is open). */

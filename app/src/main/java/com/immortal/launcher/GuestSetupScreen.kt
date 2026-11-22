@@ -9,6 +9,9 @@ package com.immortal.launcher
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.Row
@@ -64,26 +67,43 @@ internal fun GuestSettingsContent() {
       message = if (ok) null else "Couldn't save the password or door code. Try again."
     }
   }
-  val preview = GuestCardContent(draft.settings, draft.password, if (draft.doorCodeOn) draft.doorCode else "", card.use24)
-  val flow = @Composable { modifier: Modifier ->
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(28.dp)) {
+  val flow: @Composable (Modifier) -> Unit = { m ->
+    Column(m, verticalArrangement = Arrangement.spacedBy(28.dp)) {
       if (saved) GuestSetupDone(onEdit = { saved = false })
       else GuestSetupFlow(draft, card.use24, message, onDraft = { draft = it; message = null }, onSave = save)
     }
   }
-  val cardWidth = SettingsSplitMetrics.pageContentWidthDp(LocalConfiguration.current.screenWidthDp, LocalSettingsSinglePane.current)
-  if (SettingsSplitMetrics.compactCards(cardWidth)) {
-    // The Mini's cards: the steps get the full width and the preview follows them.
-    Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(40.dp)) {
-      flow(Modifier.fillMaxWidth())
-      GuestSetupPreview(preview)
-    }
-  } else {
-    Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(40.dp)) {
-      flow(Modifier.weight(1f))
-      GuestSetupPreview(preview)
+  val preview: @Composable () -> Unit = {
+    GuestSetupPreview(GuestCardContent(draft.settings, draft.password, if (draft.doorCodeOn) draft.doorCode else "", card.use24))
+  }
+  val layoutClass = currentLayoutClass()
+  BoxWithConstraints(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+    if (GuestSetupLayout.sideBySide(layoutClass, maxWidth.value.toDouble())) {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(GuestSetupLayout.GAP_DP.dp)) {
+        flow(Modifier.weight(1f))
+        preview()
+      }
+    } else {
+      // Compact: the steps get the full width (the door-code pad needs ~550 dp) and the preview follows.
+      Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(GuestSetupLayout.GAP_DP.dp)) {
+        flow(Modifier.fillMaxWidth())
+        preview()
+      }
     }
   }
+}
+
+/** Whether the guest setup keeps its preview beside the steps (pure, JVM-tested). */
+internal object GuestSetupLayout {
+  const val PREVIEW_DP = 420
+  const val GAP_DP = 40
+
+  /** The steps' widest part: the door-code pad (3 × 76 dp keys + gaps) beside its 40 sp value. */
+  const val FLOW_MIN_DP = 560
+
+  /** The Portal+ always keeps the shipped side-by-side split; compact windows stack when it doesn't fit. */
+  fun sideBySide(cls: LayoutClass, widthDp: Double): Boolean =
+      !cls.compact || widthDp >= PREVIEW_DP + GAP_DP + FLOW_MIN_DP
 }
 
 
@@ -118,6 +138,7 @@ private fun GuestFinishStep(draft: GuestSetupDraft) {
       else "A step still needs something. Tap it above to finish it.")
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun GuestSetupDone(onEdit: () -> Unit) {
   val context = LocalContext.current
@@ -128,7 +149,7 @@ private fun GuestSetupDone(onEdit: () -> Unit) {
   GuestHint(if (on) "Guest mode is on. ${guestUntilLabel(mode)}."
       else "To start Guest mode, open the card from Home or Tools → Guests and choose how long guests are staying. " +
           "Guest mode hides photos, calendar, notes and your music library.")
-  Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+  FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
     ToolsButton("Open the guest card", primary = true) { GuestEntry.openCard(context) }
     ToolsButton("Edit again", onClick = onEdit)
     if (on) ToolsButton("End Guest mode") { GuestFeature.end(context) }
@@ -139,7 +160,7 @@ private fun GuestSetupDone(onEdit: () -> Unit) {
 @Composable
 private fun GuestSetupPreview(content: GuestCardContent) {
   val shape = RoundedCornerShape(28.dp)
-  Column(Modifier.width(PREVIEW_WIDTH).clip(shape).background(ApprovedHomePalette.Background).approvedOutline(shape)
+  Column(Modifier.width(GuestSetupLayout.PREVIEW_DP.dp).clip(shape).background(ApprovedHomePalette.Background).approvedOutline(shape)
       .padding(28.dp), verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.Start) {
     GuestLabel("Preview")
     GuestQr(content.network, size = PREVIEW_QR)
@@ -147,7 +168,6 @@ private fun GuestSetupPreview(content: GuestCardContent) {
   }
 }
 
-private val PREVIEW_WIDTH = 420.dp
 private val PREVIEW_QR = 260.dp
 
 /** Writes a finished setup; false when a secret couldn't be stored (non-secret values still apply). */

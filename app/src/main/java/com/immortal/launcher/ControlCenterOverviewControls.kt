@@ -37,18 +37,38 @@ import androidx.compose.ui.unit.sp
 @Composable
 internal fun CcPlanTopRow(floors: CcFloorTabs, floorId: String, lens: CcLens, onFloor: (String) -> Unit, onLens: (CcLens) -> Unit,
                           style3d: Boolean, onStyle: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-  val portrait = currentLayoutClass().compactPortrait
-  Row(modifier, horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+  val layout = currentLayoutClass()
+  val portrait = layout.compactPortrait
+  val floorTabs: @Composable (Modifier?) -> Unit = { scrollIn ->
     if (floors.tabs.size > 1) {
       val options = remember(floors) { floors.tabs.map { Triple(it.id, it.label, null as String?) } }
-      // Narrow (Mini upright): the floor tabs take what the lens and style leave and scroll sideways if needed.
-      if (portrait) CcScrollingSeg(floorId, Modifier.weight(1f, fill = false)) { inView ->
+      // Narrow: the floor tabs take what the other switches leave and scroll sideways (with fades) if needed.
+      if (scrollIn != null) CcScrollingSeg(floorId, scrollIn) { inView ->
         CcSeg(options, floorId, onFloor, selectedModifier = inView)
       } else CcSeg(options, floorId, onFloor)
     }
-    CcSeg(LENSES, lens, onLens)
-    // The mock's `.planTop`: the style switch sits at the far end; upright it drops its icons to fit.
-    if (!portrait) androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+  }
+  Row(modifier, horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+    when {
+      portrait -> {
+        floorTabs(Modifier.weight(1f, fill = false))
+        CcSeg(LENSES, lens, onLens)
+      }
+      // Mini turned: the same look as the Portal+ when everything fits; three or more floors no
+      // longer push the style switch past the card's edge.
+      layout.compactLandscape -> Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(14.dp),
+          verticalAlignment = Alignment.CenterVertically) {
+        floorTabs(Modifier.weight(1f, fill = false))
+        CcSeg(LENSES, lens, onLens)
+      }
+      else -> {
+        floorTabs(null)
+        CcSeg(LENSES, lens, onLens)
+        // The mock's `.planTop`: the style switch sits at the far end.
+        androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+      }
+    }
+    // Upright the style switch drops its icons to fit.
     CcSeg(if (portrait) STYLES_NARROW else STYLES, style3d, onStyle)
   }
 }

@@ -10,9 +10,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -227,7 +229,17 @@ private fun CompactToolWorkspace(
 private fun ToolsTabStrip(selectedTool: ApprovedTool, advanced: Boolean, onSelect: (ApprovedTool) -> Unit) {
     val tools = remember(advanced) { ApprovedToolsCatalog.visible(advanced) }
     val p = LocalApprovedPalette.current
-    LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
+    // An intentional strip (14 tools never fit 800 dp); it opens on the selected tool and keeps a
+    // newly selected one in view, so the current tab is never off to the side.
+    val selectedIndex = tools.indexOfFirst { it.id == selectedTool.id }.coerceAtLeast(0)
+    val strip = rememberLazyListState(initialFirstVisibleItemIndex = selectedIndex)
+    LaunchedEffect(selectedIndex) {
+        val visible = strip.layoutInfo.visibleItemsInfo
+        val full = visible.any { it.index == selectedIndex && it.offset >= 0 &&
+            it.offset + it.size <= strip.layoutInfo.viewportEndOffset }
+        if (!full) strip.animateScrollToItem(selectedIndex)
+    }
+    LazyRow(Modifier.fillMaxWidth(), state = strip, horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)) {
         items(tools, key = { it.id }) { tool ->
             val selected = selectedTool.id == tool.id
@@ -381,25 +393,27 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
                 }
             }
             item(key = "categories", span = { GridItemSpan(maxLineSpan) }) {
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ApprovedToolsCatalog.categories(advanced).forEach { category ->
-                        val selected = selectedGroup == category
-                        val shape = RoundedCornerShape(16.dp)
-                        Box(Modifier.heightIn(min = 68.dp).clip(shape)
-                            .background(if (selected) p.surface2 else Color.Transparent)
-                            .then(if (selected) Modifier.border(1.dp, p.divider, shape) else Modifier)
-                            .semantics { this.selected = selected; role = Role.Tab }
-                            .tvFocusable(shape, focusScale = 1f, ringColor = p.accent) { group = category },
-                            contentAlignment = Alignment.Center) {
-                            Text(category, color = if (selected) p.text else p.secondary,
-                                fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp))
-                            if (selected) Column(Modifier.matchParentSize()) {
-                                Spacer(Modifier.weight(1f))
-                                Box(Modifier.fillMaxWidth().height(3.dp).background(p.accent))
+                val categories = ApprovedToolsCatalog.categories(advanced)
+                val padding = if (layoutClass.compact) ToolsCategoryLayout.CHIP_PADDING_DP.dp else 24.dp
+                val chip: @Composable (String) -> Unit = { category ->
+                    ToolsCategoryChip(category, selectedGroup == category, padding) { group = category }
+                }
+                if (layoutClass.compact) {
+                    // Compact: the chips wrap onto a second line instead of scrolling sideways.
+                    val fontScale = LocalDensity.current.fontScale
+                    val rows = ToolsCategoryLayout.rows(categories, maxWidth.value.toDouble(), fontScale)
+                    Column(Modifier.fillMaxWidth().padding(ToolsCategoryLayout.INSET_DP.dp),
+                        verticalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.GAP_DP.dp)) {
+                        rows.forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.GAP_DP.dp)) {
+                                row.forEach { chip(categories[it]) }
                             }
                         }
+                    }
+                } else {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        categories.forEach { chip(it) }
                     }
                 }
             }
@@ -471,4 +485,25 @@ private fun toolsDefaultSummary(id: String): String = when (id) {
     "iss" -> "Passes over your location"
     "aurora" -> "Planetary K-index"
     else -> "Run only when needed"
+}
+
+/** One category filter chip in the Tools library (underlined when selected). */
+@Composable
+private fun ToolsCategoryChip(category: String, selected: Boolean, padding: Dp, onSelect: () -> Unit) {
+    val p = LocalApprovedPalette.current
+    val shape = RoundedCornerShape(16.dp)
+    Box(Modifier.heightIn(min = 68.dp).clip(shape)
+        .background(if (selected) p.surface2 else Color.Transparent)
+        .then(if (selected) Modifier.border(1.dp, p.divider, shape) else Modifier)
+        .semantics { this.selected = selected; role = Role.Tab }
+        .tvFocusable(shape, focusScale = 1f, ringColor = p.accent, onClick = onSelect),
+        contentAlignment = Alignment.Center) {
+        Text(category, color = if (selected) p.text else p.secondary,
+            fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+            modifier = Modifier.padding(horizontal = padding, vertical = 16.dp))
+        if (selected) Column(Modifier.matchParentSize()) {
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.fillMaxWidth().height(3.dp).background(p.accent))
+        }
+    }
 }
