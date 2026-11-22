@@ -714,3 +714,47 @@ transparent or not.
 - **The remaining household change cost belongs to the other modes** (Mosaic, Cinema, Hero + Sidebar, Panorama, the native Filmstrip handoff). A branch trace of one household change (no `photo_strips`) had a 310 ms frame whose time went to `prepareTree` (147 ms) and `flush layers` (96 ms) of a native `FrameLayout` layer, with `kswapd0` busy 97 ms. The GPU thread had 25 ms. That frame is native view work, not WebView upload. Mosaic, Hero + Sidebar, Cinema and Filmstrip still get their former copies (no drawn size), which is the next target.
 - **Memory:** running PSS was 378–394 MB in B1 and B2 against 268–290 MB on 1.313, and 273 MB in B3. +70 s was back at the Home level on every run (192–219 vs 203–210). No fill canvas existed in those runs, so the B1/B2 peaks are not band canvases. They match the 409–413 MB peaks seen in earlier rounds (1.306 A r2, B r3; `engine-upload-2` C r3). A painted fill canvas is the 2400 × 1600 crop (~15 MB) in place of the CSS background's decoded image and raster tiles. At most two exist (incoming and outgoing), and a retired one is zeroed at once.
 - **Verdict:** the mechanism works on the device. Bands upload a slice per frame, the dissolve composites without an upload, and on the test scenes no frame exceeded 28 ms against 35–54 ms on 1.313. On household photos it is not yet measured, because the 40 s method never landed on a fill single. Measuring it needs a longer window or several changes per run, which is a method change for the owner to approve. Device left on official 1.313.
+
+## Screensaver photo change by mode, long window (branch `engine-modes`)
+
+**Question:** which modes cost what at a household change, measured with a window long enough to see most modes; and what is the native layer in the 310 ms frame of the round-3 trace?
+
+**Method (new: long window).** The household's own `shuffle` screensaver, settings unchanged, no test source, real dream through `Somnambulator`, about 5 minutes per run (~9–10 beats at the household's 30 s interval). Framestats were polled back to back (about 1.3 polls/s) and deduplicated by `IntendedVsync`. Each beat was attributed to its mode by the engine's `photo_beat <mode>` console line (logcat `-v monotonic`, the same clock as framestats). "Change" is the frames from 0.5 s before a beat's log line to 3 s after it. The first beat of each run (the dream start) is left out. Each build got Home, ~50 s idle and one unmeasured 40 s warm-up dream before its run. Installs were plain `adb install -r` (`-d` for the branch, which carries the 1.313 version name). STREAM_MUSIC was set to 0 and restored to 3. No screenshots. Builds: O = official 1.313 (sha256 verified); M = local `main` `assemblePerformance` (= 1.314); N = official 1.314 (sha256 verified; same code as M, a release build); B = this branch, 3 runs (B2 and B3 under `atrace gfx view --async`). 1.313 has no `photo_beat` line, so O is unattributed. Mode order is random, so each mode got 0–4 changes per build.
+
+**Household finding first:** every Ken Burns, Push and Memories beat in 6 runs was a **pair** (`photo_plan pair`; no `photo_strips` line at all). This household's 9 photos never produce a fill single, so round 3's bands never run here. Its change cost comes from the other modes.
+
+**Change cost per mode: worst frame ms / frames over 60 ms, one entry per change**
+
+| Mode | main (M, N) | branch (B1–B3) |
+|---|---|---|
+| Filmstrip (native handoff) | 264 / 5, 242 / 2 | 177 / 3, 105 / 4 |
+| Cinema | 124 / 4, 59 / 0, 119 / 8, 115 / 1 | 63 / 1, 170 / 5 |
+| Gallery Wall | — | 240 / 23, 271 / 23, 228 / 19 |
+| Polaroid | — | 119 / 1, 139 / 4, 106 / 5, 130 / 7 |
+| Framed | 95 / 3, 256 / 5 | 312 / 6 |
+| Mosaic | 102 / 6 | 98 / 9 |
+| Diptych | 49 / 0, 72 / 4, 114 / 7 | 127 / 7 |
+| Panorama | 117 / 7, 147 / 5 | 61 / 1, 173 / 5 |
+| Hero + Sidebar | 125 / 6, 71 / 3 | — |
+| Memories (pair) | 124 / 6 | 125 / 7, 157 / 8 |
+| Ken Burns (pair) | 110 / 4 | 116 / 7 |
+| Push (pair) | — | 149 / 6, 190 / 3 |
+
+Official 1.313 (unattributed; 9 changes): worst frame 61–289 ms (median 130), 1–10 frames over 60 ms each. Memory (launcher PSS MB, Home → running → +5 s): O 179 → 459 → 206, M 188 → 469 → 198, N 190 → 433 → 220, B 176–186 → 279–414 → 187–220.
+
+- **Gallery Wall is the most expensive household change**: 19–23 frames over 60 ms and 3.3–3.4 s of frames over 32 ms per change, about 3× any other mode. Trace (B2): two `WebViewFunctor::drawGl` frames of 108 and 161 ms at the beat, then ~1 s of 36–46 ms `drawGl` frames through the 1.6 s beat fade. It is WebView work, not a native layer. Each tile and photo layer paints the tiled `photo-doodles-dark.svg` and a 30 px `box-shadow` (`styles.css:75–80`, `mode-impls.js:919–923`). Not changed in this round.
+- Most other modes cost about 100–170 ms worst and 3–8 frames over 60 ms. Between runs of the same mode the spread is as wide as between builds (Cinema 59–124 ms on main), so one or two changes per mode cannot separate main from the branch, except for the native Filmstrip handoff below.
+
+**The native layer in the 310 ms frame** (round-3 trace `prepareTree` 147 ms, `drawLayer [FrameLayout] 1190 × 893` 54 ms, `flush layers` 96 ms): that is the Filmstrip stage, at its first visible frame of the native handoff (`HybridFilmstripHost.promote`). 1190 × 893 is a 4:3 Filmstrip card (0.62 × 1440 tall). Every dimmed card (`alpha .4`, overlapping children) is rendered into its own offscreen layer. Each card's black dimmer (`alpha .45`) got a second layer inside it (`drawLayer [View] 670 × 893`). That frame built 8 + 8 layers and uploaded all the card photos. The stage is added at alpha 0 during preparation, and HWUI skips it until it becomes visible, so all of it lands on the handoff frame. The same frame on main this round: 264 ms (sync 123 ms + draw 101 ms) on M; 242 ms on N.
+
+**Changes:**
+1. `FilmstripTextureWarmup.kt` (new) + `FilmstripEngine.kt:89–90, 218–229`: a prepared deck is handed to the GPU one photo and its backdrop at a time (`Bitmap.prepareToDraw`, RenderThread upload in its idle gap), one step per 34 ms, before the deck is admitted. Abandoned exactly once (bitmaps freed) if the deck is superseded, the engine closes, or the queue rejects a step. `PausableFrameCallbacks.kt:72–74` `postOwnedDelayed`. 9 photos take ~0.3 s; the JS prepare timeout is 8 s.
+2. `FilmstripEngine.kt:259` + `FlatDimmer` (`:479`): the card dimmer draws its fill at its alpha (`hasOverlappingRendering() = false`). One opaque fill at alpha α gives the same pixels as that fill drawn opaque into a layer and composited at α. One fewer layer per card.
+3. Cinema (`modes.js:375–385` `SS.cinemaDrawnEdge`, `mode-impls.js:1786–1790`): on the Portal+ a contained photo (up to 2.2:1) asks for its drawn size in the 78 % scope: 4:3 → 1500 px copy (was 2400), 3:4 → 1200. Wide photos crop, drift and follow faces, so they keep their former copy. Compact screens are unchanged.
+- **Not changed:** Mosaic and Hero + Sidebar re-justify every photo's box whenever another photo in the composition swaps. A drawn size taken at load time could later be drawn larger, which would soften it, so these keep their former copies. Gallery Wall (above) is the next target.
+
+**Result (trace B3, branch, household Filmstrip handoff):** the 9 card photos were uploaded beforehand as 15 ms `Bitmap#prepareToDraw` slices, spread out. On the handoff frame `prepareTree` took 2 ms, card layers `drawLayer` 5 ms and `flush layers` 18 ms (was 147 + 54 + 96 ms). The next frame still had one 84 ms `flush commands` (the window's GPU submission with the stage fading in over the WebView). Filmstrip handoff worst frame: branch 177 and 105 ms vs main 264 and 242 ms. The remaining 84 ms submission is not explained yet. It may be first-use shader programs (shadows, the vignette gradient, the stage's alpha layer).
+
+**Tests:** `node --test scripts/tests/*.test.mjs scripts/tests/*.test.cjs`: 528 tests, 509 pass, 19 skipped, 0 fail. New: Cinema drawn edge values and a property test that the copy covers the laid-out box for every shape from 0.3 to 2.2:1 (`slideshow_drawn_edge.test.mjs`); the cinema initial request is 1685 px in the resolved-resources fixture. `:app:testDebugUnitTest`: 9178 tests, 0 failures, including `FilmstripTextureWarmupTest` (7: one step per post, then a single admission; empty deck; superseded deck abandoned; close abandons once; rejected post; failed upload hint still admits; paused delayed owned post keeps its remaining delay).
+
+**Device** at the end: official 1.314 (on-device sha256 `e06ce483…`, matching `hearthpane-latest.json`), Home on top and default, test source never used, dev mode off (`fleetctl info`: `devMode: false`), STREAM_MUSIC 3.
