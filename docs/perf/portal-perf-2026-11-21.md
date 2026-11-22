@@ -976,3 +976,84 @@ measure) plus RenderThread 17–29 ms: the header texture re-rendered for the ti
 the returning Map, swap. Next candidates: draw the title outside the header's cached texture (a layer inside it still
 re-renders the texture; the heading is now one drawn node, so drawing it elsewhere need not add a node), and find
 what of the returning Map's `flush commands` is avoidable.
+
+## Settings kept alive, and Control Center's last-known states (branch `settings-alive`)
+
+Both changes were owner decisions from the two "Next" lists above.
+
+**Changes:**
+- **Settings stays alive between opens** (`SettingsRetention.kt`, `ImmortalSettingsActivity.kt`, manifest).
+  - Settings now has its own task (`singleTask`, excluded from recents). Back at the top, and Settings' Home
+    button, move it behind Home (`moveTaskToBack`, with no transition, matching the old finish) instead of
+    finishing it.
+  - A reopen is `onNewIntent` plus a resume. A reopen after Back gets a light reset before its first frame: the
+    last page at depth 1, the list pane, search, dialogs, the Jarvis pulse and every scroll position.
+  - A reopen after any other exit (a Home press, the screensaver, a sub-screen left on top) composes the tree
+    afresh.
+  - A parked Settings is finished after 10 min unopened, or on memory pressure (`RUNNING_LOW`, `RUNNING_CRITICAL`,
+    background levels). It is never finished while one of its sub-screens is on screen.
+  - The first open after process start is the same cold launch as before.
+- **Control Center opens fully drawn** (`ControlCenterLastKnown.kt`, engine).
+  - When CC is hidden, the background subscription still drops the plan's non-alert entities. The engine now
+    keeps them as last known, in memory (at most 600), instead of discarding them.
+  - An open restores them at once, marked unconfirmed, and publishes, so the plan models are built on the engine
+    thread. The foreground subscription's full answer then confirms them in place, and drops any that HA no
+    longer has. An unchanged entity keeps its instance.
+  - Unconfirmed entities never raise alerts.
+  - Safety-critical entities (locks, the alarm, garage doors and gates, leak/smoke/CO/gas sensors) show the
+    in-flight look while unconfirmed. Actions on them are refused, in both the UI gate and the engine, until HA
+    confirms them.
+  - Nothing is persisted to disk.
+
+**Device and method:**
+- Family Portal+, lock held 20:16–20:23 PST. STREAM_MUSIC was 0 during the session and restored to 3. No
+  screenshots; the tap targets came from `uiautomator dump`.
+- Before: official 1.317 (OTA install, long-running process). After: the branch `assemblePerformance` build,
+  installed with a plain `adb install -r`, then 25 s idle.
+- Settings: `gfxinfo reset`, tap Settings, 2.5 s, `framestats`, Back, 4 s. Control Center: the same with Home
+  Control and 3 s; only open and Back were used.
+- One unmeasured warm-up open before each series. Medians of 5. "Span" runs from the first frame's intended vsync
+  to the last frame's completion.
+- At the end, official 1.317 was reinstalled (sha256 `4db51aa3…2f2a`, matching `hearthpane-latest.json`). Home
+  was the default and on top, and dev mode was off.
+
+| | Frames (all windows) | Janky | p90 / p99 ms | Frames > 32 ms | Max ms | Span ms |
+|---|---|---|---|---|---|---|
+| Settings open, official 1.317 | 18 (Settings 16) | 16 (89 %) | 61 / 69 | 8 | 72 | 389 |
+| Settings first open after install, branch (cold, n = 1) | 18 (Settings 16) | 18 | 93 / 105 | 15 | 105 | 661 |
+| **Settings reopen, branch** | **3 (Settings 2)** | 3 (100 %) | 69 / 69 | 3 | 70 | **152** |
+| CC open, official 1.317 | 13 | 9 (69 %) | 133 / 150 | 4 | 141 | — |
+| CC open, branch | 11 | 8 (73 %) | 150 / 150 | 4 | 171 | — |
+
+**Settings:**
+- A reopen is a resume: 2 Settings frames instead of 16, and the open settles in 119–153 ms instead of
+  369–466 ms. The first reopen after the cold open took 268 ms.
+- Every frame is still janky. Settings' first frame recreates the window surface and re-records the whole tree
+  (66–70 ms; 158 ms on the first reopen), and Home draws its hide frame at the same time. The targets
+  (≤ 1 janky frame, p90 < 16 ms) are still not met, but the open is about 2.5 × shorter.
+- The single cold open ran on a fresh install (not `speed-profile`), so it isn't comparable with the
+  long-running official process.
+- Logcat showed `Settings reopened (LIGHT)` on all 5 reopens. Back returned to Home each time.
+
+**Memory cost of a parked Settings:**
+- Launcher PSS was 249.1 MB with Settings parked, and 234.7 MB about 6 s after
+  `am send-trim-memory RUNNING_LOW`. Logcat showed `Releasing retained Settings (trim 10)`, and no Settings
+  activity record remained.
+- So the cost is about 14 MB, almost all Java heap (35.5 → 21.8 MB). Graphics was unchanged at 51.0 MB, because
+  a stopped window's surface is already freed.
+- This is an upper bound: the trim also runs the app's other trim handlers.
+
+**Control Center:**
+- No measurable change in jank (frames over 32 ms: 4 vs 4). The CC window draws about 9 frames instead of 11.
+- The open is still dominated by its first two frames, 115–167 ms each: CC's first composition and Home's frame
+  queued behind it. The redraw when the snapshot arrives was 20–54 ms before, and is not the bottleneck on this
+  household.
+- The change is kept for what it shows: the plan is fully drawn from the first frame, with no pop when the
+  states arrive. It is not kept for frame time.
+
+**Tests:**
+- New JVM tests: `SettingsRetentionTest` (10), `CcLastKnownTest` (10) plus `CcLiveUnchangedTest` (1), and
+  `CcEngineLastKnownTest` (6).
+- `cc_engine_golden.txt` was re-recorded. Only `entitiesVersion` counts changed, because identical updates no
+  longer bump the version.
+- Full suite: 9,216 tests, 0 failures.
