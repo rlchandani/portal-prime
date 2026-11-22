@@ -134,7 +134,8 @@ internal object CcTeslaStatus {
 
 /** While the car isn't charging, the hero's wide tile: what's happening and how long a charge to the limit would take. */
 @Immutable
-internal data class CcIdleCharge(val title: String, val detail: String?)
+/** [shortDetail]: the same estimate without the charge rate, for the Mini's narrower tile. */
+internal data class CcIdleCharge(val title: String, val detail: String?, val shortDetail: String? = detail)
 
 /** Idle charge wording and a home-charge estimate (pure): kWh to the limit ÷ the Wall Connector rate. */
 internal object CcTeslaIdle {
@@ -162,16 +163,19 @@ internal object CcTeslaIdle {
       CcChargeState.NO_POWER -> "Plugged in · no power"
       else -> "Not plugged in"
     }
-    return CcIdleCharge(title, detail(v, charger, model))
+    val (detail, short) = detail(v, charger, model) ?: (null to null)
+    return CcIdleCharge(title, detail, short)
   }
 
-  private fun detail(v: CcCarView, charger: CcChargerView?, model: String?): String? {
+  /** The full estimate and its short form, or null without the numbers to estimate. */
+  private fun detail(v: CcCarView, charger: CcChargerView?, model: String?): Pair<String, String>? {
     val pct = v.batteryPct ?: return null
     val limit = v.limitPct ?: return null
-    if (pct >= limit) return "At your $limit% limit"
+    if (pct >= limit) return "At your $limit% limit".let { it to it }
     val kw = rateKw(v.chargeAmps, charger?.gridVolts) ?: return null
     val mins = minutesTo(pct, limit, packKwh(model), kw)
-    return "About ${CcTeslaText.duration(mins)} to $limit% at ${Math.round(kw)} kW"
+    val short = "About ${CcTeslaText.duration(mins)} to $limit%"
+    return "$short at ${Math.round(kw)} kW" to short
   }
 
   fun rateKw(amps: Int?, volts: Double?): Double? = amps?.let { it * (volts ?: NOMINAL_VOLTS) / W_PER_KW }

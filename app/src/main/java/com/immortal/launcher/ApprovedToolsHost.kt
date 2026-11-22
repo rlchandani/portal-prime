@@ -10,7 +10,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -347,6 +346,7 @@ private fun ToolsRail(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpen: (ApprovedTool) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -370,7 +370,7 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
         }
     }
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = edge).padding(top = 52.dp, bottom = 24.dp)) {
-        val columns = if (maxWidth < 1200.dp) 2 else 3
+        val columns = ToolsCategoryLayout.libraryColumns(layoutClass, maxWidth.value.toDouble())
         LazyVerticalGrid(GridCells.Fixed(columns), state = grid, modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
@@ -394,21 +394,18 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
             }
             item(key = "categories", span = { GridItemSpan(maxLineSpan) }) {
                 val categories = ApprovedToolsCatalog.categories(advanced)
-                val padding = if (layoutClass.compact) ToolsCategoryLayout.CHIP_PADDING_DP.dp else 24.dp
+                val chips = ToolsCategoryLayout.of(layoutClass)
                 val chip: @Composable (String) -> Unit = { category ->
-                    ToolsCategoryChip(category, selectedGroup == category, padding) { group = category }
+                    ToolsCategoryChip(category, selectedGroup == category, chips.padding.dp) { group = category }
                 }
                 if (layoutClass.compact) {
-                    // Compact: the chips wrap onto a second line instead of scrolling sideways.
-                    val fontScale = LocalDensity.current.fontScale
-                    val rows = ToolsCategoryLayout.rows(categories, maxWidth.value.toDouble(), fontScale)
-                    Column(Modifier.fillMaxWidth().padding(ToolsCategoryLayout.INSET_DP.dp),
-                        verticalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.GAP_DP.dp)) {
-                        rows.forEach { row ->
-                            Row(horizontalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.GAP_DP.dp)) {
-                                row.forEach { chip(categories[it]) }
-                            }
-                        }
+                    // Compact: the chips are measured and wrap onto a further line only when they
+                    // truly don't fit (never a sideways scroll); upright they're tighter so the
+                    // whole set, Advanced included, sits on one line at the default text size.
+                    FlowRow(Modifier.fillMaxWidth().padding(ToolsCategoryLayout.INSET_DP.dp),
+                        horizontalArrangement = Arrangement.spacedBy(chips.gap.dp),
+                        verticalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.ROW_GAP_DP.dp)) {
+                        categories.forEach { chip(it) }
                     }
                 } else {
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(4.dp),

@@ -81,4 +81,10 @@ class HaDashboardModelTest {
     // big tiles (climate, media, dimmer span-2) lead; single sensor trails
     assertEquals(HaDashboardModel.Kind.SENSOR, tiles.last().kind)
   }
+
+  @Test fun everyToggleTileWellShowsADomainGlyph() {
+    assertEquals("bulb", HaDashboardModel.wellIcon("light"))
+    assertEquals("plug", HaDashboardModel.wellIcon("switch"))
+    assertEquals("plug", HaDashboardModel.wellIcon("fan"))
+  }
 }

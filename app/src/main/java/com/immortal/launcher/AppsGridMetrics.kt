@@ -18,6 +18,9 @@ internal object AppsGridMetrics {
   const val COMPACT_MIN_COLUMNS = 3
   /** A word this long or shorter fits one line of a compact tile's label (20 sp, ≥ 136 dp). */
   const val COMPACT_WORD_CHARS = 12
+  /** The header buttons on the Mini upright: an even grid this many across, this far apart. */
+  const val PORTRAIT_BUTTON_COLUMNS = 2
+  const val BUTTON_GAP_DP = 12
 
   fun columns(layout: LayoutClass, contentWidthDp: Int): Int {
     if (!layout.compact) return LARGE_COLUMNS

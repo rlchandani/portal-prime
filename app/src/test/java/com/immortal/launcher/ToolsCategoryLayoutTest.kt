@@ -10,44 +10,42 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** The Tools library's category chips wrap instead of scrolling sideways on the Mini. */
 class ToolsCategoryLayoutTest {
-  private val basic = ApprovedToolsCatalog.categories(advanced = false)
   private val advanced = ApprovedToolsCatalog.categories(advanced = true)
 
   /** The library grid's width: the window less the Tools edge (24 dp upright, 48 dp turned). */
   private val miniUpright = 800.0 - 2 * 24
   private val miniTurned = 1280.0 - 2 * 48
 
-  private fun fits(rows: List<List<Int>>, labels: List<String>, width: Double, scale: Float) = rows.all { row ->
-    CompactRowFit.rowWidth(row.map { ToolsCategoryLayout.CHIP.width(labels[it], scale) },
-        ToolsCategoryLayout.GAP_DP.toDouble()) <= width - 2 * ToolsCategoryLayout.INSET_DP
-  }
-
-  @Test fun theBasicSetStaysOnOneRowOnTheMiniUpright() {
-    assertEquals(listOf(basic.indices.toList()), ToolsCategoryLayout.rows(basic, miniUpright))
-  }
-
-  @Test fun theAdvancedSetWrapsItsLastChipInsteadOfScrolling() {
-    val rows = ToolsCategoryLayout.rows(advanced, miniUpright)
-    assertEquals(2, rows.size)
-    assertEquals(listOf(advanced.lastIndex), rows.last())
-  }
-
-  @Test fun theMiniTurnedFitsEverySetOnOneRow() {
-    assertEquals(1, ToolsCategoryLayout.rows(advanced, miniTurned).size)
-  }
-
-  @Test fun everyRowFitsAndKeepsReadingOrderAtEveryMiniWidthAndScale() {
-    for (labels in listOf(basic, advanced)) for (width in listOf(miniUpright, miniTurned)) for (scale in listOf(1f, 1.15f, 1.3f)) {
-      val rows = ToolsCategoryLayout.rows(labels, width, scale)
-      assertEquals(labels.indices.toList(), rows.flatten())
-      assertTrue("rows fit $width dp at $scale", fits(rows, labels, width, scale))
+  @Test fun everyChipFitsTheRowOnItsOwnAtEveryMiniWidthAndScale() {
+    // The flow row wraps whole chips; a chip wider than a line on its own would clip its label.
+    for ((cls, width) in listOf(LayoutClass.COMPACT_PORTRAIT to miniUpright, LayoutClass.COMPACT_LANDSCAPE to miniTurned)) {
+      val spec = ToolsCategoryLayout.chip(ToolsCategoryLayout.of(cls))
+      for (scale in listOf(1f, 1.15f, 1.3f)) for (label in advanced) {
+        assertTrue("$label fits $width dp at $scale", spec.width(label, scale) <= width - 2 * ToolsCategoryLayout.INSET_DP)
+      }
     }
   }
 
-  @Test fun theEstimateIsGenerousForTheLongestCategory() {
-    // "Home & downtime" at 22 sp medium is ~170 dp of text plus 40 dp padding.
-    assertTrue(ToolsCategoryLayout.CHIP.width("Home & downtime") >= 210.0)
+  @Test fun theUprightChipsAreTighterThanTheTurnedAndThePortalPlusKeepsItsLook() {
+    val upright = ToolsCategoryLayout.of(LayoutClass.COMPACT_PORTRAIT)
+    val turned = ToolsCategoryLayout.of(LayoutClass.COMPACT_LANDSCAPE)
+    assertTrue(upright.padding < turned.padding && upright.gap < turned.gap)
+    assertEquals(ToolsCategoryLayout.Chips(padding = 24, gap = 12), ToolsCategoryLayout.of(LayoutClass.LARGE))
+  }
+
+  @Test fun theUprightLibraryIsOneColumnSoNeighbouringCardsNeverDifferInHeight() {
+    assertEquals(1, ToolsCategoryLayout.libraryColumns(LayoutClass.COMPACT_PORTRAIT, miniUpright))
+  }
+
+  @Test fun wideWindowsKeepTheirTwoOrThreeColumns() {
+    assertEquals(2, ToolsCategoryLayout.libraryColumns(LayoutClass.COMPACT_LANDSCAPE, 1100.0))
+    assertEquals(3, ToolsCategoryLayout.libraryColumns(LayoutClass.COMPACT_LANDSCAPE, 1232.0))
+    assertEquals(3, ToolsCategoryLayout.libraryColumns(LayoutClass.LARGE, 1728.0))
+  }
+
+  @Test fun theEstimateCoversTheLongestCategory() {
+    // "Home & downtime" at 22 sp medium measured ~194 dp of text on the Portal.
+    assertTrue(ToolsCategoryLayout.chip(ToolsCategoryLayout.PORTRAIT).width("Home & downtime") >= 194.0 + 28)
   }
 }

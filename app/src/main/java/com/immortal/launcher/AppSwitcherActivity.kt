@@ -335,18 +335,19 @@ private fun ApprovedAppsContent(
         Column(Modifier.fillMaxWidth()) {
           ApprovedAppsHeading(if (folder != null) folder!! else if (recent) "Recent apps" else "Your apps",
               if (folder != null) "Apps in your folder." else if (recent) "Open, inspect, close or uninstall an app." else "Installed apps on this Portal.")
-          // Compact windows wrap the buttons onto a second line instead of clipping the last one.
-          AppsButtonRow(appsLayout.compact) {
+          // Compact windows wrap the buttons instead of clipping the last one; upright they form
+          // an even two-column grid so no button is left alone on its own line.
+          AppsButtonRow(appsLayout) { m ->
             if (folder == null && !recent) {
-              ApprovedAppsButton("App Store", primary = true) { launchApprovedIntent(context, Intent(context, StoreActivity::class.java)) }
-              if ("Settings" in folderNames) ApprovedAppsButton("Settings folder") { openFolder("Settings") }
-              ApprovedAppsButton("Edit favorites") { editFavorites = true }
-              ApprovedAppsButton("Recent apps") { recent = true }
+              ApprovedAppsButton("App Store", primary = true, modifier = m) { launchApprovedIntent(context, Intent(context, StoreActivity::class.java)) }
+              if ("Settings" in folderNames) ApprovedAppsButton("Settings folder", modifier = m) { openFolder("Settings") }
+              ApprovedAppsButton("Edit favorites", modifier = m) { editFavorites = true }
+              ApprovedAppsButton("Recent apps", modifier = m) { recent = true }
             } else if (folder != null) {
-              ApprovedAppsButton("Rename folder") { newFolderName = folder!!; renameFolder = true }
-              ApprovedAppsButton("Edit folder contents") { editFolder = true }
-              ApprovedAppsButton("All apps", onClick = ::showAllApps)
-            } else ApprovedAppsButton("All apps", onClick = ::showAllApps)
+              ApprovedAppsButton("Rename folder", modifier = m) { newFolderName = folder!!; renameFolder = true }
+              ApprovedAppsButton("Edit folder contents", modifier = m) { editFolder = true }
+              ApprovedAppsButton("All apps", modifier = m, onClick = ::showAllApps)
+            } else ApprovedAppsButton("All apps", modifier = m, onClick = ::showAllApps)
           }
           if (searching) ApprovedAppsSearch(query, { query = it }, "Search apps and folders", Modifier.padding(top = 24.dp))
           if (failure != null) {
@@ -500,7 +501,8 @@ private fun CompactAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: Int
     Column(Modifier.fillMaxWidth().heightIn(min = 168.dp).combinedClickable(role = Role.Button,
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
-        .padding(horizontal = 10.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        // Top-aligned: a two-line label grows downwards, so every icon in a row stays on one line.
+        .padding(horizontal = 10.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
       BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
         ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}",
             entry.label, if (layout.compactPortrait) 88.dp else 96.dp, entry.app?.icon ?: shortcutIcon, plain = entry.folder == null)
@@ -512,13 +514,22 @@ private fun CompactAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: Int
     }
 }
 
-/** The Apps header buttons: one row on LARGE (unchanged), wrapping rows on compact windows. */
+/**
+ * The Apps header buttons: one row on LARGE (unchanged); wrapping rows on the Mini turned; an even
+ * grid of [AppsGridMetrics.PORTRAIT_BUTTON_COLUMNS] equal buttons on the Mini upright.
+ */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun AppsButtonRow(compact: Boolean, content: @Composable () -> Unit) {
-  if (compact) androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp)) { content() }
-  else Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { content() }
+private fun AppsButtonRow(layout: LayoutClass, content: @Composable (Modifier) -> Unit) {
+  val gap = AppsGridMetrics.BUTTON_GAP_DP.dp
+  when {
+    layout.compactPortrait -> androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(gap), verticalArrangement = Arrangement.spacedBy(gap),
+        maxItemsInEachRow = AppsGridMetrics.PORTRAIT_BUTTON_COLUMNS) { content(Modifier.weight(1f)) }
+    layout.compact -> androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(gap),
+        verticalArrangement = Arrangement.spacedBy(gap)) { content(Modifier) }
+    else -> Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { content(Modifier) }
+  }
 }
 
 @Composable
