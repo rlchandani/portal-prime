@@ -1293,6 +1293,9 @@
     const now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
     let COLS = Math.min(MAX, Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H))), ROWS = Math.ceil(MAX / COLS);
     let freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
+    // The 9-slice shadow bitmap (styles.css .ss-polaroid::before) equals the box-shadow only while
+    // the shadow (the print less 16 px a side) holds both 96 px blur ramps: 2 * 96 + 2 * 16 = 224.
+    const BITMAP_SHADOW_MIN = 224;
     // Six live prints and one reusable incoming owner. Resting paper never asks
     // for permanent promotion; no guessed date, event or place belongs on it.
     const pool = Array.from({ length: MAX + 1 }, () => {
@@ -1328,6 +1331,7 @@
       const x = cx + pad + boundW / 2 + print.biasX * Math.max(0, cellW - pad * 2 - boundW);
       const y = cy + pad + boundH / 2 + print.biasY * Math.max(0, cellH - pad * 2 - boundH);
       print.card.style.width = W + "px"; print.card.style.height = H + "px";
+      print.card.classList.toggle("ss-live-shadow", Math.min(W, H) < BITMAP_SHADOW_MIN);
       print.card.style.padding = `${edge}px ${edge}px ${chin}px`;
       print.card.style.left = (x - W / 2) + "px"; print.card.style.top = (y - H / 2) + "px";
       print.image.style.width = pw + "px"; print.image.style.height = ph + "px";
