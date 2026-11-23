@@ -20,7 +20,8 @@ import org.json.JSONObject
  *   for Jarvis's prompt, plus whether to hand the conversation over at its end (`learning`) and, from slice 4,
  *   whether to run the text extractor first (`extract`, with the `known` fact ids it may deduplicate against; only
  *   while plan D3's "closer reading" switch is on too, otherwise Jarvis hands over without it). The
- *   extracted Recent topics the note offers are marked shown, so Jarvis follows each up once.
+ *   extracted Recent topics the note offers are marked shown, so Jarvis follows each up once. For the card's badges
+ *   ([MemoryCard]): `who` (first name and room, only for an adult alone with Jarvis) and the `facts` the note used.
  * - [observe] (`memory_observe`, conversation end): runs the dictionary extractor over the digest, re-checks the
  *   text extractor's suggestions ([LlmExtractionCheck]) and learns, then drops the digest. Answers only ids and labels
  *   of what became known, for the "Learned … Undo" notice.
@@ -60,6 +61,8 @@ internal class MemoryHandoff(
         .apply { if (note.lines.isNotEmpty()) put("note", note.lines.joinToString("\n")) }
         .apply { if (learning && closerReading()) put("extract", true).put("known", JSONArray(knownIds(profile))) }
         .apply { threads(profile, note.offeredTopics).takeIf { it.length() > 0 }?.let { put("threads", it) } }
+        .apply { MemoryCard.who(on, portal())?.let { put("who", it) } }
+        .apply { MemoryCard.facts(note.used, dictionary())?.let { put("facts", it) } }
   }
 
   /**
