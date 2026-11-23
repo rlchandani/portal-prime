@@ -15,22 +15,38 @@ internal data class MemoryConversations(
     val currentId: String? = null,
     val currentAccess: MemoryAccess? = null,
     val openedAtMs: Long = 0L,
+    /**
+     * The conversation before the current one, still waiting for its handover: since slice 4 Jarvis runs the text
+     * extractor first, so the next conversation may open before the last one's words arrive.
+     */
+    val previousId: String? = null,
+    val previousAccess: MemoryAccess? = null,
+    val previousOpenedAtMs: Long = 0L,
     /** Fact ids the latest finished conversation added evidence to, and when it finished. */
     val lastTouched: Set<String> = emptySet(),
     val lastTouchedScope: MemoryScope? = null,
     val lastTouchedAtMs: Long = 0L,
 ) {
-  fun opened(id: String, access: MemoryAccess, nowMs: Long) = copy(currentId = id, currentAccess = access, openedAtMs = nowMs)
+  fun opened(id: String, access: MemoryAccess, nowMs: Long) = copy(
+      currentId = id, currentAccess = access, openedAtMs = nowMs,
+      previousId = currentId.takeIf { it != id } ?: previousId,
+      previousAccess = if (currentId != null && currentId != id) currentAccess else previousAccess,
+      previousOpenedAtMs = if (currentId != null && currentId != id) openedAtMs else previousOpenedAtMs,
+  )
 
-  /** The access frozen when conversation [id] opened, if it is the current one and not stale. */
-  fun accessFor(id: String, nowMs: Long): MemoryAccess? =
-      currentAccess.takeIf { id == currentId && nowMs - openedAtMs in 0..MAX_CONVERSATION_MS }
+  /** The access frozen when conversation [id] opened, if it is the current (or still-pending previous) one. */
+  fun accessFor(id: String, nowMs: Long): MemoryAccess? = when (id) {
+    currentId -> currentAccess.takeIf { nowMs - openedAtMs in 0..MAX_CONVERSATION_MS }
+    previousId -> previousAccess.takeIf { nowMs - previousOpenedAtMs in 0..MAX_CONVERSATION_MS }
+    else -> null
+  }
 
   /** The access of the conversation under way now (for `hearthpane.memory` mid-conversation), if any. */
   fun liveAccess(nowMs: Long): MemoryAccess? = currentId?.let { accessFor(it, nowMs) }
 
   fun finished(id: String, scope: MemoryScope?, touched: Set<String>, nowMs: Long) = copy(
       currentId = currentId.takeIf { it != id }, currentAccess = currentAccess.takeIf { id != currentId },
+      previousId = previousId.takeIf { it != id }, previousAccess = previousAccess.takeIf { id != previousId },
       lastTouched = touched, lastTouchedScope = scope, lastTouchedAtMs = nowMs,
   )
 

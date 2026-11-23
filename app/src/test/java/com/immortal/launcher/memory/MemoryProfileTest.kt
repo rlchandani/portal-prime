@@ -75,9 +75,9 @@ class MemoryProfileTest {
     val f = fact("team:a").copy(confidence = 4.0).normalized()
     assertEquals(1.0, f.confidence, 0.0)
     assertEquals(0.0, fact("team:b").copy(confidence = Double.NaN).normalized().confidence, 0.0)
-    val topics = (1..8L).map { RecentTopic("t$it", "g".repeat(200), null, it) }
+    val topics = (1..12L).map { RecentTopic("t$it", "g".repeat(200), null, it) }
     val kept = MemoryProfile(person, recentTopics = topics).normalized().recentTopics
-    assertEquals(listOf(8L, 7L, 6L, 5L, 4L), kept.map { it.atMs })
+    assertEquals((12L downTo 5L).toList(), kept.map { it.atMs })
     assertEquals(RecentTopic.MAX_GIST, kept.first().gist.length)
   }
 

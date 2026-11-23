@@ -68,6 +68,7 @@ internal object MemoryProfileCodec {
       .put("topic", t.topic).put("gist", t.gist)
       .apply { t.openQuestion?.let { put("open", it) } }
       .put("at", t.atMs)
+      .apply { if (t.shownCount > 0) put("shown", t.shownCount) }
 
   private fun readFact(o: JSONObject): MemoryFact? = runCatching {
     MemoryFact(
@@ -101,6 +102,7 @@ internal object MemoryProfileCodec {
         gist = o.text("gist", RecentTopic.MAX_GIST, allowEmpty = true),
         openQuestion = if (o.has("open")) o.text("open", MAX_TEXT) else null,
         atMs = o.getLong("at"),
+        shownCount = o.optInt("shown", 0),
     )
   }.getOrNull()
 

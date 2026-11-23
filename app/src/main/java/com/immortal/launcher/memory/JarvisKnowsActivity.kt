@@ -268,6 +268,7 @@ private fun KnowsFactRow(row: KnowsRows.Row, actions: KnowsActions) {
 private fun glyph(category: KnowsRows.Category) = when (category) {
   KnowsRows.Category.MUSIC -> "music"
   KnowsRows.Category.MARKETS -> "stocks"
+  KnowsRows.Category.PLACES -> "place"
   else -> "info"
 }
 

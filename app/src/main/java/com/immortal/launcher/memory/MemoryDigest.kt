@@ -22,6 +22,8 @@ internal data class MemoryDigest(
     val screen: String?,
     val userTurns: List<String>,
     val toolCalls: List<ToolCall>,
+    /** The slice 4 text extractor's suggestions (Jarvis 2.7.12+), still to be checked; null when none ran. */
+    val extracted: LlmExtraction? = null,
 ) {
   /** One structured call, by name with its free-text query (web search terms, what to play). */
   data class ToolCall(val name: String, val query: String)
@@ -50,6 +52,7 @@ internal data class MemoryDigest(
           screen = o.optString("screen").takeIf(SCREEN::matches),
           userTurns = turns(o.optJSONArray("user")),
           toolCalls = tools(o.optJSONArray("tools")),
+          extracted = LlmExtraction.parse(o.optJSONObject("extracted")),
       )
     }
 
