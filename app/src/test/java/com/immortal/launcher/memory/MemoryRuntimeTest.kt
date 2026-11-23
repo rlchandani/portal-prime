@@ -58,6 +58,24 @@ class MemoryRuntimeTest {
     assertTrue(store.runtime.profile(house).facts.isEmpty())
   }
 
+  @Test fun chipFeedbackIsWrittenWithTheNextWriteAndForgottenWithItsScope() {
+    val alex = MemoryScope.Person("p1")
+    store.runtime.recordFeedback { it.with(house, "screen:music", ForYouFeedback.Kind.NEVER, NOW) }
+    store.runtime.recordFeedback { it.with(alex, "screen:music", ForYouFeedback.Kind.NEVER, NOW) }
+    assertTrue(store.feedback.events.isEmpty())
+    store.runTimers()
+    assertEquals(2, store.feedback.events.size)
+    assertTrue(store.runtime.forgetScope(house))
+    assertEquals(listOf(alex.token), store.feedback.events.map { it.scope })
+    assertTrue(store.runtime.forgetAll())
+    assertTrue(store.runtime.feedback().events.isEmpty())
+  }
+
+  @Test fun dontSuggestIsWrittenAtOnce() {
+    store.runtime.recordFeedback(immediate = true) { it.with(house, "app:a", ForYouFeedback.Kind.NEVER, NOW) }
+    assertTrue(store.feedback.suppressed(house, "app:a"))
+  }
+
   @Test fun everyChangeBumpsTheRevision() {
     val before = store.runtime.revision.value
     remember()

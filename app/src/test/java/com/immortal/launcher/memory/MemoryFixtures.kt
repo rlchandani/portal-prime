@@ -29,6 +29,7 @@ internal object MemoryFixtures {
   class FakeStore {
     val saved = mutableMapOf<MemoryScope, MemoryProfile>()
     var usage = UsageCounts()
+    var feedback = ForYouFeedback()
     var saves = 0
     var failSaves = false
     val scheduled = mutableListOf<() -> Unit>()
@@ -40,9 +41,11 @@ internal object MemoryFixtures {
         loadUsage = { usage },
         saveUsage = { usage = it; true },
         remove = { saved.remove(it); true },
-        wipe = { saved.clear(); usage = UsageCounts(); true },
+        wipe = { saved.clear(); usage = UsageCounts(); feedback = ForYouFeedback(); true },
         schedule = { _, task -> scheduled += task },
         now = { clock },
+        loadFeedback = { feedback },
+        saveFeedback = { feedback = it; true },
     )
 
     fun runTimers() {
