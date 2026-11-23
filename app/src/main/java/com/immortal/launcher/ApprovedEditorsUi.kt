@@ -168,8 +168,9 @@ internal fun ApprovedEditorsCollectionRow(
                 lineHeight = 29.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 6.dp))
         }
-        if (action != null && onAction != null) ApprovedSettingsTextButton(action, onAction)
-        ApprovedSettingsTextButton("Remove", onRemove)
+        if (action != null && onAction != null)
+            ApprovedSettingsTextButton(action, ApprovedEditorsCopy.rowActionSpoken(action, title), onAction)
+        ApprovedSettingsTextButton("Remove", ApprovedEditorsCopy.rowActionSpoken("Remove", title), onRemove)
     }
 }
 

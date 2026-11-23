@@ -73,6 +73,21 @@ class AccessibilityDuplicateLabelsTest {
     assertDistinct("Calls", calls)
   }
 
+  @Test fun settingsCollectionRows_nameTheirItem() {
+    assertEquals("Remove Apple", ApprovedEditorsCopy.rowActionSpoken("Remove", "Apple"))
+    assertEquals("Edit Kitchen camera", ApprovedEditorsCopy.rowActionSpoken("Edit", "Kitchen camera"))
+    // The visible verb stays the start of the spoken name so voice control still matches the button.
+    listOf("Remove", "Edit").forEach { verb ->
+      assertTrue(ApprovedEditorsCopy.rowActionSpoken(verb, "Apple").startsWith(verb))
+    }
+    // One list screen: every row's "Remove" (and optional "Edit") reads distinctly by its row.
+    val rows = listOf("Apple", "Microsoft", "Alphabet", "Front door camera", "Back door camera")
+    val settings = rows.flatMap { title ->
+      listOf(ApprovedEditorsCopy.rowActionSpoken("Remove", title), ApprovedEditorsCopy.rowActionSpoken("Edit", title))
+    }
+    assertDistinct("Settings collection rows", settings)
+  }
+
   @Test fun controlCenterAlertButtons_nameTheirAlert() {
     assertEquals("Office door is open · Close", CcSpeech.alertAction("Office door is open", "Close"))
     // The room sheet's visible "Close…" (confirm follows) is spoken without the ellipsis.
