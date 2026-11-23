@@ -90,6 +90,7 @@ internal object JarvisMemory {
 
   /** Forget all, from the operator or a reset: every profile and count on this Portal. */
   fun forgetEverything(context: Context): Boolean = runtime(context).forgetAll().also {
+    ForYouHome.clearCaches()
     Log.i(TAG, "forget everything → ${if (it) "done" else "incomplete"}")
   }
 

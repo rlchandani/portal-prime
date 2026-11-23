@@ -64,8 +64,10 @@ import kotlinx.coroutines.withContext
 
 /**
  * Home's "For you right now" row (mock `mocks/jarvis-personalization-20261122`, Home: the row between the header and
- * the widgets): up to three chips from what's usually opened here around now, the best with the ember outline, each
- * saying why. Tap opens the why-sheet (Open · Show less often · Don't suggest this); ✕ is "not now". Nothing shows
+ * the widgets): up to three chips from what's usually opened here around now and, since slice 3, from the teams,
+ * stocks and topics Jarvis has learned (a game tonight, a live or final score, the market's open or close, a big
+ * move, fresh headlines), the best with the ember outline, each saying why. Tap opens the why-sheet (Open · Show
+ * less often · Don't suggest this); ✕ is "not now". Nothing shows
  * with the switch off, for guests, children and teens, or before a habit has formed, so the row costs no space until
  * it has something to say. Never spoken.
  */
@@ -80,10 +82,12 @@ internal fun HomeForYouRow(
   val active = LocalApprovedLauncherPageActive.current
   val who by WhosThere.homeView.collectAsState()
   var tick by remember { mutableStateOf(0) }
-  LaunchedEffect(active) { while (active) { delay(REFRESH_MS); tick++ } }
   val snapshot by produceState<ForYouHome.Snapshot?>(null, active, who, tick) {
     if (active) value = withContext(Dispatchers.IO) { runCatching { ForYouHome.load(context) }.getOrNull() }
   }
+  // Every 10 minutes; every 30 s while a followed team's score is live, and at kick-off (ForYouInterests.refreshMs).
+  val refreshMs = snapshot?.refreshMs ?: com.immortal.launcher.memory.ForYouInterests.REFRESH_MS
+  LaunchedEffect(active, tick, refreshMs) { if (active) { delay(refreshMs); tick++ } }
   val snap = snapshot ?: return
   var hidden by remember(snap.scope) { mutableStateOf(emptySet<String>()) }
   var why by remember { mutableStateOf<ForYouChips.Chip?>(null) }
@@ -92,7 +96,7 @@ internal fun HomeForYouRow(
   LaunchedEffect(active) { if (!active) { hidden = emptySet(); why = null } }
   val icons = remember(apps) { apps.associate { MemoryUsage.surfaceForApp(it.component.packageName) to it } }
   val chips = remember(snap, icons, hidden) {
-    ForYouChips.build(snap.ranked.filter { it.surface !in hidden }, snap.household) { target(it, icons) }
+    ForYouChips.build(snap.ranked.filter { it.surface !in hidden }, snap.household) { snap.targets[it] ?: target(it, icons) }
   }
   val dismissedAll = chips.isEmpty() && hidden.isNotEmpty()
   if (chips.isEmpty() && !dismissedAll && toast == null) return
@@ -105,7 +109,10 @@ internal fun HomeForYouRow(
       com.immortal.launcher.memory.ForYouRanker.SCREEN_MUSIC -> onOpenMusic()
       com.immortal.launcher.memory.ForYouRanker.SCREEN_CALLS -> onLaunch(CALLS_COMPONENT)
       com.immortal.launcher.memory.MemoryHandoff.JARVIS_SURFACE -> onLaunch(ComponentName(JarvisHandoff.PACKAGE, ""))
-      else -> icons[chip.surface]?.let { onLaunch(it.component) }
+      // An interest chip (a game, a stock, a topic) opens Jarvis, which already knows the team or ticker.
+      else -> if (com.immortal.launcher.memory.ForYouInterests.isInterest(chip.surface)) {
+        onLaunch(ComponentName(JarvisHandoff.PACKAGE, ""))
+      } else icons[chip.surface]?.let { onLaunch(it.component) }
     }
   }
   val t = forYouTokens()
@@ -140,22 +147,21 @@ internal fun HomeForYouRow(
         onOpen = { why = null; open(chip) },
         onLessOften = {
           why = null
-          ForYouHome.note(context, snap.scope, chip.surface, Kind.LESS_OFTEN)
+          ForYouHome.note(context, snap.scope, chip.feedbackKey, Kind.LESS_OFTEN)
           toast = "Will show this less often" to null
         },
         onNever = {
           why = null
-          ForYouHome.note(context, snap.scope, chip.surface, Kind.NEVER)
+          ForYouHome.note(context, snap.scope, chip.feedbackKey, Kind.NEVER)
           hidden = hidden + chip.surface
           toast = "Won't suggest this again" to {
-            ForYouHome.allowAgain(context, snap.scope, chip.surface)
+            ForYouHome.allowAgain(context, snap.scope, chip.feedbackKey)
             hidden = hidden - chip.surface
           }
         })
   }
 }
 
-private const val REFRESH_MS = 10 * 60_000L
 private const val TOAST_MS = 4_000L
 private val Ember = Color(0xFFD9773A)
 private val EmberInk = Color(0xFF1B120B)

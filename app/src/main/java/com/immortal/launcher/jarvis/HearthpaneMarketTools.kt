@@ -39,6 +39,8 @@ internal object HearthpaneMarketTools {
   private const val SCOREBOARD_TTL_MS = 20L * 1000
   private const val CACHE_PREFIX = "jarvis.espn:"
   private const val MAX_RECENT_PAGES = 24
+  private const val QUOTE_TTL_MS = 60L * 1000
+  private const val MAX_RECENT_QUOTES = 16
   private val io = Executors.newCachedThreadPool { r -> Thread(r, "hearthpane-jarvis-market").apply { isDaemon = true } }
 
   fun build(context: Context): Map<String, (String?) -> JSONObject> {
@@ -64,7 +66,7 @@ internal object HearthpaneMarketTools {
    * in [HttpCache] and a stale one still serves; game pages live in a small in-memory cache for their short TTL and
    * are never served stale (an old "live" score would mislead).
    */
-  private fun espn(ctx: Context, paths: List<String>, budgetMs: Long): List<String?> {
+  internal fun espn(ctx: Context, paths: List<String>, budgetMs: Long): List<String?> {
     val deadline = System.currentTimeMillis() + budgetMs
     val reads: List<Pair<Future<String?>?, String?>> = paths.map { path ->
       val persistent = path.endsWith("/teams")
@@ -103,6 +105,29 @@ internal object HearthpaneMarketTools {
     path.endsWith("/schedule") -> SCHEDULE_TTL_MS
     path.endsWith("/scoreboard") -> SCOREBOARD_TTL_MS
     else -> TEAM_TTL_MS
+  }
+
+  private class Quoted(val quote: StockQuotes.Quote, val atMs: Long)
+
+  /** Recent quotes by symbol for Home's interest chips, at most [MAX_RECENT_QUOTES], kept [QUOTE_TTL_MS]. */
+  private val quoteCache = LinkedHashMap<String, Quoted>()
+
+  /**
+   * [quotes] through a short in-memory cache, for Home's interest chips (which re-read every few minutes): a quote
+   * younger than [QUOTE_TTL_MS] is reused, anything older is fetched again and never served stale.
+   */
+  internal fun recentQuotes(ctx: Context, symbols: List<String>): List<StockQuotes.Quote> {
+    val nowMs = System.currentTimeMillis()
+    val have = synchronized(quoteCache) {
+      symbols.mapNotNull { s -> quoteCache[s]?.takeIf { nowMs - it.atMs < QUOTE_TTL_MS }?.quote }
+    }
+    val missing = symbols.filter { s -> have.none { it.symbol.equals(s, ignoreCase = true) } }
+    val got = if (missing.isEmpty()) emptyList() else quotes(ctx, missing)
+    synchronized(quoteCache) {
+      got.forEach { q -> val key = q.symbol.uppercase(Locale.ROOT); quoteCache.remove(key); quoteCache[key] = Quoted(q, nowMs) }
+      while (quoteCache.size > MAX_RECENT_QUOTES) quoteCache.remove(quoteCache.keys.first())
+    }
+    return have + got
   }
 
   /** The Stocks widget's Alpaca quotes when the household has a key, then Yahoo's keyless chart for the rest. */

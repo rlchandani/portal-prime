@@ -125,7 +125,10 @@ The Kotlin package is flat; files are grouped by name prefix:
   `MemoryConfidence` (how sure), `MemoryNote` (the prompt note); `JarvisKnowsActivity` ("What Jarvis knows");
   silent usage counts `UsageCounts` / `MemoryUsage`; Home's "For you right now" row (slice 2, same switch) in
   `HomeForYouRow`, ranked by `ForYouRanker` (habit lift/support/decay) and tuned by `ForYouFeedback` (shown, opened,
-  not now, less often, don't suggest), with `ForYouChips` for the chip text. Never log user text or profile content.
+  not now, less often, don't suggest), with `ForYouChips` for the chip text; slice 3's interest chips (a followed
+  team's game, live or final score, the market's open/close, a ≥4% move, fresh topic headlines) in `ForYouInterests`
+  (pure) over `ForYouInterestFeed` (the `SportsFeed` / `StockQuotes` feeds via `HearthpaneMarketTools`, Google News
+  topic search kept in RAM), refreshed every 30 s while a score is live. Never log user text or profile content.
 - **Jarvis household tools (`jarvis/`, declared in `res/values/jarvis_tools.xml`):** `HearthpaneHouseholdTools` binds
   them. Alarms: `HearthpaneAlarms` over `AlarmBook` — the main alarm is `AlarmConfig`, up to 5 more are `MoreAlarms`
   (own request codes in `AlarmScheduler`, Tools › Alarm's "Other alarms" in `ToolsOtherAlarms`); the ring under way

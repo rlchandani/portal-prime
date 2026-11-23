@@ -71,6 +71,21 @@ object NewsFeed {
           .getOrDefault(emptyList())
 
   /** All inner-text spans for `<tag …>…</tag>` occurrences (handles attributes on the open tag). */
+  /**
+   * When the newest item in [xml] was published: RSS `<pubDate>` (RFC 1123) or Atom `<published>`/`<updated>`
+   * (ISO 8601). Null when there are no readable dates. Pure; for "fresh headlines" on Home's interest chips.
+   */
+  internal fun newestPublishedMs(xml: String?): Long? = runCatching {
+    val blocks = extractBlocks(xml ?: return null, "item").ifEmpty { extractBlocks(xml, "entry") }
+    blocks.mapNotNull { block ->
+      val raw = (firstTag(block, "pubDate") ?: firstTag(block, "published") ?: firstTag(block, "updated"))
+          ?.let { clean(it) } ?: return@mapNotNull null
+      runCatching { java.time.ZonedDateTime.parse(raw, java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME) }
+          .recoverCatching { java.time.OffsetDateTime.parse(raw).toZonedDateTime() }
+          .getOrNull()?.toInstant()?.toEpochMilli()
+    }.maxOrNull()
+  }.getOrNull()
+
   private fun extractBlocks(xml: String, tag: String): List<String> {
     val out = ArrayList<String>()
     val open = "<$tag"
