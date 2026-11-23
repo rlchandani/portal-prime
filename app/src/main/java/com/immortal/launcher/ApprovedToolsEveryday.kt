@@ -194,32 +194,8 @@ internal fun ToolsAlarmContent() {
     EverydayPanel("Repeat") {
       ToolsText("Choose days, or leave all off for a one-time alarm.", secondary = true)
       Spacer(Modifier.height(24.dp))
-      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Calendar uses 1-based Sunday–Saturday, unlike the mock's 0-based browser days.
-        listOf("S", "M", "T", "W", "T", "F", "S").forEachIndexed { index, label ->
-          val day = index + Calendar.SUNDAY
-          val selected = alarm?.days?.contains(day) == true
-          val fullDay = DateFormatSymbols(Locale.getDefault()).weekdays[day]
-          Surface(
-              onClick = {
-                changeAlarm({ ToolsAlarmEdits.toggleDay(it, day) })
-              },
-              enabled = alarm != null && !operations.busy,
-              shape = RoundedCornerShape(16.dp),
-              color = if (selected) EverydayAccent else EverydayRaised,
-              contentColor = if (selected) EverydayAccentInk else EverydayInk,
-              modifier = Modifier.weight(1f).heightIn(min = 68.dp).semantics {
-                contentDescription = fullDay
-                stateDescription = if (selected) "Selected" else "Not selected"
-              },
-              border = androidx.compose.foundation.BorderStroke(1.dp, EverydayDivider),
-          ) {
-            Text(
-                label, fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium,
-                fontSize = 24.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(vertical = 16.dp))
-          }
-        }
+      EverydayDayChips(alarm?.days.orEmpty(), enabled = alarm != null && !operations.busy) { day ->
+        changeAlarm({ ToolsAlarmEdits.toggleDay(it, day) })
       }
       EverydayActions {
         ToolsButton("Preview ringing screen", enabled = alarm != null && !operations.busy) {
@@ -554,9 +530,39 @@ internal fun ToolsConverterContent() {
   })
 }
 
+/** Sunday–Saturday chips for an alarm's repeat days (Calendar's 1-based days); shared by Repeat and Add alarm. */
+@Composable
+internal fun EverydayDayChips(selected: Set<Int>, enabled: Boolean, onToggle: (Int) -> Unit) {
+  Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    // Calendar uses 1-based Sunday–Saturday, unlike the mock's 0-based browser days.
+    listOf("S", "M", "T", "W", "T", "F", "S").forEachIndexed { index, label ->
+      val day = index + Calendar.SUNDAY
+      val isOn = day in selected
+      val fullDay = DateFormatSymbols(Locale.getDefault()).weekdays[day]
+      Surface(
+          onClick = { onToggle(day) },
+          enabled = enabled,
+          shape = RoundedCornerShape(16.dp),
+          color = if (isOn) EverydayAccent else EverydayRaised,
+          contentColor = if (isOn) EverydayAccentInk else EverydayInk,
+          modifier = Modifier.weight(1f).heightIn(min = 68.dp).semantics {
+            contentDescription = fullDay
+            stateDescription = if (isOn) "Selected" else "Not selected"
+          },
+          border = androidx.compose.foundation.BorderStroke(1.dp, EverydayDivider),
+      ) {
+        Text(
+            label, fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium,
+            fontSize = 24.sp, textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 16.dp))
+      }
+    }
+  }
+}
+
 /** Numbers are draft fields in the parent sheet; only its final action persists changes. */
 @Composable
-private fun EverydayNumberField(
+internal fun EverydayNumberField(
     title: String, value: String, min: Int, max: Int, fallback: Int,
     wrap: Boolean = false, enabled: Boolean = true, onChange: (String) -> Unit,
 ) {

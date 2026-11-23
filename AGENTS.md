@@ -130,6 +130,12 @@ The Kotlin package is flat; files are grouped by name prefix:
   and spoken snooze/stop are `AlarmRinging`. Timers: `HearthpaneTimers` drives `SharedTimers` (every room). Home
   routines (not the kids' picture `Routine*`): `HomeRoutines` (Good night, Leaving, household-made) run by
   `HearthpaneRoutines` through `CcJarvisHome.runBatch`, the same policy gate and confirm sheet as `home_control`.
+  Feeds (`HearthpaneFeedTools`): `HearthpaneCalendar` (any day, `day` next, and the recognised person's own
+  calendar via `WhosThereContent`) and `HearthpaneNews`. Markets (`HearthpaneMarketTools`): `HearthpaneSports` over
+  `SportsFeed` (ESPN's keyless site API, undocumented, personal use; fixtures in `src/test/resources/sports`) and
+  `HearthpaneStocks` over `StockQuotes` (the Stocks widget's Alpaca key, else Yahoo's keyless chart). "My team" /
+  "my stocks" read `MemoryHandoff.interests`; their tool calls feed `MemoryExtractor` (Jarvis 2.7.11 hands them over).
+  Tests never touch the network.
 - **Remote / Portal TV:** `Remote*`, `TvFocus`
 - **Boot / lifecycle:** `ImmortalApp`, `BootReceiver`, `BootLaunch`, `Sleep*`, `ScreenControl`
 - **Settings (the registry — read [Settings infrastructure](#settings-infrastructure) before

@@ -20,7 +20,8 @@ import com.immortal.launcher.memory.MemoryFact.Kind
  * - an intent phrase ("keep an eye on", "I follow") marks the entities near it as intent; a negation ("I don't care
  *   about") drops them from this conversation.
  *
- * Music genres come only from the `play_music` tool call's query. Pure.
+ * Music genres come only from the `play_music` tool call's query; teams and tickers also from `hearthpane.sports` and
+ * `hearthpane.stocks` calls. Pure.
  */
 internal class MemoryExtractor(private val dictionary: MemoryDictionary) {
 
@@ -47,8 +48,25 @@ internal class MemoryExtractor(private val dictionary: MemoryDictionary) {
       matches(sentence).flatMap { it.entries }.filter { it.kind == Kind.MUSIC_TASTE }
           .map { Observation(it, Evidence.Source.TOOL_CALL) }
     }
+    SPORTS -> kindOnly(call.query, Kind.TEAM, known)
+    STOCKS -> kindOnly(call.query, Kind.TICKER, known)
     else -> emptyList()
   }
+
+  /**
+   * A typed tool's argument (`hearthpane.sports`' team, `hearthpane.stocks`' symbols): the tool names the kind, so
+   * that kind's common-word names count without a cue ("the Giants" for sports still needs its league or what's known).
+   */
+  private fun kindOnly(query: String, kind: Kind, known: Set<String>): List<Observation> =
+      MemoryText.sentences(query).flatMap { tokens ->
+        matches(tokens).mapNotNull { match ->
+          val entries = match.entries.filter { it.kind == kind }.distinctBy { it.factId }
+          val entry = entries.singleOrNull() ?: entries.filter { e ->
+            dictionary.leagueWords[e.attrs[MemoryDictionary.ATTR_LEAGUE]].orEmpty().any { MemoryText.contains(tokens, it) }
+          }.singleOrNull() ?: entries.filter { it.factId in known }.singleOrNull()
+          entry?.let { Observation(it, Evidence.Source.TOOL_CALL) }
+        }
+      }
 
   private fun text(text: String, source: Evidence.Source, known: Set<String>) =
       MemoryText.sentences(text).flatMap { sentence -> sentence(sentence, source, known) }
@@ -132,5 +150,8 @@ internal class MemoryExtractor(private val dictionary: MemoryDictionary) {
   companion object {
     const val WEB_SEARCH = "portal.web_search"
     const val PLAY_MUSIC = "portal.play_music"
+    /** Hearthpane's own typed tools, handed over by Jarvis 2.7.11+ with their team / symbols as the query. */
+    const val SPORTS = "hearthpane.sports"
+    const val STOCKS = "hearthpane.stocks"
   }
 }

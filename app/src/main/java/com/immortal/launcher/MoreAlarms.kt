@@ -58,6 +58,15 @@ internal object MoreAlarms {
   /** The lowest free id, or null when [MAX] are kept. */
   fun freeId(alarms: List<Alarm>): Int? = (1..MAX).firstOrNull { id -> alarms.none { it.id == id } }
 
+  /**
+   * [alarms] with a new, turned-on alarm in the lowest free slot (Tools › Alarm's Add alarm); null when all [MAX] are
+   * kept. Never takes a turned-off alarm's slot: the household may want it back.
+   */
+  fun add(alarms: List<Alarm>, config: AlarmConfig.Config): List<Alarm>? {
+    val id = freeId(alarms) ?: return null
+    return put(alarms, Alarm(id, config.copy(enabled = true, label = config.label.trim().ifEmpty { "Alarm" })))
+  }
+
   /** [alarms] with [alarm] put in its slot (added or replaced). */
   fun put(alarms: List<Alarm>, alarm: Alarm): List<Alarm> =
       (alarms.filterNot { it.id == alarm.id } + alarm).sortedBy { it.id }

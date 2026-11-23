@@ -122,4 +122,20 @@ class MemoryExtractorTest {
     val obs = MemoryFixtures.observe("c", "How did the Lakers do?", "Actually I don't care about the Lakers.")
     assertTrue(obs.isEmpty())
   }
+
+  private fun tool(name: String, query: String) =
+      extractor.extract(MemoryFixtures.digest("c", tools = listOf(MemoryDigest.ToolCall(name, query)))).map { it.factId }
+
+  @Test fun theSportsToolsTeamCountsWithoutACueButOnlyAsATeam() {
+    assertEquals(listOf("team:nba.gsw"), tool("hearthpane.sports", "Warriors"))
+    assertEquals(listOf("team:epl.bha"), tool("hearthpane.sports", "Brighton"))
+    assertEquals("Apple is a ticker, not a team", emptyList<String>(), tool("hearthpane.sports", "Apple"))
+    assertEquals("same-named teams still need a league", emptyList<String>(), tool("hearthpane.sports", "Giants"))
+    assertEquals(listOf("team:mlb.sf"), tool("hearthpane.sports", "Giants baseball"))
+  }
+
+  @Test fun theStocksToolsSymbolsCountOnlyAsTickers() {
+    assertEquals(listOf("ticker:AAPL", "ticker:NVDA"), tool("hearthpane.stocks", "Apple, NVDA"))
+    assertEquals(emptyList<String>(), tool("hearthpane.stocks", "Warriors"))
+  }
 }

@@ -1,0 +1,56 @@
+{
+ "sports": [
+  {
+   "leagues": [
+    {
+     "teams": [
+      {
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics",
+        "shortDisplayName": "Celtics",
+        "location": "Boston",
+        "name": "Celtics",
+        "nickname": "Boston"
+       }
+      },
+      {
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State",
+        "name": "Warriors",
+        "nickname": "Golden State"
+       }
+      },
+      {
+       "team": {
+        "id": "13",
+        "abbreviation": "LAL",
+        "displayName": "Los Angeles Lakers",
+        "shortDisplayName": "Lakers",
+        "location": "Los Angeles",
+        "name": "Lakers",
+        "nickname": "Los Angeles"
+       }
+      },
+      {
+       "team": {
+        "id": "29",
+        "abbreviation": "MEM",
+        "displayName": "Memphis Grizzlies",
+        "shortDisplayName": "Grizzlies",
+        "location": "Memphis",
+        "name": "Grizzlies",
+        "nickname": "Memphis"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

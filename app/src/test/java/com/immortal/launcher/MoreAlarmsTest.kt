@@ -67,3 +67,29 @@ class OtherAlarmSubtitleTest {
     assertEquals("Every day", otherAlarmSubtitle(AlarmConfig.Config(true, 6, 30, "", (1..7).toSet())))
   }
 }
+
+/** Tools › Alarm's Add alarm: a new, turned-on alarm in a free slot, never over a turned-off one. */
+class AddOtherAlarmTest {
+  private fun alarm(id: Int, on: Boolean = true) = MoreAlarms.Alarm(id, AlarmConfig.Config(on, 6, 0, "Alarm", emptySet()))
+
+  @Test fun addTakesTheLowestFreeSlotTurnedOnWithADefaultLabel() {
+    val added = MoreAlarms.add(listOf(alarm(1), alarm(2, on = false)), AlarmConfig.Config(false, 9, 15, "  ", setOf(Calendar.SATURDAY)))!!
+    assertEquals(listOf(1, 2, 3), added.map { it.id })
+    val c = added.last().config
+    assertEquals(AlarmConfig.Config(true, 9, 15, "Alarm", setOf(Calendar.SATURDAY)), c)
+    assertEquals("the turned-off alarm is kept", false, added.first { it.id == 2 }.config.enabled)
+  }
+
+  @Test fun addIsRefusedWhenEverySlotIsKept() {
+    assertNull(MoreAlarms.add((1..MoreAlarms.MAX).map { alarm(it, on = false) }, AlarmConfig.Config(true, 7, 0, "Alarm", emptySet())))
+  }
+
+  @Test fun draftNeedsAValidTimeAndTrimsTheLabel() {
+    val draft = OtherAlarmDraft(hour = "6", minute = "30", label = "  Gym  ").toggled(Calendar.MONDAY).toggled(Calendar.FRIDAY)
+    assertEquals(AlarmConfig.Config(true, 6, 30, "Gym", setOf(Calendar.MONDAY, Calendar.FRIDAY)), draft.config())
+    assertEquals(setOf(Calendar.FRIDAY), draft.toggled(Calendar.MONDAY).days)
+    assertNull(OtherAlarmDraft(hour = "24").config())
+    assertNull(OtherAlarmDraft(minute = "").config())
+    assertEquals("Alarm", OtherAlarmDraft().config()!!.label)
+  }
+}

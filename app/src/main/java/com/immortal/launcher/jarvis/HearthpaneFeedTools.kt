@@ -15,6 +15,10 @@ import com.immortal.launcher.ImmortalSettings
 import com.immortal.launcher.NewsConfig
 import com.immortal.launcher.NewsFeed
 import com.immortal.launcher.ScreensaverConfig
+import com.immortal.launcher.WhosThere
+import com.immortal.launcher.WhosThereContent
+import com.immortal.launcher.WhosThereView
+import com.immortal.launcher.memory.MemoryAccess
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.Executors
@@ -36,7 +40,8 @@ internal object HearthpaneFeedTools {
     val ctx = context.applicationContext
     val calendar = HearthpaneCalendar(
         feed = { calendar(ctx) }, hidden = { GuestMode.hides(GuestContent.CALENDAR) }, now = System::currentTimeMillis,
-        zone = TimeZone::getDefault, locale = Locale::getDefault, use24 = { ImmortalSettings.use24HourClock(ctx) })
+        zone = TimeZone::getDefault, locale = Locale::getDefault, use24 = { ImmortalSettings.use24HourClock(ctx) },
+        mine = { mine(ctx) })
     val news = HearthpaneNews(sources = { news(ctx) }, defaulted = { NewsConfig.load(ctx).isEmpty() })
     return mapOf(HearthpaneCalendar.NAME to calendar::invoke, HearthpaneNews.NAME to news::invoke)
   }
@@ -48,6 +53,26 @@ internal object HearthpaneFeedTools {
     val read = io.submit<CalendarFeed.Result> { CalendarFeed.read(url, System.currentTimeMillis()) }
     return within(read, System.currentTimeMillis() + NETWORK_BUDGET_MS, "calendar")
         ?: CalendarFeed.Result(emptyList(), unavailable = true)
+  }
+
+  /**
+   * The recognised person's calendar as their personal Home shows it: their own feed, else the household's filtered
+   * to them. Null while nobody (or a glance still asking "is this you?") is recognised.
+   */
+  private fun mine(ctx: Context): HearthpaneCalendar.Mine? {
+    val ui = WhosThere.state.value
+    val view = ui.view as? WhosThereView.Personal ?: return null
+    if (view.confirm) return null
+    val person = ui.owner ?: return null
+    val name = MemoryAccess.firstName(person.name) ?: "you"
+    val own = person.calendarUrl?.takeIf { it.isNotBlank() }
+    val url = own ?: ScreensaverConfig.load(ctx).calendarUrl?.takeIf { it.isNotBlank() } ?: return HearthpaneCalendar.Mine(name, null)
+    val read = io.submit<CalendarFeed.Result> { CalendarFeed.read(url, System.currentTimeMillis()) }
+    val result = within(read, System.currentTimeMillis() + NETWORK_BUDGET_MS, "personal calendar")
+        ?: CalendarFeed.Result(emptyList(), unavailable = true)
+    val events = if (own != null) WhosThereContent.fromOwnFeed(result.events, person)
+        else WhosThereContent.fromShared(result.events, person, ui.people)
+    return HearthpaneCalendar.Mine(name, CalendarFeed.Result(HearthpaneCalendar.personal(events, ui.hidePrivate), result.unavailable))
   }
 
   /** Every added feed (or the default one), fetched side by side. */

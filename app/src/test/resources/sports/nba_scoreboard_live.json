@@ -1,0 +1,113 @@
+{
+ "day": {
+  "date": "2026-11-22"
+ },
+ "events": [
+  {
+   "id": "401910029",
+   "date": "2026-11-22T20:30Z",
+   "name": "Detroit Pistons at Atlanta Hawks",
+   "shortName": "DET @ ATL",
+   "competitions": [
+    {
+     "id": "401910029",
+     "date": "2026-11-22T20:30Z",
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "displayClock": "12:00",
+      "period": 4
+     },
+     "competitors": [
+      {
+       "id": "1",
+       "homeAway": "home",
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks",
+        "shortDisplayName": "Hawks",
+        "location": "Atlanta",
+        "name": "Hawks"
+       },
+       "winner": true,
+       "score": "107"
+      },
+      {
+       "id": "8",
+       "homeAway": "away",
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons",
+        "shortDisplayName": "Pistons",
+        "location": "Detroit",
+        "name": "Pistons"
+       },
+       "winner": false,
+       "score": "97"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401910035",
+   "date": "2026-11-23T01:30Z",
+   "name": "Boston Celtics at Golden State Warriors",
+   "shortName": "BOS @ GS",
+   "competitions": [
+    {
+     "id": "401910035",
+     "date": "2026-11-23T01:30Z",
+     "status": {
+      "type": {
+       "id": "2",
+       "name": "STATUS_IN_PROGRESS",
+       "state": "in",
+       "completed": false,
+       "description": "In Progress",
+       "detail": "3:12 - 3rd Quarter",
+       "shortDetail": "3:12 - 3rd"
+      },
+      "displayClock": "3:12",
+      "period": 3
+     },
+     "competitors": [
+      {
+       "id": "9",
+       "homeAway": "home",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       },
+       "score": "78"
+      },
+      {
+       "id": "2",
+       "homeAway": "away",
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics",
+        "shortDisplayName": "Celtics",
+        "location": "Boston"
+       },
+       "score": "81"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

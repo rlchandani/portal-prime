@@ -26,8 +26,9 @@ class HearthpaneCalendarTest {
   private var feed: CalendarFeed.Result? = CalendarFeed.Result(emptyList())
   private var hidden = false
   private var use24 = false
+  private var mine: HearthpaneCalendar.Mine? = null
   private val tool = HearthpaneCalendar(feed = { feed }, hidden = { hidden }, now = { now },
-      zone = { TimeZone.getTimeZone("UTC") }, locale = { Locale.US }, use24 = { use24 })
+      zone = { TimeZone.getTimeZone("UTC") }, locale = { Locale.US }, use24 = { use24 }, mine = { mine })
 
   private fun event(start: Long, title: String, hours: Long = 1, allDay: Boolean = false, location: String? = null) =
       CalendarFeed.Event(start, start + hours * hour, title, allDay, location)
@@ -135,5 +136,51 @@ class HearthpaneCalendarTest {
     events(event(midnight + 9 * hour, "x".repeat(300)))
     val title = call().getJSONArray("events").getJSONObject(0).getString("title")
     assertEquals(HearthpaneCalendar.MAX_TITLE, title.length)
+  }
+
+  @Test fun nextIsTheSoonestEventStillToStartHoweverFarOut() {
+    events(event(now - hour, "Standup", hours = 2), event(midnight, "Holiday", hours = 24, allDay = true),
+        event(midnight + 12 * day + 15 * hour, "Dentist", location = "Main St"), event(midnight + 20 * day, "Later"))
+    val r = call("day" to "next")
+    assertTrue(r.getBoolean("ok"))
+    assertEquals("Next on the calendar: Dentist on Sunday, November 29 at 3:00 PM.", r.getString("message"))
+    assertEquals("Main St", r.getJSONArray("events").getJSONObject(0).getString("location"))
+    events(event(midnight + day + 9 * hour, "Dentist"))
+    assertEquals("Next on the calendar: Dentist tomorrow at 9:00 AM.", call("day" to "coming up").getString("message"))
+    events()
+    assertEquals("Nothing coming up on the calendar in the next 45 days.", call("day" to "next").getString("message"))
+    feed = CalendarFeed.Result(emptyList(), unavailable = true)
+    assertEquals("I couldn't reach the calendar just now.", call("day" to "next").getString("message"))
+  }
+
+  @Test fun myCalendarIsTheRecognisedPersonsUnlessTheHouseholdIsAsked() {
+    events(event(midnight + 10 * hour, "Family brunch"))
+    mine = HearthpaneCalendar.Mine("Maya", CalendarFeed.Result(listOf(event(midnight + 15 * hour, "Piano"))))
+    val r = call("day" to "today")
+    assertEquals("Maya", r.getString("whose"))
+    assertEquals("Today you have 1 thing: Piano at 3:00 PM.", r.getString("message"))
+    assertEquals("Next on the calendar: Piano today at 3:00 PM.", call("day" to "next", "for" to "me").getString("message"))
+    val household = call("day" to "today", "for" to "household")
+    assertFalse(household.has("whose"))
+    assertEquals("Today you have 1 thing: Family brunch at 10:00 AM.", household.getString("message"))
+  }
+
+  @Test fun myCalendarWithNobodyRecognisedIsTheHouseholdsAndSaysSo() {
+    events(event(midnight + 10 * hour, "Family brunch"))
+    val r = call("for" to "me")
+    assertEquals("I can't tell who's asking, so this is the household calendar.", r.getString("note"))
+    assertTrue(r.getString("message").contains("Family brunch"))
+    mine = HearthpaneCalendar.Mine("Maya", null)
+    assertFalse(call("for" to "me").getBoolean("ok"))
+  }
+
+  @Test fun privatePersonalEventsAreKeptBackWhileOthersMayHear() {
+    val events = listOf(
+        com.immortal.launcher.PersonalEvent(now, now + hour, "Therapy", false, "Clinic", com.immortal.launcher.EventOwner.MINE, private = true),
+        com.immortal.launcher.PersonalEvent(now, now + hour, "Piano", false, null, com.immortal.launcher.EventOwner.MINE, private = false))
+    val hidden = HearthpaneCalendar.personal(events, hidePrivate = true)
+    assertEquals(listOf("Private", "Piano"), hidden.map { it.title })
+    assertEquals(null, hidden[0].location)
+    assertEquals(listOf("Therapy", "Piano"), HearthpaneCalendar.personal(events, hidePrivate = false).map { it.title })
   }
 }

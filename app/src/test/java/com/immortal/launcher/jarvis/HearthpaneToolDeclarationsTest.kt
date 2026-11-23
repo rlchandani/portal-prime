@@ -29,7 +29,8 @@ class HearthpaneToolDeclarationsTest {
     val names = (0 until decls.length()).map { decls.getJSONObject(it).getString("name") }
     assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL,
         HearthpaneTools.REMINDERS, HearthpaneAnnounce.NAME, HearthpaneLists.NAME, HearthpaneAlarms.NAME,
-        HearthpaneTimers.NAME, HearthpaneRoutines.NAME, HearthpaneBriefing.NAME, HearthpaneCalendar.NAME, HearthpaneNews.NAME, HearthpaneCall.NAME,
+        HearthpaneTimers.NAME, HearthpaneRoutines.NAME, HearthpaneBriefing.NAME, HearthpaneCalendar.NAME, HearthpaneNews.NAME,
+        HearthpaneSports.NAME, HearthpaneStocks.NAME, HearthpaneCall.NAME,
         com.immortal.launcher.memory.MemoryTool.NAME), names)
     for (i in 0 until decls.length()) {
       val d = decls.getJSONObject(i)
@@ -76,7 +77,11 @@ class HearthpaneToolDeclarationsTest {
     requires(HearthpaneRoutines.NAME, "action", "name", "steps")
     requires(HearthpaneBriefing.NAME, "show")
     requires(HearthpaneCall.NAME, "room", "video")
-    requires(HearthpaneCalendar.NAME, "day", "date")
+    requires(HearthpaneCalendar.NAME, "day", "date", "for")
+    requires(HearthpaneSports.NAME, "team", "league")
+    requires(HearthpaneStocks.NAME, "symbols")
+    assertEquals("ARRAY", tool(HearthpaneStocks.NAME).getJSONObject("parameters").getJSONObject("properties")
+        .getJSONObject("symbols").getString("type"))
     requires(HearthpaneNews.NAME, "count", "source")
     assertEquals("ARRAY", tool(HearthpaneLists.NAME).getJSONObject("parameters").getJSONObject("properties")
         .getJSONObject("items").getString("type"))
@@ -86,6 +91,9 @@ class HearthpaneToolDeclarationsTest {
 
   @Test fun householdToolsPromiseTheirSafetyRules() {
     assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("not a countdown timer"))
+    assertTrue(tool(HearthpaneSports.NAME).getString("description").contains("do not guess scores"))
+    assertTrue(tool(HearthpaneStocks.NAME).getString("description").contains("never as advice"))
+    assertTrue(tool(HearthpaneNews.NAME).getString("description").contains("hearthpane.sports"))
     assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("needs_which"))
     assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("action snooze"))
     assertTrue(tool(HearthpaneCall.NAME).getString("description").contains("never phone numbers"))
