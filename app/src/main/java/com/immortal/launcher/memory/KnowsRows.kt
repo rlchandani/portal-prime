@@ -21,7 +21,7 @@ import java.util.Locale
  */
 internal object KnowsRows {
   enum class Category(val title: String) { EVERYTHING("Everything"), TEAMS("Teams"), MARKETS("Markets"),
-    NEWS("News"), MUSIC("Music") }
+    NEWS("News"), MUSIC("Music"), PLACES("Places") }
 
   data class Row(
       val id: String,
@@ -57,6 +57,9 @@ internal object KnowsRows {
     Kind.TEAM -> Category.TEAMS
     Kind.TICKER, Kind.CRYPTO -> Category.MARKETS
     Kind.MUSIC_TASTE -> Category.MUSIC
+    Kind.PLACE -> Category.PLACES
+    // Slice 4's preferences have no tab of their own in the mock: they show under Everything only.
+    Kind.PREFERENCE -> Category.EVERYTHING
     else -> Category.NEWS
   }
 

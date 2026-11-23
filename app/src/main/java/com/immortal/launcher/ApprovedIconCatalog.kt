@@ -100,6 +100,7 @@ internal fun approvedIconResource(name: String): Int = when (name.lowercase(Loca
     "spark", "learned" -> R.drawable.memory_icon_spark
     "interest_trend" -> R.drawable.memory_icon_trend
     "interest_news" -> R.drawable.memory_icon_news
+    "place", "pin_place" -> R.drawable.memory_icon_pin
     else -> R.drawable.approved_icon_info
 }
 

@@ -6,7 +6,10 @@
  */
 package com.immortal.launcher.memory
 
+import java.time.Instant
 import java.time.ZoneId
+import java.time.format.TextStyle
+import java.util.Locale
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -14,9 +17,12 @@ import org.json.JSONObject
 /**
  * Jarvis ↔ Hearthpane memory, the non-model provider methods (plan §3.3–3.4), Android-free:
  * - [context] (`memory_context`, conversation open): freezes whose conversation it is and answers the note lines
- *   for Jarvis's prompt, plus whether to hand the conversation over at its end (`learning`).
- * - [observe] (`memory_observe`, conversation end): runs the extractor over the digest and learns, then drops the
- *   digest. Answers only ids and labels of what became known, for the "Learned … Undo" notice.
+ *   for Jarvis's prompt, plus whether to hand the conversation over at its end (`learning`) and, from slice 4,
+ *   whether to run the text extractor first (`extract`, with the `known` fact ids it may deduplicate against). The
+ *   extracted Recent topics the note offers are marked shown, so Jarvis follows each up once.
+ * - [observe] (`memory_observe`, conversation end): runs the dictionary extractor over the digest, re-checks the
+ *   text extractor's suggestions ([LlmExtractionCheck]) and learns, then drops the digest. Answers only ids and labels
+ *   of what became known, for the "Learned … Undo" notice.
  * - [undo] (`memory_forget`): that notice's Undo; only facts the latest conversation touched.
  * Nothing here logs or keeps conversation text.
  */
@@ -42,12 +48,33 @@ internal class MemoryHandoff(
     val on = access as? MemoryAccess.On ?: return off(access as MemoryAccess.Off)
     recordUsage(on.scope, JARVIS_SURFACE)
     val profile = runtime.profile(on.scope)
-    val lines = MemoryNote.lines(MemoryNote.Inputs(access, profile, nowMs, zone(), screen))
+    val note = MemoryNote.build(MemoryNote.Inputs(access, profile, nowMs, zone(), screen))
+    if (note.offeredTopics.isNotEmpty()) runtime.update(on.scope) { MemoryLearner.markShown(it, note.offeredTopics) }
+    val learning = !profile.paused
     return JSONObject()
-        .put("learning", !profile.paused)
+        .put("learning", learning)
         .put("scope", if (on.scope is MemoryScope.Household) "household" else "person")
-        .apply { if (lines.isNotEmpty()) put("note", lines.joinToString("\n")) }
+        .apply { if (note.lines.isNotEmpty()) put("note", note.lines.joinToString("\n")) }
+        .apply { if (learning) put("extract", true).put("known", JSONArray(knownIds(profile))) }
+        .apply { threads(profile, note.offeredTopics).takeIf { it.length() > 0 }?.let { put("threads", it) } }
   }
+
+  /**
+   * The offered Recent topics as the card sees them: the day each came up and the words naming it, so the card can
+   * say "Picked up from Tuesday" when Jarvis follows one up (mock `.used`). No gist, nothing more.
+   */
+  private fun threads(profile: MemoryProfile, offered: Set<String>): JSONArray = JSONArray().apply {
+    profile.recentTopics.filter { it.topic in offered }.forEach { t ->
+      val day = Instant.ofEpochMilli(t.atMs).atZone(zone()).dayOfWeek.getDisplayName(TextStyle.FULL, Locale.US)
+      val words = t.topic.substringAfter(':').split('-').filter { it.length >= THREAD_WORD }.take(THREAD_WORDS)
+      if (words.isNotEmpty()) put(JSONObject().put("day", day).put("words", JSONArray(words)))
+    }
+  }
+
+  /** What the text extractor may deduplicate against: the usable, non-sensitive fact ids, most sure first. */
+  private fun knownIds(profile: MemoryProfile): List<String> = profile.facts
+      .filter { MemoryConfidence.usable(it) && !it.sensitive }
+      .sortedByDescending { it.confidence }.take(MAX_KNOWN).map { it.id }
 
   /**
    * The [kind] facts known for whoever the conversation under way belongs to (the scope [tool] uses), most sure
@@ -77,11 +104,16 @@ internal class MemoryHandoff(
       return JSONObject().put("learned", JSONArray()).put("ignored", true)
     }
     val known = runtime.profile(on.scope).facts.map { it.id }.toSet()
-    val observations = MemoryExtractor(dictionary()).extract(digest, known)
+    val words = dictionary()
+    val fromWords = MemoryExtractor(words).extract(digest, known)
+    val suggested = LlmExtractionCheck(words).check(digest.extracted, digest.userTurns, nowMs)
+    val observations = (fromWords.filter { it.factId !in suggested.negated } + suggested.observations)
+        .groupBy { it.factId }.map { (_, same) -> same.maxBy { MemoryConfidence.weightOf(it.source) } }
+        .sortedBy { it.factId }
     var learned = emptyList<MemoryFact>()
     val next = runtime.update(on.scope) { profile ->
-      MemoryLearner.learn(profile, observations, digest.conversationId, portal(), nowMs).also { learned = it.learned }
-          .profile
+      MemoryLearner.learn(profile, observations, digest.conversationId, portal(), nowMs, suggested.topics)
+          .also { learned = it.learned }.profile
     }
     val touched = observations.map { it.factId }.filter { id -> next.facts.any { it.id == id && it.label.isNotEmpty() } }
     synchronized(lock) {
@@ -90,6 +122,7 @@ internal class MemoryHandoff(
     return JSONObject().put("learned", JSONArray().apply {
       learned.forEach { put(JSONObject().put("id", it.id).put("label", it.label).put("kind", it.kind.name.lowercase())) }
     }).put("observed", observations.size)
+        .put("extracted", suggested.observations.size).put("topics", suggested.topics.size)
   }
 
   fun undo(argsJson: String?): JSONObject {
@@ -139,6 +172,9 @@ internal class MemoryHandoff(
     const val METHOD_OBSERVE = "memory_observe"
     const val METHOD_FORGET = "memory_forget"
     const val JARVIS_SURFACE = "jarvis"
+    const val MAX_KNOWN = 20
+    private const val THREAD_WORD = 3
+    private const val THREAD_WORDS = 4
     private val ID = Regex("[A-Za-z0-9_-]{1,64}")
     private val SCREEN = Regex("[a-z0-9_]{1,32}")
   }

@@ -23,6 +23,12 @@ internal object MemoryLearner {
   /** The stand-in for "Recent topics" in slice 1: the last few things talked about, by fact id. */
   const val RECENT_KEEP = 3
 
+  /** Extracted Recent topics kept (slice 4), newest first, on top of the [RECENT_KEEP] stand-ins. */
+  const val TOPICS_KEEP = 5
+
+  /** Kinds kept out of every note and suggestion (and so never learned for the household). */
+  private val SENSITIVE_KINDS = setOf(MemoryFact.Kind.PLACE, MemoryFact.Kind.PERSON_NAME)
+
   /** A learning pass: the new profile and the facts that became usable in it (for the "Learned …" notice). */
   data class Result(val profile: MemoryProfile, val learned: List<MemoryFact>)
 
@@ -32,9 +38,10 @@ internal object MemoryLearner {
       conversationId: String,
       portal: String,
       nowMs: Long,
+      topics: List<RecentTopic> = emptyList(),
   ): Result {
     val current = refresh(profile, nowMs)
-    if (current.paused || observations.isEmpty()) return Result(current, emptyList())
+    if (current.paused || (observations.isEmpty() && topics.isEmpty())) return Result(current, emptyList())
     val byId = current.facts.associateBy { it.id }
     val touched = observations.mapNotNull { obs ->
       val existing = byId[obs.factId]
@@ -42,7 +49,7 @@ internal object MemoryLearner {
       val evidence = Evidence(obs.source, nowMs, portal, conversationId, MemoryConfidence.weightOf(obs.source))
       val base = existing ?: MemoryFact(
           id = obs.factId, kind = obs.entry.kind, label = obs.entry.label, attrs = obs.entry.attrs,
-          firstSeenMs = nowMs, lastSeenMs = nowMs,
+          firstSeenMs = nowMs, lastSeenMs = nowMs, sensitive = obs.entry.kind in SENSITIVE_KINDS,
       )
       val duplicate = base.evidence.any { it.conversationId == conversationId && it.source == obs.source }
       val withEvidence = if (duplicate) base else base.copy(evidence = listOf(evidence) + base.evidence)
@@ -51,10 +58,32 @@ internal object MemoryLearner {
     val touchedIds = touched.map { it.id }.toSet()
     val learned = touched.filter { MemoryConfidence.usable(it) && byId[it.id]?.let(MemoryConfidence::usable) != true }
     val facts = current.facts.filter { it.id !in touchedIds } + touched
-    val topics = touched.map { RecentTopic(topic = it.id, gist = it.label, atMs = nowMs) } +
-        current.recentTopics.filter { it.topic !in touchedIds }
-    val next = current.copy(facts = facts, recentTopics = topics.take(RECENT_KEEP)).normalized()
+    val standIns = touched.map { RecentTopic(topic = it.id, gist = it.label, atMs = nowMs) } +
+        current.recentTopics.filter { !it.extracted && it.topic !in touchedIds }
+    val next = current.copy(facts = facts,
+        recentTopics = standIns.take(RECENT_KEEP) + extractedTopics(current.recentTopics, topics)).normalized()
     return Result(next, learned.map { f -> next.facts.first { it.id == f.id } })
+  }
+
+  /**
+   * This conversation's extracted topics ahead of the older ones. A topic talked about again keeps its [shownCount],
+   * so it is still followed up at most once.
+   */
+  private fun extractedTopics(existing: List<RecentTopic>, incoming: List<RecentTopic>): List<RecentTopic> {
+    val old = existing.filter { it.extracted }
+    val byId = old.associateBy { it.topic }
+    val fresh = incoming.filter { it.extracted }.distinctBy { it.topic }
+        .map { t -> t.copy(shownCount = byId[t.topic]?.shownCount ?: 0) }
+    val ids = fresh.map { it.topic }.toSet()
+    return (fresh + old.filter { it.topic !in ids }).take(TOPICS_KEEP)
+  }
+
+  /** The topics a conversation note just offered, each marked shown once more (so it isn't offered again). */
+  fun markShown(profile: MemoryProfile, topicIds: Set<String>): MemoryProfile {
+    if (topicIds.isEmpty()) return profile
+    return profile.copy(recentTopics = profile.recentTopics.map {
+      if (it.topic in topicIds) it.copy(shownCount = it.shownCount + 1) else it
+    }).normalized()
   }
 
   /** Decay brought up to [nowMs]: confidence and state recomputed, long-unseen facts and old topics dropped. */
@@ -73,9 +102,16 @@ internal object MemoryLearner {
       MemoryFact(id = id, kind = kind, label = "", state = State.SUPPRESSED, firstSeenMs = nowMs, lastSeenMs = nowMs)
     }.filterNotNull()
     val ids = suppressed.map { it.id }.toSet()
+    // Forget wins over a thread about the same thing: an extracted topic naming a forgotten fact goes with it.
+    val names = ids.mapNotNull { existing[it] }.flatMap { listOf(it.label, it.id.substringAfter(':')) }
+        .map(MemoryText::tokens).filter { it.isNotEmpty() }
+    fun mentions(t: RecentTopic): Boolean {
+      val words = MemoryText.tokens("${t.topic.substringAfter(':').replace('-', ' ')} ${t.gist} ${t.openQuestion.orEmpty()}")
+      return names.any { MemoryText.contains(words, it) }
+    }
     return profile.copy(
         facts = profile.facts.filter { it.id !in ids } + suppressed,
-        recentTopics = profile.recentTopics.filter { it.topic !in ids },
+        recentTopics = profile.recentTopics.filter { it.topic !in ids && !(it.extracted && mentions(it)) },
     ).normalized()
   }
 
@@ -119,6 +155,8 @@ internal object MemoryLearner {
     "crypto" -> MemoryFact.Kind.CRYPTO
     "news" -> MemoryFact.Kind.NEWS_TOPIC
     "music" -> MemoryFact.Kind.MUSIC_TASTE
+    "place" -> MemoryFact.Kind.PLACE
+    "preference" -> MemoryFact.Kind.PREFERENCE
     else -> null
   }
 }

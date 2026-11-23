@@ -36,7 +36,8 @@ internal data class MemoryProfile(
 
   companion object {
     const val MAX_FACTS = 300
-    const val MAX_RECENT_TOPICS = 5
+    /** Slice 1's [MemoryLearner.RECENT_KEEP] stand-ins plus up to [MemoryLearner.TOPICS_KEEP] extracted topics. */
+    const val MAX_RECENT_TOPICS = 8
 
     /** Over the cap, SUPPRESSED facts are kept first (they stop re-learning), then the most recently seen. */
     private val KEEP_ORDER = compareByDescending<MemoryFact> { it.state == MemoryFact.State.SUPPRESSED }
@@ -142,12 +143,28 @@ internal data class Evidence(
   enum class Source { TOOL_CALL, UTTERANCE, INTENT_PHRASE, USAGE, WIDGET, CONFIRM, EXPLICIT }
 }
 
-/** A conversation thread worth picking up again ("Recent topics"). [gist] is at most 140 characters. */
-internal data class RecentTopic(val topic: String, val gist: String, val openQuestion: String? = null, val atMs: Long) {
-  fun normalized(): RecentTopic = copy(gist = gist.take(MAX_GIST))
+/**
+ * A conversation thread worth picking up again ("Recent topics"). [gist] is at most 140 characters. [topic] is a fact
+ * id for slice 1's stand-in (the last things talked about), or `topic:<slug>` for one the slice 4 extractor gave.
+ * [shownCount] is how many conversation notes offered it: Jarvis may follow a topic up once (plan §3.9), so a topic
+ * already offered is not offered again.
+ */
+internal data class RecentTopic(
+    val topic: String,
+    val gist: String,
+    val openQuestion: String? = null,
+    val atMs: Long,
+    val shownCount: Int = 0,
+) {
+  /** From the slice 4 extractor (its own thread), rather than slice 1's stand-in for a fact. */
+  val extracted: Boolean get() = topic.startsWith(LlmExtractionCheck.TOPIC_PREFIX)
+
+  fun normalized(): RecentTopic = copy(gist = gist.take(MAX_GIST), openQuestion = openQuestion?.take(MAX_QUESTION),
+      shownCount = shownCount.coerceAtLeast(0))
 
   companion object {
     const val MAX_GIST = 140
+    const val MAX_QUESTION = 100
     const val HALF_LIFE_MS = 7 * MemoryFact.DAY_MS
     const val DROP_AFTER_MS = 14 * MemoryFact.DAY_MS
   }

@@ -133,8 +133,14 @@ The Kotlin package is flat; files are grouped by name prefix:
   News (`InterestWidgets`, pure; `HomeInterestWidgets` draws them, ✦ + "new" + ✕/Undo, removal is a per-scope
   "Don't suggest this" on `widget:<kind>:<key>`), the Sports widget (`SportsCard` for the card and its slot scale,
   `SportsHomeWidget`; kind `sports`, offered in the picker only while the switch is on) and the personal briefing's
-  "Your teams & markets" line (`BriefingInterests`), all bound in `InterestWidgetsHome`. Never log user text or
-  profile content.
+  "Your teams & markets" line (`BriefingInterests`), all bound in `InterestWidgetsHome`. Slice 4 (same switch; Jarvis
+  2.7.12+): `memory_context` answers `extract` + `known` while learning, Jarvis runs one text-only extraction over the
+  person's own turns (Gemini Flash, or the LAN host on Local) and hands it over as the digest's `extracted`
+  (`LlmExtraction`); `LlmExtractionCheck` re-checks it (kind allow-list, quote must be their words, `MemorySensitive`
+  deny-list, dictionary canonicalization, UTTERANCE weight unless `intent`) for news topics, music, places (sensitive:
+  never injected) and preferences (personal only), plus extracted Recent topics (`topic:<slug>`) that `MemoryNote`
+  offers once as "Recently: …" (`shownCount`) and the context's `threads` for the card's "Picked up from …".
+  Never log user text or profile content.
 - **Jarvis household tools (`jarvis/`, declared in `res/values/jarvis_tools.xml`):** `HearthpaneHouseholdTools` binds
   them. Alarms: `HearthpaneAlarms` over `AlarmBook` — the main alarm is `AlarmConfig`, up to 5 more are `MoreAlarms`
   (own request codes in `AlarmScheduler`, Tools › Alarm's "Other alarms" in `ToolsOtherAlarms`); the ring under way
