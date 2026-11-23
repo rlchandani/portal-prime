@@ -17,11 +17,16 @@ MARK_TAG = "PerfBenchOta"
 OTA_TAG = "HearthpaneOta"
 FLEET_TAG = "ImmortalFleet"
 HOME_CLASS = "com.immortal.launcher.HomeActivity"
+# Android resumes Meta's launcher while ours is frozen; Hearthpane's MY_PACKAGE_REPLACED restore
+# (ReplacedHomeReceiver) must take the screen back. Before it nothing did unless Android kept
+# our HomeActivity record by luck (1.332 OTA over the photo frame: Meta's Home stayed 3.5 min).
+STOCK_HOME_CLASS = "com.facebook.aloha.app.home.touch.HomeActivity"
+RESTORE_TAG = "HearthpaneReplacedHome"
 ASSISTANT = "com.portal.assistant"
 WATCHED = (PACKAGE, ASSISTANT, "com.android.systemui", "system_server")
 # Device-side filter for the logcat dump (keeps the transfer small; times are filtered here).
 LOGCAT_PATTERN = (f"{MARK_TAG}|{OTA_TAG}|committed install|headless install|am_proc_start|am_proc_died|"
-                  "_on_resume_called|Displayed|Force stopping")
+                  f"_on_resume_called|Displayed|Force stopping|{RESTORE_TAG}")
 
 LogLine = namedtuple("LogLine", "epoch pid level tag msg")
 _LINE = re.compile(r"^\s*(\d+\.\d+)\s+(\d+)\s+\d+\s+([VDIWEFS])\s+([^:]*?)\s*: ?(.*)$")
@@ -41,7 +46,9 @@ EVENTS = (
     ("old_stopped", "system stops the old launcher (Force stopping, install)", "old_stopped", None),
     ("package_replaced", "package replaced (new versionCode)", None, "version_new"),
     ("old_process_gone", "old launcher process gone", "old_died", "pid_gone"),
+    ("stock_home_resumed", "Meta Home resumed in the gap (ours frozen)", "stock_resumed", None),
     ("new_process", "new launcher process started", "new_started", "pid_new"),
+    ("home_restore", "Hearthpane restore asked for Home (MY_PACKAGE_REPLACED)", "home_restore", None),
     ("home_first_frame", "Home first frame (Displayed HomeActivity)", "home_displayed", None),
     ("home_resumed", "HomeActivity resumed", "home_resumed", "home_top"),
 )
@@ -58,6 +65,7 @@ PHASES = (
     ("old process gone -> new process", "old_process_gone", "new_process"),
     ("new process -> Home first frame", "new_process", "home_first_frame"),
     ("new process -> HomeActivity resumed", "new_process", "home_resumed"),
+    ("Meta Home on top: stock resume -> HomeActivity resumed", "stock_home_resumed", "home_resumed"),
 )
 
 TOTALS = (
@@ -117,6 +125,13 @@ def markers(lines, package=PACKAGE):
     start = _first(lines, after, lambda x: x.tag == "am_proc_start" and _proc(_PROC_START, x.msg)[1] == package)
     found["new_started"] = start.epoch if start else None
     new_pid = _proc(_PROC_START, start.msg)[0] if start else None
+    stock = _first(lines, found["old_stopped"], lambda x: x.tag.endswith("_on_resume_called") and STOCK_HOME_CLASS in x.msg)
+    found["stock_resumed"] = stock.epoch if stock else None
+    restore = _first(lines, found["new_started"], lambda x: x.tag == RESTORE_TAG and "restoring Home" in x.msg)
+    found["home_restore"] = restore.epoch if restore else None
+    verdict = _first(lines, found["new_started"], lambda x: x.tag == RESTORE_TAG and "Home start(s)" in x.msg)
+    if verdict:
+        extra["replaced_home"] = verdict.msg[:200]
     if new_pid:
         extra["new_pid"] = new_pid
     shown = _first(lines, found["new_started"], lambda x: x.tag in ("ActivityTaskManager", "ActivityManager")
@@ -264,6 +279,8 @@ def markdown(ota):
     lines += [f"- Reboot: {'YES' if r.get('rebooted') else 'no' if r.get('rebooted') is False else '?'} "
               f"(uptime {r.get('uptime_before_s')} -> {r.get('uptime_after_s')} s, boot id "
               f"{'same' if r.get('boot_id_same') else 'CHANGED'})", f"- Processes (pid before -> after): {procs}"]
+    restore = (ota.get("logcat") or {}).get("replaced_home")
+    lines.append(f"- Home restore after the replace ({RESTORE_TAG}): {restore or 'none logged'}")
     if ota.get("pm_last_update_t") is not None:
         lines.append(f"- dumpsys lastUpdateTime: t={ota['pm_last_update_t']} s (1 s resolution, cross-check)")
     lines += ["", "| Event | t (s after check) | Source |", "|---|---|---|"]

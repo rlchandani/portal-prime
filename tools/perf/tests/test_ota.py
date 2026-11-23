@@ -67,6 +67,30 @@ class ParsingTest(unittest.TestCase):
         self.assertEqual(extra["displayed"], "+2s210ms")
         self.assertEqual(extra["assistant_starts"], [])
 
+    def test_meta_home_gap_and_hearthpane_restore_are_marked(self):
+        t0 = 5000.0
+        extra_lines = "\n".join([
+            log_line(t0 + 15.7, "am_on_resume_called", f"[0,{otaphases.STOCK_HOME_CLASS},RESUME_ACTIVITY]", pid=2318),
+            log_line(t0 + 16.3, otaphases.RESTORE_TAG, "package replaced: restoring Home (start 1, accepted=true)",
+                     pid=5151),
+            log_line(t0 + 17.9, otaphases.RESTORE_TAG, "package replaced: RESTORED after 1 Home start(s)", pid=5151),
+        ])
+        found, extra = otaphases.markers(otaphases.parse_logcat(sample_log(t0) + "\n" + extra_lines))
+        self.assertEqual(found["stock_resumed"], 5015.7)
+        self.assertEqual(found["home_restore"], 5016.3)
+        self.assertEqual(extra["replaced_home"], "package replaced: RESTORED after 1 Home start(s)")
+        events = otaphases.timeline(found, {}, None)
+        gap = next(p for p in otaphases.phases(events) if p["from"] == "stock_home_resumed")
+        self.assertEqual(gap["seconds"], 2.8)  # Meta's Home on top until ours resumed
+
+    def test_no_meta_gap_without_a_stock_resume(self):
+        found, _ = otaphases.markers(otaphases.parse_logcat(sample_log(5000.0)))
+        self.assertNotIn("stock_resumed", found)
+        self.assertNotIn("home_restore", found)
+
+    def test_device_filter_keeps_the_restore_lines(self):
+        self.assertIn(otaphases.RESTORE_TAG, otaphases.LOGCAT_PATTERN)
+
     def test_missing_lines_fall_back_to_polls_on_the_device_clock(self):
         found, _ = otaphases.markers(otaphases.parse_logcat(
             log_line(10.0, otaphases.MARK_TAG, "check-sent") + "\n" + log_line(12.0, otaphases.MARK_TAG, "install-sent")))
