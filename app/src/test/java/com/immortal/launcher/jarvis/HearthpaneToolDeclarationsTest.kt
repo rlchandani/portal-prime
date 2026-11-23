@@ -29,7 +29,8 @@ class HearthpaneToolDeclarationsTest {
     val names = (0 until decls.length()).map { decls.getJSONObject(it).getString("name") }
     assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL,
         HearthpaneTools.REMINDERS, HearthpaneAnnounce.NAME, HearthpaneLists.NAME, HearthpaneAlarms.NAME,
-        HearthpaneBriefing.NAME, HearthpaneCall.NAME, com.immortal.launcher.memory.MemoryTool.NAME), names)
+        HearthpaneBriefing.NAME, HearthpaneCalendar.NAME, HearthpaneNews.NAME, HearthpaneCall.NAME,
+        com.immortal.launcher.memory.MemoryTool.NAME), names)
     for (i in 0 until decls.length()) {
       val d = decls.getJSONObject(i)
       assertTrue(d.getString("description").isNotBlank())
@@ -73,6 +74,8 @@ class HearthpaneToolDeclarationsTest {
     requires(HearthpaneAlarms.NAME, "action", "time", "repeat", "label", "replace")
     requires(HearthpaneBriefing.NAME, "show")
     requires(HearthpaneCall.NAME, "room", "video")
+    requires(HearthpaneCalendar.NAME, "day", "date")
+    requires(HearthpaneNews.NAME, "count", "source")
     assertEquals("ARRAY", tool(HearthpaneLists.NAME).getJSONObject("parameters").getJSONObject("properties")
         .getJSONObject("items").getString("type"))
     assertEquals("BOOLEAN", tool(HearthpaneAlarms.NAME).getJSONObject("parameters").getJSONObject("properties")
@@ -86,5 +89,8 @@ class HearthpaneToolDeclarationsTest {
     assertTrue(tool(HearthpaneAnnounce.NAME).getString("description").contains("quiet hours"))
     assertTrue(tool(HearthpaneLists.NAME).getString("description").contains("shopping list and the to-do list"))
     assertTrue(tool(HearthpaneBriefing.NAME).getString("description").contains("reads_aloud"))
+    assertTrue(tool(HearthpaneBriefing.NAME).getString("description").contains(HearthpaneNews.NAME))
+    assertTrue(tool(HearthpaneCalendar.NAME).getString("description").contains("its own clock"))
+    assertTrue(tool(HearthpaneNews.NAME).getString("description").contains("search the web"))
   }
 }

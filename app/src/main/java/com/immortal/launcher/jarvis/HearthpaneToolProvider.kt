@@ -39,7 +39,8 @@ class HearthpaneToolProvider : ContentProvider() {
     HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
         homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search,
         reminders = { args -> reminderTool.invoke(args) },
-        household = HearthpaneHouseholdTools.build(requireNotNull(context)) + (MemoryTool.NAME to ::memoryTool))
+        household = HearthpaneHouseholdTools.build(requireNotNull(context)) + HearthpaneFeedTools.build(requireNotNull(context)) +
+            (MemoryTool.NAME to ::memoryTool))
   }
 
   /** `hearthpane.memory`, bound per call so it always sees the conversation under way. */
