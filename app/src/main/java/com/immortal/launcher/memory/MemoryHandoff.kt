@@ -18,7 +18,8 @@ import org.json.JSONObject
  * Jarvis ↔ Hearthpane memory, the non-model provider methods (plan §3.3–3.4), Android-free:
  * - [context] (`memory_context`, conversation open): freezes whose conversation it is and answers the note lines
  *   for Jarvis's prompt, plus whether to hand the conversation over at its end (`learning`) and, from slice 4,
- *   whether to run the text extractor first (`extract`, with the `known` fact ids it may deduplicate against). The
+ *   whether to run the text extractor first (`extract`, with the `known` fact ids it may deduplicate against; only
+ *   while plan D3's "closer reading" switch is on too, otherwise Jarvis hands over without it). The
  *   extracted Recent topics the note offers are marked shown, so Jarvis follows each up once.
  * - [observe] (`memory_observe`, conversation end): runs the dictionary extractor over the digest, re-checks the
  *   text extractor's suggestions ([LlmExtractionCheck]) and learns, then drops the digest. Answers only ids and labels
@@ -34,6 +35,8 @@ internal class MemoryHandoff(
     private val now: () -> Long,
     private val zone: () -> ZoneId,
     private val recordUsage: (MemoryScope, String) -> Unit = { _, _ -> },
+    /** Plan D3's own switch: whether Jarvis may run its text extractor (the cloud read) at all. */
+    private val closerReading: () -> Boolean = { true },
 ) {
   private val lock = Any()
   private var conversations = MemoryConversations()
@@ -55,7 +58,7 @@ internal class MemoryHandoff(
         .put("learning", learning)
         .put("scope", if (on.scope is MemoryScope.Household) "household" else "person")
         .apply { if (note.lines.isNotEmpty()) put("note", note.lines.joinToString("\n")) }
-        .apply { if (learning) put("extract", true).put("known", JSONArray(knownIds(profile))) }
+        .apply { if (learning && closerReading()) put("extract", true).put("known", JSONArray(knownIds(profile))) }
         .apply { threads(profile, note.offeredTopics).takeIf { it.length() > 0 }?.let { put("threads", it) } }
   }
 
@@ -106,7 +109,9 @@ internal class MemoryHandoff(
     val known = runtime.profile(on.scope).facts.map { it.id }.toSet()
     val words = dictionary()
     val fromWords = MemoryExtractor(words).extract(digest, known)
-    val suggested = LlmExtractionCheck(words).check(digest.extracted, digest.userTurns, nowMs)
+    // With the closer-reading switch off, anything a text extractor still sent is dropped unread.
+    val extracted = if (closerReading()) digest.extracted else null
+    val suggested = LlmExtractionCheck(words).check(extracted, digest.userTurns, nowMs)
     val observations = (fromWords.filter { it.factId !in suggested.negated } + suggested.observations)
         .groupBy { it.factId }.map { (_, same) -> same.maxBy { MemoryConfidence.weightOf(it.source) } }
         .sortedBy { it.factId }

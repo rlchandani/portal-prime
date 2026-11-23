@@ -37,8 +37,18 @@ internal object JarvisSettings {
                       get = { it.learnFromConversations },
                       set = JarvisWakeConfig::setLearnFromConversations,
                       help = "Jarvis picks up the teams, stocks and news you talk about, with nothing to set up, " +
-                          "and uses them in later answers. It stays sealed on this Portal. Guests and children " +
-                          "are never learned.",
+                          "and uses them in later answers. It stays sealed on your Portals and follows you " +
+                          "between them. Guests and children are never learned.",
+                      scope = SettingScope.HOUSEHOLD),
+                  BoolSpec(
+                      "closerReading",
+                      "Closer reading of conversations",
+                      get = { it.closerReading },
+                      set = JarvisWakeConfig::setCloserReading,
+                      help = "After a chat ends, Jarvis sends only your own words, as text, to its model for a " +
+                          "closer read of topics, places and threads to pick up. Off: only what this Portal " +
+                          "recognises by itself is learned.",
+                      visible = { _, s -> s.learnFromConversations },
                       scope = SettingScope.HOUSEHOLD),
                   NavSpec(
                       KNOWS_KEY,

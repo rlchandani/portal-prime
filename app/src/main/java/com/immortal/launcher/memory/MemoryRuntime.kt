@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
  * The profiles and usage counts in memory, written back debounced (plan §3.2: at most one write per [WRITE_DELAY_MS],
  * Forget at once). Every read and change goes through one lock, and the values it hands out are immutable, so the
  * provider's binder threads and the "What Jarvis knows" screen can share it. Storage, the timer and the clock are
- * seams, so the debounce and Forget rules are JVM-tested.
+ * seams, so the debounce and Forget rules are JVM-tested. [profilesSaved] runs after a profile reaches disk, so the
+ * other Portals hear of it ([MemorySync], slice 5).
  */
 internal class MemoryRuntime(
     private val load: (MemoryScope) -> MemoryProfile,
@@ -27,6 +28,7 @@ internal class MemoryRuntime(
     private val now: () -> Long,
     private val loadFeedback: () -> ForYouFeedback = { ForYouFeedback() },
     private val saveFeedback: (ForYouFeedback) -> Boolean = { true },
+    private val profilesSaved: () -> Unit = {},
 ) {
   private val lock = Any()
   private var profiles: Map<MemoryScope, MemoryProfile> = emptyMap()
@@ -99,6 +101,7 @@ internal class MemoryRuntime(
       out
     }
     val failed = toSave.filterNot(save).map { it.scope }.toSet()
+    if (toSave.size > failed.size) profilesSaved()
     val usageFailed = counts != null && !saveUsage(counts)
     val feedbackFailed = chips != null && !saveFeedback(chips)
     if (failed.isNotEmpty() || usageFailed || feedbackFailed) {
@@ -112,20 +115,77 @@ internal class MemoryRuntime(
 
   /**
    * "Forget all" on the screen: everything about [scope] (its profile, Recent topics, usage counts and what was done
-   * with its suggestions), at once. Its pause setting goes with it. True when nothing of it remains on disk.
+   * with its suggestions), at once. Its pause setting goes with it. What stays is only the tombstone
+   * ([MemoryLearner.forgotAll]), so every other Portal forgets the same when it syncs. True when it is all written.
    */
   fun forgetScope(scope: MemoryScope): Boolean {
+    val tombstone = MemoryLearner.forgotAll(scope, now())
     val (counts, chips) = synchronized(lock) {
-      profiles = profiles - scope
+      profiles = profiles + (scope to tombstone)
       dirty = dirty - scope
-      val counts = (usage ?: loadUsage()).without(scope).also { usage = it; usageDirty = false }
-      val chips = (feedback ?: loadFeedback()).without(scope).also { feedback = it; feedbackDirty = false }
-      counts to chips
+      wipeCounts(scope)
     }
     revisions.value++
-    val removed = remove(scope)
+    val saved = save(tombstone)
+    if (!saved) synchronized(lock) { dirty = dirty + scope }
     val chipsSaved = saveFeedback(chips)
-    return saveUsage(counts) && chipsSaved && removed
+    val usageSaved = saveUsage(counts)
+    if (saved) profilesSaved()
+    return usageSaved && chipsSaved && saved
+  }
+
+  /**
+   * Another Portal's copy of [theirs]'s scope, merged in ([MemorySync.merge]) and written at once. A newer "Forget
+   * all" in it drops this Portal's usage counts and chip feedback for the scope too. Returns the merged profile.
+   */
+  fun mergeIn(theirs: MemoryProfile): MemoryProfile {
+    val scope = theirs.scope
+    val (merged, changed, wiped) = synchronized(lock) {
+      val mine = MemoryLearner.refresh(cached(scope), now())
+      val merged = MemorySync.merge(mine, theirs, now())
+      val changed = merged != mine
+      if (changed) {
+        profiles = profiles + (scope to merged)
+        dirty = dirty + scope
+      }
+      val wiped = MemorySync.wipedBy(mine, merged)
+      Triple(merged, changed, if (wiped) wipeCounts(scope) else null)
+    }
+    if (wiped != null) {
+      saveFeedback(wiped.second)
+      saveUsage(wiped.first)
+    }
+    if (changed) {
+      revisions.value++
+      flush()
+    }
+    return merged
+  }
+
+  /**
+   * Moves [from]'s profile into [to] (merged with anything already there) and removes [from]: profiles kept under a
+   * Portal-local person id before slice 5 move to the household-stable one. Nothing happens if [from] has nothing.
+   */
+  fun adopt(from: MemoryScope, to: MemoryScope) {
+    if (from == to) return
+    val old = synchronized(lock) { cached(from) }
+    if (old.facts.isEmpty() && old.recentTopics.isEmpty() && !old.paused) {
+      synchronized(lock) { profiles = profiles - from }
+      return
+    }
+    mergeIn(old.copy(scope = to).normalized())
+    synchronized(lock) {
+      profiles = profiles - from
+      dirty = dirty - from
+    }
+    remove(from)
+  }
+
+  /** [scope]'s usage counts and chip feedback dropped in memory (under [lock]); the caller writes them. */
+  private fun wipeCounts(scope: MemoryScope): Pair<UsageCounts, ForYouFeedback> {
+    val counts = (usage ?: loadUsage()).without(scope).also { usage = it; usageDirty = false }
+    val chips = (feedback ?: loadFeedback()).without(scope).also { feedback = it; feedbackDirty = false }
+    return counts to chips
   }
 
   /** Forget all: every profile and every count, in memory and on disk, at once. True when nothing remains. */

@@ -36,7 +36,11 @@ internal object KnowsRows {
       val detail: String,
   )
 
-  fun rows(profile: MemoryProfile, nowMs: Long, zone: ZoneId): List<Row> = profile.facts
+  /**
+   * The screen's rows. [here] is this Portal's name: a fact last seen on another of the household's Portals (slice 5)
+   * says where, as the mock does ("… · Living Area").
+   */
+  fun rows(profile: MemoryProfile, nowMs: Long, zone: ZoneId, here: String? = null): List<Row> = profile.facts
       .filter { it.state != State.SUPPRESSED && it.state != State.TOMBSTONE && it.label.isNotBlank() }
       .sortedWith(compareByDescending<MemoryFact> { MemoryConfidence.usable(it) }.thenByDescending { it.confidence }
           .thenBy { it.label })
@@ -46,7 +50,7 @@ internal object KnowsRows {
         Row(
             id = fact.id, title = fact.label, badge = badge(fact), category = categoryOf(fact.kind),
             bars = MemoryConfidence.bars(fact), tentative = tentative, fresh = fresh && fact.state != State.CONFIRMED,
-            detail = "${provenance(fact, nowMs, zone)} · ${seen(fact, nowMs, zone, tentative)}",
+            detail = "${provenance(fact, nowMs, zone)} · ${seen(fact, nowMs, zone, tentative)}" + where(fact, here),
         )
       }
 
@@ -95,6 +99,13 @@ internal object KnowsRows {
       days < WEEK -> "last mentioned ${last.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.US)}"
       else -> "last mentioned $days days ago"
     }
+  }
+
+  /** " · Living Area" when [fact]'s newest evidence came from another Portal than [here]; empty otherwise. */
+  private fun where(fact: MemoryFact, here: String?): String {
+    if (here == null || fact.state == State.CONFIRMED) return ""
+    val portal = fact.evidence.maxByOrNull { it.atMs }?.portal?.takeIf { it.isNotBlank() } ?: return ""
+    return if (portal.equals(here, ignoreCase = true)) "" else " · $portal"
   }
 
   private fun sameDay(a: Long, b: Long, zone: ZoneId) =

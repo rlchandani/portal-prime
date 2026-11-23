@@ -114,7 +114,7 @@ internal class MemoryTool(
   }
 
   private fun pause(on: MemoryAccess.On, paused: Boolean): JSONObject {
-    update(on.scope) { MemoryLearner.setPaused(it, paused) }
+    update(on.scope) { MemoryLearner.setPaused(it, paused, now()) }
     return message(if (paused) "Learning paused. I'll keep what I know but learn nothing new." else "Learning is back on.")
   }
 

@@ -117,6 +117,8 @@ class RemoteRoutes internal constructor(
         ChoresPeerRoute.PATH -> ChoresPeerRoute.handle(context, req)
         // Portal↔Portal reminders exchange: HouseholdKey-signed, the replica sealed (AES-GCM) inside.
         RemindersPeerRoute.PATH -> RemindersPeerRoute.handle(context, req)
+        // Portal↔Portal "What Jarvis knows" exchange (slice 5): HouseholdKey-signed, the profiles sealed (AES-GCM).
+        com.immortal.launcher.memory.MemorySyncNet.PATH -> com.immortal.launcher.memory.MemorySyncNet.handle(context, req)
         // Portal↔Portal household settings exchange: HouseholdKey-signed, its own message types.
         SettingsSyncNet.PATH -> SettingsSyncNet.handle(context, req)
         // Portal↔Portal Home Assistant connection hand-off: HouseholdKey-signed, announced-address bound,

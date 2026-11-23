@@ -97,7 +97,7 @@ class MemoryHandoffTest {
   }
 
   @Test fun pausedConversationsAreNotHandedOver() {
-    store.runtime.update(MemoryScope.Household) { MemoryLearner.setPaused(it, true) }
+    store.runtime.update(MemoryScope.Household) { MemoryLearner.setPaused(it, true, NOW) }
     assertFalse(open("c1").getBoolean("learning"))
   }
 

@@ -92,7 +92,7 @@ internal object InterestWidgetsHome {
    */
   fun briefingLines(context: Context, personId: String): List<String> {
     val snap = load(context) ?: return emptyList()
-    if (snap.scope != MemoryScope.Person(personId)) return emptyList()
+    if (snap.scope != JarvisMemory.personScope(personId)) return emptyList()
     val nowMs = System.currentTimeMillis()
     val zone = ZoneId.systemDefault()
     val use24 = ImmortalSettings.use24HourClock(context)

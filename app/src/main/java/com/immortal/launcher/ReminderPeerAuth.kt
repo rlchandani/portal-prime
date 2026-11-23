@@ -6,9 +6,6 @@
  */
 package com.immortal.launcher
 
-import java.security.MessageDigest
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 import org.json.JSONObject
 
 /**
@@ -26,26 +23,20 @@ internal object ReminderPeerAuth {
   const val SIGNAL_TYPE = "reminders_rev"
   private const val RESPONSE_DOMAIN = "reminders_state"
 
-  data class Request(val from: String, val nonce: String)
+  private val auth = PeerExchangeAuth(REQUEST_TYPE, RESPONSE_DOMAIN)
 
   fun requestHeader(key: ByteArray, from: String, nonce: String, ts: Long, body: String): String? =
-      HouseholdMessage.encodeOrNull(HouseholdMessage(REQUEST_TYPE, from, ts, nonce, JSONObject().put("s", sha256(body))), key)
+      auth.requestHeader(key, from, nonce, ts, body)
 
   /** The verified caller, or null for a missing/forged/stale/replayed header or a swapped body. */
   fun verifyRequest(header: String?, body: String, key: ByteArray, nowMs: Long,
-                    replay: HouseholdMessage.ReplayGuard, self: String?): Request? {
-    if (header == null) return null
-    val msg = HouseholdMessage.decode(header, key, nowMs, replay) ?: return null
-    if (msg.type != REQUEST_TYPE || msg.from == self) return null
-    val pinned = msg.body.opt("s") as? String ?: return null
-    if (!MessageDigest.isEqual(pinned.toByteArray(), sha256(body).toByteArray())) return null
-    return Request(msg.from, msg.nonce)
-  }
+                    replay: HouseholdMessage.ReplayGuard, self: String?): PeerExchangeAuth.Request? =
+      auth.verifyRequest(header, body, key, nowMs, replay, self)
 
-  fun signResponse(key: ByteArray, nonce: String, body: String): String = hmacHex(key, "$RESPONSE_DOMAIN|$nonce|$body")
+  fun signResponse(key: ByteArray, nonce: String, body: String): String = auth.signResponse(key, nonce, body)
 
   fun verifyResponse(key: ByteArray, nonce: String, body: String, sig: String?): Boolean =
-      sig != null && MessageDigest.isEqual(sig.toByteArray(), signResponse(key, nonce, body).toByteArray())
+      auth.verifyResponse(key, nonce, body, sig)
 
   /** `{name, sealed}`: the replica sealed for [direction] of exchange [nonce]. */
   fun sealedBody(key: ByteArray, nonce: String, direction: String, name: String, s: ReminderState): String =
@@ -58,11 +49,4 @@ internal object ReminderPeerAuth {
     val plain = ReminderSeal.open(key, nonce, direction, sealed) ?: return null
     return ReminderCodec.decodeState(runCatching { JSONObject(plain) }.getOrNull())
   }
-
-  private fun sha256(text: String): String =
-      MessageDigest.getInstance("SHA-256").digest(text.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
-
-  private fun hmacHex(key: ByteArray, text: String): String =
-      Mac.getInstance("HmacSHA256").apply { init(SecretKeySpec(key, "HmacSHA256")) }
-          .doFinal(text.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
 }

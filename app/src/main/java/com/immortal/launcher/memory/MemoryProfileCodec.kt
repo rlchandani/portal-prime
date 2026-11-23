@@ -35,6 +35,8 @@ internal object MemoryProfileCodec {
         .put("facts", JSONArray().apply { p.facts.forEach { put(fact(it)) } })
         .put("topics", JSONArray().apply { p.recentTopics.forEach { put(topic(it)) } })
         .apply { if (p.paused) put("paused", true) }
+        .apply { if (p.pausedMs > 0) put("pausedAt", p.pausedMs) }
+        .apply { if (p.forgotAllMs > 0) put("forgotAllAt", p.forgotAllMs) }
         .toString()
   }
 
@@ -49,7 +51,8 @@ internal object MemoryProfileCodec {
     if (MemoryScope.fromToken(root.optString("scope")) != expected) throw FormatException("scope mismatch")
     val facts = root.optJSONArray("facts").objects().mapNotNull(::readFact)
     val topics = root.optJSONArray("topics").objects().mapNotNull(::readTopic)
-    return MemoryProfile(expected, facts, topics, paused = root.optBoolean("paused", false)).normalized()
+    return MemoryProfile(expected, facts, topics, paused = root.optBoolean("paused", false),
+        pausedMs = root.optLong("pausedAt", 0), forgotAllMs = root.optLong("forgotAllAt", 0)).normalized()
   }
 
   private fun fact(f: MemoryFact): JSONObject = JSONObject()
@@ -58,6 +61,7 @@ internal object MemoryProfileCodec {
       .put("evidence", JSONArray().apply { f.evidence.forEach { put(evidence(it)) } })
       .put("folded", f.foldedEvidence).put("conf", f.confidence).put("state", f.state.name)
       .put("first", f.firstSeenMs).put("last", f.lastSeenMs).put("sensitive", f.sensitive)
+      .apply { if (f.stateMs > 0) put("stateAt", f.stateMs) }
 
   private fun evidence(e: Evidence): JSONObject = JSONObject()
       .put("src", e.source.name).put("at", e.atMs).put("portal", e.portal)
@@ -83,8 +87,22 @@ internal object MemoryProfileCodec {
         firstSeenMs = o.getLong("first"),
         lastSeenMs = o.getLong("last"),
         sensitive = o.optBoolean("sensitive", false),
-    )
+        stateMs = o.optLong("stateAt", 0),
+    ).let(::withStateTime)
   }.getOrNull()
+
+  /**
+   * A profile written before slice 5 has no `stateAt`: a forgotten fact was suppressed at its last sighting, and a
+   * confirmed one at its newest Keep or remember.
+   */
+  private fun withStateTime(f: MemoryFact): MemoryFact = when {
+    f.stateMs > 0 -> f
+    f.state == MemoryFact.State.SUPPRESSED || f.state == MemoryFact.State.TOMBSTONE -> f.copy(stateMs = f.lastSeenMs)
+    f.state == MemoryFact.State.CONFIRMED -> f.copy(stateMs = f.evidence
+        .filter { it.source == Evidence.Source.CONFIRM || it.source == Evidence.Source.EXPLICIT }
+        .maxOfOrNull { it.atMs } ?: f.lastSeenMs)
+    else -> f
+  }
 
   private fun readEvidence(o: JSONObject): Evidence? = runCatching {
     Evidence(
