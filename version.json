@@ -1,6 +1,6 @@
 {
-  "versionCode": 329,
-  "versionName": "1.335",
+  "versionCode": 330,
+  "versionName": "1.336",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Jarvis memory (when on) also learns topics, music and places from what you say, and picks up earlier conversations"
+  "notes": "Jarvis memory (when on) follows each person across your Portals; Forget applies everywhere; separate switch for closer reading"
 }
