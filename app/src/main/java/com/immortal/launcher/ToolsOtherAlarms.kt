@@ -9,7 +9,9 @@ package com.immortal.launcher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -132,8 +134,11 @@ internal fun ToolsOtherAlarmsPanel() {
           EverydayNumberField("Minute", draftMinute, 0, 59, 0, wrap = true, enabled = !operations.busy) { draftMinute = it }
         }
       }
+      Spacer(Modifier.height(24.dp))
       ToolsText("Repeat: choose days, or leave all off for a one-time alarm.", secondary = true)
+      Spacer(Modifier.height(12.dp))
       EverydayDayChips(draft.days, enabled = !operations.busy) { day -> draftDays = draft.toggled(day).days.sorted() }
+      Spacer(Modifier.height(24.dp))
       ToolsField("Label (optional)", draftLabel, { draftLabel = it.take(MAX_LABEL) }, enabled = !operations.busy)
       EverydayError(operations.error)
     }
