@@ -34,7 +34,10 @@ object AlarmScheduler {
 
   internal fun requestCode(id: Int): Int = if (id == MoreAlarms.MAIN_ID) RC else MORE_RC + id
 
-  /** Re-arm regular occurrences. Explicit edits cancel snooze; startup preserves it. */
+  /** Each alarm's snooze has its own slot, so snoozing one never drops another's. Main = [SNOOZE_RC]. */
+  internal fun snoozeRequestCode(id: Int): Int = SNOOZE_RC + id.coerceIn(0, MoreAlarms.MAX)
+
+  /** Re-arm regular occurrences. Explicit edits cancel the main alarm's snooze; startup preserves it. */
   fun reschedule(context: Context, cancelSnooze: Boolean = true) {
     if (cancelSnooze) PendingIntent.getBroadcast(context, SNOOZE_RC,
         Intent(context, AlarmReceiver::class.java).setAction(ACTION_SNOOZE),

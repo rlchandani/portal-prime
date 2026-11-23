@@ -50,6 +50,11 @@ class MoreAlarmsTest {
     val codes = (0..MoreAlarms.MAX).map(AlarmScheduler::requestCode)
     assertEquals(codes.size, codes.toSet().size)
     assertEquals(false, AlarmScheduler.SNOOZE_RC in codes)
+    // Two alarms snoozed at once each keep their own snooze.
+    val snoozes = (0..MoreAlarms.MAX).map(AlarmScheduler::snoozeRequestCode)
+    assertEquals(snoozes.size, snoozes.toSet().size)
+    assertEquals(AlarmScheduler.SNOOZE_RC, AlarmScheduler.snoozeRequestCode(MoreAlarms.MAIN_ID))
+    assertEquals(emptySet<Int>(), codes.toSet() intersect snoozes.toSet())
   }
 }
 

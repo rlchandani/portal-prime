@@ -47,7 +47,7 @@ internal object AlarmRinging {
     val app = context.applicationContext
     val intent = Intent(app, AlarmReceiver::class.java).setAction(AlarmScheduler.ACTION_SNOOZE)
         .putExtra(EXTRA_ID, ring.id).putExtra(AlarmRingActivity.EXTRA_LABEL, ring.label)
-    val pi = PendingIntent.getBroadcast(app, AlarmScheduler.SNOOZE_RC, intent,
+    val pi = PendingIntent.getBroadcast(app, AlarmScheduler.snoozeRequestCode(ring.id), intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val am = app.getSystemService(AlarmManager::class.java)
     AlarmSnooze.schedule(
