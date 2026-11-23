@@ -35,8 +35,11 @@ internal object MemoryNote {
       val screen: String? = null,
   )
 
-  /** The note's lines and the extracted Recent topics it offers (marked shown, so each is offered once). */
-  data class Note(val lines: List<String>, val offeredTopics: Set<String>)
+  /**
+   * The note's lines, the extracted Recent topics it offers (marked shown, so each is offered once) and the facts its
+   * lines name ([used], best first), for the card's "Warriors · your team".
+   */
+  data class Note(val lines: List<String>, val offeredTopics: Set<String>, val used: List<MemoryFact> = emptyList())
 
   /** The note's lines, or empty when there is nothing to say (or nobody to say it about). */
   fun lines(inputs: Inputs): List<String> = build(inputs).lines
@@ -59,12 +62,12 @@ internal object MemoryNote {
     // An extracted thread is kept room for first (it is at most RECENT_MAX), then the facts fill what is left;
     // slice 1's stand-in only joins when it fits after the facts.
     if (threads.isNotEmpty() && recent != null) {
-      fill(access, facts, recent.first, budget)?.let { return Note(it.first, recent.second) }
+      fill(access, facts, recent.first, budget)?.let { return Note(it.first, recent.second, it.second) }
     }
     val (plain, chosen) = fill(access, facts, null, budget) ?: (emptyList<String>() to emptyList())
     val withStandIn = recent?.takeIf { threads.isEmpty() }?.let { render(access, chosen, it.first) }
-    if (withStandIn != null && size(withStandIn) <= budget) return Note(withStandIn, emptySet())
-    return Note(plain, emptySet())
+    if (withStandIn != null && size(withStandIn) <= budget) return Note(withStandIn, emptySet(), chosen)
+    return Note(plain, emptySet(), chosen)
   }
 
   private fun size(lines: List<String>) = lines.sumOf { it.length + 1 }
