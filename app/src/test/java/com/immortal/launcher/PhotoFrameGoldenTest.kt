@@ -103,6 +103,11 @@ internal object PhotoFrameGoldenScenarios {
           mode(ScreensaverConfig.MODE_SMART, 20, mapOf("soundscape" to "rain")), options = O.copy(overnightNightPhoto = true)) { r ->
         r.up(); r.deliver(); r.advance(0); r.deliver(); r.pending()
       },
+      "night photo under fit=fit: the stage is told to hold it whole" to Scenario(
+          mode(ScreensaverConfig.MODE_SMART, 20, mapOf("fit" to ScreensaverConfig.FIT_FIT)),
+          options = O.copy(overnightNightPhoto = true)) { r ->
+        r.up(); r.deliver(); r.advance(0); r.deliver(); r.pending()
+      },
       "music photos (photos only): no overlays, the operator pin is ignored" to Scenario(mode("kenBurns", 45),
           testSource = PhotoFrameGoldenRig.TestSource(pinMode = ScreensaverConfig.MODE_WHOLE, pinIntervalSec = 9),
           options = O.copy(photosOnly = true)) { r -> r.up(); r.deliver(); r.advance(0); r.deliver(); r.pending() },

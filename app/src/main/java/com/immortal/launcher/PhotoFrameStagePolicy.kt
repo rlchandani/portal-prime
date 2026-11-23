@@ -20,6 +20,8 @@ internal object PhotoFrameStagePolicy {
       val gallerySpread: Boolean,
       val feature: SlideshowStage.Feature,
       val keepPeople: Boolean,
+      /** The household chose "fit" in a style that honours it: the Night photo is whole too. */
+      val wholeAtNight: Boolean = false,
   )
 
   fun isGallery(mode: String): Boolean =
@@ -46,6 +48,7 @@ internal object PhotoFrameStagePolicy {
             else -> SlideshowStage.Feature.NONE
           },
           keepPeople = keepPeople(settings),
+          wholeAtNight = PhotoFitPolicy.honoursFit(settings.mode) && settings.fit == ScreensaverConfig.FIT_FIT,
       )
 
   /** The finite style a presented native scene reports to a bounded capture, if any. */

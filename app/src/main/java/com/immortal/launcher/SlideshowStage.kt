@@ -44,6 +44,8 @@ internal class SlideshowStage(
       val style: CompactStagePlan.Style? = null,
       /** Alternates compact drift/sweep directions per scene; fixed for the scene's lifetime. */
       val parity: Boolean = false,
+      /** Photo fit at "fit": a Night photo is held whole instead of covering. */
+      val wholeAtNight: Boolean = false,
   ) {
     val galleryStyle: Boolean get() = galleryPrint || gallerySpread
     /** A new-mode scene: one unedited photo without a saved crop. */
@@ -101,7 +103,7 @@ internal class SlideshowStage(
       occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
       gallerySpread: Boolean = false, automatic: Boolean = true,
       feature: Feature = Feature.NONE, keepPeople: Boolean = false,
-      style: CompactStagePlan.Style? = null,
+      style: CompactStagePlan.Style? = null, wholeAtNight: Boolean = false,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
     // Retain one extra obstacle as an overflow sentinel; gallery styles then take their
@@ -112,7 +114,8 @@ internal class SlideshowStage(
         fill && !gallery, motion && !gallery, dwell, measured, galleryPrint,
         gallerySpread && !galleryPrint, automatic = automatic,
         feature = if (gallery) Feature.NONE else feature, keepPeople = keepPeople,
-        style = style, parity = style != null && compactParity.also { compactParity = !it })
+        style = style, parity = style != null && compactParity.also { compactParity = !it },
+        wholeAtNight = wholeAtNight)
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -481,8 +484,9 @@ internal class SlideshowStage(
       val bh = photo.bitmap.height
       // Night photo keeps the day's whole-photo rule: a badly mismatched photo (a portrait on the
       // Portal+, a landscape on the upright Mini) is shown whole over its own warm backdrop instead
-      // of losing more than half of itself to the cover crop. Matching photos still cover.
-      val nightWhole = !split && ScreensaverLayout.nightWhole(bw, bh, width, height)
+      // of losing more than half of itself to the cover crop. Matching photos still cover, unless
+      // the household chose "fit": then the Night photo is whole like the day scene.
+      val nightWhole = !split && ScreensaverLayout.nightWhole(bw, bh, width, height, fit = p.wholeAtNight)
       val parity = (featureParity++ and 1) == 1
       val plan = if (nightWhole) PremiumFraming.Frame(ScreensaverLayout.wholeMotion(bw, bh,
           ScreensaverLayout.nightZone(cls, width, height, density), p.motion), true)

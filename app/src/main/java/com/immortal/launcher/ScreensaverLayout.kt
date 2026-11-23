@@ -194,10 +194,11 @@ internal object ScreensaverLayout {
    * Compact Classic (mock): a photo whose cover crop keeps 80 % covers the screen and zooms
    * gently; anything else fills the screen's short side and pans along its long axis over the beat,
    * so the whole photo is seen (a landscape upright, a portrait turned). [beat] alternates the
-   * direction. Null for an empty photo or view (the caller leaves the view at rest).
+   * direction. Null for an empty photo or view, and under fit ([fill] false): the caller leaves the
+   * FIT_CENTER view at rest, the whole photo letterboxed and still, as Classic fit on the Portal+.
    */
-  fun classicPan(pw: Int, ph: Int, vw: Int, vh: Int, beat: Int): ClassicPan? {
-    if (pw <= 0 || ph <= 0 || vw <= 0 || vh <= 0) return null
+  fun classicPan(pw: Int, ph: Int, vw: Int, vh: Int, beat: Int, fill: Boolean = true): ClassicPan? {
+    if (!fill || pw <= 0 || ph <= 0 || vw <= 0 || vh <= 0) return null
     val contain = minOf(vw.toFloat() / pw, vh.toFloat() / ph)
     val cw = pw * contain
     val ch = ph * contain
@@ -220,10 +221,11 @@ internal object ScreensaverLayout {
   /**
    * Night photo keeps the day's whole-photo rule (all Portals): a photo that mismatches the panel
    * by more than [PremiumFraming.MISMATCH] is shown whole over its blurred backdrop instead of
-   * losing more than half of itself to the cover crop. Matching photos still cover, as approved.
+   * losing more than half of itself to the cover crop. Matching photos still cover, as approved,
+   * unless the household chose [fit] ("fit" in a style that honours it): then every photo is whole.
    */
-  fun nightWhole(pw: Int, ph: Int, vw: Int, vh: Int): Boolean =
-      PremiumFraming.mismatch(pw, ph, vw, vh) > PremiumFraming.MISMATCH
+  fun nightWhole(pw: Int, ph: Int, vw: Int, vh: Int, fit: Boolean = false): Boolean =
+      fit || PremiumFraming.mismatch(pw, ph, vw, vh) > PremiumFraming.MISMATCH
 
   /** The whole Night photo's zone: above the amber clock (mock zones per class). */
   fun nightZone(cls: LayoutClass, widthPx: Int, heightPx: Int, density: Float): Box = when (cls) {
