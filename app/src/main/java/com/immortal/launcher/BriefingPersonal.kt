@@ -44,4 +44,9 @@ internal data class BriefingPersonalInputs(
     /** Ready(null): no calendar added. */
     val events: BriefingPart<List<PersonalEvent>?> = BriefingPart.Loading,
     val reminders: List<String> = emptyList(),
+    /**
+     * "Your teams / Your markets" ([com.immortal.launcher.memory.BriefingInterests]); empty with the personalization
+     * switch off, nothing followed, or others near.
+     */
+    val interests: List<String> = emptyList(),
 )

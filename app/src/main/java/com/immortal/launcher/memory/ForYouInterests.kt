@@ -57,10 +57,14 @@ internal object ForYouInterests {
   private val MARKET_OPEN: LocalTime = LocalTime.of(9, 30)
   private val MARKET_CLOSE: LocalTime = LocalTime.of(16, 0)
 
-  /** A followed team's games: [name] the short name ("Warriors"), [shortNames] ESPN id → short name for opponents. */
+  /**
+   * A followed team's games: [name] the short name ("Warriors"), [shortNames] ESPN id → short name for opponents,
+   * [teams] the league's teams by ESPN id (abbreviation and colour for the Sports widget).
+   */
   data class TeamGames(
       val key: String, val teamId: String, val name: String, val live: SportsFeed.Game?, val last: SportsFeed.Game?,
       val next: SportsFeed.Game?, val shortNames: Map<String, String> = emptyMap(),
+      val teams: Map<String, SportsFeed.Team> = emptyMap(),
   )
 
   /** Today's move for a followed stock. */

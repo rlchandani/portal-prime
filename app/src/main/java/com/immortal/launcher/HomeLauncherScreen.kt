@@ -672,7 +672,8 @@ internal fun LauncherScreen(
           (0..3).flatMap { c -> (0..1).map { r -> c to r } }.filterNot { it in empty }.toSet()
         }
         val more = remember(advanced, homeWidgets) {
-          HomeWidgetPicker.more(advanced, HomeWidgetPicker.photoMemoryAllowed(homeWidgets))
+          HomeWidgetPicker.more(advanced, HomeWidgetPicker.photoMemoryAllowed(homeWidgets),
+              sports = com.immortal.launcher.memory.JarvisMemory.enabled(context))
         }
         val providerChoices = remember(providers) {
           providers?.mapNotNull { entry ->

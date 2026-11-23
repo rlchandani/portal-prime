@@ -71,6 +71,8 @@ object HomeWidgetStore {
   const val KIND_NEWS = "news"
   const val KIND_STOCKS = "stocks"
   const val KIND_OPTIONS = "options"
+  /** Followed teams' games (Jarvis personalization, slice 3): offered only while "learn from conversations" is on. */
+  const val KIND_SPORTS = "sports"
   const val KIND_HA = "ha"
   // The former fixed dashboard cards — now regular widgets (addable/removable). Only the
   // greeting card stays permanent chrome.

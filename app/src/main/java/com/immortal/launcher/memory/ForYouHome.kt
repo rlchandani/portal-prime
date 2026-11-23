@@ -85,6 +85,9 @@ internal object ForYouHome {
   /** Topic searches in RAM only (the topic is personal), at most [MAX_NEWS_PAGES], for [NEWS_TTL_MS]. */
   private val newsPages = LinkedHashMap<String, Page>()
 
+  /** Topic search bodies for [urls] through the same RAM-only cache (also the News widget's topic feeds). */
+  internal fun topicPages(urls: List<String>): List<String?> = news(urls)
+
   private fun news(urls: List<String>): List<String?> {
     val nowMs = System.currentTimeMillis()
     val deadline = nowMs + NEWS_BUDGET_MS

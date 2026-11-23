@@ -23,6 +23,7 @@ internal object BriefingPersonalBuilder {
             BriefingBuilder.weatherSection(inputs),
             calendarSection(inputs, p, today),
             remindersSection(p),
+            interestsSection(p),
             BriefingBuilder.timersSection(inputs.timers),
             routine?.let { BriefingBuilder.routineSection(it, inputs.use24Hour) },
         ),
@@ -58,6 +59,12 @@ internal object BriefingPersonalBuilder {
       "$time  ${title(e, p.hidePrivate)}"
     })
   }
+
+  /** The followed teams and markets, only when there is something to say. */
+  private fun interestsSection(p: BriefingPersonalInputs): BriefingSection? =
+      p.interests.takeIf { it.isNotEmpty() }?.let {
+        BriefingSection(BriefingSectionKind.INTERESTS, com.immortal.launcher.memory.BriefingInterests.HEADING, it)
+      }
 
   private fun remindersSection(p: BriefingPersonalInputs): BriefingSection {
     val heading = BriefingCopy.PERSONAL_REMINDERS

@@ -128,7 +128,13 @@ The Kotlin package is flat; files are grouped by name prefix:
   not now, less often, don't suggest), with `ForYouChips` for the chip text; slice 3's interest chips (a followed
   team's game, live or final score, the market's open/close, a ≥4% move, fresh topic headlines) in `ForYouInterests`
   (pure) over `ForYouInterestFeed` (the `SportsFeed` / `StockQuotes` feeds via `HearthpaneMarketTools`, Google News
-  topic search kept in RAM), refreshed every 30 s while a score is live. Never log user text or profile content.
+  topic search kept in RAM), refreshed every 30 s while a score is live. Slice 3's widgets (same switch; nothing changes
+  with it off): learned tickers/coins added after the household's own in the Stocks/Crypto widgets and topic feeds in
+  News (`InterestWidgets`, pure; `HomeInterestWidgets` draws them, ✦ + "new" + ✕/Undo, removal is a per-scope
+  "Don't suggest this" on `widget:<kind>:<key>`), the Sports widget (`SportsCard` for the card and its slot scale,
+  `SportsHomeWidget`; kind `sports`, offered in the picker only while the switch is on) and the personal briefing's
+  "Your teams & markets" line (`BriefingInterests`), all bound in `InterestWidgetsHome`. Never log user text or
+  profile content.
 - **Jarvis household tools (`jarvis/`, declared in `res/values/jarvis_tools.xml`):** `HearthpaneHouseholdTools` binds
   them. Alarms: `HearthpaneAlarms` over `AlarmBook` — the main alarm is `AlarmConfig`, up to 5 more are `MoreAlarms`
   (own request codes in `AlarmScheduler`, Tools › Alarm's "Other alarms" in `ToolsOtherAlarms`); the ring under way

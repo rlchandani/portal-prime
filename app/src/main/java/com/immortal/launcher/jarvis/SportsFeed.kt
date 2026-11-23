@@ -49,7 +49,9 @@ internal object SportsFeed {
       "bundesliga" to "BUNDESLIGA", "serie a" to "SERIEA", "ligue 1" to "LIGUE1",
   )
 
-  data class Team(val id: String, val name: String, val short: String, val abbreviation: String, val nickname: String)
+  /** [color] is ESPN's primary team colour as six hex digits ("1d428a"), or empty when it isn't given. */
+  data class Team(val id: String, val name: String, val short: String, val abbreviation: String, val nickname: String,
+      val color: String = "")
 
   enum class State { PRE, LIVE, FINAL }
 
@@ -87,7 +89,8 @@ internal object SportsFeed {
   private fun team(o: JSONObject): Team? {
     val id = o.optString("id").takeIf(TEAM_ID::matches) ?: return null // goes into a URL path
     val name = o.optString("displayName").ifEmpty { return null }
-    return Team(id, name, o.optString("shortDisplayName"), o.optString("abbreviation"), o.optString("nickname"))
+    val color = o.optString("color").lowercase(Locale.ROOT).takeIf(COLOR::matches).orEmpty()
+    return Team(id, name, o.optString("shortDisplayName"), o.optString("abbreviation"), o.optString("nickname"), color)
   }
 
   /**
@@ -173,7 +176,8 @@ internal object SportsFeed {
       path.endsWith("/teams") -> parseTeams(body).takeIf { it.isNotEmpty() }?.let { teams ->
         val list = JSONArray(teams.map { t ->
           JSONObject().put("team", JSONObject().put("id", t.id).put("displayName", t.name).put("shortDisplayName", t.short)
-              .put("abbreviation", t.abbreviation).put("nickname", t.nickname))
+              .put("abbreviation", t.abbreviation).put("nickname", t.nickname)
+              .apply { if (t.color.isNotEmpty()) put("color", t.color) })
         })
         JSONObject().put("sports", JSONArray().put(JSONObject().put("leagues", JSONArray().put(JSONObject().put("teams", list)))))
             .toString()
@@ -219,4 +223,5 @@ internal object SportsFeed {
 
   private const val HOUR_MS = 60L * 60 * 1000
   private val TEAM_ID = Regex("[0-9]{1,8}")
+  private val COLOR = Regex("[0-9a-f]{6}")
 }

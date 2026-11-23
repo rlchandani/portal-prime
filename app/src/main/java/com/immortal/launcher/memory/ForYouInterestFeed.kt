@@ -50,6 +50,16 @@ internal class ForYouInterestFeed(
     return Read(ForYouInterests.Inputs(teams, tickers, moves, topics), teamFacts.size, tickers.size, topicFacts.size)
   }
 
+  /**
+   * The games of the scope's followed teams for the Sports widget and the briefing: the same reads and rules as the
+   * chips (at most [ForYouInterests.MAX_TEAMS], team lists cached, a live score only from the scoreboard).
+   */
+  fun teamGames(facts: List<MemoryFact>, nowMs: Long): List<ForYouInterests.TeamGames> {
+    val teamFacts = facts.filter { it.kind == MemoryFact.Kind.TEAM && MemoryConfidence.usable(it) && !it.sensitive && it.label.isNotBlank() }
+        .take(ForYouInterests.MAX_TEAMS)
+    return if (teamFacts.isEmpty()) emptyList() else teams(teamFacts, nowMs)
+  }
+
   private class Wanted(val fact: MemoryFact, val league: String)
 
   private fun teams(facts: List<MemoryFact>, nowMs: Long): List<ForYouInterests.TeamGames> {
@@ -76,7 +86,7 @@ internal class ForYouInterestFeed(
           ?: SportsFeed.upcoming((schedule + board).filter { it.id != live?.id }, t.id, nowMs)
       val shortNames = lists[w.league].orEmpty().associate { it.id to it.short.ifBlank { it.name } }
       ForYouInterests.TeamGames(w.fact.id.substringAfter(':'), t.id, t.short.ifBlank { t.name }, live,
-          SportsFeed.lastResult(schedule + board, t.id), next, shortNames)
+          SportsFeed.lastResult(schedule + board, t.id), next, shortNames, lists[w.league].orEmpty().associateBy { it.id })
     }
   }
 

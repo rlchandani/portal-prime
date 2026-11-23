@@ -23,9 +23,11 @@ internal object HomeWidgetPicker {
    * Built-in kinds behind "More" (the retire-candidates). Options needs Advanced settings; Photo
    * memory is offered only while Home has none (it is the page hero).
    */
-  fun more(advanced: Boolean, photoMemoryAllowed: Boolean): List<String> = listOfNotNull(
+  fun more(advanced: Boolean, photoMemoryAllowed: Boolean, sports: Boolean = false): List<String> = listOfNotNull(
       HomeWidgetStore.KIND_ROUTINES, HomeWidgetStore.KIND_CHORES, HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS, HomeWidgetStore.KIND_CRYPTO,
       HomeWidgetStore.KIND_NEWS, HomeWidgetStore.KIND_STOCKS,
+      // Jarvis personalization: only while "learn from conversations" is on, so the picker is unchanged without it.
+      HomeWidgetStore.KIND_SPORTS.takeIf { sports },
       HomeWidgetStore.KIND_OPTIONS.takeIf { advanced },
       HomeWidgetStore.KIND_PHOTO_MEMORY.takeIf { photoMemoryAllowed })
 
@@ -59,6 +61,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_CRYPTO -> "Crypto"
     HomeWidgetStore.KIND_NEWS -> "News"
     HomeWidgetStore.KIND_STOCKS -> "Stocks"
+    HomeWidgetStore.KIND_SPORTS -> "Sports"
     HomeWidgetStore.KIND_OPTIONS -> "Options"
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo memory"
     HomeWidgetStore.KIND_ROUTINES -> "Routines"
@@ -83,6 +86,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_CHORES -> "tools"
     HomeWidgetStore.KIND_CALLS -> "calls"
     HomeWidgetStore.KIND_WIFI -> "wifi"
+    HomeWidgetStore.KIND_SPORTS -> "interest_ball"
     HomeWidgetStore.KIND_CRYPTO, HomeWidgetStore.KIND_STOCKS, HomeWidgetStore.KIND_OPTIONS -> "calculator"
     else -> "apps"
   }
