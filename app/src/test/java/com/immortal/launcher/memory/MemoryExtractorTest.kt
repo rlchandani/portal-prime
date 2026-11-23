@@ -20,8 +20,15 @@ import org.junit.Test
 class MemoryExtractorTest {
   private val extractor = MemoryExtractor(MemoryFixtures.dictionary)
 
+  /**
+   * One golden transcript. [expect] is what a person would expect; [miss] (a subset of it) and [extra] are the known
+   * misses and false positives of the dictionary, so the extractor must yield exactly [yields] while precision and
+   * recall are still measured against [expect].
+   */
   private data class Case(val id: String, val digest: MemoryDigest, val expect: Set<String>, val intent: Set<String>,
-      val sensitive: Boolean)
+      val sensitive: Boolean, val miss: Set<String>, val extra: Set<String>) {
+    val yields: Set<String> get() = expect - miss + extra
+  }
 
   private val cases: List<Case> by lazy {
     val root = JSONObject(File("src/test/resources/memory/transcripts.json").readText())
@@ -33,15 +40,18 @@ class MemoryExtractorTest {
         (0 until arr.length()).map { arr.getJSONObject(it) }.map { MemoryDigest.ToolCall(it.getString("name"), it.getString("query")) }
       }.orEmpty()
       Case(o.getString("id"), MemoryDigest(o.getString("id"), 0L, null, strings("user"), tools),
-          strings("expect").toSet(), strings("intent").toSet(), o.optBoolean("sensitive"))
+          strings("expect").toSet(), strings("intent").toSet(), o.optBoolean("sensitive"), strings("miss").toSet(),
+          strings("extra").toSet())
     }
   }
 
   private fun found(c: Case) = extractor.extract(c.digest)
 
-  @Test fun goldenSetHasAtLeastFiftySyntheticTranscripts() {
-    assertTrue(cases.size >= 50)
+  @Test fun goldenSetHasAtLeastOneHundredFiftySyntheticTranscripts() {
+    assertTrue(cases.size >= 150)
     assertEquals(cases.size, cases.map { it.id }.toSet().size)
+    for (c in cases) assertTrue("${c.id}: miss must be part of expect", c.expect.containsAll(c.miss))
+    for (c in cases) assertTrue("${c.id}: extra must not be expected", c.extra.none { it in c.expect })
   }
 
   @Test fun teamsAndTickersMeetThePrecisionAndRecallGate() {
@@ -69,7 +79,7 @@ class MemoryExtractorTest {
   @Test fun everyTranscriptYieldsExactlyItsExpectedFacts() {
     val wrong = cases.mapNotNull { c ->
       val got = found(c).map { it.factId }.toSet()
-      if (got == c.expect) null else "${c.id}: got $got want ${c.expect}"
+      if (got == c.yields) null else "${c.id}: got $got want ${c.yields}"
     }
     assertTrue(wrong.joinToString("\n"), wrong.isEmpty())
   }
@@ -83,7 +93,7 @@ class MemoryExtractorTest {
 
   @Test fun sensitiveConversationsYieldNothing() {
     val sensitive = cases.filter { it.sensitive }
-    assertTrue(sensitive.size >= 5)
+    assertTrue(sensitive.size >= 12)
     for (c in sensitive) assertEquals(c.id, emptyList<Any>(), found(c))
   }
 

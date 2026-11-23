@@ -136,6 +136,6 @@ internal object ForYouHome {
   /** The row's "Resume" on the paused banner: learning back on for [scope]. */
   fun resume(context: Context, scope: MemoryScope) {
     val ctx = context.applicationContext
-    JarvisMemory.background { JarvisMemory.runtime(ctx).update(scope) { MemoryLearner.setPaused(it, false) } }
+    JarvisMemory.background { JarvisMemory.runtime(ctx).update(scope) { MemoryLearner.setPaused(it, false, System.currentTimeMillis()) } }
   }
 }

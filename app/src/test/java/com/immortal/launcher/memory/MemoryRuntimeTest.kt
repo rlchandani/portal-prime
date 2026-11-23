@@ -48,12 +48,12 @@ class MemoryRuntimeTest {
     assertTrue(store.saved.containsKey(house))
   }
 
-  @Test fun forgetAllForAScopeRemovesItsProfileAndCounts() {
+  @Test fun forgetAllForAScopeLeavesOnlyItsTombstoneAndDropsItsCounts() {
     remember()
     store.runtime.recordUsage { it.record(house, "jarvis", NOW, ZoneOffset.UTC) }
     store.runTimers()
     assertTrue(store.runtime.forgetScope(house))
-    assertTrue(store.saved.isEmpty())
+    assertEquals(MemoryProfile(house, pausedMs = NOW, forgotAllMs = NOW), store.saved[house])
     assertTrue(store.usage.buckets.isEmpty())
     assertTrue(store.runtime.profile(house).facts.isEmpty())
   }

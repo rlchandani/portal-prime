@@ -175,7 +175,7 @@ internal object SettingsPageSections {
             section("Voice", rows("jarvis", "wakeOnScreens"),
                 footer = "Hearthpane listens on this Portal only while one of its screens is in front. " +
                     "Nothing is recorded or sent until Jarvis opens."),
-            section("Memory", rows("jarvis", "learnFromConversations", "whatJarvisKnows"),
+            section("Memory", rows("jarvis", "learnFromConversations", "closerReading", "whatJarvisKnows"),
                 footer = "Learned from what's said to Jarvis, kept sealed on this Portal. Guests and children are " +
                     "never learned. Off until you turn it on."),
         ),

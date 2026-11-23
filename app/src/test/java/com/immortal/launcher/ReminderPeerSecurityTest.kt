@@ -52,7 +52,7 @@ class ReminderPeerSecurityTest {
     val body = ReminderPeerAuth.sealedBody(key, "nonce1", ReminderSeal.REQUEST, "Kitchen", state)
     val header = ReminderPeerAuth.requestHeader(key, "kitchen", "nonce1", now, body)!!
     val replay = HouseholdMessage.ReplayGuard()
-    assertEquals(ReminderPeerAuth.Request("kitchen", "nonce1"),
+    assertEquals(PeerExchangeAuth.Request("kitchen", "nonce1"),
         ReminderPeerAuth.verifyRequest(header, body, key, now, replay, "living"))
     assertNull("replayed", ReminderPeerAuth.verifyRequest(header, body, key, now, replay, "living"))
     assertNull("swapped body", ReminderPeerAuth.verifyRequest(header, "$body ", key, now, HouseholdMessage.ReplayGuard(), "living"))

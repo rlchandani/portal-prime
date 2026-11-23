@@ -12,7 +12,9 @@ import com.immortal.launcher.ControlCenterConfig
 import com.immortal.launcher.DinnerCall
 import com.immortal.launcher.GuestMode
 import com.immortal.launcher.WhosThere
+import com.immortal.launcher.WhosTherePerson
 import com.immortal.launcher.WhosThereRole
+import com.immortal.launcher.WhosThereStore
 import com.immortal.launcher.WhosThereView
 import com.immortal.launcher.jarvis.wake.JarvisWakeConfig
 import com.immortal.launcher.youtube.YtKeystoreSecureStore
@@ -45,7 +47,13 @@ internal object JarvisMemory {
   fun enabled(context: Context): Boolean =
       JarvisWakeConfig.load(context).learnFromConversations || MemoryDebug.forceOn(context)
 
-  /** Who the moment belongs to right now (see [MemoryAccess.decide]). */
+  /** Whether Jarvis may send what was said for a closer text read (plan D3), on top of the switch. */
+  fun cloudExtraction(context: Context): Boolean = JarvisWakeConfig.load(context).closerReading
+
+  /**
+   * Who the moment belongs to right now (see [MemoryAccess.decide]). A recognised person's profile is kept under
+   * their household-stable id ([HouseholdPersonId]), so it is the same profile on every Portal.
+   */
   fun accessNow(context: Context): MemoryAccess {
     val ui = WhosThere.state.value
     fun role(id: String) = when (ui.person(id)?.role) {
@@ -55,13 +63,34 @@ internal object JarvisMemory {
     }
     val seen = when (val view = ui.view) {
       WhosThereView.Shared -> MemoryAccess.Seen.Nobody
-      is WhosThereView.Personal ->
-        MemoryAccess.Seen.One(view.personId, ui.person(view.personId)?.name, role(view.personId), view.othersNear)
+      is WhosThereView.Personal -> MemoryAccess.Seen.One(stableId(ui.people, view.personId).orEmpty(),
+          ui.person(view.personId)?.name, role(view.personId), view.othersNear)
       is WhosThereView.Family -> MemoryAccess.Seen.Several(view.personIds.map(::role))
     }
     val kids = runCatching { ControlCenterConfig.load(context).kids }.getOrDefault(true)
     return MemoryAccess.decide(MemoryAccess.Inputs(enabled(context), GuestMode.isOn(), kids, seen))
   }
+
+  /** The household-stable scope for this Portal's person [localId], if they have one. */
+  fun personScope(localId: String): MemoryScope.Person? =
+      stableId(WhosThereStore.householdState.value.people, localId)?.let(MemoryScope::Person)
+
+  private fun stableId(people: List<WhosTherePerson>, localId: String): String? =
+      HouseholdPersonId.resolve(localId, people.map { it.id to it.name })
+
+  /**
+   * The scopes this Portal syncs (slice 5): the household's and those of the adults enrolled here. Never a kid's or a
+   * teen's (D2), and nobody this Portal doesn't know. Empty with the switch off.
+   */
+  fun syncScopes(context: Context): List<MemoryScope> {
+    if (!enabled(context)) return emptyList()
+    val adults = WhosThereStore.householdState.value.people.filter { it.role == WhosThereRole.ADULT }
+        .mapNotNull { personScope(it.id) }
+    return (listOf<MemoryScope>(MemoryScope.Household) + adults).distinct().take(MemorySync.MAX_SCOPES)
+  }
+
+  /** [syncScopes]' profiles as they are now. */
+  fun syncProfiles(context: Context): List<MemoryProfile> = syncScopes(context).map(runtime(context)::profile)
 
   fun runtime(context: Context): MemoryRuntime = bind(context).runtime
 
@@ -81,11 +110,38 @@ internal object JarvisMemory {
     }
   }
 
-  /** Loads the household profile off the main thread so the first conversation's note is quick. */
+  /**
+   * At start-up: listens for the other Portals (slice 5), then, with the switch on, loads the household profile off
+   * the main thread so the first conversation's note is quick, moves profiles kept under a Portal-local id to the
+   * household-stable one, and announces this Portal's revisions (the catch-up path for a Portal that was off).
+   */
   fun warm(context: Context) {
     val ctx = context.applicationContext
+    MemorySyncNet.install(ctx)
     if (!enabled(ctx)) return
-    io.execute { runCatching { runtime(ctx).profile(MemoryScope.Household) } }
+    io.execute {
+      runCatching {
+        val runtime = runtime(ctx)
+        runtime.profile(MemoryScope.Household)
+        adoptLocalProfiles(ctx, runtime)
+      }.onFailure { Log.w(TAG, "memory warm-up failed (${it.javaClass.simpleName})") }
+      MemorySyncNet.signalSoon(ctx)
+    }
+  }
+
+  /** Profiles under a Portal-local Who's there id (before slice 5) move to that person's stable id. */
+  private fun adoptLocalProfiles(context: Context, runtime: MemoryRuntime) {
+    val stored = MemoryProfileStore.get(context).scopes().filterIsInstance<MemoryScope.Person>().toSet()
+    var moved = 0
+    WhosThereStore.householdState.value.people.forEach { person ->
+      val local = runCatching { MemoryScope.Person(person.id) }.getOrNull() ?: return@forEach
+      val stable = personScope(person.id) ?: return@forEach
+      if (local in stored && local != stable) {
+        runtime.adopt(local, stable)
+        moved++
+      }
+    }
+    if (moved > 0) Log.i(TAG, "moved $moved profiles to household ids")
   }
 
   /** Forget all, from the operator or a reset: every profile and count on this Portal. */
@@ -127,6 +183,7 @@ internal object JarvisMemory {
         now = System::currentTimeMillis,
         loadFeedback = { ForYouFeedback.decode(runCatching { feedbackStore.load() }.getOrNull()) },
         saveFeedback = { log -> runCatching { feedbackStore.save(log.encode()) }.isSuccess },
+        profilesSaved = { MemorySyncNet.signalSoon(ctx) },
     )
     val handoff = MemoryHandoff(
         runtime = runtime,
@@ -136,6 +193,7 @@ internal object JarvisMemory {
         now = System::currentTimeMillis,
         zone = ZoneId::systemDefault,
         recordUsage = { scope, surface -> io.execute { runCatching { record(ctx, scope, surface) } } },
+        closerReading = { cloudExtraction(ctx) },
     )
     return Bound(runtime, handoff)
   }

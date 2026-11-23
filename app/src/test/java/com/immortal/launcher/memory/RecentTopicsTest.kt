@@ -55,7 +55,7 @@ class RecentTopicsTest {
   }
 
   @Test fun noExtractionWhenLearningIsPausedOrOff() {
-    store.runtime.update(alex) { MemoryLearner.setPaused(it, true) }
+    store.runtime.update(alex) { MemoryLearner.setPaused(it, true, NOW) }
     assertFalse(open("c1").has("extract"))
     for (reason in MemoryAccess.Reason.entries) {
       access = MemoryAccess.Off(reason)
@@ -180,7 +180,7 @@ class RecentTopicsTest {
   }
 
   @Test fun pausedLearningKeepsNewTopicsOut() {
-    store.runtime.update(alex) { MemoryLearner.setPaused(it, true) }
+    store.runtime.update(alex) { MemoryLearner.setPaused(it, true, NOW) }
     open("c1")
     end("c1", listOf("When does NVIDIA report earnings?"), topics = listOf(earnings))
     assertTrue(profile().recentTopics.isEmpty())

@@ -84,7 +84,7 @@ class MemoryLearnerTest {
   }
 
   @Test fun pausedLearnsNothingButKeepsWhatItKnows() {
-    val p = MemoryLearner.setPaused(learn(household, "c1", NOW, "Keep an eye on AMD").profile, true)
+    val p = MemoryLearner.setPaused(learn(household, "c1", NOW, "Keep an eye on AMD").profile, true, NOW)
     val r = learn(p, "c2", NOW, "I follow the Warriors")
     assertNull(r.profile.fact("team:nba.gsw"))
     assertEquals(State.ACTIVE, r.profile.fact("ticker:AMD")?.state)

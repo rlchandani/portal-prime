@@ -132,7 +132,15 @@ class MemoryProfileTest {
   }
 
   @Test fun theGoldenFileDecodesToTheProfile() {
-    assertEquals(golden.normalized(), MemoryProfileCodec.decode(goldenJson, person))
+    // A pre-slice-5 file has no "stateAt": a Forget is dated to the fact's last sighting, so it still syncs.
+    val dated = golden.copy(facts = golden.facts.map { if (it.state == State.SUPPRESSED) it.copy(stateMs = 20L) else it })
+    assertEquals(dated.normalized(), MemoryProfileCodec.decode(goldenJson, person))
+  }
+
+  @Test fun syncTimesRoundTrip() {
+    val p = golden.copy(pausedMs = 5L, forgotAllMs = 7L,
+        facts = golden.facts.map { if (it.state == State.SUPPRESSED) it.copy(stateMs = 30L) else it })
+    assertEquals(p.normalized(), MemoryProfileCodec.decode(MemoryProfileCodec.encode(p), person))
   }
 
   @Test fun decodeRefusesAnotherVersionAnotherScopeOrJunk() {

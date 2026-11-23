@@ -34,6 +34,7 @@ internal object MemoryFixtures {
     var failSaves = false
     val scheduled = mutableListOf<() -> Unit>()
     var clock = NOW
+    var signals = 0
 
     val runtime = MemoryRuntime(
         load = { saved[it] ?: MemoryProfile(it) },
@@ -46,6 +47,7 @@ internal object MemoryFixtures {
         now = { clock },
         loadFeedback = { feedback },
         saveFeedback = { feedback = it; true },
+        profilesSaved = { signals++ },
     )
 
     fun runTimers() {

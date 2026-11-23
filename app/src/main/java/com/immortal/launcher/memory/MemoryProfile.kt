@@ -13,13 +13,17 @@ package com.immortal.launcher.memory
  * plan's caps and privacy rules so no writer can store something the plan forbids.
  *
  * Written by [MemoryLearner] (slice 1). [paused] is the person's "Learning off": nothing new is learned, what is
- * known stays and is still used.
+ * known stays and is still used. For syncing across Portals (slice 5, [MemorySync]): [pausedMs] is when [paused] was
+ * last set (the latest choice wins), and [forgotAllMs] is when "Forget all" last ran for this scope, a tombstone that
+ * wipes anything learned before it on every Portal.
  */
 internal data class MemoryProfile(
     val scope: MemoryScope,
     val facts: List<MemoryFact> = emptyList(),
     val recentTopics: List<RecentTopic> = emptyList(),
     val paused: Boolean = false,
+    val pausedMs: Long = 0,
+    val forgotAllMs: Long = 0,
 ) {
   /**
    * The profile with every rule applied: caps (facts, evidence per fact, recent topics), confidence
@@ -31,7 +35,8 @@ internal data class MemoryProfile(
     val unique = allowed.groupBy { it.id }.values.map { same -> same.maxBy { it.lastSeenMs } }
     val kept = unique.sortedWith(KEEP_ORDER).take(MAX_FACTS).map(MemoryFact::normalized).sortedBy { it.id }
     val topics = recentTopics.sortedByDescending { it.atMs }.take(MAX_RECENT_TOPICS).map(RecentTopic::normalized)
-    return copy(facts = kept, recentTopics = topics)
+    return copy(facts = kept, recentTopics = topics, pausedMs = pausedMs.coerceAtLeast(0),
+        forgotAllMs = forgotAllMs.coerceAtLeast(0))
   }
 
   companion object {
@@ -78,7 +83,9 @@ internal sealed interface MemoryScope {
 /**
  * One learned item. [id] is stable, `<kind>:<canonical>` (e.g. `team:nba.gsw`). [evidence] is the
  * provenance, newest first; entries past the cap are folded into [foldedEvidence].
- * [confidence] is recomputed on read from evidence and decay (slice 1); stored for display.
+ * [confidence] is recomputed on read from evidence and decay (slice 1); stored for display. [stateMs] is when the
+ * person last set the state themselves (Keep or remember → CONFIRMED, Forget → SUPPRESSED): across Portals the
+ * latest such choice wins ([MemorySync]).
  */
 internal data class MemoryFact(
     val id: String,
@@ -93,6 +100,7 @@ internal data class MemoryFact(
     val lastSeenMs: Long,
     /** Never injected when others are near, never learned at household scope. */
     val sensitive: Boolean = false,
+    val stateMs: Long = 0,
 ) {
   /** [halfLifeMs] drives decay; [householdAllowed] is plan §4.4's household-scope allowlist. */
   enum class Kind(val halfLifeMs: Long, val householdAllowed: Boolean) {

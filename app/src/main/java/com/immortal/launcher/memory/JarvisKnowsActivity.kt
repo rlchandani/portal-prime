@@ -95,7 +95,7 @@ private const val UNDO_MS = 4_000L
 private const val LEARN_KEY = "learnFromConversations"
 
 /** One undoable change on the screen: what to say and how to put it back. */
-private data class Undoable(val text: String, val undo: (() -> Unit)?)
+private data class Undoable(val toast: KnowsText.Toast, val undo: (() -> Unit)?)
 
 @Composable
 private fun KnowsScreen(onClose: () -> Unit) {
@@ -114,11 +114,13 @@ private fun KnowsScreen(onClose: () -> Unit) {
       is MemoryAccess.Off -> KnowsLocked(a.reason, onClose)
       is MemoryAccess.On -> {
         val profile = remember(a.scope, revision) { runtime.profile(a.scope) }
-        val rows = remember(profile) { KnowsRows.rows(profile, System.currentTimeMillis(), ZoneId.systemDefault()) }
         val portal = remember { runCatching { DinnerCall.selfName(context) }.getOrDefault("Portal") }
+        val rows = remember(profile) {
+          KnowsRows.rows(profile, System.currentTimeMillis(), ZoneId.systemDefault(), here = portal)
+        }
         // The real "Jarvis learns from conversations" setting, never the operator's force (re-read on every change).
         val settingOn = remember(revision) { JarvisWakeConfig.load(context).learnFromConversations }
-        val actions = KnowsActions(context, runtime, a.scope, portal, settingOn) { toast = it }
+        val actions = KnowsActions(context, runtime, a, portal, settingOn) { toast = it }
         val rail = !currentLayoutClass().compactPortrait
         Row(Modifier.fillMaxSize()) {
           if (rail) KnowsRail(rows, category, onClose) { category = it }
@@ -135,23 +137,25 @@ private fun KnowsScreen(onClose: () -> Unit) {
 private class KnowsActions(
     private val context: Context,
     private val runtime: MemoryRuntime,
-    private val scope: MemoryScope,
+    private val access: MemoryAccess.On,
     private val portal: String,
     val settingOn: Boolean,
     private val report: (Undoable) -> Unit,
 ) {
+  private val scope = access.scope
+
   private fun now() = System.currentTimeMillis()
 
   fun forget(row: KnowsRows.Row) {
     val before = runtime.profile(scope)
     runtime.update(scope, immediate = true) { MemoryLearner.forget(it, setOf(row.id), now()) }
-    report(Undoable("Forgot ${row.title}") { runtime.update(scope, immediate = true) { _ -> before } })
+    report(Undoable(KnowsText.forgot(row.title)) { runtime.update(scope, immediate = true) { _ -> before } })
   }
 
   fun keep(row: KnowsRows.Row) {
     val before = runtime.profile(scope)
     runtime.update(scope) { MemoryLearner.keep(it, row.id, portal, now()) }
-    report(Undoable("Kept ${row.title}") { runtime.update(scope) { _ -> before } })
+    report(Undoable(KnowsText.kept(row.title)) { runtime.update(scope) { _ -> before } })
   }
 
   fun setLearning(on: Boolean) {
@@ -160,14 +164,14 @@ private class KnowsActions(
     if (change.turnSettingOn) {
       SettingsRegistry.apply(context, JarvisSettings.domain.id, JSONObject().put(LEARN_KEY, true))
     }
-    runtime.update(scope) { MemoryLearner.setPaused(it, change.paused) }
-    report(Undoable(if (on) "Learning on" else "Learning paused · Jarvis keeps what it knows", null))
+    runtime.update(scope) { MemoryLearner.setPaused(it, change.paused, now()) }
+    report(Undoable(KnowsText.learning(on), null))
   }
 
   fun forgetAll() {
     val before = runtime.profile(scope)
     runtime.forgetScope(scope)
-    report(Undoable("Forgot everything") { runtime.update(scope, immediate = true) { _ -> before } })
+    report(Undoable(KnowsText.forgotAll(scope is MemoryScope.Household, access.firstName)) { runtime.update(scope, immediate = true) { _ -> before } })
   }
 }
 
@@ -217,15 +221,9 @@ private fun KnowsMain(access: MemoryAccess.On, profile: MemoryProfile, rows: Lis
       }
       ApprovedHomePillButton("Forget all") { actions.forgetAll() }
     }
-    KnowsBanner(if (household) {
-      "Learned automatically while nobody was recognised, from what's said to Jarvis on this Portal. Shared by " +
-          "everyone here. Dashed items are still being learned."
-    } else {
-      "Learned automatically from what ${access.firstName ?: "you"} says to Jarvis on this Portal. Kept sealed on " +
-          "this Portal, only for you. Dashed items are still being learned."
-    })
+    KnowsBanner(KnowsText.banner(household, access.firstName))
     if (rows.isEmpty()) {
-      KnowsEmpty("Nothing here yet", "Jarvis learns as you talk. There's nothing to set up.")
+      KnowsEmpty(KnowsText.EMPTY_TITLE, KnowsText.EMPTY)
     } else {
       LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         items(rows, key = { it.id }) { row -> KnowsFactRow(row, actions) }
@@ -333,7 +331,10 @@ private fun KnowsToast(toast: Undoable, modifier: Modifier, onDone: () -> Unit) 
   Row(modifier.clip(RoundedCornerShape(24.dp)).background(p.text).padding(horizontal = 28.dp, vertical = 10.dp)
       .heightIn(min = 68.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-    Text(toast.text, color = p.background, fontSize = 22.sp)
+    Column {
+      Text(toast.toast.text, color = p.background, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+      toast.toast.sub?.let { Text(it, color = p.background.copy(alpha = 0.75f), fontSize = 18.sp) }
+    }
     toast.undo?.let { undo -> ApprovedHomeTextButton("Undo") { undo(); onDone() } }
   }
 }

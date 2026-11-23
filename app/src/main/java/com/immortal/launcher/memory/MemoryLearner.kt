@@ -99,20 +99,30 @@ internal object MemoryLearner {
     val existing = profile.facts.associateBy { it.id }
     val suppressed = factIds.map { id ->
       val kind = existing[id]?.kind ?: kindOf(id) ?: return@map null
-      MemoryFact(id = id, kind = kind, label = "", state = State.SUPPRESSED, firstSeenMs = nowMs, lastSeenMs = nowMs)
+      MemoryFact(id = id, kind = kind, label = "", state = State.SUPPRESSED, firstSeenMs = nowMs, lastSeenMs = nowMs,
+          stateMs = nowMs)
     }.filterNotNull()
     val ids = suppressed.map { it.id }.toSet()
-    // Forget wins over a thread about the same thing: an extracted topic naming a forgotten fact goes with it.
-    val names = ids.mapNotNull { existing[it] }.flatMap { listOf(it.label, it.id.substringAfter(':')) }
+    return profile.copy(
+        facts = profile.facts.filter { it.id !in ids } + suppressed,
+        recentTopics = topicsWithout(profile.recentTopics, ids.mapNotNull { existing[it] } + suppressed),
+    ).normalized()
+  }
+
+  /**
+   * Forget wins over a thread about the same thing: [topics] without the stand-in for any of [forgotten] and without
+   * an extracted topic naming one (by its label or id).
+   */
+  fun topicsWithout(topics: List<RecentTopic>, forgotten: List<MemoryFact>): List<RecentTopic> {
+    if (forgotten.isEmpty()) return topics
+    val ids = forgotten.map { it.id }.toSet()
+    val names = forgotten.flatMap { listOf(it.label, it.id.substringAfter(':')) }
         .map(MemoryText::tokens).filter { it.isNotEmpty() }
     fun mentions(t: RecentTopic): Boolean {
       val words = MemoryText.tokens("${t.topic.substringAfter(':').replace('-', ' ')} ${t.gist} ${t.openQuestion.orEmpty()}")
       return names.any { MemoryText.contains(words, it) }
     }
-    return profile.copy(
-        facts = profile.facts.filter { it.id !in ids } + suppressed,
-        recentTopics = profile.recentTopics.filter { it.topic !in ids && !(it.extracted && mentions(it)) },
-    ).normalized()
+    return topics.filter { it.topic !in ids && !(it.extracted && mentions(it)) }
   }
 
   /**
@@ -133,7 +143,7 @@ internal object MemoryLearner {
         id = entry.factId, kind = entry.kind, label = entry.label, attrs = entry.attrs,
         firstSeenMs = nowMs, lastSeenMs = nowMs,
     )).let { it.copy(evidence = listOf(evidence) + it.evidence, state = State.CONFIRMED, confidence = 1.0,
-        lastSeenMs = nowMs) }
+        lastSeenMs = nowMs, stateMs = nowMs) }
     return profile.copy(facts = profile.facts.filter { it.id != fact.id } + fact).normalized()
   }
 
@@ -142,11 +152,20 @@ internal object MemoryLearner {
     val fact = profile.facts.firstOrNull { it.id == factId && it.state != State.SUPPRESSED } ?: return profile
     val evidence = Evidence(Evidence.Source.CONFIRM, nowMs, portal, null, 1.0)
     val kept = fact.copy(evidence = listOf(evidence) + fact.evidence, state = State.CONFIRMED, confidence = 1.0,
-        lastSeenMs = nowMs)
+        lastSeenMs = nowMs, stateMs = nowMs)
     return profile.copy(facts = profile.facts.map { if (it.id == factId) kept else it }).normalized()
   }
 
-  fun setPaused(profile: MemoryProfile, paused: Boolean): MemoryProfile = profile.copy(paused = paused)
+  /** Learning off or on; [nowMs] is kept so the latest choice wins on every Portal. */
+  fun setPaused(profile: MemoryProfile, paused: Boolean, nowMs: Long): MemoryProfile =
+      if (profile.paused == paused) profile else profile.copy(paused = paused, pausedMs = nowMs)
+
+  /**
+   * "Forget all" for [scope]: nothing kept but the tombstone, so every Portal drops what was learned before [nowMs]
+   * when it syncs ([MemorySync]). Learning stays on; the pause choice is reset too.
+   */
+  fun forgotAll(scope: MemoryScope, nowMs: Long): MemoryProfile =
+      MemoryProfile(scope, pausedMs = nowMs, forgotAllMs = nowMs)
 
   /** The kind a fact id names (`team:…` → TEAM), for forgetting an id that was never stored. */
   fun kindOf(factId: String): MemoryFact.Kind? = when (factId.substringBefore(':', "")) {
