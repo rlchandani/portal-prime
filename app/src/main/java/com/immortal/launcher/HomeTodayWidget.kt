@@ -115,12 +115,12 @@ internal fun TodayStripWidget(modifier: Modifier = Modifier) {
           ?.let { "${it.emoji} ${it.label}" to it.phrase() }
     }.getOrNull()
     alarmLine = runCatching {
-      val cfg = AlarmConfig.load(context)
-      val next = if (cfg.enabled) AlarmConfig.nextTrigger(cfg) else null
-      next?.let {
-        val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
-        cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(it))
-      }
+      // The soonest of every alarm: the main one and the ones Jarvis added.
+      MoreAlarms.all(context).mapNotNull { a -> AlarmConfig.nextTrigger(a.config)?.let { a.config to it } }
+          .minByOrNull { it.second }?.let { (cfg, next) ->
+            val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
+            cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(next))
+          }
     }.getOrNull()
     todoOpen = runCatching { TodoStore.load(context).count { !it.done } }.getOrDefault(0)
   }

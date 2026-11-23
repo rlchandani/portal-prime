@@ -7,9 +7,6 @@
 
 package com.immortal.launcher
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -60,6 +57,8 @@ class AlarmRingActivity : ComponentActivity() {
     const val EXTRA_LABEL = "alarm_label"
   }
   private var preview = false
+  private var label = "Alarm"
+  private var alarmId = MoreAlarms.MAIN_ID
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -75,12 +74,14 @@ class AlarmRingActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
 
-    val label = intent.getStringExtra(EXTRA_LABEL) ?: "Alarm"
+    label = intent.getStringExtra(EXTRA_LABEL) ?: "Alarm"
+    alarmId = intent.getIntExtra(AlarmRinging.EXTRA_ID, MoreAlarms.MAIN_ID)
     val alarm = AlarmConfig.load(this)
     val previewTime = String.format(Locale.getDefault(), "%02d:%02d", alarm.hour, alarm.minute)
     setContent {
       PortalPrimeTheme(darkTheme = true) {
         CompositionLocalProvider(LocalApprovedPalette provides ApprovedToolsPalette) {
+          if (!preview) CloseWhenRingEnds()
           AlarmRingScreen(label, preview, previewTime, onDismiss = ::dismiss, onSnooze = ::snooze)
         }
       }
@@ -98,29 +99,24 @@ class AlarmRingActivity : ComponentActivity() {
   }
 
   private fun dismiss() {
-    if (!preview) {
-      AlarmSound.stop(this)
-      AlarmReceiver.clearNotification(this)
-      BriefingLauncher.afterWake(this)
-    }
+    if (!preview) AlarmRinging.dismiss(this, force = true)
     finish()
   }
 
   private fun snooze() {
-    if (preview) { finish(); return }
-    AlarmSound.stop(this)
-    AlarmReceiver.clearNotification(this)
-    val intent = Intent(this, AlarmReceiver::class.java).setAction(AlarmScheduler.ACTION_SNOOZE)
-    val pi =
-        PendingIntent.getBroadcast(
-            this, AlarmScheduler.SNOOZE_RC, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    val am = getSystemService(AlarmManager::class.java)
-    AlarmSnooze.schedule(
-        exact = { type, at -> am.setExactAndAllowWhileIdle(type, at, pi) },
-        fallback = { type, at -> am.setAndAllowWhileIdle(type, at, pi) },
-    )
+    if (!preview) AlarmRinging.snooze(this, fallback = AlarmRinging.Ring(alarmId, label, System.currentTimeMillis()))
     finish()
+  }
+
+  /** A spoken snooze or stop (Jarvis) ends the ring elsewhere: close this screen with it. */
+  @Composable
+  private fun CloseWhenRingEnds() {
+    LaunchedEffect(Unit) {
+      var seen = false
+      AlarmRinging.ringing.collect { ring ->
+        if (ring != null) seen = true else if (seen && !isFinishing) finish()
+      }
+    }
   }
 
   // Dismiss/Snooze own ringing cleanup. Activity recreation must preserve the

@@ -228,6 +228,7 @@ internal fun ToolsAlarmContent() {
         }
       }
     }
+    ToolsOtherAlarmsPanel()
   })
 
   if (editing && alarm != null) {

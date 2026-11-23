@@ -124,6 +124,12 @@ The Kotlin package is flat; files are grouped by name prefix:
   `MemoryAccess` (who), `MemoryExtractor` + `assets/memory/dictionary.json` (what), `MemoryLearner` /
   `MemoryConfidence` (how sure), `MemoryNote` (the prompt note); `JarvisKnowsActivity` ("What Jarvis knows");
   silent usage counts `UsageCounts` / `MemoryUsage`. Never log user text or profile content.
+- **Jarvis household tools (`jarvis/`, declared in `res/values/jarvis_tools.xml`):** `HearthpaneHouseholdTools` binds
+  them. Alarms: `HearthpaneAlarms` over `AlarmBook` — the main alarm is `AlarmConfig`, up to 5 more are `MoreAlarms`
+  (own request codes in `AlarmScheduler`, Tools › Alarm's "Other alarms" in `ToolsOtherAlarms`); the ring under way
+  and spoken snooze/stop are `AlarmRinging`. Timers: `HearthpaneTimers` drives `SharedTimers` (every room). Home
+  routines (not the kids' picture `Routine*`): `HomeRoutines` (Good night, Leaving, household-made) run by
+  `HearthpaneRoutines` through `CcJarvisHome.runBatch`, the same policy gate and confirm sheet as `home_control`.
 - **Remote / Portal TV:** `Remote*`, `TvFocus`
 - **Boot / lifecycle:** `ImmortalApp`, `BootReceiver`, `BootLaunch`, `Sleep*`, `ScreenControl`
 - **Settings (the registry — read [Settings infrastructure](#settings-infrastructure) before

@@ -20,20 +20,28 @@ import android.os.Build
  *  arms the next occurrence. */
 class AlarmReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
-    val snooze = intent?.action == AlarmScheduler.ACTION_SNOOZE
-    if (!snooze && intent?.action != AlarmScheduler.ACTION_FIRE) return
-    val cfg = AlarmConfig.load(context)
+    if (intent == null) return
+    val snooze = intent.action == AlarmScheduler.ACTION_SNOOZE
+    if (!snooze && intent.action != AlarmScheduler.ACTION_FIRE) return
+    val id = intent.getIntExtra(AlarmRinging.EXTRA_ID, MoreAlarms.MAIN_ID)
+    val main = id == MoreAlarms.MAIN_ID
+    val stored = if (main) AlarmConfig.load(context) else MoreAlarms.find(context, id)?.config
+    // A snoozed ring of an alarm deleted meanwhile still rings once, under its own label.
+    val cfg = stored ?: if (snooze) AlarmConfig.Config(false, 0, 0, "Alarm", emptySet()) else return
     if (!AlarmDeliveryPolicy.shouldRing(cfg.enabled, snooze)) return
+    val label = intent.getStringExtra(AlarmRingActivity.EXTRA_LABEL)?.takeIf { snooze } ?: cfg.label
     AlarmSound.start(context)
-    showAlert(context, cfg)
+    AlarmRinging.started(id, label)
+    showAlert(context, id, label)
     if (!AlarmDeliveryPolicy.shouldAdvanceSchedule(snooze)) return
     if (cfg.days.isEmpty()) {
       // One-shot alarm (no repeat days): turn it off after firing so it doesn't re-arm for the
       // same time tomorrow. Disabling makes nextTrigger return null, so no new alarm is scheduled.
-      AlarmConfig.setEnabled(context, false)
+      if (main) AlarmConfig.setEnabled(context, false)
+      else MoreAlarms.edit(context) { all -> all.map { if (it.id == id) it.copy(config = it.config.copy(enabled = false)) else it } }
     }
     // Re-arm the next matching weekday (a no-op for a now-disabled one-shot).
-    AlarmScheduler.reschedule(context, cancelSnooze = false)
+    if (main) AlarmScheduler.reschedule(context, cancelSnooze = false) else AlarmScheduler.rescheduleMore(context)
   }
 
   /**
@@ -43,10 +51,11 @@ class AlarmReceiver : BroadcastReceiver() {
    * full-screen activity even from the background / lock screen. We also try a direct
    * start (harmless on API 28 where it's allowed and is a no-op duplicate otherwise).
    */
-  private fun showAlert(context: Context, cfg: AlarmConfig.Config) {
+  private fun showAlert(context: Context, id: Int, label: String) {
     val activity =
         Intent(context, AlarmRingActivity::class.java)
-            .putExtra(AlarmRingActivity.EXTRA_LABEL, cfg.label)
+            .putExtra(AlarmRingActivity.EXTRA_LABEL, label)
+            .putExtra(AlarmRinging.EXTRA_ID, id)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
     val pi =
@@ -65,7 +74,7 @@ class AlarmReceiver : BroadcastReceiver() {
     val notif =
         Notification.Builder(context, CHANNEL)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(cfg.label)
+            .setContentTitle(label)
             .setContentText("Alarm")
             .setContentIntent(pi)
             .setCategory(Notification.CATEGORY_ALARM)

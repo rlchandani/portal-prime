@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.immortal.launcher.AlarmConfig
+import com.immortal.launcher.AlarmRinging
 import com.immortal.launcher.AlarmScheduler
 import com.immortal.launcher.BriefingActivity
 import com.immortal.launcher.BriefingConfig
@@ -21,11 +22,14 @@ import com.immortal.launcher.BriefingPolicy
 import com.immortal.launcher.CallKind
 import com.immortal.launcher.Calling
 import com.immortal.launcher.CallingStore
+import com.immortal.launcher.CcJarvisHome
 import com.immortal.launcher.ChimeConfig
 import com.immortal.launcher.DinnerCall
 import com.immortal.launcher.GuestMode
 import com.immortal.launcher.HouseholdListStore
 import com.immortal.launcher.HouseholdListSync
+import com.immortal.launcher.MoreAlarms
+import com.immortal.launcher.SharedTimers
 import com.immortal.launcher.GuestContent
 import java.util.TimeZone
 import java.util.concurrent.Executors
@@ -34,8 +38,8 @@ import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 
 /**
- * Binds the household tools ([HearthpaneAnnounce], [HearthpaneLists], [HearthpaneAlarms], [HearthpaneBriefing],
- * [HearthpaneCall]) to Hearthpane's live features. Runs on the provider's binder thread, inside Jarvis's 5 s tool
+ * Binds the household tools ([HearthpaneAnnounce], [HearthpaneLists], [HearthpaneAlarms], [HearthpaneTimers],
+ * [HearthpaneRoutines], [HearthpaneBriefing], [HearthpaneCall]) to Hearthpane's live features. Runs on the provider's binder thread, inside Jarvis's 5 s tool
  * timeout: the briefing's network sources get [NETWORK_BUDGET_MS] together, and a call is placed on the main thread.
  */
 internal object HearthpaneHouseholdTools {
@@ -56,22 +60,52 @@ internal object HearthpaneHouseholdTools {
         edit = { op -> HouseholdListStore.edit(ctx, op) },
         by = { HouseholdListSync.selfName(ctx) }, now = { HouseholdListStore.clock() },
         hidden = { GuestMode.hides(GuestContent.HOUSEHOLD_LIST) })
-    val alarms = HearthpaneAlarms(
-        load = { AlarmConfig.load(ctx) },
-        save = { c -> AlarmConfig.save(ctx, c); AlarmScheduler.reschedule(ctx) }, use24 = use24)
+    val alarms = HearthpaneAlarms(alarmBook(ctx), use24 = use24)
     val briefing = HearthpaneBriefing(inputs = { briefingInputs(ctx) }, open = { BriefingActivity.open(ctx) },
         hides = { GuestMode.hides(it) }, readsAloud = { readsAloud(ctx) })
     val call = HearthpaneCall(
         ready = { Calling.ready(ctx) }, selfName = { Calling.selfName(ctx) },
         peers = { CallingStore.peers.value }, busy = { Calling.state.value.busy },
-        dial = { id, video -> onMain { Calling.dial(ctx, id, CallKind.CALL, video) } })
+        dial = { id, video -> onMain(false) { Calling.dial(ctx, id, CallKind.CALL, video) } })
+    val timers = HearthpaneTimers(
+        timers = { SharedTimers.snapshot(ctx) },
+        start = { name, ms -> SharedTimers.start(ctx, name, ms) },
+        act = { action, id -> SharedTimers.act(ctx, action, id) is SharedTimers.ActResult.Changed },
+        here = { SharedTimers.selfName(ctx) })
+    val routines = HearthpaneRoutines(
+        saved = { HomeRoutines.load(ctx) }, save = { HomeRoutines.save(ctx, it) },
+        home = { requests -> CcJarvisHome.runBatch(ctx, requests) }, nextAlarm = alarms::nextSpoken)
     return mapOf(
         HearthpaneAnnounce.NAME to announce::invoke,
+        HearthpaneRoutines.NAME to routines::invoke,
+        HearthpaneTimers.NAME to timers::invoke,
         HearthpaneLists.NAME to lists::invoke,
         HearthpaneAlarms.NAME to alarms::invoke,
         HearthpaneBriefing.NAME to briefing::invoke,
         HearthpaneCall.NAME to call::invoke,
     )
+  }
+
+  /** The Portal's alarms: the main one in [AlarmConfig], the others in [MoreAlarms]; ring actions on the main thread. */
+  private fun alarmBook(ctx: Context) = object : AlarmBook {
+    override fun all() = MoreAlarms.all(ctx)
+    override fun save(alarm: MoreAlarms.Alarm) {
+      if (alarm.id == MoreAlarms.MAIN_ID) {
+        AlarmConfig.save(ctx, alarm.config); AlarmScheduler.reschedule(ctx)
+      } else {
+        MoreAlarms.edit(ctx) { MoreAlarms.put(it, alarm) }; AlarmScheduler.rescheduleMore(ctx)
+      }
+    }
+    override fun remove(id: Int) {
+      if (id == MoreAlarms.MAIN_ID) {
+        AlarmConfig.save(ctx, AlarmConfig.load(ctx).copy(enabled = false)); AlarmScheduler.reschedule(ctx)
+      } else {
+        MoreAlarms.edit(ctx) { all -> all.filterNot { it.id == id } }; AlarmScheduler.rescheduleMore(ctx)
+      }
+    }
+    override fun ringing() = AlarmRinging.current()
+    override fun snooze(minutes: Int) = onMain(null) { AlarmRinging.snooze(ctx, minutes) }
+    override fun dismiss() = onMain(null) { AlarmRinging.dismiss(ctx) }
   }
 
   /** The household briefing's inputs: the quick local ones, plus weather and calendar if they answer in time. */
@@ -93,14 +127,14 @@ internal object HearthpaneHouseholdTools {
         !ChimeConfig.isQuietNow(ctx, BriefingPolicy.minuteOfDay(System.currentTimeMillis(), TimeZone.getDefault()))
   }.getOrDefault(false)
 
-  /** Runs [block] on the main thread and waits briefly for its answer (false if it didn't run in time). */
-  private fun onMain(block: () -> Boolean): Boolean {
+  /** Runs [block] on the main thread and waits briefly for its answer ([late] if it didn't run in time). */
+  private fun <T> onMain(late: T, block: () -> T): T {
     if (Looper.myLooper() == Looper.getMainLooper()) return block()
     val task = FutureTask(block)
     Handler(Looper.getMainLooper()).post(task)
     return runCatching { task.get(MAIN_WAIT_MS, TimeUnit.MILLISECONDS) }.getOrElse {
       task.cancel(false) // never let a late action happen after we've answered that it didn't
-      Log.w(TAG, "main-thread action didn't finish in time", it); false
+      Log.w(TAG, "main-thread action didn't finish in time", it); late
     }
   }
 }
