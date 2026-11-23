@@ -1,6 +1,6 @@
 {
-  "versionCode": 328,
-  "versionName": "1.334",
+  "versionCode": 329,
+  "versionName": "1.335",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Jarvis: several alarms with voice snooze, timers in every room, Good night / Leaving routines, sports scores and stock prices; Add alarm in Tools; interest chips, Sports widget and briefing line (with Jarvis memory on)"
+  "notes": "Jarvis memory (when on) also learns topics, music and places from what you say, and picks up earlier conversations"
 }
