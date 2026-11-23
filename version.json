@@ -1,6 +1,6 @@
 {
-  "versionCode": 327,
-  "versionName": "1.333",
+  "versionCode": 328,
+  "versionName": "1.334",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Home comes back after every update; 'For you' suggestions (with Jarvis memory on); whole photos at night with Fit; Jarvis reads your calendar, news headlines and world time"
+  "notes": "Jarvis: several alarms with voice snooze, timers in every room, Good night / Leaving routines, sports scores and stock prices; Add alarm in Tools; interest chips, Sports widget and briefing line (with Jarvis memory on)"
 }
