@@ -63,6 +63,8 @@ class ImmortalApp : Application() {
     ShareFeature.install(this)
     // Loads guest mode: Home and the dream must not show household content while it is on.
     GuestFeature.install(this)
+    // Resumed-activity count: lets the post-replace Home restore see that Home really came back.
+    OwnActivityResumes.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Compact Portals only: covers the right turn the platform's rotation ignores (sensor dormant elsewhere).

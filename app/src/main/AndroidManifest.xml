@@ -825,6 +825,14 @@
             </intent-filter>
         </receiver>
 
+        <!-- After our own package is replaced (OTA, fleet, adb), bring Home back over Meta's
+             launcher, which Android resumes when it force-removes our activities. -->
+        <receiver android:name=".ReplacedHomeReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".RemoteSceneReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
