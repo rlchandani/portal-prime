@@ -10,9 +10,10 @@ package com.immortal.launcher
  * Which screensaver styles honour the photo-fit setting ([ScreensaverConfig.Settings.fit]). Pure;
  * Settings shows the Fit row only for these.
  *  - Smart frame and Portrait pair: the native stage covers or contains by fit on the Portal+
- *    ([PhotoFrameStagePolicy.presentation]) and on compact windows ([CompactStagePlan.plan]).
- *  - Classic: photos crop or letterbox by fit on the Portal+ and videos follow it everywhere
- *    (compact Classic photos always pan whole).
+ *    ([PhotoFrameStagePolicy.presentation]) and on compact windows ([CompactStagePlan.plan]); under
+ *    fit the Night photo is whole too ([ScreensaverLayout.nightWhole]).
+ *  - Classic: photos crop or letterbox by fit on the Portal+, compact photos pan under fill and rest
+ *    whole under fit ([ScreensaverLayout.classicPan]); videos follow it everywhere.
  *  - Not: Whole photo and the Gallery styles never crop; Split glance always covers its card;
  *    Shuffle and the engine styles never read the setting.
  */

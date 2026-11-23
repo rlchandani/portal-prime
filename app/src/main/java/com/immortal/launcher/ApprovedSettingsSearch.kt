@@ -197,7 +197,7 @@ internal fun approvedSettingsPrerequisite(context: android.content.Context, cont
         key == "batterySaver" -> "This setting is unavailable on a Portal without a battery."
         key.startsWith("overnight") -> "Turn on Overnight screen-off to set its times."
         key.startsWith("sleepTimer") -> "Turn on Sleep timer to set its duration."
-        key == "fit" -> "Choose the Classic screensaver style to change Fit."
+        key == "fit" -> "Choose the Smart frame, Portrait pair or Classic screensaver style to change Fit."
         key == "soundscapeVolume" -> "Choose an ambient sound to set its volume."
         domainId == "quickbar" -> "Turn on the app-switcher button to see this option."
         domainId == "chime" && key.startsWith("quiet") -> "Turn on Quiet hours to set its times."

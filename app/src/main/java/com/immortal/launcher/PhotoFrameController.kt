@@ -1573,7 +1573,8 @@ class PhotoFrameController(
 
   private fun applyFit() {
     // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
-    // Compact Classic pans the contained frame itself (see [startCompactPan]), whatever the fit.
+    // Compact Classic keeps the view FIT_CENTER: under fill [startCompactPan] covers or pans it,
+    // under fit it rests whole and still.
     val scaleType =
         if (settings.fit == ScreensaverConfig.FIT_FIT || compactClassic()) ImageView.ScaleType.FIT_CENTER
         else ImageView.ScaleType.CENTER_CROP
@@ -1836,7 +1837,8 @@ class PhotoFrameController(
     val look = PhotoFrameStagePolicy.presentation(settings, nightPhotoOn, splitGlance, splitNightOn)
     nativeStage.show(photos, look.fill, look.motion, intervalMs(), measuredNativeOcclusions(),
         galleryPrint = look.galleryPrint, gallerySpread = look.gallerySpread, automatic = automatic,
-        feature = look.feature, keepPeople = look.keepPeople, style = CompactStagePlan.style(settings.mode))
+        feature = look.feature, keepPeople = look.keepPeople, style = CompactStagePlan.style(settings.mode),
+        wholeAtNight = look.wholeAtNight)
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
   }
@@ -2746,14 +2748,15 @@ class PhotoFrameController(
   /**
    * Compact Classic (mock): a landscape upright (a portrait turned) fills the short side and pans
    * along its long axis over the beat, so all of it is seen; a photo that already fits covers and
-   * zooms gently. Only RenderNode scale/translation animate; the view stays FIT_CENTER.
+   * zooms gently. Under fit nothing moves: the photo rests whole. Only RenderNode scale/translation
+   * animate; the view stays FIT_CENTER.
    */
   private fun startCompactPan(target: ImageView, storeFront: Boolean) {
     val drawable = target.drawable ?: return
     val w = if (target.width > 0) target.width else context.resources.displayMetrics.widthPixels
     val h = if (target.height > 0) target.height else context.resources.displayMetrics.heightPixels
     val pan = ScreensaverLayout.classicPan(drawable.intrinsicWidth, drawable.intrinsicHeight, w, h,
-        kenBurnsStyle++) ?: return
+        kenBurnsStyle++, fill = settings.fit == ScreensaverConfig.FIT_FILL) ?: return
     target.pivotX = w / 2f
     target.pivotY = h / 2f
     target.scaleX = pan.scale0; target.scaleY = pan.scale0
