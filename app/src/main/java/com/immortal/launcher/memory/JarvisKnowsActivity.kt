@@ -58,10 +58,14 @@ import com.immortal.launcher.DinnerCall
 import com.immortal.launcher.R
 import com.immortal.launcher.WhosThere
 import com.immortal.launcher.currentLayoutClass
+import com.immortal.launcher.jarvis.wake.JarvisWakeConfig
+import com.immortal.launcher.settings.JarvisSettings
+import com.immortal.launcher.settings.SettingsRegistry
 import com.immortal.launcher.tvFocusable
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import java.time.ZoneId
+import org.json.JSONObject
 
 /**
  * "What Jarvis knows" (plan §4.3, mock `mocks/jarvis-personalization-20261122` screen 2): a categories rail and the
@@ -88,6 +92,7 @@ class JarvisKnowsActivity : ComponentActivity() {
 }
 
 private const val UNDO_MS = 4_000L
+private const val LEARN_KEY = "learnFromConversations"
 
 /** One undoable change on the screen: what to say and how to put it back. */
 private data class Undoable(val text: String, val undo: (() -> Unit)?)
@@ -111,7 +116,9 @@ private fun KnowsScreen(onClose: () -> Unit) {
         val profile = remember(a.scope, revision) { runtime.profile(a.scope) }
         val rows = remember(profile) { KnowsRows.rows(profile, System.currentTimeMillis(), ZoneId.systemDefault()) }
         val portal = remember { runCatching { DinnerCall.selfName(context) }.getOrDefault("Portal") }
-        val actions = KnowsActions(runtime, a.scope, portal) { toast = it }
+        // The real "Jarvis learns from conversations" setting, never the operator's force (re-read on every change).
+        val settingOn = remember(revision) { JarvisWakeConfig.load(context).learnFromConversations }
+        val actions = KnowsActions(context, runtime, a.scope, portal, settingOn) { toast = it }
         val rail = !currentLayoutClass().compactPortrait
         Row(Modifier.fillMaxSize()) {
           if (rail) KnowsRail(rows, category, onClose) { category = it }
@@ -126,9 +133,11 @@ private fun KnowsScreen(onClose: () -> Unit) {
 
 /** The screen's changes, each immediate (Forget writes at once) and each reported with its Undo. */
 private class KnowsActions(
+    private val context: Context,
     private val runtime: MemoryRuntime,
     private val scope: MemoryScope,
     private val portal: String,
+    val settingOn: Boolean,
     private val report: (Undoable) -> Unit,
 ) {
   private fun now() = System.currentTimeMillis()
@@ -146,7 +155,12 @@ private class KnowsActions(
   }
 
   fun setLearning(on: Boolean) {
-    runtime.update(scope) { MemoryLearner.setPaused(it, !on) }
+    val change = KnowsLearning.change(on, settingOn)
+    // Through the registry, so the remote, validation and side effects stay in step with Settings › Jarvis.
+    if (change.turnSettingOn) {
+      SettingsRegistry.apply(context, JarvisSettings.domain.id, JSONObject().put(LEARN_KEY, true))
+    }
+    runtime.update(scope) { MemoryLearner.setPaused(it, change.paused) }
     report(Undoable(if (on) "Learning on" else "Learning paused · Jarvis keeps what it knows", null))
   }
 
@@ -198,7 +212,8 @@ private fun KnowsMain(access: MemoryAccess.On, profile: MemoryProfile, rows: Lis
           .padding(start = 22.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("Learning", color = p.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
-        ApprovedSettingsSwitch(checked = !profile.paused, onCheckedChange = { actions.setLearning(it) })
+        ApprovedSettingsSwitch(checked = KnowsLearning.checked(actions.settingOn, profile.paused),
+            onCheckedChange = { actions.setLearning(it) })
       }
       ApprovedHomePillButton("Forget all") { actions.forgetAll() }
     }

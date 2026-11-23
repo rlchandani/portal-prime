@@ -25,12 +25,16 @@ internal class MemoryRuntime(
     private val wipe: () -> Boolean,
     private val schedule: (delayMs: Long, task: () -> Unit) -> Unit,
     private val now: () -> Long,
+    private val loadFeedback: () -> ForYouFeedback = { ForYouFeedback() },
+    private val saveFeedback: (ForYouFeedback) -> Boolean = { true },
 ) {
   private val lock = Any()
   private var profiles: Map<MemoryScope, MemoryProfile> = emptyMap()
   private var usage: UsageCounts? = null
   private var dirty: Set<MemoryScope> = emptySet()
   private var usageDirty = false
+  private var feedback: ForYouFeedback? = null
+  private var feedbackDirty = false
   private var writePending = false
   private val revisions = MutableStateFlow(0)
 
@@ -69,38 +73,59 @@ internal class MemoryRuntime(
     (usage ?: loadUsage()).pruned(now(), java.time.ZoneId.systemDefault()).also { usage = it }
   }
 
+  /** What was done with the "For you right now" chips, within its retention (pruned on read). */
+  fun feedback(): ForYouFeedback = synchronized(lock) {
+    (feedback ?: loadFeedback()).pruned(now()).also { feedback = it }
+  }
+
+  /** Applies [change] to the chip feedback; written with the next debounced write, or now when [immediate]. */
+  fun recordFeedback(immediate: Boolean = false, change: (ForYouFeedback) -> ForYouFeedback) {
+    synchronized(lock) {
+      feedback = change(feedback ?: loadFeedback())
+      feedbackDirty = true
+    }
+    revisions.value++
+    if (immediate) flush() else scheduleWrite()
+  }
+
   /** Writes everything changed since the last write. */
   fun flush() {
-    val (toSave, counts) = synchronized(lock) {
+    val (toSave, counts, chips) = synchronized(lock) {
       writePending = false
-      val out = dirty.mapNotNull { profiles[it] } to usage?.takeIf { usageDirty }
+      val out = Triple(dirty.mapNotNull { profiles[it] }, usage?.takeIf { usageDirty }, feedback?.takeIf { feedbackDirty })
       dirty = emptySet()
       usageDirty = false
+      feedbackDirty = false
       out
     }
     val failed = toSave.filterNot(save).map { it.scope }.toSet()
     val usageFailed = counts != null && !saveUsage(counts)
-    if (failed.isNotEmpty() || usageFailed) {
+    val feedbackFailed = chips != null && !saveFeedback(chips)
+    if (failed.isNotEmpty() || usageFailed || feedbackFailed) {
       synchronized(lock) {
         dirty = dirty + failed
         usageDirty = usageDirty || usageFailed
+        feedbackDirty = feedbackDirty || feedbackFailed
       }
     }
   }
 
   /**
-   * "Forget all" on the screen: everything about [scope] (its profile, Recent topics and usage counts), at once.
-   * Its pause setting goes with it. True when nothing of it remains on disk.
+   * "Forget all" on the screen: everything about [scope] (its profile, Recent topics, usage counts and what was done
+   * with its suggestions), at once. Its pause setting goes with it. True when nothing of it remains on disk.
    */
   fun forgetScope(scope: MemoryScope): Boolean {
-    val counts = synchronized(lock) {
+    val (counts, chips) = synchronized(lock) {
       profiles = profiles - scope
       dirty = dirty - scope
-      (usage ?: loadUsage()).without(scope).also { usage = it; usageDirty = false }
+      val counts = (usage ?: loadUsage()).without(scope).also { usage = it; usageDirty = false }
+      val chips = (feedback ?: loadFeedback()).without(scope).also { feedback = it; feedbackDirty = false }
+      counts to chips
     }
     revisions.value++
     val removed = remove(scope)
-    return saveUsage(counts) && removed
+    val chipsSaved = saveFeedback(chips)
+    return saveUsage(counts) && chipsSaved && removed
   }
 
   /** Forget all: every profile and every count, in memory and on disk, at once. True when nothing remains. */
@@ -108,8 +133,10 @@ internal class MemoryRuntime(
     synchronized(lock) {
       profiles = emptyMap()
       usage = UsageCounts()
+      feedback = ForYouFeedback()
       dirty = emptySet()
       usageDirty = false
+      feedbackDirty = false
     }
     revisions.value++
     return wipe()

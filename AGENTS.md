@@ -123,7 +123,9 @@ The Kotlin package is flat; files are grouped by name prefix:
   `memory_observe` / `memory_forget` and `hearthpane.memory` in `MemoryHandoff` / `MemoryTool`; pure rules in
   `MemoryAccess` (who), `MemoryExtractor` + `assets/memory/dictionary.json` (what), `MemoryLearner` /
   `MemoryConfidence` (how sure), `MemoryNote` (the prompt note); `JarvisKnowsActivity` ("What Jarvis knows");
-  silent usage counts `UsageCounts` / `MemoryUsage`. Never log user text or profile content.
+  silent usage counts `UsageCounts` / `MemoryUsage`; Home's "For you right now" row (slice 2, same switch) in
+  `HomeForYouRow`, ranked by `ForYouRanker` (habit lift/support/decay) and tuned by `ForYouFeedback` (shown, opened,
+  not now, less often, don't suggest), with `ForYouChips` for the chip text. Never log user text or profile content.
 - **Remote / Portal TV:** `Remote*`, `TvFocus`
 - **Boot / lifecycle:** `ImmortalApp`, `BootReceiver`, `BootLaunch`, `Sleep*`, `ScreenControl`
 - **Settings (the registry — read [Settings infrastructure](#settings-infrastructure) before
