@@ -70,7 +70,45 @@ object NewsFeed {
           }
           .getOrDefault(emptyList())
 
+  /**
+   * [parse] with each headline's publication time (RSS `<pubDate>`, Atom `<published>`/`<updated>`; null when it
+   * has none), for the News widget's topic feeds ("AI and chips · 2 h"). Pure.
+   */
+  internal fun parseDated(xml: String?): List<Pair<Headline, Long?>> =
+      runCatching {
+            val blocks = extractBlocks(xml ?: return emptyList(), "item").ifEmpty { extractBlocks(xml, "entry") }
+            blocks.mapNotNull { block ->
+              val title = firstTag(block, "title")?.let { clean(it) }
+              if (title.isNullOrBlank()) return@mapNotNull null
+              Headline(title = title, link = extractLink(block)) to publishedMs(block)
+            }.take(MAX_HEADLINES)
+          }
+          .getOrDefault(emptyList())
+
+  private fun publishedMs(block: String): Long? {
+    val raw = (firstTag(block, "pubDate") ?: firstTag(block, "published") ?: firstTag(block, "updated"))
+        ?.let { clean(it) } ?: return null
+    return runCatching { java.time.ZonedDateTime.parse(raw, java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME) }
+        .recoverCatching { java.time.OffsetDateTime.parse(raw).toZonedDateTime() }
+        .getOrNull()?.toInstant()?.toEpochMilli()
+  }
+
   /** All inner-text spans for `<tag …>…</tag>` occurrences (handles attributes on the open tag). */
+  /**
+   * When the newest item in [xml] was published: RSS `<pubDate>` (RFC 1123) or Atom `<published>`/`<updated>`
+   * (ISO 8601). Null when there are no readable dates. Pure; for "fresh headlines" on Home's interest chips.
+   */
+  internal fun newestPublishedMs(xml: String?): Long? = runCatching {
+    val blocks = extractBlocks(xml ?: return null, "item").ifEmpty { extractBlocks(xml, "entry") }
+    blocks.mapNotNull { block ->
+      val raw = (firstTag(block, "pubDate") ?: firstTag(block, "published") ?: firstTag(block, "updated"))
+          ?.let { clean(it) } ?: return@mapNotNull null
+      runCatching { java.time.ZonedDateTime.parse(raw, java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME) }
+          .recoverCatching { java.time.OffsetDateTime.parse(raw).toZonedDateTime() }
+          .getOrNull()?.toInstant()?.toEpochMilli()
+    }.maxOrNull()
+  }.getOrNull()
+
   private fun extractBlocks(xml: String, tag: String): List<String> {
     val out = ArrayList<String>()
     val open = "<$tag"

@@ -81,4 +81,10 @@ class CryptoFeedTest {
     assertTrue(CryptoFeed.parse("", coins).isEmpty())
     assertTrue(CryptoFeed.parse("{}", coins).isEmpty())
   }
+
+  @Test
+  fun `a learned coin with no symbol of its own shows CoinGecko's`() {
+    val quotes = CryptoFeed.parse(sample, listOf(CryptoConfig.Coin("solana", ""), CryptoConfig.Coin("bitcoin", "BTC")))
+    assertEquals(listOf("SOL", "BTC"), quotes.map { it.symbol })
+  }
 }

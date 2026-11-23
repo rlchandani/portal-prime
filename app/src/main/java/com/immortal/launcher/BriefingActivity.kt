@@ -137,6 +137,14 @@ private fun rememberBriefingPersonal(personId: String?): BriefingPersonalInputs?
   val owner = BriefingPersonalPolicy.owner(ui, personId) ?: return null
   var events by remember(owner.id) { mutableStateOf<BriefingPart<List<PersonalEvent>?>>(BriefingPart.Loading) }
   var reminders by remember(owner.id) { mutableStateOf(emptyList<String>()) }
+  var interests by remember(owner.id) { mutableStateOf(emptyList<String>()) }
+  // Jarvis personalization (off by default): "Your teams / Your markets", only for this adult, alone.
+  LaunchedEffect(owner.id) {
+    interests = withContext(Dispatchers.IO) {
+      runCatching { com.immortal.launcher.memory.InterestWidgetsHome.briefingLines(context, owner.id) }
+          .getOrElse { Log.w("ImmortalBriefing", "interests unavailable (${it.javaClass.simpleName})"); emptyList() }
+    }
+  }
   LaunchedEffect(owner.id) {
     reminders = withContext(Dispatchers.IO) {
       runCatching { ReminderVisibility.briefingTitles(ReminderStore.current(context), owner, ui.people) }
@@ -145,6 +153,6 @@ private fun rememberBriefingPersonal(personId: String?): BriefingPersonalInputs?
     val day = withContext(Dispatchers.IO) { loadWhosThereDay(context.applicationContext, owner, ui.people) }
     events = BriefingPart.Ready(day.events.takeIf { day.source != null })
   }
-  return BriefingPersonalInputs(owner.name, BriefingPersonalPolicy.hidePrivate(ui, holdOver), events, reminders)
+  return BriefingPersonalInputs(owner.name, BriefingPersonalPolicy.hidePrivate(ui, holdOver), events, reminders, interests)
 }
 

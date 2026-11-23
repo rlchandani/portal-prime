@@ -1,0 +1,69 @@
+{
+ "team": {
+  "id": "9",
+  "abbreviation": "GS",
+  "displayName": "Golden State Warriors",
+  "shortDisplayName": "Warriors",
+  "location": "Golden State",
+  "name": "Warriors",
+  "standingSummary": "3rd in Pacific Division",
+  "record": {
+   "items": [
+    {
+     "summary": "8-8"
+    }
+   ]
+  },
+  "nextEvent": [
+   {
+    "id": "401910035",
+    "date": "2026-11-23T01:30Z",
+    "name": "Boston Celtics at Golden State Warriors",
+    "shortName": "BOS @ GS",
+    "competitions": [
+     {
+      "id": "401910035",
+      "date": "2026-11-23T01:30Z",
+      "status": {
+       "type": {
+        "completed": false,
+        "description": "Scheduled",
+        "detail": "Sun, November 22nd at 8:30 PM EST",
+        "id": "1",
+        "name": "STATUS_SCHEDULED",
+        "shortDetail": "11/22 - 8:30 PM EST",
+        "state": "pre"
+       },
+       "displayClock": "0.0",
+       "period": 0
+      },
+      "competitors": [
+       {
+        "id": "9",
+        "homeAway": "home",
+        "team": {
+         "id": "9",
+         "abbreviation": "GS",
+         "displayName": "Golden State Warriors",
+         "shortDisplayName": "Warriors",
+         "location": "Golden State"
+        }
+       },
+       {
+        "id": "2",
+        "homeAway": "away",
+        "team": {
+         "id": "2",
+         "abbreviation": "BOS",
+         "displayName": "Boston Celtics",
+         "shortDisplayName": "Celtics",
+         "location": "Boston"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -62,6 +62,12 @@ import kotlinx.coroutines.withContext
  */
 @Composable
 internal fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+  // Jarvis personalization (off by default): learned coins follow the household's own; nothing changes without them.
+  val interests = rememberInterestWidgets()
+  if (interests != null && interests.picks.coins.isNotEmpty()) {
+    LearnedCryptoWidget(interests, modifier, maxRows)
+    return
+  }
   val context = androidx.compose.ui.platform.LocalContext.current
   var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
   OnResume { coins = CryptoConfig.load(context) }
@@ -98,13 +104,13 @@ internal fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 
 }
 
 // Crypto row budget: 35sp price line + 8dp + 32dp pill row; 16dp between rows; 24sp footer.
-private const val CRYPTO_ROW_DP = 76f
-private const val CRYPTO_GAP_DP = 16f
-private const val CRYPTO_FOOTER_DP = 24f
+internal const val CRYPTO_ROW_DP = 76f
+internal const val CRYPTO_GAP_DP = 16f
+internal const val CRYPTO_FOOTER_DP = 24f
 
 /** One coin line: symbol · 7d sparkline · price · tinted change pill (Dusk Aurora). */
 @Composable
-private fun CryptoRow(q: CryptoFeed.Quote) {
+internal fun CryptoRow(q: CryptoFeed.Quote) {
   Column(Modifier.fillMaxWidth()) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically) {
@@ -131,7 +137,7 @@ private fun CryptoRow(q: CryptoFeed.Quote) {
  * Fixed min-width keeps columns of pills aligned.
  */
 @Composable
-private fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
+internal fun ChangePill(pct: Double, modifier: Modifier = Modifier) {
   val up = pct >= 0
   val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
   val tint = if (up) palette.green else if (palette.dark) Color(0xFFFFC8B9) else palette.error
@@ -190,6 +196,12 @@ private fun formatUsd(v: Double): String =
  */
 @Composable
 internal fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+  // Jarvis personalization (off by default): learned topics become topic feeds after the household's own.
+  val interests = rememberInterestWidgets()
+  if (interests != null && interests.picks.topics.isNotEmpty()) {
+    LearnedNewsWidget(interests, modifier, maxRows)
+    return
+  }
   val context = androidx.compose.ui.platform.LocalContext.current
   var feeds by remember { mutableStateOf(NewsConfig.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -261,6 +273,12 @@ private fun interleave(lists: List<List<NewsFeed.Headline>>): List<NewsFeed.Head
  */
 @Composable
 internal fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+  // Jarvis personalization (off by default): learned tickers follow the household's own; nothing changes without them.
+  val interests = rememberInterestWidgets()
+  if (interests != null && interests.picks.tickers.isNotEmpty()) {
+    LearnedStocksWidget(interests, modifier, maxRows)
+    return
+  }
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
@@ -293,7 +311,7 @@ internal fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 
 
 /** One ticker line: symbol · last price · tinted daily-change pill (Dusk Aurora). */
 @Composable
-private fun StockRow(q: AlpacaClient.StockQuote) {
+internal fun StockRow(q: AlpacaClient.StockQuote) {
   Column(Modifier.fillMaxWidth()) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically) {

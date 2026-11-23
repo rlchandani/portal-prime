@@ -46,7 +46,7 @@ class HomeWidgetPickerTest {
   }
 
   @Test fun everydayAndMore_neverOverlap_andCoverEveryCustomKind() {
-    val all = HomeWidgetPicker.everyday + HomeWidgetPicker.more(advanced = true, photoMemoryAllowed = true)
+    val all = HomeWidgetPicker.everyday + HomeWidgetPicker.more(advanced = true, photoMemoryAllowed = true, sports = true)
     assertEquals(all.size, all.toSet().size)
     assertEquals(RemoteLayoutPolicy.kinds, all.toSet())
   }
@@ -71,8 +71,16 @@ class HomeWidgetPickerTest {
     assertFalse(HomeWidgetStore.KIND_WEATHER in HomeWidgetPicker.livePreviewKinds)
   }
 
+  @Test fun sports_isOfferedOnlyWithPersonalizationOn() {
+    assertEquals(HomeWidgetPicker.more(true, true), HomeWidgetPicker.more(true, true, sports = false))
+    assertFalse(HomeWidgetStore.KIND_SPORTS in HomeWidgetPicker.more(advanced = true, photoMemoryAllowed = true))
+    val on = HomeWidgetPicker.more(advanced = false, photoMemoryAllowed = true, sports = true)
+    assertEquals(on.indexOf(HomeWidgetStore.KIND_STOCKS) + 1, on.indexOf(HomeWidgetStore.KIND_SPORTS))
+    assertTrue(HomeWidgetStore.KIND_SPORTS in RemoteLayoutPolicy.kinds)
+  }
+
   @Test fun everyKind_hasALabelAndIcon() {
-    (HomeWidgetPicker.everyday + HomeWidgetPicker.more(true, true)).forEach {
+    (HomeWidgetPicker.everyday + HomeWidgetPicker.more(true, true, sports = true)).forEach {
       assertNotEquals(it, "Widget", HomeWidgetPicker.label(it))
       assertTrue(it, HomeWidgetPicker.icon(it).isNotBlank())
     }

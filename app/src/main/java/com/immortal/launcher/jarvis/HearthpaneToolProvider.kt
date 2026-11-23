@@ -40,6 +40,7 @@ class HearthpaneToolProvider : ContentProvider() {
         homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search,
         reminders = { args -> reminderTool.invoke(args) },
         household = HearthpaneHouseholdTools.build(requireNotNull(context)) + HearthpaneFeedTools.build(requireNotNull(context)) +
+            HearthpaneMarketTools.build(requireNotNull(context)) +
             (MemoryTool.NAME to ::memoryTool))
   }
 

@@ -67,6 +67,8 @@ internal enum class BriefingSectionKind(val icon: String) {
   TIMERS("timer"),
   ROUTINE("tools"),
   REMINDERS("todo"),
+  /** Followed teams and markets (Jarvis personalization, personal briefing only). */
+  INTERESTS("interest_ball"),
 }
 
 /** One block of the card. [muted] lines are status copy (loading, empty, unavailable). */

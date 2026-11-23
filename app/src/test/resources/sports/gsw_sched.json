@@ -1,0 +1,335 @@
+{
+ "team": {
+  "id": "9",
+  "abbreviation": "GS",
+  "displayName": "Golden State Warriors",
+  "location": "Golden State",
+  "name": "Warriors"
+ },
+ "events": [
+  {
+   "id": "401910035",
+   "date": "2026-11-23T01:30Z",
+   "name": "Boston Celtics at Golden State Warriors",
+   "shortName": "BOS @ GS",
+   "competitions": [
+    {
+     "id": "401910035",
+     "date": "2026-11-23T01:30Z",
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "Sun, November 22nd at 8:30 PM EST",
+       "shortDetail": "11/22 - 8:30 PM EST"
+      },
+      "displayClock": "0.0",
+      "period": 0
+     },
+     "competitors": [
+      {
+       "id": "9",
+       "homeAway": "home",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       }
+      },
+      {
+       "id": "2",
+       "homeAway": "away",
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics",
+        "shortDisplayName": "Celtics",
+        "location": "Boston"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401909324",
+   "date": "2026-11-26T03:00Z",
+   "name": "Sacramento Kings at Golden State Warriors",
+   "shortName": "SAC @ GS",
+   "competitions": [
+    {
+     "id": "401909324",
+     "date": "2026-11-26T03:00Z",
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "Wed, November 25th at 10:00 PM EST",
+       "shortDetail": "11/25 - 10:00 PM EST"
+      },
+      "displayClock": "0.0",
+      "period": 0
+     },
+     "competitors": [
+      {
+       "id": "9",
+       "homeAway": "home",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       }
+      },
+      {
+       "id": "23",
+       "homeAway": "away",
+       "team": {
+        "id": "23",
+        "abbreviation": "SAC",
+        "displayName": "Sacramento Kings",
+        "shortDisplayName": "Kings",
+        "location": "Sacramento"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401909336",
+   "date": "2026-11-28T02:30Z",
+   "name": "Golden State Warriors at Portland Trail Blazers",
+   "shortName": "GS @ POR",
+   "competitions": [
+    {
+     "id": "401909336",
+     "date": "2026-11-28T02:30Z",
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "Fri, November 27th at 9:30 PM EST",
+       "shortDetail": "11/27 - 9:30 PM EST"
+      },
+      "displayClock": "0.0",
+      "period": 0
+     },
+     "competitors": [
+      {
+       "id": "22",
+       "homeAway": "home",
+       "team": {
+        "id": "22",
+        "abbreviation": "POR",
+        "displayName": "Portland Trail Blazers",
+        "shortDisplayName": "Trail Blazers",
+        "location": "Portland"
+       }
+      },
+      {
+       "id": "9",
+       "homeAway": "away",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401910019",
+   "date": "2026-11-20T01:00Z",
+   "name": "Golden State Warriors at Memphis Grizzlies",
+   "shortName": "GS @ MEM",
+   "competitions": [
+    {
+     "id": "401910019",
+     "date": "2026-11-20T01:00Z",
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "displayClock": "0.0",
+      "period": 4
+     },
+     "competitors": [
+      {
+       "id": "29",
+       "homeAway": "home",
+       "team": {
+        "id": "29",
+        "abbreviation": "MEM",
+        "displayName": "Memphis Grizzlies",
+        "shortDisplayName": "Grizzlies",
+        "location": "Memphis"
+       },
+       "winner": true,
+       "score": {
+        "value": 126.0,
+        "displayValue": "126"
+       }
+      },
+      {
+       "id": "9",
+       "homeAway": "away",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       },
+       "winner": false,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401910016",
+   "date": "2026-11-19T01:00Z",
+   "name": "Golden State Warriors at Dallas Mavericks",
+   "shortName": "GS @ DAL",
+   "competitions": [
+    {
+     "id": "401910016",
+     "date": "2026-11-19T01:00Z",
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "displayClock": "12:00",
+      "period": 4
+     },
+     "competitors": [
+      {
+       "id": "6",
+       "homeAway": "home",
+       "team": {
+        "id": "6",
+        "abbreviation": "DAL",
+        "displayName": "Dallas Mavericks",
+        "shortDisplayName": "Mavericks",
+        "location": "Dallas"
+       },
+       "winner": true,
+       "score": {
+        "value": 116.0,
+        "displayValue": "116"
+       }
+      },
+      {
+       "id": "9",
+       "homeAway": "away",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       },
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401910000",
+   "date": "2026-11-17T01:00Z",
+   "name": "Golden State Warriors at New Orleans Pelicans",
+   "shortName": "GS @ NO",
+   "competitions": [
+    {
+     "id": "401910000",
+     "date": "2026-11-17T01:00Z",
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "displayClock": "12:00",
+      "period": 4
+     },
+     "competitors": [
+      {
+       "id": "3",
+       "homeAway": "home",
+       "team": {
+        "id": "3",
+        "abbreviation": "NO",
+        "displayName": "New Orleans Pelicans",
+        "shortDisplayName": "Pelicans",
+        "location": "New Orleans"
+       },
+       "winner": true,
+       "score": {
+        "value": 115.0,
+        "displayValue": "115"
+       }
+      },
+      {
+       "id": "9",
+       "homeAway": "away",
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "shortDisplayName": "Warriors",
+        "location": "Golden State"
+       },
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

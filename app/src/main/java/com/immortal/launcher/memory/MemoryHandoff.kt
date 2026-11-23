@@ -49,6 +49,21 @@ internal class MemoryHandoff(
         .apply { if (lines.isNotEmpty()) put("note", lines.joinToString("\n")) }
   }
 
+  /**
+   * The [kind] facts known for whoever the conversation under way belongs to (the scope [tool] uses), most sure
+   * first, for "how did my team do" / "how are my stocks"; only usable, non-sensitive ones. Null when memory is off
+   * for this moment (switch off, guests, children), so the caller asks instead of guessing.
+   */
+  fun interests(kind: MemoryFact.Kind): List<MemoryFact>? {
+    val nowMs = now()
+    val current = accessNow()
+    val access = if (current is MemoryAccess.Off) current else synchronized(lock) { conversations.liveAccess(nowMs) } ?: current
+    val on = access as? MemoryAccess.On ?: return null
+    return runtime.profile(on.scope).facts
+        .filter { it.kind == kind && MemoryConfidence.usable(it) && !it.sensitive && it.label.isNotBlank() }
+        .sortedWith(compareByDescending<MemoryFact> { it.confidence }.thenByDescending { it.lastSeenMs })
+  }
+
   fun observe(argsJson: String?): JSONObject {
     val digest = MemoryDigest.parse(argsJson) ?: return JSONObject().put("error", "bad digest")
     val nowMs = now()

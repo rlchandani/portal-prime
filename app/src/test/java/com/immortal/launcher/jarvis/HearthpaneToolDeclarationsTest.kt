@@ -29,7 +29,8 @@ class HearthpaneToolDeclarationsTest {
     val names = (0 until decls.length()).map { decls.getJSONObject(it).getString("name") }
     assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL,
         HearthpaneTools.REMINDERS, HearthpaneAnnounce.NAME, HearthpaneLists.NAME, HearthpaneAlarms.NAME,
-        HearthpaneBriefing.NAME, HearthpaneCalendar.NAME, HearthpaneNews.NAME, HearthpaneCall.NAME,
+        HearthpaneTimers.NAME, HearthpaneRoutines.NAME, HearthpaneBriefing.NAME, HearthpaneCalendar.NAME, HearthpaneNews.NAME,
+        HearthpaneSports.NAME, HearthpaneStocks.NAME, HearthpaneCall.NAME,
         com.immortal.launcher.memory.MemoryTool.NAME), names)
     for (i in 0 until decls.length()) {
       val d = decls.getJSONObject(i)
@@ -71,10 +72,16 @@ class HearthpaneToolDeclarationsTest {
   @Test fun householdToolsDeclareTheArgumentsTheirHandlersRead() {
     requires(HearthpaneAnnounce.NAME, "message", "room")
     requires(HearthpaneLists.NAME, "action", "items", "list")
-    requires(HearthpaneAlarms.NAME, "action", "time", "repeat", "label", "replace")
+    requires(HearthpaneAlarms.NAME, "action", "time", "repeat", "label", "replace", "from", "all", "minutes")
+    requires(HearthpaneTimers.NAME, "action", "duration_seconds", "label", "all")
+    requires(HearthpaneRoutines.NAME, "action", "name", "steps")
     requires(HearthpaneBriefing.NAME, "show")
     requires(HearthpaneCall.NAME, "room", "video")
-    requires(HearthpaneCalendar.NAME, "day", "date")
+    requires(HearthpaneCalendar.NAME, "day", "date", "for")
+    requires(HearthpaneSports.NAME, "team", "league")
+    requires(HearthpaneStocks.NAME, "symbols")
+    assertEquals("ARRAY", tool(HearthpaneStocks.NAME).getJSONObject("parameters").getJSONObject("properties")
+        .getJSONObject("symbols").getString("type"))
     requires(HearthpaneNews.NAME, "count", "source")
     assertEquals("ARRAY", tool(HearthpaneLists.NAME).getJSONObject("parameters").getJSONObject("properties")
         .getJSONObject("items").getString("type"))
@@ -84,8 +91,18 @@ class HearthpaneToolDeclarationsTest {
 
   @Test fun householdToolsPromiseTheirSafetyRules() {
     assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("not a countdown timer"))
-    assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("needs_replace"))
+    assertTrue(tool(HearthpaneSports.NAME).getString("description").contains("do not guess scores"))
+    assertTrue(tool(HearthpaneStocks.NAME).getString("description").contains("never as advice"))
+    assertTrue(tool(HearthpaneNews.NAME).getString("description").contains("hearthpane.sports"))
+    assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("needs_which"))
+    assertTrue(tool(HearthpaneAlarms.NAME).getString("description").contains("action snooze"))
     assertTrue(tool(HearthpaneCall.NAME).getString("description").contains("never phone numbers"))
+    assertTrue(tool(HearthpaneTimers.NAME).getString("description").contains("every room"))
+    assertTrue(tool(HearthpaneRoutines.NAME).getString("description").contains("never done by voice"))
+    assertTrue(tool(HearthpaneRoutines.NAME).getString("description").contains("needs_confirmation"))
+    assertTrue(tool(HearthpaneRoutines.NAME).getString("description").contains("also_call"))
+    assertTrue(tool(HearthpaneTools.HOME_CONTROL).getString("description").contains(HearthpaneRoutines.NAME))
+    assertTrue(tool(HearthpaneTimers.NAME).getString("description").contains(HearthpaneAlarms.NAME))
     assertTrue(tool(HearthpaneAnnounce.NAME).getString("description").contains("quiet hours"))
     assertTrue(tool(HearthpaneLists.NAME).getString("description").contains("shopping list and the to-do list"))
     assertTrue(tool(HearthpaneBriefing.NAME).getString("description").contains("reads_aloud"))

@@ -20,6 +20,7 @@ import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import com.immortal.launcher.jarvis.HomeStepResult.Status as StepStatus
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -99,26 +100,78 @@ internal object CcJarvisHome {
   }
 
   /** Sends [items] and waits briefly for Home Assistant's answers (dry run answers at once). */
-  private fun send(app: Context, items: List<CcHomeItem>): CcHomeRoute.Outcome {
-    if (items.isEmpty()) return CcHomeRoute.Outcome(0, 0, 0)
+  private fun send(app: Context, items: List<CcHomeItem>): CcHomeRoute.Outcome = outcome(sendAll(app, items))
+
+  private fun outcome(results: List<Boolean?>) =
+      CcHomeRoute.Outcome(results.count { it == true }, results.count { it == false }, results.count { it == null })
+
+  /** Each item's answer: true done, false failed, null no answer in [RESULT_WAIT_MS]. All are sent at once. */
+  private fun sendAll(app: Context, items: List<CcHomeItem>): List<Boolean?> {
+    if (items.isEmpty()) return emptyList()
     val latch = CountDownLatch(items.size)
-    val ok = AtomicInteger()
-    val failed = AtomicInteger()
-    for (item in items) {
+    val results = java.util.concurrent.atomic.AtomicReferenceArray<Boolean?>(items.size)
+    fun answer(i: Int, done: Boolean) { results.set(i, done); latch.countDown() }
+    items.forEachIndexed { i, item ->
       val e = item.entity
       if (e.domain == "scene" || e.domain == "script") {
-        if (ControlCenter.runScene(app, e)) ok.incrementAndGet() else failed.incrementAndGet()
-        latch.countDown()
-        continue
+        answer(i, ControlCenter.runScene(app, e))
+      } else {
+        val sent = ControlCenter.send(app, item.call, undoable = false, onResult = { done, _ -> answer(i, done) })
+        if (!sent) answer(i, false)
       }
-      val sent = ControlCenter.send(app, item.call, undoable = false, onResult = { done, _ ->
-        if (done) ok.incrementAndGet() else failed.incrementAndGet()
-        latch.countDown()
-      })
-      if (!sent) { failed.incrementAndGet(); latch.countDown() }
     }
     latch.await(RESULT_WAIT_MS, TimeUnit.MILLISECONDS)
-    return CcHomeRoute.Outcome(ok.get(), failed.get(), latch.count.toInt())
+    return List(items.size) { results.get(it) }
+  }
+
+  /**
+   * A routine's house requests (`hearthpane.routines`), run together inside Jarvis's 5 s: one wait for Home
+   * Assistant, every request resolved and routed through the same policy as [run], everything runnable sent at once,
+   * and only the first asking-first action put on the Portal's confirm sheet (the others say to tap them there too).
+   */
+  fun runBatch(context: Context, requests: List<String>): com.immortal.launcher.jarvis.HomeBatch {
+    val app = context.applicationContext
+    val s = live(app) ?: return com.immortal.launcher.jarvis.HomeBatch(emptyList(),
+        ControlCenter.state(app).value.connection.disabledReason ?: "Home Assistant isn't connected")
+    val plans = requests.map { text ->
+      text to when (val intent = CcHomeCommand.resolve(s, CcHomeRequest(text.take(CcHomeCommand.MAX_TEXT)))) {
+        is CcHomeIntent.Unclear -> null
+        is CcHomeIntent.Act -> intent to CcHomeRoute.split(intent.items, s.settings) { ControlCenterConfig.scenesSeen(app) }
+      }
+    }
+    val runnable = plans.flatMap { (_, plan) -> plan?.second?.run.orEmpty() }
+    val answers = runnable.zip(sendAll(app, runnable))
+    val dry = CcDebugStore.dryRun(app)
+    val visible = onScreen
+    val firstConfirm = plans.firstNotNullOfOrNull { (_, plan) -> plan?.second?.confirm?.firstOrNull() }
+    firstConfirm?.let { askOnScreen(app, s, it, visible) }
+    var offset = 0
+    val steps = plans.map { (text, plan) ->
+      if (plan == null) return@map com.immortal.launcher.jarvis.HomeStepResult(text, StepStatus.SKIPPED, "")
+      val (act, routed) = plan
+      val mine = answers.subList(offset, offset + routed.run.size).map { it.second }
+      offset += routed.run.size
+      stepResult(text, act, routed, outcome(mine), dry, firstConfirm)
+    }
+    Log.i(TAG, "routine steps=${requests.size} run=${runnable.size} confirm=${firstConfirm != null} dry=$dry")
+    return com.immortal.launcher.jarvis.HomeBatch(steps, null)
+  }
+
+  private fun stepResult(text: String, a: CcHomeIntent.Act, r: CcHomeRoute.Routed, o: CcHomeRoute.Outcome, dry: Boolean,
+      shown: CcHomeItem?): com.immortal.launcher.jarvis.HomeStepResult {
+    val status = when {
+      r.confirm.isNotEmpty() -> StepStatus.CONFIRM
+      r.run.isNotEmpty() && o.failed == r.run.size -> StepStatus.FAILED
+      r.run.isEmpty() && r.refused.isNotEmpty() -> StepStatus.REFUSED
+      r.run.isEmpty() && a.already == 0 -> StepStatus.SKIPPED
+      else -> StepStatus.DONE
+    }
+    val reply = if (r.confirm.isNotEmpty() && r.confirm.first() != shown) {
+      val ran = CcHomeRoute.reply(a, r.copy(confirm = emptyList()), o, dry).takeIf { r.run.isNotEmpty() }
+      listOfNotNull(ran, "${CcHomeRoute.asking(r.confirm.first())} needs a tap too: confirm it in the Control Center.")
+          .joinToString(" ")
+    } else CcHomeRoute.reply(a, r, o, dry)
+    return com.immortal.launcher.jarvis.HomeStepResult(text, status, reply)
   }
 
   /** Puts the Portal's own confirm sheet up (opening the Control Center if it isn't showing). */

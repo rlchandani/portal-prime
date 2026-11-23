@@ -49,10 +49,13 @@ object CryptoFeed {
    * Failed requests or malformed responses serve cached (possibly stale) prices when available.
    * A valid empty markets array replaces old prices. Coins the API doesn't return are dropped.
    */
+  /** The markets request for [ids] (comma-separated CoinGecko ids). */
+  internal fun url(ids: String): String = "$BASE?vs_currency=usd&ids=$ids&sparkline=true&price_change_percentage=24h"
+
   fun fetch(context: Context, coins: List<CryptoConfig.Coin>): List<Quote> {
     if (coins.isEmpty()) return emptyList()
     val ids = coins.joinToString(",") { it.id }
-    val url = "$BASE?vs_currency=usd&ids=$ids&sparkline=true&price_change_percentage=24h"
+    val url = url(ids)
     val body =
         HttpCache.getOrFetch(context, "$CACHE_KEY:$ids", TTL_MS) {
           // Admit the response before publication so an error page cannot replace usable prices.
@@ -87,7 +90,8 @@ object CryptoFeed {
             }
             coins.mapNotNull { coin ->
               // Keep the user's configured symbol label (byId's is API-derived).
-              byId[coin.id]?.copy(symbol = coin.symbol)
+              // A learned coin (blank symbol, Jarvis personalization) shows CoinGecko's own.
+              byId[coin.id]?.let { if (coin.symbol.isBlank()) it else it.copy(symbol = coin.symbol) }
             }
           }
           .getOrNull()

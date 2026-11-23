@@ -88,6 +88,7 @@ internal fun ImmortalWidgetContent(
     HomeWidgetStore.KIND_CALLS -> CallsHomeWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_SPORTS -> SportsHomeWidget(modifier)
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier, maxTileRows = widget.spanY.coerceIn(1, 4))
     // The former fixed dashboard cards, now regular widgets. They keep their self-sizing card
@@ -116,6 +117,8 @@ internal fun ImmortalWidgetShell(
     scrollContent: Boolean = true,
     /** True when the card body already shows a button doing exactly what [onOpen] does. */
     duplicatesBodyAction: Boolean = false,
+    /** The ✦ line for learned rows (Jarvis personalization); null draws the card exactly as before. */
+    provenance: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
@@ -129,13 +132,15 @@ internal fun ImmortalWidgetShell(
     "timers" -> "timer"
     "todo" -> "notes"
     "news" -> "globe"
+    "sports" -> "interest_ball"
     else -> "tools"
   }
   Column(modifier = modifier.padding(30.dp)) {
     ApprovedHomeWidgetHeading(title, icon, action) {
       if (onOpen != null) onOpen() else context.openApprovedHomeSettings(openPage)
     }
-    Spacer(Modifier.height(22.dp))
+    if (provenance != null) LearnedProvenance(provenance, Modifier.padding(top = 10.dp))
+    Spacer(Modifier.height(if (provenance != null) 14.dp else 22.dp))
     Column(Modifier.weight(1f).fillMaxWidth().then(
         if (scrollContent) Modifier.verticalScroll(rememberScrollState()) else Modifier)) { content() }
   }

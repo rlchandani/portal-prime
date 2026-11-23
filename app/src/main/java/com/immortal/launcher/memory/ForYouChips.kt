@@ -14,16 +14,25 @@ package com.immortal.launcher.memory
 internal object ForYouChips {
   const val MAX = 3
 
-  /** What a surface opens: [key] identifies the thing (for de-duplication), [glyph] an approved icon, or null. */
-  data class Target(val key: String, val title: String, val glyph: String?)
+  /**
+   * What a surface opens: [key] identifies the thing (for de-duplication), [glyph] an approved icon, or null. An
+   * interest chip ([ForYouInterests]) brings its own [why] and sends "Show less often" / "Don't suggest this" to
+   * [feedbackKey] (the whole team or stock), not to the one phase it shows.
+   */
+  data class Target(val key: String, val title: String, val glyph: String?, val why: String? = null,
+      val feedbackKey: String? = null)
 
-  data class Chip(val surface: String, val title: String, val why: String, val glyph: String?, val top: Boolean)
+  /** [feedbackKey] takes "Show less often" and "Don't suggest this"; [surface] the impressions and ✕. */
+  data class Chip(val surface: String, val title: String, val why: String, val glyph: String?, val top: Boolean,
+      val feedbackKey: String = surface)
 
   fun build(ranked: List<ForYouRanker.Suggestion>, household: Boolean, resolve: (String) -> Target?): List<Chip> {
     val seen = mutableSetOf<String>()
     return ranked.mapNotNull { s -> resolve(s.surface)?.takeIf { seen.add(it.key) }?.let { s to it } }
         .take(MAX)
-        .mapIndexed { i, (s, t) -> Chip(s.surface, t.title, why(t.key, household), t.glyph, top = i == 0) }
+        .mapIndexed { i, (s, t) ->
+          Chip(s.surface, t.title, t.why ?: why(t.key, household), t.glyph, top = i == 0, feedbackKey = t.feedbackKey ?: s.surface)
+        }
   }
 
   /** Hearthpane's own screens and a Jarvis conversation; apps are resolved against the installed list. */
@@ -46,7 +55,7 @@ internal object ForYouChips {
   /** The why-sheet's sentence (mock `whySheet`). */
   fun explanation(chip: Chip, household: Boolean): String =
       "${chip.why}. Learned on this Portal from what " +
-          (if (household) "is opened here" else "you open and ask about") + ". Nothing was typed in."
+          (if (household) "is opened and asked about here" else "you open and ask about") + ". Nothing was typed in."
 
   const val MUSIC = "music"
   const val CALLS = "calls"

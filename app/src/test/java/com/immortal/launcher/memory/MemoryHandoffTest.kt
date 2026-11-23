@@ -14,6 +14,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -119,5 +120,16 @@ class MemoryHandoffTest {
     assertEquals(listOf(MemoryHandoff.JARVIS_SURFACE), usage)
     assertTrue(handoff.context("{\"conversation\":\"../x\"}").has("error"))
     assertTrue(handoff.observe("not json").has("error"))
+  }
+
+  @Test fun interestsAreTheConversationsUsableTeamsAndNothingWhenMemoryIsOff() {
+    conversation("c1", "I follow the Warriors.")
+    conversation("c2", "Keep an eye on AMD.")
+    assertEquals(listOf("team:nba.gsw"), handoff.interests(MemoryFact.Kind.TEAM)?.map { it.id })
+    assertEquals(listOf("ticker:AMD"), handoff.interests(MemoryFact.Kind.TICKER)?.map { it.id })
+    access = MemoryAccess.Off(MemoryAccess.Reason.GUEST)
+    assertNull(handoff.interests(MemoryFact.Kind.TEAM))
+    access = MemoryAccess.On(MemoryScope.Person("p1"), "Maya", false)
+    assertEquals("someone else's profile is empty", emptyList<MemoryFact>(), handoff.interests(MemoryFact.Kind.TEAM))
   }
 }

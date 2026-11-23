@@ -125,7 +125,28 @@ The Kotlin package is flat; files are grouped by name prefix:
   `MemoryConfidence` (how sure), `MemoryNote` (the prompt note); `JarvisKnowsActivity` ("What Jarvis knows");
   silent usage counts `UsageCounts` / `MemoryUsage`; Home's "For you right now" row (slice 2, same switch) in
   `HomeForYouRow`, ranked by `ForYouRanker` (habit lift/support/decay) and tuned by `ForYouFeedback` (shown, opened,
-  not now, less often, don't suggest), with `ForYouChips` for the chip text. Never log user text or profile content.
+  not now, less often, don't suggest), with `ForYouChips` for the chip text; slice 3's interest chips (a followed
+  team's game, live or final score, the market's open/close, a ≥4% move, fresh topic headlines) in `ForYouInterests`
+  (pure) over `ForYouInterestFeed` (the `SportsFeed` / `StockQuotes` feeds via `HearthpaneMarketTools`, Google News
+  topic search kept in RAM), refreshed every 30 s while a score is live. Slice 3's widgets (same switch; nothing changes
+  with it off): learned tickers/coins added after the household's own in the Stocks/Crypto widgets and topic feeds in
+  News (`InterestWidgets`, pure; `HomeInterestWidgets` draws them, ✦ + "new" + ✕/Undo, removal is a per-scope
+  "Don't suggest this" on `widget:<kind>:<key>`), the Sports widget (`SportsCard` for the card and its slot scale,
+  `SportsHomeWidget`; kind `sports`, offered in the picker only while the switch is on) and the personal briefing's
+  "Your teams & markets" line (`BriefingInterests`), all bound in `InterestWidgetsHome`. Never log user text or
+  profile content.
+- **Jarvis household tools (`jarvis/`, declared in `res/values/jarvis_tools.xml`):** `HearthpaneHouseholdTools` binds
+  them. Alarms: `HearthpaneAlarms` over `AlarmBook` — the main alarm is `AlarmConfig`, up to 5 more are `MoreAlarms`
+  (own request codes in `AlarmScheduler`, Tools › Alarm's "Other alarms" in `ToolsOtherAlarms`); the ring under way
+  and spoken snooze/stop are `AlarmRinging`. Timers: `HearthpaneTimers` drives `SharedTimers` (every room). Home
+  routines (not the kids' picture `Routine*`): `HomeRoutines` (Good night, Leaving, household-made) run by
+  `HearthpaneRoutines` through `CcJarvisHome.runBatch`, the same policy gate and confirm sheet as `home_control`.
+  Feeds (`HearthpaneFeedTools`): `HearthpaneCalendar` (any day, `day` next, and the recognised person's own
+  calendar via `WhosThereContent`) and `HearthpaneNews`. Markets (`HearthpaneMarketTools`): `HearthpaneSports` over
+  `SportsFeed` (ESPN's keyless site API, undocumented, personal use; fixtures in `src/test/resources/sports`) and
+  `HearthpaneStocks` over `StockQuotes` (the Stocks widget's Alpaca key, else Yahoo's keyless chart). "My team" /
+  "my stocks" read `MemoryHandoff.interests`; their tool calls feed `MemoryExtractor` (Jarvis 2.7.11 hands them over).
+  Tests never touch the network.
 - **Remote / Portal TV:** `Remote*`, `TvFocus`
 - **Boot / lifecycle:** `ImmortalApp`, `BootReceiver`, `BootLaunch`, `Sleep*`, `ScreenControl`
 - **Settings (the registry — read [Settings infrastructure](#settings-infrastructure) before

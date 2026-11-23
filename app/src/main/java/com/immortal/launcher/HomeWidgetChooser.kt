@@ -38,6 +38,7 @@ internal fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_CALLS -> "Calls"
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
+      HomeWidgetStore.KIND_SPORTS -> "Sports"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
       HomeWidgetStore.KIND_HA -> "Home Assistant"
       HomeWidgetStore.KIND_TODAY -> "Today"
@@ -98,8 +99,13 @@ internal fun ApprovedWidgetLibrary(
         Triple(HomeWidgetStore.KIND_APP_WIDGET, "Android app widget", "apps"),
     )
   }
-  val choices = remember(advanced, kinds, builtIns) {
-    builtIns.filter { advanced || it.first != HomeWidgetStore.KIND_OPTIONS }
+  val context = androidx.compose.ui.platform.LocalContext.current
+  // Jarvis personalization's Sports widget is offered only while "learn from conversations" is on.
+  val sports = remember { com.immortal.launcher.memory.JarvisMemory.enabled(context) }
+  val choices = remember(advanced, kinds, builtIns, sports) {
+    (if (sports) builtIns.dropLast(1) + Triple(HomeWidgetStore.KIND_SPORTS, "Sports", "interest_ball") + builtIns.last()
+        else builtIns)
+        .filter { advanced || it.first != HomeWidgetStore.KIND_OPTIONS }
         .map { (kind, title, icon) ->
           ApprovedHomeLibraryCard(kind, title, icon, if (kind in kinds) "On your home" else "Add to your home")
         }

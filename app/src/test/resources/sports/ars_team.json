@@ -1,0 +1,74 @@
+{
+ "team": {
+  "id": "359",
+  "abbreviation": "ARS",
+  "displayName": "Arsenal",
+  "shortDisplayName": "Arsenal",
+  "location": "Arsenal",
+  "name": "Arsenal",
+  "nickname": "Gunners",
+  "standingSummary": "1st in English Premier League",
+  "record": {
+   "items": [
+    {
+     "summary": "9-1-1"
+    }
+   ]
+  },
+  "nextEvent": [
+   {
+    "id": "401878753",
+    "date": "2026-11-29T16:30Z",
+    "name": "Manchester City at Arsenal",
+    "shortName": "MNC @ ARS",
+    "competitions": [
+     {
+      "id": "401878753",
+      "date": "2026-11-29T16:30Z",
+      "status": {
+       "type": {
+        "completed": false,
+        "description": "Scheduled",
+        "detail": "Sun, November 29th at 11:30 AM EST",
+        "id": "1",
+        "name": "STATUS_SCHEDULED",
+        "shortDetail": "11/29 - 11:30 AM EST",
+        "state": "pre"
+       },
+       "displayClock": "0'",
+       "period": 0
+      },
+      "competitors": [
+       {
+        "id": "359",
+        "homeAway": "home",
+        "team": {
+         "id": "359",
+         "abbreviation": "ARS",
+         "displayName": "Arsenal",
+         "shortDisplayName": "Arsenal",
+         "location": "Arsenal",
+         "nickname": "Gunners"
+        },
+        "winner": false
+       },
+       {
+        "id": "382",
+        "homeAway": "away",
+        "team": {
+         "id": "382",
+         "abbreviation": "MNC",
+         "displayName": "Manchester City",
+         "shortDisplayName": "Man City",
+         "location": "Manchester City",
+         "nickname": "Sky Blues"
+        },
+        "winner": false
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}
