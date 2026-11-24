@@ -37,16 +37,31 @@ internal object CallGroupQuality {
 
 /**
  * Per-peer bitrate: each peer connection steps its own ceiling down when that link is congested
- * (bandwidth-limited, or receiving fewer than half the frames it should) and back up slowly
- * once it has been clean for a while. CPU limits are handled for the whole call by
+ * (bandwidth-limited, or receiving fewer than half the frames it should) and back up once it has
+ * been clean for a while. CPU limits are handled for the whole call by
  * [CallingQualityPolicy.shouldDegrade]. Pure.
+ *
+ * Recovery is tuned for the home LAN: an in-home link has plenty of headroom, so after a brief
+ * Wi-Fi hiccup the ceiling should climb back quickly rather than leave the picture soft for most
+ * of a minute. The step-down stays aggressive, and any fresh congestion resets the clean counter,
+ * so a genuinely saturated link can't oscillate — it just settles low. The step-up pace
+ * ([STEP_UP], [CLEAN_SAMPLES_TO_RAISE]) is the one knob worth confirming on a live 2-Portal call.
  */
 internal object CallLinkBitrate {
   const val FLOOR_KBPS = 250
   const val STEP_DOWN = 0.7
-  const val STEP_UP = 1.15
-  /** Samples (2 s each) a link must stay clean before it may climb again. */
-  const val CLEAN_SAMPLES_TO_RAISE = 10
+  /** Each climb adds 30%: on a LAN the headroom is there, so recover briskly after a blip. */
+  const val STEP_UP = 1.3
+  /** Clean samples (2 s each) a link must hold before it may climb again (8 s — brisk but not twitchy). */
+  const val CLEAN_SAMPLES_TO_RAISE = 4
+
+  /**
+   * Where to open a fresh link's bitrate estimate. The link is LAN-only, so start near the budget
+   * — the picture opens sharp instead of ramping up from a low default — but cap the opening so a
+   * very high ceiling (e.g. "Best") doesn't blast the full rate before the estimator settles.
+   */
+  const val LAN_FAST_START_KBPS = 2_500
+  fun startEstimateKbps(ceilingKbps: Int): Int = minOf(ceilingKbps, LAN_FAST_START_KBPS).coerceAtLeast(FLOOR_KBPS)
 
   @Immutable
   data class State(val kbps: Int, val clean: Int = 0)

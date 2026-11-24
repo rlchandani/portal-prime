@@ -125,8 +125,9 @@ internal class CallMediaLink(
   private fun applyEncoding() {
     val p = profile ?: return
     val ceiling = bitrate.kbps.takeIf { it > 0 } ?: p.maxKbps
-    // LAN: start the estimate near the target so the picture opens sharp instead of ramping up.
-    runCatching { pc?.setBitrate(MIN_KBPS * KBPS, minOf(START_KBPS, ceiling) * KBPS, ceiling * KBPS) }
+    // LAN: open the estimate near the budget ([CallLinkBitrate.startEstimateKbps]) so the picture
+    // comes up sharp instead of ramping from a low default.
+    runCatching { pc?.setBitrate(MIN_KBPS * KBPS, CallLinkBitrate.startEstimateKbps(ceiling) * KBPS, ceiling * KBPS) }
     pc?.transceivers?.filter { it.mediaType == MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO }?.forEach { t ->
       val params = t.sender.parameters
       params.degradationPreference = RtpParameters.DegradationPreference.BALANCED
@@ -172,7 +173,6 @@ internal class CallMediaLink(
     const val STREAM_ID = "hp"
     const val KBPS = 1_000
     const val MIN_KBPS = 150
-    const val START_KBPS = 1_500
     const val GATHER_TIMEOUT_MS = 2_500L
   }
 }
