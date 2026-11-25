@@ -138,19 +138,62 @@ untouched.
 
 ---
 
+## 3b. Changes shipped in the `calling-improve` branch (off `calling-opt`)
+
+### NEW — In-call quality indicator (`CallHealth.kt`, wired in `CallScreensLive.kt`)
+- `CallHealthMeter.of(stats, remoteCameraOn)` maps one `CallStats` sample to GOOD/FAIR/POOR with a
+  plain-words reason. Pure, named thresholds (`POOR_RTT_MS` 300, `FAIR_RTT_MS` 150, frozen/low recv
+  fps). A camera the other room turned off never reads as a problem.
+- `CallHealthBanner` shows a tinted `CallChip` only when 1:1 + LIVE + not-GOOD, below the title
+  (both large and compact layouts; suppressed in the drop-in bar). Quiet by design: a healthy LAN
+  call shows nothing, so the signal only appears when it answers "why did the picture soften?".
+- Why in-home-appropriate: the #1 complaints (soft picture, echo) usually track a strained link;
+  surfacing network/CPU/freeze state gives the household an honest, glanceable reason.
+- Tests: `CallHealthMeterTest.kt` (10 tests) pin every band and the camera-off guard.
+
+### F1 groundwork — ICE-restart reconnection, policy-first (`CallReconnect.kt`)
+- `CallReconnectPolicy` (pure): `down`/`up`/`decide`/`attempted`. `decide` → WAIT/RESTART_ICE/GIVE_UP
+  with a self-heal grace (`GRACE_MS` 2 s), attempt backoff (`ATTEMPT_BACKOFF_MS` 3 s) and a budget
+  (`MAX_ATTEMPTS` 3) after which it gives up so `RECONNECT_MS` ends the call honestly. Glare-free:
+  only the offerer side (`CallMediaLink.offerer`) may restart.
+- `CallAnswerGate` (pure): extracted + widened `answerBlocking` guard — accepts the initial offer
+  while setting up **and** a signed re-offer once the member is LIVE/RECONNECTING, never a stranger
+  or a foreign call. The route still verifies the signed header + `lanOnly` + fingerprint first, so
+  accepting a re-offer is invariant-safe. This widening is safe in all builds (no re-offer arrives
+  in a normal build, so behaviour is unchanged in practice).
+- Mechanism wired: `CallMediaLink.reoffer()` creates an `IceRestart=true` offer through the same
+  `setLocal`→`lanOnly` path; `CallMediaHub.sendReoffer` sends it over the existing signed
+  `exchange()`; the policy is driven from the 2 s stats tick, keyed off `onConnectionChange`.
+- **Gated OFF for shipping:** the trigger (`CallMediaLink.maybeReconnect`) passes
+  `enabled = BuildConfig.PORTAL_CALL_LOOPBACK`, so only measurement/loopback builds (the night /
+  2-Portal test harness) initiate a restart. Normal builds are byte-for-byte unchanged and fall
+  through to today's `RECONNECT_MS` timeout. **Not claimed working end-to-end** — the live recovery
+  (pull Wi-Fi, roam AP) is unverified and must be confirmed on two Portals before the gate is
+  promoted to all builds (change `enabled` to `true`).
+- Tests: `CallReconnectPolicyTest.kt` (16 tests) pin gating (non-offerer/disabled/healthy), grace,
+  backoff, give-up budget, the full persistent-outage cycle, and every `CallAnswerGate` branch.
+
+**Invariants preserved:** no change to discovery, the signed offer/answer wire, `lanOnly`, the DTLS
+fingerprint, or group/Grandma/video-message flows. The only existing-path change is the (safe)
+`answerBlocking` guard widening; everything else is additive and gated.
+
+---
+
 ## 4. Needs a 2-Portal live test (Family `2221B01C7T01C0` + another Portal, same room)
 
 > Same-room speakerphone: watch for echo. Keep volume low (household etiquette); use the
 > `/perf/calling` fleet probe (loopback build) for state/stats without touching the screens.
 
-1. **F1 — ICE-restart reconnection (recommended next, highest reliability value).** Design: on an
-   offerer link going `DISCONNECTED`, after a short grace (before `RECONNECT_MS`) issue
-   `pc.restartIce()` + a fresh offer with `IceRestart=true`, re-run the **existing signed
-   `sendOffer`/`exchange`** path (so `lanOnly` + fingerprint + household signing all still apply —
-   invariant-safe by construction), and apply the answer. Requires widening
-   `answerBlocking`'s guard to accept a re-offer during RECONNECTING/LIVE and glare handling
-   (fixed offerer role per link). Not shipped blind: role/glare correctness and real route-change
-   recovery must be verified on two Portals (pull Wi-Fi briefly, roam APs).
+1. **F1 — ICE-restart reconnection (now BUILT + gated; needs the live confirm to enable).** The
+   policy, answer gate, re-offer mechanism and signed-exchange wiring are implemented and
+   unit-tested (`CallReconnect.kt`, §3b) — glare-free (offerer-only), invariant-safe (reuses the
+   signed `exchange` + `lanOnly` + fingerprint). The trigger is gated behind
+   `BuildConfig.PORTAL_CALL_LOOPBACK`, so it only fires in the measurement build. **To verify:** on
+   two Portals in a loopback/measurement build, place a call, pull Wi-Fi / roam the AP for a few
+   seconds, and confirm the picture recovers without ending (watch `/perf/calling` for the
+   RECONNECTING→LIVE transition and the "ICE restart attempt N" log). Confirm no spurious re-offer
+   on a self-healing blip, and correct behaviour at the attempt budget. Once confirmed, promote by
+   setting `enabled = true` in `CallMediaLink.maybeReconnect`.
 2. **F3 confirm** — the fast-start open and F2 recovery pace on real home Wi-Fi (no visible
    overshoot/pumping at AUTO and BEST).
 3. **F4 — audio/echo** — confirm AEC3 holds with both Portals on speakerphone in one room; only
@@ -159,3 +202,6 @@ untouched.
    MAINTAIN_RESOLUTION for HD solo on the Portal's fixed talking-head framing.
 5. **F6 — callee pre-warming** — measure first-media latency with factory/EGL pre-warmed on ring.
 6. **Camera capability** — confirm whether camera 0 can deliver 1080p for a future BEST bump.
+7. **Quality indicator (new)** — confirm the FAIR/POOR bands and reasons read sensibly on real home
+   Wi-Fi (the healthy LAN should almost always show nothing). Tune `POOR_RTT_MS`/`FAIR_RTT_MS` if
+   the home network's idle round trip is higher than expected.

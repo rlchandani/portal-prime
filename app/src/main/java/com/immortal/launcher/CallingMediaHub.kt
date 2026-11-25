@@ -43,6 +43,8 @@ internal object CallMediaHub {
   val stats: StateFlow<Map<String, CallStats>> = mutableStats.asStateFlow()
 
   private var mediaCallId: String? = null
+  /** Kept so offerer-link ICE-restart re-offers can be sent without a screen in front. */
+  private var appContext: Context? = null
   @Volatile private var foreground = false
   private val queued = ArrayList<() -> Unit>()
   private var audio: SavedAudio? = null
@@ -114,13 +116,13 @@ internal object CallMediaHub {
     val abandoned = AtomicBoolean(false)
     var result: String? = null
     main.post {
-      // Re-check on the main thread: the screen is still in front, this is still the call and the
-      // member being set up, and the HTTP side hasn't given up. Otherwise nothing opens.
+      // Re-check on the main thread: the screen is still in front, this is still the call and a
+      // member we may answer (the initial offer while setting up, or a signed ICE-restart re-offer
+      // once up — [CallAnswerGate]), and the HTTP side hasn't given up. Otherwise nothing opens.
       val current = Calling.state.value.call
-      val settingUp = current?.id == call.id && (
-          (current.peer.deviceId == from && current.phase == CallPhase.CONNECTING) ||
-              current.leg(from)?.phase == LegPhase.JOINING)
-      if (!foreground || abandoned.get() || current == null || !settingUp) { latch.countDown(); return@post }
+      if (!foreground || abandoned.get() || current == null || !CallAnswerGate.accepts(current, call.id, from)) {
+        latch.countDown(); return@post
+      }
       val m = ensure(context, call.id)
       m.camera(current.cameraOn)
       m.mic(current.micOn)
@@ -164,6 +166,7 @@ internal object CallMediaHub {
     mutableStats.value = emptyMap()
     mutableProbe.value = false
     mediaCallId = null
+    appContext = null
     m.release()
     restoreAudio(context)
   }
@@ -178,6 +181,7 @@ internal object CallMediaHub {
     current(callId)?.let { return it }
     stop(context)
     val quality = CallingQualityPolicy.startQuality(context, CallingConfig.load(context).callQuality)
+    appContext = context.applicationContext
     val m = CallMedia(context, quality, events(callId), testFrames = CallTestMode.frames)
     mediaCallId = callId
     mutableMedia.value = m
@@ -196,7 +200,28 @@ internal object CallMediaHub {
       if (statsCount++ % STATS_LOG_EVERY == 0) Log.i("HearthpaneCallStats", "${peer.take(PEER_TAG)} ${stats.logLine()}")
       if (CallingQualityPolicy.shouldDegrade(stats)) main.post(::degrade)
     }
+    override fun onReoffer(peer: String, sdp: String) { main.post { sendReoffer(callId, peer, sdp) } }
   }
+
+  /**
+   * Send an offerer link's ICE-restart re-offer over the existing signed path, exactly as the
+   * initial offer goes (so `lanOnly` + fingerprint + household signing all still apply). A no-op
+   * unless this is still the live call and member. Only ever reached in measurement builds today
+   * (the trigger in [CallMediaLink] is gated); shipping calls are untouched.
+   */
+  private fun sendReoffer(callId: String, peer: String, sdp: String) {
+    val ctx = appContext ?: return
+    val call = Calling.state.value.call?.takeIf { it.id == callId && it.isMember(peer) } ?: return
+    val m = current(callId) ?: return
+    if (!CallSignalAuth.hasLanCandidate(sdp)) return
+    val (host, port) = addressOf(call, peer)
+    Log.i(TAG, "re-offer ${peer.take(PEER_TAG)} (ICE restart)")
+    exchange(ctx, m, callId, peer, host, port, sdp, left = 1)
+  }
+
+  private fun addressOf(call: ActiveCall, peer: String): Pair<String?, Int> =
+      if (call.peer.deviceId == peer) call.peerHost to call.peerPort
+      else call.leg(peer)?.let { it.host to it.port } ?: (null to 0)
 
   private fun fail(callId: String, peer: String, why: String) {
     Log.w(TAG, "call setup failed: $why")
