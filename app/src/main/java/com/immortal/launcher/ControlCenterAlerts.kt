@@ -48,8 +48,22 @@ internal object CcAlerts {
     val out = ArrayList<CcAlert>()
     entities.values.forEach { e -> alertFor(e, now, warnAfterMin, rooms)?.let(out::add) }
     appliancesDone.forEach { (id, at) -> entities[id]?.let { e -> out += done(e, at, rooms) } }
-    return out.sortedWith(compareBy<CcAlert> { it.severity.ordinal }.thenByDescending { it.since })
+    // entityId breaks ties so the surviving row of a duplicate group is the same one every snapshot.
+    return dedupe(out.sortedWith(compareBy<CcAlert> { it.severity.ordinal }.thenByDescending { it.since }.thenBy { it.entityId }))
   }
+
+  /** How two alerts read to the eye: identical here means identical rows on screen. */
+  private data class CcAlertFace(val severity: CcSeverity, val kind: CcKind, val title: String, val body: String)
+
+  /**
+   * Collapses alerts that read identically. One physical thing — a door, a leak — exposed as
+   * several Home Assistant entities raises one alert per entity, which the house would otherwise
+   * show as three identical "… is open" rows. The first survivor (most serious, newest) stands for
+   * the group. This runs before the dismissed filter on purpose: snoozing the shown row hides the
+   * whole group instead of surfacing the next identical copy next snapshot.
+   */
+  fun dedupe(alerts: List<CcAlert>): List<CcAlert> =
+      alerts.distinctBy { CcAlertFace(it.severity, it.kind, it.title, it.body) }
 
   private fun alertFor(e: CcEntity, now: Long, warnAfterMin: Int, rooms: (String) -> String?): CcAlert? {
     if (e.unavailable) return null

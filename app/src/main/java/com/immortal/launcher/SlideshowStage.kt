@@ -169,7 +169,7 @@ internal class SlideshowStage(
       presentation.photos.size == 2 -> "Portrait pair"
       else -> "Photo slideshow"
     }
-    if (first || !animationsAllowed()) {
+    if (!animationsAllowed()) {
       layer.alpha = 1f
       if (!first) layers[outgoing].clear()
       onPresented?.invoke()
@@ -177,11 +177,12 @@ internal class SlideshowStage(
     }
     layer.alpha = 0f
     val ticket = revision
-    // Keep the outgoing scene opaque. Fading both layers simultaneously introduces a
-    // dark dip because the incoming alpha also reveals the matte beneath the outgoing.
+    // On entry there is no outgoing scene: the wall fades up from the matte so it arrives as a soft
+    // reveal instead of a hard black→photos cut. Later swaps keep the outgoing scene opaque beneath —
+    // fading both layers at once dips through the matte. Either way this is cheap RenderNode alpha.
     fade = ObjectAnimator.ofFloat(layer, View.ALPHA, 0f, 1f).apply {
-      duration = presentation.dissolveMs
-      interpolator = when (presentation.feature) {
+      duration = if (first) ENTER_FADE_MS else presentation.dissolveMs
+      interpolator = if (first) HearthEasing.SOFT else when (presentation.feature) {
         Feature.SPLIT -> HearthEasing.SOFT
         Feature.NIGHT_PHOTO, Feature.SPLIT_NIGHT -> SINE
         Feature.NONE -> LinearInterpolator()
@@ -189,7 +190,7 @@ internal class SlideshowStage(
       addListener(object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator) {
           if (ticket != revision) return
-          layers[outgoing].clear()
+          if (!first) layers[outgoing].clear()
           fade = null
           dissolvePause.end()
         }
@@ -872,5 +873,7 @@ internal class SlideshowStage(
     val MATTE: Int = Color.rgb(20, 22, 27)
     private val PRINT_MATTE: Int = Color.rgb(28, 27, 25)
     const val DISSOLVE_MS = 900L
+    /** The first wall fades up from the matte on entry: a soft reveal, not a hard black→photos cut. */
+    const val ENTER_FADE_MS = 700L
   }
 }
