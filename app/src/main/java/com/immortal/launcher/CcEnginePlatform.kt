@@ -67,6 +67,10 @@ internal interface CcHost {
   fun loadPlan(): CcPlan?
   fun savePlan(plan: CcPlan): Boolean
 
+  /** The last-known entity states cached on disk, so even a cold open draws at once ([CcLastKnownStore]). */
+  fun loadLastKnown(): Map<String, CcEntity>
+  fun saveLastKnown(entities: Map<String, CcEntity>): Boolean
+
   fun dryRun(): Boolean
   fun setDryRun(on: Boolean)
   fun testPlan(): CcPlan?

@@ -16,6 +16,9 @@ internal class FakeCcHost : CcHost {
   var token = "tok"
   var online = true
   var plan: CcPlan? = null
+  /** The disk-cached last-known states a cold process starts with ([CcLastKnownStore]). */
+  var persistedLastKnown: Map<String, CcEntity> = emptyMap()
+  val savedLastKnown = ArrayList<Map<String, CcEntity>>()
   var dry = false
   var test: CcPlan? = null
   val scenes = LinkedHashSet<String>()
@@ -31,6 +34,8 @@ internal class FakeCcHost : CcHost {
   override fun online() = online
   override fun loadPlan() = plan
   override fun savePlan(plan: CcPlan): Boolean { this.plan = plan; savedPlans += plan; return true }
+  override fun loadLastKnown() = persistedLastKnown
+  override fun saveLastKnown(entities: Map<String, CcEntity>): Boolean { persistedLastKnown = entities; savedLastKnown += entities; return true }
   override fun dryRun() = dry
   override fun setDryRun(on: Boolean) { dry = on }
   override fun testPlan() = test

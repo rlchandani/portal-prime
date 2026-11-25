@@ -35,6 +35,9 @@ internal class CcAndroidHost(private val app: Context) : CcHost {
   override fun loadPlan() = CcPlanStore.load(app)
   override fun savePlan(plan: CcPlan) = CcPlanStore.save(app, plan)
 
+  override fun loadLastKnown() = CcLastKnownStore.load(app)
+  override fun saveLastKnown(entities: Map<String, CcEntity>) = CcLastKnownStore.save(app, entities)
+
   override fun dryRun() = CcDebugStore.dryRun(app)
   override fun setDryRun(on: Boolean) = CcDebugStore.setDryRun(app, on)
   override fun testPlan() = CcDebugStore.testPlan(app)
