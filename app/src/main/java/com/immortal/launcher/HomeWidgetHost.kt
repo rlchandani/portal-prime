@@ -12,8 +12,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.os.Bundle
 import android.view.ViewGroup
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
@@ -127,39 +129,59 @@ internal fun ApprovedWidgetArea(
     val focus = androidx.compose.ui.platform.LocalFocusManager.current
     val currentPage = rememberUpdatedState(page)
     val pageChanged = rememberUpdatedState(onPageChanged)
-    val slide = remember { Animatable(page.index.toFloat()) }
+    // The scroll position in pages. A live finger drag owns it directly (1:1 tracking); otherwise
+    // the settle animation drives it to the target page. Plain float state so the drag can write it
+    // synchronously each frame without a coroutine, which is what makes the swipe track the finger.
+    var scroll by remember { mutableFloatStateOf(page.index.toFloat()) }
+    var dragging by remember { mutableStateOf(false) }
+    var viewportWidthPx by remember { mutableFloatStateOf(0f) }
     // The page the last slide finished on. Page work (producers, lifecycle, resume reads) and the
     // next neighbor's composition follow it, so they start after the slide, not in its first frame.
     var settled by remember { mutableIntStateOf(page.index) }
-    val swipeThreshold = with(androidx.compose.ui.platform.LocalDensity.current) { 64.dp.toPx() }
-    LaunchedEffect(page.index, page.count) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val flingVelocityPx = with(density) { HomePagerGesture.FLING_VELOCITY_DP.dp.toPx() }
+    // Settle to the target once the finger lifts (or a button/Move jumps pages). While a drag is in
+    // progress it owns `scroll`, so this stays out of the way until the drag ends.
+    LaunchedEffect(page.index, page.count, dragging) {
+      if (dragging) return@LaunchedEffect
       if (!preserveCounterFocus) focus.clearFocus(force = true)
       // Removed widgets or numbered Move can skip pages outside the retained neighbors.
-      if (slide.value > prepared.lastIndex || abs(slide.value - page.index) > 1f)
-        slide.snapTo(page.index.toFloat())
-      else slide.animateTo(page.index.toFloat(), tween(180, easing = EaseOutCubic))
+      if (scroll > prepared.lastIndex || abs(scroll - page.index) > 1f) scroll = page.index.toFloat()
+      else if (scroll != page.index.toFloat())
+        animate(scroll, page.index.toFloat(),
+            animationSpec = tween(HomePagerGesture.settleDurationMillis(scroll, page.index),
+                easing = EaseOutCubic)) { value, _ -> scroll = value }
       settled = page.index
     }
     BoxWithConstraints(modifier.clipToBounds().semantics { contentDescription = "Home widgets" }
         .then(if (!homeActive || page.count < 2 || placing) Modifier else Modifier.pointerInput(page.count) {
-          var distance = 0f
+          val tracker = VelocityTracker()
+          var startScroll = 0f
+          var totalDrag = 0f
           detectHorizontalDragGestures(
-              onDragStart = { distance = 0f },
-              onDragCancel = { distance = 0f },
+              onDragStart = {
+                tracker.resetTracking()
+                startScroll = scroll
+                totalDrag = 0f
+                dragging = true
+              },
+              onDragCancel = { dragging = false },
               onDragEnd = {
-                if (abs(distance) >= swipeThreshold) {
-                  val selected = currentPage.value
-                  val next = HomePresentation.pageAfterSwipe(selected, swipeRight = distance > 0f)
-                  if (next != selected.index) pageChanged.value(next)
-                }
-                distance = 0f
+                val velocity = tracker.calculateVelocity().x
+                val target = HomePagerGesture.targetPage(
+                    scroll, startScroll.roundToInt(), velocity, flingVelocityPx, prepared.lastIndex)
+                dragging = false
+                if (target != currentPage.value.index) pageChanged.value(target)
               },
           ) { change, delta ->
+            tracker.addPosition(change.uptimeMillis, change.position)
             change.consume()
-            distance += delta
+            totalDrag += delta
+            scroll = HomePagerGesture.dragPosition(startScroll, totalDrag, viewportWidthPx, prepared.lastIndex)
           }
         })) {
       val widthPx = with(androidx.compose.ui.platform.LocalDensity.current) { maxWidth.toPx() }
+      SideEffect { if (viewportWidthPx != widthPx) viewportWidthPx = widthPx }
       for (index in HomePagerWindow.composed(page.index, settled, prepared.lastIndex)) key(index) {
         val displayed = prepared[index]
         val selected = index == page.index
@@ -168,7 +190,7 @@ internal fun ApprovedWidgetArea(
         val working = homeActive && HomePagerWindow.working(index, settled)
         // Deferred placement caches the display list; the viewport clips off-screen pages.
         Box(Modifier.fillMaxSize().absoluteOffset {
-          IntOffset((HomePresentation.pageOffset(index, slide.value) * widthPx).roundToInt(), 0)
+          IntOffset((HomePresentation.pageOffset(index, scroll) * widthPx).roundToInt(), 0)
         }.then(if (active) Modifier else Modifier.clearAndSetSemantics { })
             .pointerInput(active) {
               if (!active) awaitPointerEventScope {
