@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
@@ -249,19 +250,28 @@ internal fun ApprovedAppsIcon(
     bitmap: androidx.compose.ui.graphics.ImageBitmap? = null, plain: Boolean = false,
 ) {
   val identity = approvedAppIdentity(pkg)
-  if (bitmap != null) {
+  // Artwork carries its own full-bleed colour only when it actually fills the tile. A transparent or
+  // monochrome companion icon (e.g. Home Assistant) is a bare glyph. When its package has a known
+  // approved tile, draw that — matching the Store's own Home Assistant tile and the colored squircles
+  // around it — instead of letting a lone glyph float; a bare glyph without a known tile is left as
+  // its raw artwork (no blind guess). Measured once per bitmap, not on every recomposition.
+  val fullBleed = remember(bitmap) { bitmap != null && IconRenderer.hasOwnBackground(bitmap.asAndroidBitmap()) }
+  val bareWithTile = bitmap != null && !fullBleed && identity != null
+  if (bitmap != null && !bareWithTile) {
     // Artwork is already normalized and cached by IconRenderer, shared with Home.
     // The app's cell stays transparent; the only colored surface belongs to the icon itself.
     androidx.compose.foundation.Image(bitmap, null,
         Modifier.size(size).then(if (plain) Modifier else Modifier.clip(RoundedCornerShape(size / 4))))
   } else {
+    // The tile backs the no-artwork fallback, and a bare glyph even in a plain grid so it never floats.
+    val tile = !plain || bareWithTile
     val (glyph, color) = identity ?: ("bag" to Color(0xFF2879B8))
-    Box(Modifier.size(size).then(if (plain) Modifier else
+    Box(Modifier.size(size).then(if (!tile) Modifier else
         Modifier.clip(RoundedCornerShape(size / 4)).background(color)
             .border(1.dp, Color.White.copy(alpha = .18f), RoundedCornerShape(size / 4))),
         contentAlignment = Alignment.Center) {
-      ApprovedIcon(glyph, modifier = Modifier.size(size * if (plain) .65f else .49f),
-          tint = if (plain) IosLabel else Color.White)
+      ApprovedIcon(glyph, modifier = Modifier.size(size * if (tile) .49f else .65f),
+          tint = if (tile) Color.White else IosLabel)
     }
   }
 }

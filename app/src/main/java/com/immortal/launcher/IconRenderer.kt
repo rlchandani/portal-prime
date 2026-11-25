@@ -27,9 +27,11 @@ import kotlin.math.pow
  */
 object IconRenderer {
   // Four fixed-complexity paths, regardless of output dimensions; no mask bitmaps.
-  private val masks = LruCache<Int, Path>(4)
-  private val clearPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-    xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+  // Lazy so the object can initialize without touching Android graphics — the pure pixel-coverage
+  // helpers below are then reachable from plain JVM unit tests.
+  private val masks by lazy { LruCache<Int, Path>(4) }
+  private val clearPaint by lazy {
+    Paint(Paint.ANTI_ALIAS_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
   }
 
   /**
@@ -67,6 +69,32 @@ object IconRenderer {
     canvas.drawPath(outsideMask(sizePx), clearPaint)
 
     return output
+  }
+
+  /** Below this opaque fill a normalized icon is a bare glyph (no full-bleed tile of its own). */
+  const val MIN_OPAQUE_FILL = 0.5f
+  private const val OPAQUE_ALPHA = 128
+
+  /**
+   * Fraction of [pixels] that are substantially opaque (alpha ≥ [OPAQUE_ALPHA]). A full-bleed
+   * squircle icon fills ~0.9 of its bitmap; a transparent/monochrome glyph (e.g. the Home
+   * Assistant companion mark) fills only a fraction. Pure so it can be unit tested without a Bitmap.
+   */
+  fun opaqueFraction(pixels: IntArray): Float {
+    if (pixels.isEmpty()) return 0f
+    var opaque = 0
+    for (p in pixels) if ((p ushr 24) and 0xFF >= OPAQUE_ALPHA) opaque++
+    return opaque.toFloat() / pixels.size
+  }
+
+  /**
+   * True when a normalized app bitmap carries its own filled background. When false the artwork is
+   * a bare glyph and the grid should place it on a tile instead of letting it float.
+   */
+  fun hasOwnBackground(bitmap: Bitmap): Boolean {
+    val pixels = IntArray(bitmap.width * bitmap.height)
+    bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+    return opaqueFraction(pixels) >= MIN_OPAQUE_FILL
   }
 
   private fun outsideMask(sizePx: Int): Path = synchronized(masks) {
