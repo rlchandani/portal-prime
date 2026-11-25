@@ -169,7 +169,7 @@ internal fun ApprovedEditorsCollectionRow(
         }
         if (action != null && onAction != null)
             ApprovedSettingsTextButton(action, ApprovedEditorsCopy.rowActionSpoken(action, title), onAction)
-        ApprovedSettingsTextButton("Remove", ApprovedEditorsCopy.rowActionSpoken("Remove", title), onRemove)
+        SettingsRemoveButton(spoken = ApprovedEditorsCopy.rowActionSpoken("Remove", title), onClick = onRemove)
     }
 }
 

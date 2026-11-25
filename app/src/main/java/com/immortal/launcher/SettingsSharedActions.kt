@@ -35,12 +35,15 @@ internal fun SettingsRemoveButton(
     label: String = "Remove",
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    spoken: String = label,
     onClick: (() -> Unit)?,
 ) {
     val p = LocalApprovedPalette.current
     val shape = RoundedCornerShape(16.dp)
     Surface(color = p.surface2, shape = shape,
+        // A spoken name that differs from the visible word tells a repeated "Remove" apart by its row.
         modifier = modifier.defaultMinSize(minHeight = 68.dp)
+            .let { if (spoken != label) it.ccSpeak(spoken) else it }
             .then(if (onClick != null) Modifier.tvFocusable(shape, focusScale = 1f, ringColor = p.accent,
                 enabled = enabled, onClick = onClick) else Modifier)) {
         Box(Modifier.padding(horizontal = 24.dp, vertical = 16.dp), contentAlignment = Alignment.Center) {
