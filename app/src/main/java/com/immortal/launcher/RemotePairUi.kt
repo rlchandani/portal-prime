@@ -79,7 +79,14 @@ fun enableRemoteAndMintPin(context: Context): Pair<String?, String?> {
  * address. Shows a Wi-Fi hint when [url] is null.
  */
 @Composable
-fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
+fun RemotePairCard(
+    url: String?,
+    pin: String?,
+    modifier: Modifier = Modifier,
+    // The home quick-connect modal already shows "Control from your phone" as the dialog title and
+    // its own scan hint, so it hides this card's heading to avoid printing the same title twice.
+    showHeader: Boolean = true,
+) {
   val context = LocalContext.current
   val owner = LocalLifecycleOwner.current
   var issued by remember(url, pin) { mutableStateOf(url to pin) }
@@ -141,10 +148,12 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
           verticalAlignment = Alignment.CenterVertically,
       ) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-          Text("Control from your phone", color = IosLabel, fontSize = 28.sp,
-              fontWeight = FontWeight.Medium)
-          Text("Scan with your phone camera, or open the address below on the same Wi-Fi.",
-              color = IosSecondary, fontSize = 24.sp, lineHeight = 36.sp)
+          if (showHeader) {
+            Text("Control from your phone", color = IosLabel, fontSize = 28.sp,
+                fontWeight = FontWeight.Medium)
+            Text("Scan with your phone camera, or open the address below on the same Wi-Fi.",
+                color = IosSecondary, fontSize = 24.sp, lineHeight = 36.sp)
+          }
           Text(displayedUrl, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
           if (livePin != null && cooldownSec == 0L) {
             Text("This code works once and expires after 5 minutes.",
@@ -181,8 +190,12 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
                 }
               }
             }
-            Text(current, color = IosLabel, fontSize = 90.sp, lineHeight = 110.sp,
-                letterSpacing = 8.sp, fontWeight = FontWeight.Normal,
+            // Keep the 6-digit code on a single line: at 90.sp it overflowed the half-width code
+            // column and wrapped (e.g. "5199" / "62"). 64.sp with tighter tracking fits one line on
+            // both Portal+ and the narrower Mini dialog column; maxLines/softWrap guard any edge.
+            Text(current, color = IosLabel, fontSize = 64.sp, lineHeight = 76.sp,
+                letterSpacing = 4.sp, fontWeight = FontWeight.Normal,
+                maxLines = 1, softWrap = false,
                 modifier = Modifier.padding(top = 18.dp))
           } else if (cooldownSec > 0L) {
             Text("Too many tries", color = IosLabel, fontSize = 32.sp, lineHeight = 42.sp,
