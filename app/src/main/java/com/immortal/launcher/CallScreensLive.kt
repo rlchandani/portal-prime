@@ -90,6 +90,7 @@ private fun CallLiveSolo(call: ActiveCall, media: CallMedia?, motion: Boolean, t
       CallLiveBar(CallingCopy.liveBar(call.cameraOn, call.micOn), CallingCopy.liveDotActive(call.cameraOn, call.micOn), motion,
           Modifier.align(Alignment.TopStart).padding(40.dp))
       CallTitle(call, Modifier.align(Alignment.TopCenter).padding(top = 40.dp))
+      CallHealthBanner(call, Modifier.align(Alignment.TopCenter).padding(top = 150.dp))
     }
     CallSelfFrame(media, call.cameraOn, CallingCopy.SELF_LABEL,
         Modifier.align(Alignment.TopEnd).padding(top = if (dropIn) 150.dp else 40.dp, end = 40.dp))
@@ -139,6 +140,7 @@ private fun CallLiveCompact(call: ActiveCall, media: CallMedia?, motion: Boolean
     val selfTop = if (dropIn) (if (portrait) DROP_BAR_TALL else DROP_BAR) + edge else edge
     CallSelfFrame(media, call.cameraOn, CallingCopy.SELF_LABEL, Modifier.align(Alignment.TopEnd).padding(top = selfTop, end = edge),
         width = self.widthDp.dp, height = self.heightDp.dp)
+    if (!dropIn) CallHealthBanner(call, Modifier.align(Alignment.TopCenter).padding(top = edge + 112.dp))
     ConnectionChip(call, Modifier.align(Alignment.Center), top = CallsCompactLayout.connectionChipOffset(layout).dp)
     if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter)
         .padding(start = edge, end = edge, bottom = (ctl.bottom + ctl.height).dp + POPOVER_GAP))
@@ -310,6 +312,25 @@ private fun DropInBar(call: ActiveCall, modifier: Modifier) {
       Text("End", color = CallColors.DropBottom, fontSize = 24.sp, fontWeight = FontWeight.Bold)
     }
   }
+}
+
+/**
+ * A quiet in-call health signal: nothing while the picture is good, a tinted chip with a plain
+ * reason when the LAN is strained ([CallHealthMeter]). 1:1 only and only once live — groups already
+ * run at 360p, and before LIVE the connecting/reconnecting chip speaks for itself.
+ */
+@Composable
+private fun CallHealthBanner(call: ActiveCall, modifier: Modifier) {
+  val statsByPeer by CallMediaHub.stats.collectAsState()
+  val reading = if (call.phase == CallPhase.LIVE && !call.group)
+    statsByPeer[call.peer.deviceId]?.let { CallHealthMeter.of(it, call.remoteCameraOn) } else null
+  if (reading == null || reading.health == CallHealth.GOOD) return
+  val (tone, icon) = when (reading.health) {
+    CallHealth.POOR -> CallChipTone.RED to "wifiOff"
+    CallHealth.FAIR -> CallChipTone.WARN to "wifi"
+    CallHealth.GOOD -> return
+  }
+  Box(modifier) { CallChip(reading.reason, icon, tone) }
 }
 
 @Composable

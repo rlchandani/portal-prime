@@ -40,6 +40,10 @@ internal class CallMediaLink(
   private var previousStats: CallStats? = null
   private var bitrate = CallLinkBitrate.State(0)
   private var profile: SendProfile? = null
+  /** True when this side sent the offer: only it may re-offer to restart ICE (glare-free). */
+  private var offerer = false
+  /** Recovery bookkeeping; touched only on the media thread (via [post]). */
+  private var reconnect = CallReconnectPolicy.State()
   @Volatile private var closed = false
 
   fun createOffer(profile: SendProfile, done: (String?) -> Unit) {
@@ -74,9 +78,35 @@ internal class CallMediaLink(
       val raw = report.statsMap.values.map { RawStat(it.type, it.id, it.members) }
       val stats = CallStatsParser.parse(raw, System.currentTimeMillis(), previousStats)
       previousStats = stats
-      post { adapt(stats) }
+      post { adapt(stats); maybeReconnect(System.currentTimeMillis()) }
       events.onStats(peer, stats)
     }
+  }
+
+  /**
+   * Offerer link recovery after a LAN blip. Enabled only in measurement builds until a live
+   * 2-Portal test confirms it (see [CallReconnectPolicy]); shipping calls keep today's behaviour
+   * and fall through to the [CallTimings.RECONNECT_MS] timeout. Runs on the media thread.
+   */
+  private fun maybeReconnect(now: Long) {
+    when (CallReconnectPolicy.decide(reconnect, now, offerer, enabled = BuildConfig.PORTAL_CALL_LOOPBACK)) {
+      CallReconnectPolicy.Action.RESTART_ICE -> {
+        reconnect = CallReconnectPolicy.attempted(reconnect, now)
+        Log.i(TAG, "$peer ICE restart attempt ${reconnect.attempts}")
+        reoffer { sdp ->
+          if (sdp != null && CallSignalAuth.hasLanCandidate(sdp)) events.onReoffer(peer, sdp)
+          else Log.w(TAG, "$peer re-offer had no LAN candidate")
+        }
+      }
+      CallReconnectPolicy.Action.WAIT, CallReconnectPolicy.Action.GIVE_UP -> Unit
+    }
+  }
+
+  /** Offerer only: renegotiate ICE on the existing connection and hand the fresh signed offer up. */
+  private fun reoffer(done: (String?) -> Unit) {
+    val peer = pc ?: return done(null)
+    val restart = MediaConstraints().apply { mandatory.add(MediaConstraints.KeyValuePair("IceRestart", "true")) }
+    peer.createOffer(CallSdp.created({ desc -> setLocal(peer, desc, done) }, { done(null) }), restart)
   }
 
   fun close() {
@@ -99,6 +129,7 @@ internal class CallMediaLink(
     if (closed) return null
     val peer = factory.createPeerConnection(CallSdp.lanConfig(), observer) ?: return null
     pc = peer
+    this.offerer = offerer
     profile = initial
     bitrate = CallLinkBitrate.State(initial.maxKbps)
     if (offerer) {
@@ -125,8 +156,9 @@ internal class CallMediaLink(
   private fun applyEncoding() {
     val p = profile ?: return
     val ceiling = bitrate.kbps.takeIf { it > 0 } ?: p.maxKbps
-    // LAN: start the estimate near the target so the picture opens sharp instead of ramping up.
-    runCatching { pc?.setBitrate(MIN_KBPS * KBPS, minOf(START_KBPS, ceiling) * KBPS, ceiling * KBPS) }
+    // LAN: open the estimate near the budget ([CallLinkBitrate.startEstimateKbps]) so the picture
+    // comes up sharp instead of ramping from a low default.
+    runCatching { pc?.setBitrate(MIN_KBPS * KBPS, CallLinkBitrate.startEstimateKbps(ceiling) * KBPS, ceiling * KBPS) }
     pc?.transceivers?.filter { it.mediaType == MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO }?.forEach { t ->
       val params = t.sender.parameters
       params.degradationPreference = RtpParameters.DegradationPreference.BALANCED
@@ -156,9 +188,9 @@ internal class CallMediaLink(
       if (closed) return
       Log.i(TAG, "$peer connection $newState")
       when (newState) {
-        PeerConnection.PeerConnectionState.CONNECTED -> events.onConnected(peer)
-        PeerConnection.PeerConnectionState.DISCONNECTED -> events.onDisconnected(peer)
-        PeerConnection.PeerConnectionState.FAILED -> events.onFailed(peer)
+        PeerConnection.PeerConnectionState.CONNECTED -> { post { reconnect = CallReconnectPolicy.up() }; events.onConnected(peer) }
+        PeerConnection.PeerConnectionState.DISCONNECTED -> { post { reconnect = CallReconnectPolicy.down(reconnect, System.currentTimeMillis()) }; events.onDisconnected(peer) }
+        PeerConnection.PeerConnectionState.FAILED -> { post { reconnect = CallReconnectPolicy.down(reconnect, System.currentTimeMillis()) }; events.onFailed(peer) }
         else -> Unit
       }
     }
@@ -172,7 +204,6 @@ internal class CallMediaLink(
     const val STREAM_ID = "hp"
     const val KBPS = 1_000
     const val MIN_KBPS = 150
-    const val START_KBPS = 1_500
     const val GATHER_TIMEOUT_MS = 2_500L
   }
 }

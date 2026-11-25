@@ -48,6 +48,11 @@ internal class CallMedia(
     fun onFailed(peer: String)
     fun onCameraIssue(issue: CameraIssue)
     fun onStats(peer: String, stats: CallStats)
+    /**
+     * Offerer link recovery: a fresh signed, LAN-only ICE-restart offer for [peer] is ready to be
+     * sent over the existing signalling path. No-op by default (only the live call hub acts on it).
+     */
+    fun onReoffer(peer: String, sdp: String) {}
   }
 
   private val app = context.applicationContext
