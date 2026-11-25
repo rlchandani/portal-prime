@@ -1,6 +1,6 @@
 {
-  "versionCode": 330,
-  "versionName": "1.336",
+  "versionCode": 331,
+  "versionName": "1.337",
   "apkUrl": "https://github.com/rlchandani/portal-prime/releases/latest/download/hearthpane.apk",
-  "notes": "Jarvis memory (when on) follows each person across your Portals; Forget applies everywhere; separate switch for closer reading"
+  "notes": "Smoother Home swipes and screensaver fades, clearer in-call quality, tidier Home Assistant and app icons, Music header alignment, and reliability fixes."
 }
