@@ -79,9 +79,11 @@
         outgoing.layer.classList.add("freeze");
         outgoing.cleanup.pause();
       }
-      // The first decoded composition has no predecessor to dissolve over.
-      // A rotation re-lay replaces the same beat under the dimmed stage without a dissolve.
-      if (!outgoing || scene.relay) scene.layer.classList.add("first-scene");
+      // The first decoded composition has no predecessor to dissolve over: it fades up from the
+      // black stage as a soft entry reveal (.ss-entry). A rotation re-lay replaces the same beat
+      // under the dimmed stage without a dissolve, so it still hard-cuts (.first-scene).
+      if (scene.relay) scene.layer.classList.add("first-scene");
+      else if (!outgoing) scene.layer.classList.add("ss-entry");
       // Any scene laid out after a turn (the re-lay, or a navigation that replaced it) reveals.
       dim(false);
       scene.layer.classList.remove("freeze", "prewarm");

@@ -54,6 +54,24 @@ object PremiumFraming {
     }
   }
 
+  /**
+   * Whether a single photo shown whole should sit on its own blurred backdrop rather than the flat
+   * matte — on every panel, portrait Portal Mini and landscape Portal+ alike. It does when the photo
+   * is letterboxed (contained, not cover-filling) and its aspect mismatches the viewport past
+   * [MISMATCH], so real bars are left to fill. A near-matching photo keeps the matte (thin bars).
+   *
+   * @param fill the user's "fill" choice; false ("fit") always letterboxes.
+   * @param forceWhole the portrait-panel override that shows a badly-mismatched photo whole even
+   *   under "fill" — passed in so this stays the single source of the letterbox-vs-backdrop choice.
+   */
+  fun letterboxesOnBackdrop(
+      imageWidth: Int, imageHeight: Int, viewportWidth: Int, viewportHeight: Int,
+      fill: Boolean, forceWhole: Boolean,
+  ): Boolean {
+    val contained = !(fill && !forceWhole)
+    return contained && mismatch(imageWidth, imageHeight, viewportWidth, viewportHeight) > MISMATCH
+  }
+
   fun mismatch(imageWidth: Int, imageHeight: Int, viewportWidth: Int, viewportHeight: Int): Double {
     if (imageWidth <= 0 || imageHeight <= 0 || viewportWidth <= 0 || viewportHeight <= 0) return Double.MAX_VALUE
     val ia = imageWidth.toDouble() / imageHeight

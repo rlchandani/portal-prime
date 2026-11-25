@@ -169,7 +169,7 @@ internal class SlideshowStage(
       presentation.photos.size == 2 -> "Portrait pair"
       else -> "Photo slideshow"
     }
-    if (first || !animationsAllowed()) {
+    if (!animationsAllowed()) {
       layer.alpha = 1f
       if (!first) layers[outgoing].clear()
       onPresented?.invoke()
@@ -177,11 +177,12 @@ internal class SlideshowStage(
     }
     layer.alpha = 0f
     val ticket = revision
-    // Keep the outgoing scene opaque. Fading both layers simultaneously introduces a
-    // dark dip because the incoming alpha also reveals the matte beneath the outgoing.
+    // On entry there is no outgoing scene: the wall fades up from the matte so it arrives as a soft
+    // reveal instead of a hard black→photos cut. Later swaps keep the outgoing scene opaque beneath —
+    // fading both layers at once dips through the matte. Either way this is cheap RenderNode alpha.
     fade = ObjectAnimator.ofFloat(layer, View.ALPHA, 0f, 1f).apply {
-      duration = presentation.dissolveMs
-      interpolator = when (presentation.feature) {
+      duration = if (first) ENTER_FADE_MS else presentation.dissolveMs
+      interpolator = if (first) HearthEasing.SOFT else when (presentation.feature) {
         Feature.SPLIT -> HearthEasing.SOFT
         Feature.NIGHT_PHOTO, Feature.SPLIT_NIGHT -> SINE
         Feature.NONE -> LinearInterpolator()
@@ -189,7 +190,7 @@ internal class SlideshowStage(
       addListener(object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator) {
           if (ticket != revision) return
-          layers[outgoing].clear()
+          if (!first) layers[outgoing].clear()
           fade = null
           dissolvePause.end()
         }
@@ -376,14 +377,24 @@ internal class SlideshowStage(
       background = if (p.galleryStyle) printMatte else matte
       visibility = View.VISIBLE
       val gallery = galleryPlans(p, width, height)
-      // Portrait panels only (Portal Mini): a badly mismatched single photo is shown whole over
-      // its own blurred backdrop rather than hard-cropped or floated on the flat matte.
+      // A single photo shown whole over its own blurred backdrop rather than hard-cropped or floated
+      // on the flat matte. A portrait panel (Portal Mini) forces a badly-mismatched photo whole even
+      // under "fill" (portraitWhole); every panel — including the landscape Portal+ — then draws the
+      // backdrop whenever that photo is letterboxed rather than cover-filling (backdropWhole). The
+      // backdrop is one cached, pre-blurred bitmap (PhotoLook.backdrop) drawn in a single opaque pass
+      // by PhotoBackdropView — no live blur — so it stays within the screensaver frame budget.
       val single = p.photos.singleOrNull()
       val portraitWhole = single != null && gallery == null && !p.editing && single.adjustment == null &&
           height > width && PremiumFraming.mismatch(single.bitmap.width, single.bitmap.height,
               width, height) > PremiumFraming.MISMATCH
       val look = single?.look
-      if (portraitWhole && look != null) {
+      val backdropWhole = single != null && gallery == null && !p.editing && single.adjustment == null &&
+          look != null && PremiumFraming.letterboxesOnBackdrop(single.bitmap.width, single.bitmap.height,
+              width, height, p.fill, portraitWhole)
+      // A photo on its exact backdrop hole keeps its contain rect: never cover-filled, settled or
+      // shrunk for an overlay (see below), so the blurred fill can clip it out precisely.
+      val wholeHole = portraitWhole || backdropWhole
+      if (backdropWhole && look != null) {
         background = null
         val fill = PhotoBackdropView(context)
         addView(fill, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -401,10 +412,10 @@ internal class SlideshowStage(
         val print = gallery?.getOrNull(index)
         val initial = print?.path ?: SlideshowGeometry.plan(
             photo.bitmap.width, photo.bitmap.height, tile.width(), tile.height(), photo.regions,
-            p.fill && !portraitWhole, p.motion && photo.adjustment == null && !portraitWhole, index % 2 == 1)
+            p.fill && !wholeHole, p.motion && photo.adjustment == null && !wholeHole, index % 2 == 1)
         // Reserve a measured free area only if a protected face would intersect an overlay.
-        // A whole portrait-panel photo keeps its backdrop hole exact, so it is never shrunk.
-        val overlaps = print == null && !portraitWhole && photo.regions.any { region ->
+        // A photo on its blurred backdrop keeps its hole exact, so it is never shrunk.
+        val overlaps = print == null && !wholeHole && photo.regions.any { region ->
           val rw = region.right - region.left
           val rh = region.bottom - region.top
           fun protected(transform: SlideshowGeometry.Transform): Rect = Rect(
@@ -872,5 +883,7 @@ internal class SlideshowStage(
     val MATTE: Int = Color.rgb(20, 22, 27)
     private val PRINT_MATTE: Int = Color.rgb(28, 27, 25)
     const val DISSOLVE_MS = 900L
+    /** The first wall fades up from the matte on entry: a soft reveal, not a hard black→photos cut. */
+    const val ENTER_FADE_MS = 700L
   }
 }
