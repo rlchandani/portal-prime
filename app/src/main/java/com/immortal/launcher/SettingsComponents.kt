@@ -494,44 +494,6 @@ internal fun SelectableRow(title: String, subtitle: String, selected: Boolean, o
 }
 
 // ---------------------------------------------------------------------------
-// Segmented control
-// ---------------------------------------------------------------------------
-
-/** A compact iOS-style segmented control. [options] are label-to-value pairs. */
-@Composable
-internal fun Segmented(
-    options: List<Pair<String, String>>,
-    selected: String,
-    onSelect: (String) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .background(IosSegmentTrack, RoundedCornerShape(8.dp))
-            .padding(2.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        options.forEach { (label, value) ->
-            val on = value == selected
-            Surface(
-                // Selected segment: lighter fill so it reads against the dark track (the mock's
-                // rgba(255,255,255,.22)); IosCard is too close to the track tone on dark.
-                color = if (on) IosCard else Color.Transparent,
-                shape = RoundedCornerShape(6.dp),
-                modifier = Modifier.tvFocusable(RoundedCornerShape(6.dp), focusScale = 1f, ringColor = IosBlue) { onSelect(value) },
-            ) {
-                Text(
-                    text = label,
-                    color = if (on) IosLabel else IosSegmentInactive,
-                    fontSize = Sizes.segmentLabel,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                )
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Stepper
 // ---------------------------------------------------------------------------
 

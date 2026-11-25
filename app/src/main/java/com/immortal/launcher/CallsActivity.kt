@@ -252,22 +252,23 @@ private fun CallsTestPills(onLoopback: () -> Unit, onTestMessage: () -> Unit, su
   CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
 }
 
-/** `.seg`: surf2 track, white pill on the selected item. */
+/**
+ * Calls tabs (Rooms / Recent / Messages). A thin adapter over the shared [HearthSegmented] with the
+ * neutral variant: the selected pill now glides and gains the unified rounded-rect + depth. [weights]
+ * still stretches the tabs across the compact header; null keeps their natural widths. The existing
+ * `callClick` button semantics are preserved verbatim.
+ */
 @Composable
 internal fun CallsSegmented(labels: List<String>, selected: Int, modifier: Modifier = Modifier,
                             /** Stretched (compact): one weight per tab; null keeps the natural widths. */
                             weights: List<Float>? = null, onSelect: (Int) -> Unit) {
-  val p = LocalApprovedPalette.current
-  Row(modifier.background(p.surface2, RoundedCornerShape(50)).padding(6.dp)) {
-    labels.forEachIndexed { i, label ->
-      val on = i == selected
-      val width = weights?.getOrNull(i)?.let { Modifier.weight(it) } ?: Modifier
-      Box(width.height(76.dp).background(if (on) p.surface else Color.Transparent, RoundedCornerShape(50))
-          .callClick(label, true) { onSelect(i) }.padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
-        Text(label, color = if (on) p.text else p.secondary, fontSize = 25.5.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-      }
-    }
-  }
+  HearthSegmented(
+      segments = labels.map { HearthSegment(it) },
+      selectedIndex = selected,
+      colors = HearthSegmentedDefaults.colors(LocalApprovedPalette.current),
+      modifier = modifier,
+      weights = weights,
+      cellModifier = { i, _, label -> Modifier.callClick(label, true) { onSelect(i) } })
 }
 
 /** A centred empty/error state card for the Calls app. */

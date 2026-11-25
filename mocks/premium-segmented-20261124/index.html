@@ -1,0 +1,148 @@
+<!doctype html>
+<!--
+  Premium segmented-control proposal — static before/after mock (no build).
+  Companion to docs/quality/premium-proposal-segmented-control.md.
+  Hex values are grounded in the verified source + mocks; see the doc for citations.
+  Selection motion here is CSS-only (sliding pill) to illustrate the proposed behavior.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hearthpane — Unified Segmented Control (before / after)</title>
+<style>
+  :root{
+    /* reconciled dark palette (see tokens proposal part B) */
+    --bg:#14161B; --surface:#24262B; --surface2:#31343A; --divider:#3A3D44;
+    --text:#FFFFFF; --secondary:#B8B8B8; --accent:#FFFFFF; --accentInk:#14161B;
+    --segOn:#4A4D54; --green:#66C49E; --emberA:#F0A65A; --emberB:#D9773A;
+    --cardEdge:rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:40px;line-height:1.4}
+  h1{font-size:24px;font-weight:650;margin:0 0 4px}
+  .sub{color:var(--secondary);font-size:14px;margin:0 0 32px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px;max-width:1080px}
+  .col h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--secondary);font-weight:600;margin:0 0 14px}
+  .card{background:var(--surface);border:1px solid var(--cardEdge);
+    border-radius:20px;padding:22px;margin-bottom:18px}
+  .lbl{font-size:12px;color:var(--secondary);margin:0 0 10px}
+  .note{font-size:12px;color:var(--secondary);margin:10px 0 0}
+
+  /* ---------- CURRENT STYLES (verified) ---------- */
+  /* A: CcSeg — full pill, grey segOn, instant */
+  .cur-cc{display:inline-flex;background:var(--surface2);border-radius:999px;padding:5px;gap:2px}
+  .cur-cc .seg{height:48px;display:flex;align-items:center;padding:0 24px;border-radius:999px;
+    color:var(--secondary);font-size:16px;font-weight:500;cursor:default}
+  .cur-cc .seg.on{background:var(--segOn);color:var(--text);font-weight:650;
+    box-shadow:inset 0 0 0 1px var(--cardEdge)}
+  /* B: Calls — full pill, surface fill */
+  .cur-calls{display:inline-flex;background:var(--surface2);border-radius:999px;padding:6px}
+  .cur-calls .seg{height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;
+    color:var(--secondary);font-size:18px;font-weight:650;cursor:default}
+  .cur-calls .seg.on{background:var(--surface);color:var(--text)}
+  /* C: Tools — underline, bare unselected */
+  .cur-tools{display:inline-flex;gap:12px}
+  .cur-tools .seg{height:48px;display:flex;align-items:center;padding:0 18px;border-radius:14px;
+    color:var(--secondary);font-size:16px;font-weight:500;cursor:default;position:relative}
+  .cur-tools .seg.on{background:var(--surface2);color:var(--text);
+    border:1px solid var(--divider)}
+  .cur-tools .seg.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+    background:var(--accent)}
+  /* D: Settings tiles — raised, static */
+  .cur-set{display:inline-flex;background:var(--surface2);border-radius:18px;padding:5px;gap:4px}
+  .cur-set .seg{min-width:92px;height:52px;display:flex;align-items:center;justify-content:center;
+    border-radius:14px;color:var(--text);font-size:17px;font-weight:400;cursor:default}
+  .cur-set .seg.on{background:#4A4E57;font-weight:650}
+
+  /* ---------- PROPOSED: HearthSegmented ---------- */
+  .seg-ctl{position:relative;display:inline-flex;background:var(--surface2);
+    border-radius:16px;padding:4px;gap:2px}
+  .seg-ctl .pill{position:absolute;top:4px;bottom:4px;border-radius:12px;
+    background:var(--segOn);box-shadow:inset 0 0 0 1px var(--cardEdge);
+    transition:left .25s cubic-bezier(.4,1.2,.4,1),width .25s cubic-bezier(.4,1.2,.4,1)}
+  .seg-ctl.accent .pill{background:var(--accent)}
+  .seg-ctl .seg{position:relative;z-index:1;min-height:56px;min-width:96px;
+    display:flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;
+    color:var(--secondary);font-size:17px;font-weight:400;cursor:pointer;
+    transition:color .25s,font-weight .25s;border:0;background:none;font-family:inherit}
+  .seg-ctl .seg.on{color:var(--text);font-weight:650}
+  .seg-ctl.accent .seg.on{color:var(--accentInk)}
+  .seg-ctl .seg:active{transform:scale(.97)}
+  .hint{font-size:12px;color:var(--secondary);margin:6px 0 0}
+</style>
+</head>
+<body>
+  <h1>Unified Segmented Control — before / after</h1>
+  <p class="sub">Left: the four styles shipping today (verified in source). Right: one proposed
+     <code>HearthSegmented</code> — rounded-rect track, raised pill, sliding selection, elevation.
+     Click a proposed control to see the slide. Dark theme shown; light reconciles identically.</p>
+
+  <div class="grid">
+    <div class="col">
+      <h2>Current — 4 different styles</h2>
+
+      <div class="card"><p class="lbl">A · Control Center / Alerts — <code>CcSeg</code> (full pill, instant)</p>
+        <div class="cur-cc"><div class="seg on">Active · 3</div><div class="seg">All</div><div class="seg">Resolved</div></div>
+      </div>
+      <div class="card"><p class="lbl">B · Calls — <code>CallsSegmented</code> (full pill, surface fill)</p>
+        <div class="cur-calls"><div class="seg on">Rooms</div><div class="seg">Recent</div><div class="seg">Messages</div></div>
+      </div>
+      <div class="card"><p class="lbl">C · Tools — <code>ToolsCategoryChip</code> (underline, bare unselected)</p>
+        <div class="cur-tools"><div class="seg on">All tools</div><div class="seg">Everyday</div><div class="seg">Discover</div></div>
+      </div>
+      <div class="card"><p class="lbl">D · Settings — <code>SettingsTileTrack</code> (raised tile, static)</p>
+        <div class="cur-set"><div class="seg on">On</div><div class="seg">Off</div><div class="seg">Auto</div></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>Proposed — one component, two variants</h2>
+
+      <div class="card"><p class="lbl">Neutral variant (default) — CC, Calls, Tools, Settings nav</p>
+        <div class="seg-ctl" onclick="pick(this,event)" data-i="0">
+          <div class="pill"></div>
+          <button class="seg on">Active · 3</button><button class="seg">All</button><button class="seg">Resolved</button>
+        </div>
+        <p class="hint">Rounded-rect r16 track · raised r12 <code>segOn</code> pill · slides on select · soft depth</p>
+      </div>
+
+      <div class="card"><p class="lbl">Neutral — Tools (underline removed, gains a track)</p>
+        <div class="seg-ctl" onclick="pick(this,event)" data-i="0">
+          <div class="pill"></div>
+          <button class="seg on">All tools</button><button class="seg">Everyday</button><button class="seg">Discover</button>
+        </div>
+      </div>
+
+      <div class="card"><p class="lbl">Accent variant (opt-in) — Settings "solid blue" one-choice rows</p>
+        <div class="seg-ctl accent" onclick="pick(this,event)" data-i="0">
+          <div class="pill"></div>
+          <button class="seg on">On</button><button class="seg">Off</button><button class="seg">Auto</button>
+        </div>
+        <p class="hint">Same component; selected fill = <code>accent</code>, label = <code>accentInk</code></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Position the sliding pill under the active segment; also handles clicks.
+  function layout(ctl){
+    const segs=[...ctl.querySelectorAll('.seg')];
+    const i=+ctl.dataset.i;
+    const a=segs[i], pill=ctl.querySelector('.pill');
+    pill.style.left=a.offsetLeft+'px';
+    pill.style.width=a.offsetWidth+'px';
+    segs.forEach((s,k)=>s.classList.toggle('on',k===i));
+  }
+  function pick(ctl,e){
+    const seg=e.target.closest('.seg'); if(!seg) return;
+    ctl.dataset.i=[...ctl.querySelectorAll('.seg')].indexOf(seg);
+    layout(ctl);
+  }
+  addEventListener('load',()=>document.querySelectorAll('.seg-ctl').forEach(layout));
+</script>
+</body>
+</html>

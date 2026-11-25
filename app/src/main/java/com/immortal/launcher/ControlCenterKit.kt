@@ -73,27 +73,33 @@ internal fun CcButton(
   }
 }
 
-/** Segmented control; [options] are (key, label, icon?). */
+/**
+ * Segmented control; [options] are (key, label, icon?). A thin adapter over the shared
+ * [HearthSegmented]: Control Center keeps its own [CcColors] (so the pill stays `segOn` and the
+ * dark hairline/`cardEdge` are honoured), its one-node `ccSpeak` tab semantics, and its
+ * [selectedModifier] (used by `CcScrollingSeg` to scroll the selected option into view). Options
+ * stay content-sized here — several CC call sites place `CcSeg` in horizontally-scrolling rows
+ * where equal-width weights can't apply. The selected pill now glides unless CC's reduced-motion
+ * gate ([LocalCcMotion]) or the OS animation-scale is off.
+ */
 @Composable
 internal fun <T> CcSeg(options: List<Triple<T, String, String?>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier,
                        selectedModifier: Modifier = Modifier) {
   val c = LocalCc.current
-  Row(modifier.clip(CcStyle.Pill).background(c.surface2).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-    options.forEach { (key, label, icon) ->
-      val on = key == selected
-      Box(if (on) selectedModifier else Modifier) {
-        // Every option keeps its raised pill; selection only fades it in (a layer alpha), so a
-        // tap changes no modifier chain — nothing is inserted, re-laid out or re-recorded.
-        Box(Modifier.matchParentSize().graphicsLayer { alpha = if (on) 1f else 0f }.ccCard(CcStyle.Pill, c.segOn))
-        Row(Modifier.height(58.dp).clip(CcStyle.Pill)
-            .clickable(role = Role.Tab) { onSelect(key) }.ccSpeak(label, selected = on).padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          icon?.let { CcIcon(it, if (on) c.text else c.sec, 26.dp) }
-          Text(label, color = if (on) c.text else c.sec, fontSize = 21.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
-        }
-      }
-    }
-  }
+  HearthSegmented(
+      segments = options.map { (_, label, icon) ->
+        HearthSegment(label, icon?.let { name -> { tint -> CcIcon(name, tint, HearthSegmentedTokens.IconSize) } })
+      },
+      selectedIndex = options.indexOfFirst { it.first == selected },
+      colors = HearthSegmentedColors(
+          track = c.surface2, pill = c.segOn, pillEdge = if (c.dark) c.cardEdge else Color.Transparent,
+          selectedLabel = c.text, unselectedLabel = c.sec, elevated = !c.dark),
+      modifier = modifier,
+      reduceMotion = rememberReducedMotion() || !LocalCcMotion.current,
+      selectedSegmentModifier = selectedModifier,
+      cellModifier = { i, on, label ->
+        Modifier.clickable(role = Role.Tab) { onSelect(options[i].first) }.ccSpeak(label, selected = on)
+      })
 }
 
 @Composable
