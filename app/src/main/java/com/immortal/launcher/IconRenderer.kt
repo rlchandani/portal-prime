@@ -97,6 +97,35 @@ object IconRenderer {
     return opaqueFraction(pixels) >= MIN_OPAQUE_FILL
   }
 
+  /** How the approved grid should back an app icon, from the artwork and identity it was given. */
+  enum class IconBacking {
+    /** Full-bleed artwork with its own background: drawn untouched, never double-tiled. */
+    RAW_ARTWORK,
+    /** Bare glyph whose package has a known branded tile: drawn as that identity glyph on its tile. */
+    BRANDED_TILE,
+    /** Bare glyph with no known tile: its own artwork on a shared neutral tile so it never floats. */
+    NEUTRAL_TILE,
+    /** No artwork at all: the identity (or default) glyph on a tile. */
+    NO_ARTWORK,
+  }
+
+  /**
+   * Pure render decision for an approved app icon. A full-bleed icon is left untouched; a bare glyph
+   * gets its branded tile when known, otherwise a neutral tile; a missing bitmap falls back to a
+   * catalog glyph. Pure so the decision is unit-tested without Compose or a Bitmap.
+   *
+   * @param hasBitmap whether the app supplied artwork
+   * @param fullBleed whether that artwork fills its own background ([hasOwnBackground]); only
+   *   meaningful when [hasBitmap]
+   * @param hasIdentity whether the package has a known approved identity tile
+   */
+  fun iconBacking(hasBitmap: Boolean, fullBleed: Boolean, hasIdentity: Boolean): IconBacking = when {
+    !hasBitmap -> IconBacking.NO_ARTWORK
+    fullBleed -> IconBacking.RAW_ARTWORK
+    hasIdentity -> IconBacking.BRANDED_TILE
+    else -> IconBacking.NEUTRAL_TILE
+  }
+
   private fun outsideMask(sizePx: Int): Path = synchronized(masks) {
     masks.get(sizePx) ?: createSuperellipsePath(sizePx).apply {
       fillType = Path.FillType.INVERSE_WINDING

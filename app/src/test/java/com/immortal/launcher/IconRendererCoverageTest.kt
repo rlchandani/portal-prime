@@ -49,4 +49,31 @@ class IconRendererCoverageTest {
     val faint = 0x40_33_66_99
     assertFalse(IconRenderer.opaqueFraction(IntArray(100) { faint }) >= IconRenderer.MIN_OPAQUE_FILL)
   }
+
+  @Test fun bareGlyphWithoutKnownTileGetsNeutralTile() {
+    // The Home Assistant case on device: a bare glyph whose package has no known identity tile.
+    assertEquals(IconRenderer.IconBacking.NEUTRAL_TILE,
+        IconRenderer.iconBacking(hasBitmap = true, fullBleed = false, hasIdentity = false))
+  }
+
+  @Test fun bareGlyphWithKnownTileStaysBranded() {
+    // A known approved package keeps its branded identity tile, unchanged.
+    assertEquals(IconRenderer.IconBacking.BRANDED_TILE,
+        IconRenderer.iconBacking(hasBitmap = true, fullBleed = false, hasIdentity = true))
+  }
+
+  @Test fun fullBleedArtworkIsLeftUntouched() {
+    // An icon with its own background is never double-tiled, known or not.
+    assertEquals(IconRenderer.IconBacking.RAW_ARTWORK,
+        IconRenderer.iconBacking(hasBitmap = true, fullBleed = true, hasIdentity = false))
+    assertEquals(IconRenderer.IconBacking.RAW_ARTWORK,
+        IconRenderer.iconBacking(hasBitmap = true, fullBleed = true, hasIdentity = true))
+  }
+
+  @Test fun noArtworkFallsBackToCatalogGlyph() {
+    assertEquals(IconRenderer.IconBacking.NO_ARTWORK,
+        IconRenderer.iconBacking(hasBitmap = false, fullBleed = false, hasIdentity = false))
+    assertEquals(IconRenderer.IconBacking.NO_ARTWORK,
+        IconRenderer.iconBacking(hasBitmap = false, fullBleed = false, hasIdentity = true))
+  }
 }

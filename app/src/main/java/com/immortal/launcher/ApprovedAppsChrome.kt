@@ -218,6 +218,13 @@ internal fun ApprovedAppsGlyph(name: String, color: Color, size: Dp, description
   ApprovedIcon(name, modifier = modifier, tint = color)
 }
 
+/**
+ * Shared neutral graphite behind a monochrome glyph with no branded colour — the gear/tools/settings
+ * identity tiles and the fallback tile for any unknown bare glyph. One tone, theme-independent, so a
+ * white glyph keeps its contrast in both light and dark (matching the branded squircles beside it).
+ */
+internal val ApprovedNeutralTile = Color(0xFF647480)
+
 internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg) {
   "org.chromium.chrome", "org.mozilla.firefox" -> "globe" to Color(0xFF2879B8)
   "org.videolan.vlc" -> "vlc" to Color(0xFFCB7338)
@@ -228,14 +235,14 @@ internal fun approvedAppIdentity(pkg: String): Pair<String, Color>? = when (pkg)
   "com.aurora.store" -> "bag" to Color(0xFF7661AA)
   "org.breezyweather" -> "weather" to Color(0xFF2879B8)
   "org.y20k.transistor" -> "radio" to Color(0xFF2879B8)
-  "com.facebook.alohaapps.settings" -> "gear" to Color(0xFF647480)
+  "com.facebook.alohaapps.settings" -> "gear" to ApprovedNeutralTile
   "com.portal.assistant" -> "notes" to Color(0xFF7661AA)
   "com.portal.calendar" -> "cal" to Color(0xFFCB7338)
   "builtin:store" -> "bag" to Color(0xFF408763)
-  "builtin:tools" -> "tools" to Color(0xFF647480)
+  "builtin:tools" -> "tools" to ApprovedNeutralTile
   "builtin:music" -> "music" to Color(0xFFC84E68)
   "builtin:calls" -> "phone" to Color(0xFF408763)
-  "builtin:settings" -> "gear" to Color(0xFF647480)
+  "builtin:settings" -> "gear" to ApprovedNeutralTile
   "builtin:dashboard" -> "home" to Color(0xFF2879B8)
   "builtin:control" -> "home" to Color(0xFFD9773A)
   // The Home Assistant companion app's own identity: the same household, the same tile.
@@ -251,27 +258,39 @@ internal fun ApprovedAppsIcon(
 ) {
   val identity = approvedAppIdentity(pkg)
   // Artwork carries its own full-bleed colour only when it actually fills the tile. A transparent or
-  // monochrome companion icon (e.g. Home Assistant) is a bare glyph. When its package has a known
-  // approved tile, draw that — matching the Store's own Home Assistant tile and the colored squircles
-  // around it — instead of letting a lone glyph float; a bare glyph without a known tile is left as
-  // its raw artwork (no blind guess). Measured once per bitmap, not on every recomposition.
+  // monochrome companion icon (e.g. Home Assistant) is a bare glyph. A bare glyph with a known
+  // approved tile draws that branded tile — matching the Store's own tile and the colored squircles
+  // around it. A bare glyph with no known tile gets its own artwork on a shared neutral tile so it
+  // never floats naked. A full-bleed icon is left untouched. Measured once per bitmap, not per recompose.
   val fullBleed = remember(bitmap) { bitmap != null && IconRenderer.hasOwnBackground(bitmap.asAndroidBitmap()) }
-  val bareWithTile = bitmap != null && !fullBleed && identity != null
-  if (bitmap != null && !bareWithTile) {
-    // Artwork is already normalized and cached by IconRenderer, shared with Home.
-    // The app's cell stays transparent; the only colored surface belongs to the icon itself.
-    androidx.compose.foundation.Image(bitmap, null,
-        Modifier.size(size).then(if (plain) Modifier else Modifier.clip(RoundedCornerShape(size / 4))))
-  } else {
-    // The tile backs the no-artwork fallback, and a bare glyph even in a plain grid so it never floats.
-    val tile = !plain || bareWithTile
-    val (glyph, color) = identity ?: ("bag" to Color(0xFF2879B8))
-    Box(Modifier.size(size).then(if (!tile) Modifier else
-        Modifier.clip(RoundedCornerShape(size / 4)).background(color)
-            .border(1.dp, Color.White.copy(alpha = .18f), RoundedCornerShape(size / 4))),
-        contentAlignment = Alignment.Center) {
-      ApprovedIcon(glyph, modifier = Modifier.size(size * if (tile) .49f else .65f),
-          tint = if (tile) Color.White else IosLabel)
+  val tileShape = RoundedCornerShape(size / 4)
+  val backing = IconRenderer.iconBacking(hasBitmap = bitmap != null, fullBleed = fullBleed, hasIdentity = identity != null)
+  when (backing) {
+    IconRenderer.IconBacking.RAW_ARTWORK ->
+      // Artwork is already normalized and cached by IconRenderer, shared with Home.
+      // The app's cell stays transparent; the only colored surface belongs to the icon itself.
+      androidx.compose.foundation.Image(bitmap!!, null,
+          Modifier.size(size).then(if (plain) Modifier else Modifier.clip(tileShape)))
+    IconRenderer.IconBacking.NEUTRAL_TILE ->
+      // Unknown bare glyph: its own artwork centered on the shared neutral tile, same shape and
+      // hairline as the branded tiles so it reads as one system in both light and dark.
+      Box(Modifier.size(size).clip(tileShape).background(ApprovedNeutralTile)
+          .border(1.dp, Color.White.copy(alpha = .18f), tileShape),
+          contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Image(bitmap!!, null, Modifier.size(size))
+      }
+    else -> {
+      // Branded tile for a known bare glyph; the no-artwork fallback draws its catalog glyph, tiled
+      // unless it is a plain-grid entry with its own identity.
+      val tile = backing == IconRenderer.IconBacking.BRANDED_TILE || !plain
+      val (glyph, color) = identity ?: ("bag" to Color(0xFF2879B8))
+      Box(Modifier.size(size).then(if (!tile) Modifier else
+          Modifier.clip(tileShape).background(color)
+              .border(1.dp, Color.White.copy(alpha = .18f), tileShape)),
+          contentAlignment = Alignment.Center) {
+        ApprovedIcon(glyph, modifier = Modifier.size(size * if (tile) .49f else .65f),
+            tint = if (tile) Color.White else IosLabel)
+      }
     }
   }
 }
