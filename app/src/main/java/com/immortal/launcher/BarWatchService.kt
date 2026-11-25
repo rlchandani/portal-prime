@@ -62,8 +62,8 @@ class BarWatchService : AccessibilityService() {
     RemoteInput.unregister()
     RemoteCursor.detach()
     NotificationOverlay.detach()
-    DinnerCardOverlay.detach()
-    FollowMeCardOverlay.detach()
+    DinnerCardOverlay.detach(this) // Call everyone card held; back on the next bind (see OverlayHold)
+    FollowMeCardOverlay.detach(this) // Music-follows-you surface held; back on the next bind
     TimerDoneOverlay.detach()
     DoorbellCardOverlay.detach(this) // held; back on the next bind (see OverlayHold)
     ControlCenterBanners.detach(this) // real alerts held; back on the next bind

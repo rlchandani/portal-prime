@@ -48,71 +48,132 @@ internal object FollowMeCardOverlay {
   private const val BUTTON_SP = 32f
   private const val BANNER_SP = 30f
   private const val BANNER_TOP_DP = 32
+  /** The held surface owns the one slot (replace-don't-stack); the id only has to be stable. */
+  private const val SLOT = "followme"
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null
   private var view: View? = null
-  private var onTimeout: (() -> Unit)? = null
-  private val timeoutRunnable = Runnable {
-    val timeout = onTimeout
-    hide()
-    timeout?.invoke()
-  }
+  /**
+   * The ask card or followed banner, kept through an accessibility unbind (uiautomator,
+   * `adb install -r`, a system rebind): the process lives on, so the surface and its callbacks are
+   * held in memory ([OverlayHold]) and drawn again when the host binds. Not persisted to disk — the
+   * callbacks can't be serialized. The in-screen variant ([MusicV3FollowMeInScreen]) lives in the
+   * music Activity's own window, which an accessibility unbind doesn't touch, so it needs no hold.
+   */
+  private var hold = OverlayHold<Surface>()
+  private var callbacks: Callbacks? = null
+  private val timeout = Runnable { expire() }
 
   data class Ask(val title: String, val line: String)
 
+  /** Which surface is held: the centred ask (title + line, [ASK_MS]) or the top followed banner ([FOLLOWED_MS]). */
+  internal data class Surface(val ask: Boolean, val title: String, val line: String)
+  private data class Callbacks(val onContinue: (() -> Unit)?, val onNotNow: (() -> Unit)?, val onUndo: (() -> Unit)?)
+
+  /** The host bound: a surface parked by an unbind comes back for the rest of its time. */
   fun attach(service: AccessibilityService) {
-    main.post { host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager }
+    main.post {
+      host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+      hold = hold.hostReady(OverlayHoldStore.now())
+      if (hold.shown) { Log.i(TAG, "follow-me surface back after a rebind"); draw(OverlayHoldStore.now()) }
+    }
   }
 
-  fun detach() {
-    main.post { hide(); host = null; wm = null }
+  /** [service] unbound: the system takes the window; the surface stays held until it binds again. */
+  fun detach(service: AccessibilityService) {
+    main.post {
+      if (host !== service) return@post // an older instance's unbind after the new one bound
+      removeView()
+      if (hold.held != null) Log.i(TAG, "accessibility host unbound; follow-me surface held")
+      hold = hold.hostLost(); host = null; wm = null
+    }
   }
 
   /**
-   * Returns false when the accessibility host isn't attached (nothing shown). While the music screen
-   * is open the ask is shown inside it instead ([MusicV3FollowMeInScreen]): this overlay would cover
-   * the YouTube player.
+   * Returns false when the accessibility host isn't attached (nothing shown right now; a held surface
+   * still comes back on the next bind). While the music screen is open the ask is shown inside it
+   * instead ([MusicV3FollowMeInScreen]): this overlay would cover the YouTube player.
    */
   fun showAsk(ask: Ask, onContinue: () -> Unit, onNotNow: () -> Unit): Boolean {
-    if (MusicV3FollowMeInScreen.offerAsk(ask.title, ask.line, ASK_MS, onContinue, onNotNow)) return true.also { hide() }
-    val ctx = host ?: return false.also { Log.w(TAG, "ask card before the accessibility host attached; not shown") }
-    val root = askRoot(ctx, ask, onContinue = { hide(); onContinue() }, onNotNow = { hide(); onNotNow() })
-    val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
-    // The centred ask has a full-screen scrim: it would cover the YouTube player, so music pauses.
-    return add(root, lp, ASK_MS, onNotNow).also { shown -> if (shown) YouTubeMusicEngine.setCovered(MusicCover.FOLLOW_ASK, true) }
+    if (MusicV3FollowMeInScreen.offerAsk(ask.title, ask.line, ASK_MS, onContinue, onNotNow)) return true.also { dismiss() }
+    val now = OverlayHoldStore.now()
+    callbacks = Callbacks(onContinue, onNotNow, null)
+    hold = hold.offer(SLOT, Surface(ask = true, ask.title, ask.line), now + ASK_MS)
+    return draw(now)
   }
 
   fun showFollowed(text: String, onUndo: () -> Unit): Boolean {
-    if (MusicV3FollowMeInScreen.offerNotice(text, FOLLOWED_MS, onUndo)) return true.also { hide() }
-    val ctx = host ?: return false.also { Log.w(TAG, "followed banner before the accessibility host attached; not shown") }
-    val root = bannerRoot(ctx, text) { hide(); onUndo() }
-    val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
-        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
-        .apply { gravity = Gravity.TOP }
-    return add(root, lp, FOLLOWED_MS, null)
+    if (MusicV3FollowMeInScreen.offerNotice(text, FOLLOWED_MS, onUndo)) return true.also { dismiss() }
+    val now = OverlayHoldStore.now()
+    callbacks = Callbacks(null, null, onUndo)
+    hold = hold.offer(SLOT, Surface(ask = false, text, ""), now + FOLLOWED_MS)
+    return draw(now)
   }
 
-  fun hide() {
-    main.removeCallbacks(timeoutRunnable)
-    onTimeout = null
+  /** Answered (a button or a tap outside) or replaced in-screen: cleared and not brought back by a rebind. */
+  fun hide() = dismiss()
+
+  private fun dismiss() {
+    hold = hold.dismiss()
+    callbacks = null
+    main.removeCallbacks(timeout)
+    removeView()
+  }
+
+  private fun draw(now: Long): Boolean {
+    val surface = hold.held?.payload ?: return false
+    val ctx = host ?: return false // parked: it shows on the next bind
+    val wmgr = wm ?: return false
+    val remaining = hold.remainingMs(now) ?: run { expire(); return false }
+    removeView()
+    val cb = callbacks
+    val root: View
+    val lp: WindowManager.LayoutParams
+    if (surface.ask) {
+      root = askRoot(ctx, Ask(surface.title, surface.line), remaining,
+          onContinue = { dismiss(); cb?.onContinue?.invoke() }, onNotNow = { dismiss(); cb?.onNotNow?.invoke() })
+      lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+          WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
+    } else {
+      root = bannerRoot(ctx, surface.title, remaining) { dismiss(); cb?.onUndo?.invoke() }
+      lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
+          WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+          WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
+          .apply { gravity = Gravity.TOP }
+    }
+    // No window (the host is going away): stay held for the next bind.
+    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); hold = hold.hostLost(); return false }
+    // The centred ask has a full-screen scrim: it would cover the YouTube player, so music pauses.
+    if (surface.ask) YouTubeMusicEngine.setCovered(MusicCover.FOLLOW_ASK, true)
+    schedule(now)
+    return true
+  }
+
+  private fun schedule(now: Long) {
+    main.removeCallbacks(timeout)
+    hold.remainingMs(now)?.let { main.postDelayed(timeout, it) }
+  }
+
+  /** Its time ran out: the ask counts as Not now; the banner just disappears. */
+  private fun expire() {
+    val wasAsk = hold.held?.payload?.ask == true
+    val onNotNow = callbacks?.onNotNow
+    hold = hold.expire(OverlayHoldStore.now())
+    if (hold.held == null) {
+      callbacks = null
+      removeView()
+      if (wasAsk) onNotNow?.invoke()
+    } else schedule(OverlayHoldStore.now())
+  }
+
+  private fun removeView() {
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
     YouTubeMusicEngine.setCovered(MusicCover.FOLLOW_ASK, false)
   }
 
-  private fun add(root: View, lp: WindowManager.LayoutParams, showMs: Long, timeout: (() -> Unit)?): Boolean {
-    val wmgr = wm ?: return false
-    hide()
-    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return false }
-    onTimeout = timeout
-    main.postDelayed(timeoutRunnable, showMs)
-    return true
-  }
-
-  private fun askRoot(ctx: Context, ask: Ask, onContinue: () -> Unit, onNotNow: () -> Unit): View {
+  private fun askRoot(ctx: Context, ask: Ask, remainingMs: Long, onContinue: () -> Unit, onNotNow: () -> Unit): View {
     val px = pxOf(ctx)
     val scrim = FrameLayout(ctx).apply { setBackgroundColor(DinnerCardOverlay.SCRIM); setOnClickListener { onNotNow() } }
     val card = LinearLayout(ctx).apply {
@@ -142,13 +203,13 @@ internal object FollowMeCardOverlay {
       addView(button(ctx, FollowMeCopy.CONTINUE, solid = true, px, onContinue),
           LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(BUTTON_HEIGHT_DP)))
     })
-    card.addView(drainBar(ctx, px, ASK_MS))
+    card.addView(drainBar(ctx, px, ASK_MS, remainingMs))
     scrim.addView(card, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT,
         Gravity.CENTER).apply { setMargins(px(24), 0, px(24), 0) })
     return scrim
   }
 
-  private fun bannerRoot(ctx: Context, message: String, onUndo: () -> Unit): View {
+  private fun bannerRoot(ctx: Context, message: String, remainingMs: Long, onUndo: () -> Unit): View {
     val px = pxOf(ctx)
     val card = LinearLayout(ctx).apply {
       orientation = LinearLayout.VERTICAL
@@ -167,7 +228,7 @@ internal object FollowMeCardOverlay {
       addView(button(ctx, FollowMeCopy.UNDO, solid = true, px, onUndo),
           LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, px(88)))
     })
-    card.addView(drainBar(ctx, px, FOLLOWED_MS))
+    card.addView(drainBar(ctx, px, FOLLOWED_MS, remainingMs))
     return FrameLayout(ctx).apply {
       addView(card, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
           .apply { setMargins(px(120), px(BANNER_TOP_DP), px(120), 0) })
@@ -204,13 +265,14 @@ internal object FollowMeCardOverlay {
         setOnClickListener { onClick() }
       }
 
-  /** The yellow bar drains over the surface's lifetime (one animation, then nothing runs). */
-  private fun drainBar(ctx: Context, px: (Int) -> Int, durationMs: Long): View = View(ctx).apply {
+  /** The yellow bar drains over the surface's remaining life; after a rebind it resumes from where it is. */
+  private fun drainBar(ctx: Context, px: (Int) -> Int, totalMs: Long, remainingMs: Long): View = View(ctx).apply {
     setBackgroundColor(DinnerCardOverlay.ACCENT)
     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, px(8))
     pivotX = 0f
-    ObjectAnimator.ofFloat(this, View.SCALE_X, 1f, 0f).apply {
-      duration = durationMs
+    val from = (remainingMs.toFloat() / totalMs).coerceIn(0f, 1f)
+    ObjectAnimator.ofFloat(this, View.SCALE_X, from, 0f).apply {
+      duration = remainingMs.coerceAtLeast(0L)
       interpolator = LinearInterpolator()
       start()
     }

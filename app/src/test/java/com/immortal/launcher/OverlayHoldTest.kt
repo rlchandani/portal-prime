@@ -157,4 +157,39 @@ class OverlayHoldTest {
     assertNull(DoorbellCardOverlay.Card.decode(DoorbellCardOverlay.Card.encode(card).put("title", "")))
     assertNull(DoorbellCardOverlay.Card.decode(DoorbellCardOverlay.Card.encode(card).put("alert", "")))
   }
+
+  // --- the in-memory overlays (an accessibility unbind, process alive, no disk) ---------------
+
+  @Test fun aHeldDinnerCardComesBackAfterARebind() {
+    val model = DinnerCardModel("Dinner's ready", "plate", "From the Kitchen", "Chime on", "Reply to answer", quiet = false)
+    val shown = OverlayHold<DinnerCardModel>().hostReady(0L).offer("dinner", model, DinnerCardOverlay.SHOW_MS)
+    assertTrue(shown.shown)
+    // The unbind parks it; the rebind shows the same card for the rest of its SHOW_MS.
+    val back = shown.hostLost().hostReady(nowMs = 5_000L)
+    assertTrue(back.shown)
+    assertEquals(model, back.held?.payload)
+    assertEquals(DinnerCardOverlay.SHOW_MS - 5_000L, back.remainingMs(5_000L))
+    // A reply (or a swipe) dismisses it; a rebind doesn't bring it back.
+    assertFalse(back.dismiss().hostLost().hostReady(6_000L).shown)
+    // A newer card replaces the parked one (replace-don't-stack).
+    val newer = DinnerCardModel("Leave for school", "walk", "From the Hall", "Chime on", "Reply to answer", quiet = true)
+    assertEquals(newer, shown.hostLost().offer("dinner", newer, 7_000L + DinnerCardOverlay.SHOW_MS).held?.payload)
+    // Its time runs out while parked: the rebind shows nothing.
+    assertNull(shown.hostLost().expire(DinnerCardOverlay.SHOW_MS).held)
+  }
+
+  @Test fun aHeldFollowMeSurfaceComesBackAfterARebind() {
+    val ask = FollowMeCardOverlay.Surface(ask = true, "Continue Discover Weekly here?", "from the Kitchen")
+    val shown = OverlayHold<FollowMeCardOverlay.Surface>().hostReady(0L).offer("followme", ask, FollowMeCardOverlay.ASK_MS)
+    val back = shown.hostLost().hostReady(nowMs = 4_000L)
+    assertTrue(back.shown)
+    assertEquals(ask, back.held?.payload)
+    assertEquals(FollowMeCardOverlay.ASK_MS - 4_000L, back.remainingMs(4_000L))
+    // The banner's own shorter window applies to its surface.
+    val banner = FollowMeCardOverlay.Surface(ask = false, "Music followed you from the Kitchen", "")
+    val notice = OverlayHold<FollowMeCardOverlay.Surface>().hostReady(0L).offer("followme", banner, FollowMeCardOverlay.FOLLOWED_MS)
+    assertEquals(FollowMeCardOverlay.FOLLOWED_MS, notice.remainingMs(0L))
+    // Tapped (or timed out): dismiss clears it, and a rebind doesn't bring it back.
+    assertFalse(notice.dismiss().hostLost().hostReady(1_000L).shown)
+  }
 }
