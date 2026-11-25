@@ -56,6 +56,49 @@ class PhotoFitEverywhereTest {
     assertEquals(CompactStagePlan.Ground.BLACK, plan.ground)
   }
 
+  // ---- Smart frame on the Portal+ (LARGE), day -----------------------------------------------
+  // LARGE is never planned by CompactStagePlan ([CompactStageFitTest.largeIsNeverPlannedForEitherFit]);
+  // the day scene frames each photo through [SlideshowGeometry.plan] with the fit-derived fill flag
+  // ([SlideshowStage.display]). A credible central face is what lets "fill" cover-crop a tall photo,
+  // so it is the case where honouring fit actually matters.
+  private val centralFace = listOf(SlideshowGeometry.Region(.45f, .42f, .55f, .55f))
+  private val tallPortrait = 1000 to 1500 // on 1920x1080 a cover crop drops well over half of it
+
+  /** The Portal+ day frame for [photo] under [fit], as the native stage computes it. */
+  private fun plusFrame(photo: Pair<Int, Int>, fit: String, regions: List<SlideshowGeometry.Region>) =
+      look(ScreensaverConfig.MODE_SMART, fit).let { p ->
+        SlideshowGeometry.plan(photo.first, photo.second, plus.first, plus.second, regions, p.fill, p.motion)
+      }
+
+  @Test fun smartFramePlusFitShowsThePortraitWholeNeverCropping() {
+    val (vw, vh) = plus
+    for (regions in listOf(centralFace, emptyList())) {
+      val frame = plusFrame(tallPortrait, ScreensaverConfig.FIT_FIT, regions)
+      assertTrue("fit is whole, never a crop", frame.whole)
+      // Contained and centred: the entire photo is on screen, letterboxed.
+      val contain = minOf(vw.toFloat() / tallPortrait.first, vh.toFloat() / tallPortrait.second)
+      assertEquals(contain, frame.start.scale, 1e-3f)
+      assertTrue("whole width visible", tallPortrait.first * frame.start.scale <= vw + 1f)
+      assertTrue("whole height visible", tallPortrait.second * frame.start.scale <= vh + 1f)
+    }
+  }
+
+  @Test fun smartFramePlusFillStillCropsThatPortrait() {
+    val (_, vh) = plus
+    // The setting is the only lever: the same photo and face cover-crop under "fill".
+    val frame = plusFrame(tallPortrait, ScreensaverConfig.FIT_FILL, centralFace)
+    assertFalse("fill cover-crops", frame.whole)
+    // The crop drops well over half the image (the backlog's ">=80% fill" complaint), which fit avoids.
+    val shownFraction = vh / (tallPortrait.second * frame.start.scale)
+    assertTrue("fill drops most of the photo ($shownFraction shown)", shownFraction < .5f)
+  }
+
+  @Test fun smartFramePlusFitShowsALandscapeWhole() {
+    val frame = plusFrame(landscape32, ScreensaverConfig.FIT_FIT, centralFace)
+    assertTrue(frame.whole)
+    assertEquals(frame.start, frame.end)
+  }
+
   // ---- Night photo ---------------------------------------------------------------------------
 
   @Test fun nightPhotoHoldsTheWholePhotoUnderFit() {
