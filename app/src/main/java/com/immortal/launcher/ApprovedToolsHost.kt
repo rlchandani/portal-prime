@@ -393,26 +393,20 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
                 }
             }
             item(key = "categories", span = { GridItemSpan(maxLineSpan) }) {
+                // The category filter is now the shared equal-width segmented control (a single
+                // rounded-rect track with a gliding raised pill), replacing the old underline chips.
+                // The owner accepted dropping the 3 dp accent underline for the unified pill.
                 val categories = ApprovedToolsCatalog.categories(advanced)
-                val chips = ToolsCategoryLayout.of(layoutClass)
-                val chip: @Composable (String) -> Unit = { category ->
-                    ToolsCategoryChip(category, selectedGroup == category, chips.padding.dp) { group = category }
-                }
-                if (layoutClass.compact) {
-                    // Compact: the chips are measured and wrap onto a further line only when they
-                    // truly don't fit (never a sideways scroll); upright they're tighter so the
-                    // whole set, Advanced included, sits on one line at the default text size.
-                    FlowRow(Modifier.fillMaxWidth().padding(ToolsCategoryLayout.INSET_DP.dp),
-                        horizontalArrangement = Arrangement.spacedBy(chips.gap.dp),
-                        verticalArrangement = Arrangement.spacedBy(ToolsCategoryLayout.ROW_GAP_DP.dp)) {
-                        categories.forEach { chip(it) }
-                    }
-                } else {
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        categories.forEach { chip(it) }
-                    }
-                }
+                HearthSegmented(
+                    segments = categories.map { HearthSegment(it) },
+                    selectedIndex = categories.indexOf(selectedGroup).coerceAtLeast(0),
+                    colors = HearthSegmentedDefaults.colors(p),
+                    modifier = Modifier.fillMaxWidth().padding(ToolsCategoryLayout.INSET_DP.dp),
+                    fillWidth = true,
+                    cellModifier = { i, on, _ ->
+                        Modifier.semantics { this.selected = on; role = Role.Tab }
+                            .tvFocusable(RoundedCornerShape(HearthSegmentedTokens.PillCorner), focusScale = 1f, ringColor = p.accent) { group = categories[i] }
+                    })
             }
             if (entries.isEmpty()) item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
                 ToolsPanel("No tools found") {
@@ -484,23 +478,3 @@ private fun toolsDefaultSummary(id: String): String = when (id) {
     else -> "Run only when needed"
 }
 
-/** One category filter chip in the Tools library (underlined when selected). */
-@Composable
-private fun ToolsCategoryChip(category: String, selected: Boolean, padding: Dp, onSelect: () -> Unit) {
-    val p = LocalApprovedPalette.current
-    val shape = RoundedCornerShape(16.dp)
-    Box(Modifier.heightIn(min = 68.dp).clip(shape)
-        .background(if (selected) p.surface2 else Color.Transparent)
-        .then(if (selected) Modifier.border(1.dp, p.divider, shape) else Modifier)
-        .semantics { this.selected = selected; role = Role.Tab }
-        .tvFocusable(shape, focusScale = 1f, ringColor = p.accent, onClick = onSelect),
-        contentAlignment = Alignment.Center) {
-        Text(category, color = if (selected) p.text else p.secondary,
-            fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1,
-            modifier = Modifier.padding(horizontal = padding, vertical = 16.dp))
-        if (selected) Column(Modifier.matchParentSize()) {
-            Spacer(Modifier.weight(1f))
-            Box(Modifier.fillMaxWidth().height(3.dp).background(p.accent))
-        }
-    }
-}

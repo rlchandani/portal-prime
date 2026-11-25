@@ -34,12 +34,6 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsChoicePolicy
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 
-private val TrackRadius = 18.dp
-private val TrackPadding = 5.dp
-private val TileGap = 4.dp
-private val TileRadius = 14.dp
-private val TileMinHeight = 76.dp
-private val TileMinWidth = 96.dp
 private val InlineTrackMinWidth = 420.dp
 /** Inline tracks stop here so the title beside them keeps its width (tiles share it evenly). */
 private val InlineTrackMaxWidth = 520.dp
@@ -47,13 +41,9 @@ private val TileLabelSize = 24.sp
 private val DenseTileLabelSize = 21.sp
 private const val DENSE_TRACK_TILES = 5
 /** Small enough that five tiles (Clock Faces) keep "Hearthpane" whole on the Mini's 744 dp cards. */
-private val TileLabelPadding = 6.dp
 private val RowPaddingH = 28.dp
 private val RowPaddingV = 18.dp
 private val StackGap = 14.dp
-private const val DISABLED_ALPHA = .45f
-/** Selected tile on the dark track: the mock's lifted grey (the card colour is too close to the track). */
-private val DarkSelectedTile = Color(0xFF4A4E57)
 
 /** One tile: what it says, and whether it is the current value. */
 internal data class SettingsTile(val label: String, val selected: Boolean)
@@ -88,7 +78,12 @@ internal fun SettingsChoiceTilesRow(
     }
 }
 
-/** The track and its tiles. Each tile is its own focus target for the remote. */
+/**
+ * The track and its tiles. A thin adapter over the shared [HearthSegmented] using the **accent**
+ * variant: the fidelity mock approved a solid-accent (blue) selected tile with [accentInk] text for
+ * these one-choice rows. The selected tile now glides between options. Each tile keeps its own
+ * RadioButton focus target for the remote (via [tvFocusable] with the outer `semantics` role).
+ */
 @Composable
 internal fun SettingsTileTrack(
     tiles: List<SettingsTile>,
@@ -96,32 +91,24 @@ internal fun SettingsTileTrack(
     modifier: Modifier = Modifier,
     onSelect: (Int) -> Unit,
 ) {
-    val selectedFill = if (LocalApprovedPalette.current.dark) DarkSelectedTile else IosCard
     // Five tiles on the Mini's cards (Clock Faces) need the smaller label to keep "Hearthpane" whole.
     val cardWidth = SettingsSplitMetrics.pageContentWidthDp(LocalConfiguration.current.screenWidthDp,
         LocalSettingsSinglePane.current)
     val labelSize = if (tiles.size >= DENSE_TRACK_TILES && SettingsSplitMetrics.compactCards(cardWidth)) DenseTileLabelSize
         else TileLabelSize
-    val shape = RoundedCornerShape(TileRadius)
-    Row(
-        modifier.background(IosSegmentTrack, RoundedCornerShape(TrackRadius)).padding(TrackPadding)
-            .then(if (enabled) Modifier else Modifier.alpha(DISABLED_ALPHA)),
-        horizontalArrangement = Arrangement.spacedBy(TileGap),
-    ) {
-        tiles.forEachIndexed { index, tile ->
-            Box(
-                Modifier.weight(1f).defaultMinSize(minWidth = TileMinWidth, minHeight = TileMinHeight)
-                    .background(if (tile.selected) selectedFill else Color.Transparent, shape)
-                    .tvFocusable(shape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, role = null) {
-                        if (enabled) onSelect(index)
-                    }
-                    .semantics { role = Role.RadioButton; selected = tile.selected },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(tile.label, color = IosLabel, fontSize = labelSize, maxLines = 1, textAlign = TextAlign.Center,
-                    fontWeight = if (tile.selected) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier.padding(horizontal = TileLabelPadding))
-            }
-        }
-    }
+    val pillShape = RoundedCornerShape(HearthSegmentedTokens.PillCorner)
+    HearthSegmented(
+        segments = tiles.map { HearthSegment(it.label) },
+        selectedIndex = tiles.indexOfFirst { it.selected },
+        colors = HearthSegmentedDefaults.colors(LocalApprovedPalette.current, HearthSegmentedVariant.ACCENT),
+        modifier = modifier,
+        enabled = enabled,
+        fillWidth = true,
+        labelSize = labelSize,
+        cellModifier = { index, sel, _ ->
+            Modifier.tvFocusable(pillShape, focusScale = 1f, ringColor = IosBlue, enabled = enabled, role = null) {
+                if (enabled) onSelect(index)
+            }.semantics { role = Role.RadioButton; selected = sel }
+        },
+    )
 }
