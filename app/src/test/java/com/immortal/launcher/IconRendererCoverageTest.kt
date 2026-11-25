@@ -76,4 +76,19 @@ class IconRendererCoverageTest {
     assertEquals(IconRenderer.IconBacking.NO_ARTWORK,
         IconRenderer.iconBacking(hasBitmap = false, fullBleed = false, hasIdentity = true))
   }
+
+  @Test fun catalogGlyphWithIdentityIsTiledOnThePlainGrid() {
+    // The "Home Assistant" built-in: a catalog glyph (no artwork) with a known identity on the
+    // plain Apps grid gets its branded tile, never a bare glyph, like its tiled Home siblings.
+    assertTrue(IconRenderer.tiled(plain = true, hasIdentity = true))
+  }
+
+  @Test fun catalogGlyphWithoutIdentityStaysUntiledOnThePlainGrid() {
+    assertFalse(IconRenderer.tiled(plain = true, hasIdentity = false))
+  }
+
+  @Test fun folderMembersAreAlwaysTiled() {
+    assertTrue(IconRenderer.tiled(plain = false, hasIdentity = false))
+    assertTrue(IconRenderer.tiled(plain = false, hasIdentity = true))
+  }
 }

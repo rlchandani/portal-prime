@@ -126,6 +126,18 @@ object IconRenderer {
     else -> IconBacking.NEUTRAL_TILE
   }
 
+  /**
+   * Whether the catalog-glyph branch (BRANDED_TILE or NO_ARTWORK) draws a backing tile behind the
+   * glyph. A known branded identity always tiles, so a catalog-glyph built-in with no artwork — the
+   * "Home Assistant" app-grid entry — shows its branded squircle like its "Home Control" and "Home
+   * dashboard" siblings instead of a bare glyph. A plain-grid entry with no identity keeps its
+   * untiled glyph. Pure so the decision is unit-tested without Compose.
+   *
+   * @param plain whether this is a plain-grid entry (not inside a folder)
+   * @param hasIdentity whether the package has a known approved identity tile
+   */
+  fun tiled(plain: Boolean, hasIdentity: Boolean): Boolean = hasIdentity || !plain
+
   private fun outsideMask(sizePx: Int): Path = synchronized(masks) {
     masks.get(sizePx) ?: createSuperellipsePath(sizePx).apply {
       fillType = Path.FillType.INVERSE_WINDING

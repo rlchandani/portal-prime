@@ -280,9 +280,11 @@ internal fun ApprovedAppsIcon(
         androidx.compose.foundation.Image(bitmap!!, null, Modifier.size(size))
       }
     else -> {
-      // Branded tile for a known bare glyph; the no-artwork fallback draws its catalog glyph, tiled
-      // unless it is a plain-grid entry with its own identity.
-      val tile = backing == IconRenderer.IconBacking.BRANDED_TILE || !plain
+      // Branded tile for a known bare glyph; the no-artwork fallback draws its catalog glyph on its
+      // branded tile when the package has a known identity (e.g. the "Home Assistant" built-in, whose
+      // teal squircle then matches its "Home Control"/"Home dashboard" siblings), otherwise untiled
+      // on the plain grid.
+      val tile = IconRenderer.tiled(plain = plain, hasIdentity = identity != null)
       val (glyph, color) = identity ?: ("bag" to Color(0xFF2879B8))
       Box(Modifier.size(size).then(if (!tile) Modifier else
           Modifier.clip(tileShape).background(color)

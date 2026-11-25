@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -50,5 +51,25 @@ class ApprovedAppsBuiltinsTest {
     assertEquals("art", ApprovedAppsBuiltins.artwork(ApprovedAppsBuiltins.CONTROL, "art"))
     assertEquals("art", ApprovedAppsBuiltins.artwork(null, "art"))
     assertEquals("home" to androidx.compose.ui.graphics.Color(0xFF2879B8), approvedAppIdentity("builtin:ha_dashboard"))
+  }
+
+  /**
+   * The "Home Assistant" app-grid entry resolves to a branded identity tile (its teal squircle with
+   * the house glyph), not a tile-less bare glyph — the same way its "Home Control" and "Home
+   * dashboard" siblings are tiled. It has no prepared artwork (catalog glyph), sits on the plain
+   * grid, yet still draws a tile because its package has a known identity.
+   */
+  @Test fun homeAssistant_resolvesToABrandedTileLikeItsHomeSiblings() {
+    val pkg = "builtin:${ApprovedAppsBuiltins.HA_DASHBOARD}"
+    val identity = approvedAppIdentity(pkg)
+    assertNotNull("the Home Assistant entry has a branded identity", identity)
+    // No prepared artwork → the catalog-glyph (NO_ARTWORK) branch renders it.
+    assertNull(ApprovedAppsBuiltins.artwork(ApprovedAppsBuiltins.HA_DASHBOARD, "legacy"))
+    // On the plain grid, a known identity is still tiled — never a bare glyph.
+    assertTrue("Home Assistant must be tiled on the plain grid",
+        IconRenderer.tiled(plain = true, hasIdentity = identity != null))
+    // Its siblings resolve to their own branded tiles too.
+    assertNotNull(approvedAppIdentity("builtin:${ApprovedAppsBuiltins.CONTROL}"))
+    assertNotNull(approvedAppIdentity("builtin:${ApprovedAppsBuiltins.DASHBOARD}"))
   }
 }
