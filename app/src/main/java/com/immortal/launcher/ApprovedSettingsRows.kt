@@ -200,10 +200,26 @@ internal fun ApprovedSettingsDialog(
 }
 
 @Composable
-internal fun ApprovedSettingsTextButton(label: String, onClick: () -> Unit) {
+internal fun ApprovedSettingsTextButton(label: String, onClick: () -> Unit) =
+    ApprovedSettingsTextButtonImpl(label, label, onClick)
+
+/**
+ * A text button with a distinct screen-reader [spoken] name, for a visible word that repeats on the
+ * screen (a list row's "Remove", one per row). The drawn word stays [label]; the reader hears
+ * [spoken] ("Remove Apple"). Separate overload so the common caller keeps its trailing-lambda form.
+ */
+@Composable
+internal fun ApprovedSettingsTextButton(label: String, spoken: String, onClick: () -> Unit) =
+    ApprovedSettingsTextButtonImpl(label, spoken, onClick)
+
+@Composable
+private fun ApprovedSettingsTextButtonImpl(label: String, spoken: String, onClick: () -> Unit) {
     Box(
         Modifier.defaultMinSize(minHeight = 68.dp)
             .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f, ringColor = IosBlue, onClick = onClick)
+            // A spoken name that differs from the visible word replaces the child Text on the button's
+            // own node (ccSpeak clears descendants), so a repeated "Remove" is told apart by its row.
+            .let { if (spoken != label) it.ccSpeak(spoken) else it }
             .padding(horizontal = 20.dp, vertical = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
