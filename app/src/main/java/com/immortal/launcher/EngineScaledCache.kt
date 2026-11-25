@@ -272,7 +272,9 @@ class EngineScaledCache(
     // Long edge of a cached copy: the largest Portal panel is 2160px; 2400 leaves Ken-Burns zoom
     // headroom (2400×1800×4 ≈ 17MB texture vs 46MB for a 12MP original).
     const val TARGET_EDGE = 2400
-    // Disk budget for copies (~600KB each at QUALITY → ~250 photos). Trimmed oldest-first.
+    // Portal+ reference disk budget for copies (~600KB each at QUALITY → ~250 photos), trimmed
+    // oldest-first. Smaller panels pass a budget scaled off their long edge (PhotoEdges
+    // .cacheBudgetBytes); this reference is also the safe default when none is supplied.
     const val BUDGET_BYTES = 160L * 1024 * 1024
     const val QUALITY = 88
     // At most ~48 MiB of ARGB source pixels plus one <=2400-edge output; one decoder globally.

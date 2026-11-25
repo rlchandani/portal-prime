@@ -104,5 +104,5 @@ member** (pairing, room name, OTA, Calls/music/timers/Control Center).
 - 🅿️ Owner: pair the Mini from Portal Toolkit (household key); right-turn test with the spike Follow activity; optional HA on the Mini.
 - ✅ 1.254 Mini responsive layouts + rotation follower (review fixes C3/H1/M1; 6,492 tests; Portal+ pixel-identical). Owner morning: physical right-turn test; volume on the Mini back to 9. Also fixes: Apps-tab Calls tile opens Meta calling (all Portals); Settings open p90 ~350 ms on the Mini.
 - 🔜 Portrait-aware screensaver (handover §8.7) — fold into the premium screensaver work.
-- 🔜 Display-derived decode/cache edges (handover §8.5) — helps all Portals.
+- 🚧 Display-derived decode/cache edges (handover §8.5) — helps all Portals. Decode-at-drawn-size shipped (PhotoEdges.decodeEdge/partnerEdge). Now the EngineScaledCache disk-copy budget is also derived from the panel long edge (PhotoEdges.cacheBudgetBytes): Portal+ keeps 160 MB exactly, the Mini (1472-edge copies) gets ~60 MB so it holds the same photo working set instead of over-retaining. Pure+unit-tested (HearthPolicyTest). Memory/disk win is EXPECTED/UNMEASURED — needs a Mini device profile (gfxinfo + memory) to confirm.
 - 🔜 Separate, reversible Meta-service debloat experiment (handover §9).

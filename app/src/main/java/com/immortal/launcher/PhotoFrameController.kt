@@ -137,10 +137,19 @@ class PhotoFrameController(
   private val sourceDiscovery get() = sourceDiscoveryDelegate.value
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
   // Decode/cache edges follow the panel's long edge (2400 on a Portal+, 1472 on a Portal Mini).
-  private val photoDecodeEdge = PhotoEdges.decodeEdge(PhotoEdges.displayLongEdge(context))
+  private val photoDisplayLongEdge = PhotoEdges.displayLongEdge(context)
+  private val photoDecodeEdge = PhotoEdges.decodeEdge(photoDisplayLongEdge)
+  // The copy budget scales off the same long edge: a Portal Mini's smaller copies need a smaller
+  // budget to hold the same photo working set (~160 MB stays on the Portal+ it was tuned for).
+  private val photoCacheBudgetBytes =
+      PhotoEdges.cacheBudgetBytes(photoDisplayLongEdge, EngineScaledCache.BUDGET_BYTES)
   // ProcessCacheDir: the path is resolved once per process (FirstOpenWarmup, off main), not
   // statted again inside the frame Activity's onCreate.
-  private val scaledCache = EngineScaledCache(java.io.File(ProcessCacheDir.of(context), "ss_scaled"), targetEdge = photoDecodeEdge)
+  private val scaledCache = EngineScaledCache(
+      java.io.File(ProcessCacheDir.of(context), "ss_scaled"),
+      targetEdge = photoDecodeEdge,
+      budgetBytes = photoCacheBudgetBytes,
+  )
   // A separate single-thread executor for caption work (EXIF read + the reverse-geocode
   // network call), so an 8s geocode lookup can never stall the image-decode pipeline on [io].
   private val metaIo = Executors.newSingleThreadExecutor()

@@ -29,6 +29,35 @@ class HearthPolicyTest {
       assertTrue(PhotoEdges.decodeEdge(edge) <= SlideshowDecodeBudget.MAX_EDGE)
   }
 
+  @Test fun cacheBudgetScalesWithPanelArea() {
+    val reference = EngineScaledCache.BUDGET_BYTES // 160 MiB, tuned for the Portal+
+    // Portal+ keeps today's budget exactly — no regression on the panel it was tuned for.
+    assertEquals(reference, PhotoEdges.cacheBudgetBytes(2160, reference))
+    // Portal Mini stores ~0.38x-area copies (1472 vs 2400 edge) → ~60 MiB, well under reference.
+    val mini = PhotoEdges.cacheBudgetBytes(1280, reference)
+    assertTrue("mini below reference", mini < reference)
+    assertTrue("mini ~60 MiB", mini in 55L * 1024 * 1024..70L * 1024 * 1024)
+    // A larger panel never raises the budget above the tuned reference.
+    assertEquals(reference, PhotoEdges.cacheBudgetBytes(4000, reference))
+  }
+
+  @Test fun cacheBudgetIsMonotoneAndFloored() {
+    val reference = EngineScaledCache.BUDGET_BYTES
+    val floor = reference / 4 // MIN_BUDGET_FRACTION = 0.25
+    // A tiny panel is floored, never driven to a thrashing budget.
+    assertEquals(floor, PhotoEdges.cacheBudgetBytes(300, reference))
+    // Non-decreasing in panel size across the Mini → Portal+ range.
+    var previous = 0L
+    for (edge in listOf(300, 800, 1280, 1600, 1920, 2160, 4000)) {
+      val budget = PhotoEdges.cacheBudgetBytes(edge, reference)
+      assertTrue("monotone at $edge", budget >= previous)
+      assertTrue("within reference at $edge", budget in floor..reference)
+      previous = budget
+    }
+    // A non-positive reference degrades safely to zero.
+    assertEquals(0L, PhotoEdges.cacheBudgetBytes(1280, 0L))
+  }
+
   @Test fun cubicEaseMatchesKnownCurveValues() {
     val linear = CubicEase(0f, 0f, 1f, 1f)
     assertEquals(.3f, linear.getInterpolation(.3f), 1e-3f)
