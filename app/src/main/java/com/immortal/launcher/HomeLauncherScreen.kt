@@ -721,7 +721,7 @@ internal fun LauncherScreen(
       if (showPair) ApprovedHomeDialog("Control from your phone", { showPair = false }) {
         Text("Scan with a phone on the same Wi-Fi, or open the address and enter the code.",
             color = ApprovedHomePalette.Secondary, fontSize = 23.sp, lineHeight = 32.sp)
-        RemotePairCard(pairUrl, pairPin)
+        RemotePairCard(pairUrl, pairPin, showHeader = false)
         PairDoneButton { showPair = false }
       }
       if (showSleep) ApprovedHomeDialog("Sleep screen", { showSleep = false }) {
