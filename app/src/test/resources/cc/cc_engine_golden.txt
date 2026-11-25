@@ -484,7 +484,7 @@ state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,bi
 state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
 do visible {"on":true}
 open#0 http://ha.test:8123/api/websocket
-state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+state CONNECTING 'Connecting' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=1f/1r@-5000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"ha_version":"2026.11.0","type":"auth_required"}
 send#0 {"access_token":"tok-123","type":"auth"}
 ha#0 {"ha_version":"2026.11.0","type":"auth_ok"}
@@ -493,7 +493,7 @@ send#0 {"id":2,"type":"config/area_registry/list"}
 send#0 {"id":3,"type":"config/device_registry/list"}
 send#0 {"id":4,"type":"config/entity_registry/list"}
 send#0 {"id":5,"key":"hearthpane_floorplan","type":"frontend/get_user_data"}
-state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+state CONNECTING 'Loading rooms' live=0 retry=0 v=1 ents=0[] pending=[] reg=- plan=1f/1r@-5000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"result":[{"level":0,"name":"Ground","floor_id":"ground"}],"success":true,"id":1,"type":"result"}
 ha#0 {"result":[{"name":"Kitchen","floor_id":"ground","area_id":"kitchen"},{"name":"Hall","floor_id":"ground","area_id":"hall"}],"success":true,"id":2,"type":"result"}
 ha#0 {"result":[{"name":"Lamp","id":"dev_lamp","area_id":"kitchen"},{"name":"Model Y","model":"Model Y","id":"dev_car","area_id":null}],"success":true,"id":3,"type":"result"}
@@ -501,11 +501,10 @@ ha#0 {"result":[{"device_id":"dev_lamp","entity_id":"light.kitchen","platform":"
 send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":6,"type":"config/entity_registry/get_entries"}
 ha#0 {"result":{"binary_sensor.front_door":{"original_device_class":"door","entity_id":"binary_sensor.front_door"},"binary_sensor.kitchen_leak":{"original_device_class":"moisture","entity_id":"binary_sensor.kitchen_leak"}},"success":true,"id":6,"type":"result"}
 log i HearthpaneControl: control center registry: 1 floors, 2 areas, 11 entities, 2 sensor classes
-state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
+state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"result":{"value":{"floors":[{"rooms":[{"r":[0,0,6,5],"d":[{"e":"light.kitchen","x":0.5,"y":0.5},{"e":"binary_sensor.kitchen_leak","x":0.2,"y":0.8}],"name":"Kitchen","id":"kitchen","out":false},{"r":[6,0,4,5],"d":[{"e":"lock.front","x":0.5,"y":0.1}],"name":"Hall","id":"hall","out":false}],"name":"Ground","id":"ground","openings":[{"side":"S","at":0.5,"e":"binary_sensor.front_door","room":"hall","span":0.3}]}],"v":1,"updatedAt":1699990000000}},"success":true,"id":5,"type":"result"}
 send#0 {"id":7,"key":"hearthpane_floorplan","type":"frontend/set_user_data","value":{"floors":[{"id":"ground","name":"Ground","openings":[],"rooms":[{"d":[{"e":"light.kitchen","x":0.5,"y":0.5}],"id":"kitchen","name":"Kitchen","out":false,"r":[0,0,8,5]}]}],"updatedAt":1699995000000,"v":1}}
 send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":8,"type":"subscribe_entities"}
-state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/THIS_PORTAL toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"success":true,"id":7,"type":"result"}
 state CONNECTING 'Loading devices' live=0 retry=0 v=1 ents=0[] pending=[] reg=11e/2c plan=1f/1r@-5000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"success":true,"id":8,"type":"result"}

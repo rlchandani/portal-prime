@@ -35,6 +35,8 @@ internal class CcEngine(
   var unconfirmed: Set<String> = emptySet()
   /** The foreground subscription's first full answer will confirm or drop [unconfirmed]. */
   var awaitingFull = false
+  /** The disk cache ([CcLastKnownStore]) is read once per process, lazily on the first open. */
+  var diskLoaded = false
   private var publishedUnconfirmed: Set<String> = emptySet()
   var protocol: CcProtocol? = null
   var socket: CcSocket? = null

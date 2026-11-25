@@ -142,6 +142,8 @@ internal fun CcEngine.retarget() {
     live = live.snapshot(split.kept)
     unconfirmed = unconfirmed.filterTo(HashSet()) { it in live.raw }
     awaitingFull = false
+    // Persist the same set so even a cold open (after a reboot or a kill) draws at once.
+    host.saveLastKnown(lastKnown)
   } else awaitingFull = unconfirmed.isNotEmpty()
   subscribed = ids
   subscribedForeground = fg
@@ -157,12 +159,34 @@ private fun CcEngine.interest(): Set<String>? =
  * (building the plan models here, not in CC's first frame). Engine thread.
  */
 internal fun CcEngine.restoreLastKnown() {
+  val seeded = loadDiskCacheOnce()
   val restored = CcLastKnown.restorable(live.raw, lastKnown)
   lastKnown = emptyMap()
-  if (restored.isEmpty()) return
-  live = live.snapshot(live.raw.values + restored.values)
-  unconfirmed = unconfirmed + restored.keys
-  publish()
+  if (restored.isNotEmpty()) {
+    live = live.snapshot(live.raw.values + restored.values)
+    unconfirmed = unconfirmed + restored.keys
+  }
+  if (restored.isNotEmpty() || seeded) publish()
+}
+
+/**
+ * The first open of the process seeds from disk ([CcLastKnownStore], [CcPlanStore]): the retained
+ * last-known entities and the cached floor plan, so a cold open draws the plan with its states at
+ * once instead of blank-then-redraw. Home Assistant's answers still reconcile both (the plan via
+ * [CcPlanStore.newest], the entities via [reconcileLastKnown]). Engine thread. Returns whether it
+ * changed [ui] (so the caller publishes even when nothing was retained).
+ */
+private fun CcEngine.loadDiskCacheOnce(): Boolean {
+  if (diskLoaded) return false
+  diskLoaded = true
+  if (lastKnown.isEmpty()) lastKnown = host.loadLastKnown()
+  if (testPlan == null && ui.plan?.floors.isNullOrEmpty()) {
+    host.loadPlan()?.takeIf { it.floors.isNotEmpty() }?.let {
+      ui = ui.copy(plan = it, planSource = CcPlanSource.THIS_PORTAL)
+      return true
+    }
+  }
+  return false
 }
 
 /** HA gave [full] whole: they're live again. A full answer to the foreground subscription drops the rest. */
