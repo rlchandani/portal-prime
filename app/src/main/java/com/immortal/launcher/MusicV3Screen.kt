@@ -99,15 +99,20 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
 
 @Composable
 private fun MusicV3Header(onBack: () -> Unit, onCancel: (() -> Unit)?) {
-  Row(Modifier.fillMaxWidth().height(112.dp).padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-    MusicV3RoundButton("Back to Home", Modifier.clip(CircleShape).approvedOutline(CircleShape), size = 68.dp,
-        fill = ApprovedHomePalette.Card, onClick = onBack) {
-      ApprovedIcon("back", Modifier.size(30.dp), ApprovedHomePalette.Text)
+  // Back control sits on its own row above the title so the "Music" title's left edge lines up with
+  // the content column below (both inset 24.dp), rather than being pushed right by the back button.
+  Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+      MusicV3RoundButton("Back to Home", Modifier.clip(CircleShape).approvedOutline(CircleShape), size = 68.dp,
+          fill = ApprovedHomePalette.Card, onClick = onBack) {
+        ApprovedIcon("back", Modifier.size(30.dp), ApprovedHomePalette.Text)
+      }
+      Spacer(Modifier.weight(1f))
+      onCancel?.let { MusicV3Button("Cancel", onClick = it) }
     }
     Text("Music", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium)
-    Spacer(Modifier.weight(1f))
-    onCancel?.let { MusicV3Button("Cancel", onClick = it) }
   }
 }
 
