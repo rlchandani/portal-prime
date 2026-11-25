@@ -68,41 +68,92 @@ internal object DinnerCardOverlay {
   internal const val GLYPH_BG = 0xFF4A4535.toInt()
   internal const val TONAL = 0xFF3D3D3D.toInt()
   internal const val SCRIM = 0x99000000.toInt()
+  /** The held card owns the one slot (replace-don't-stack); the id only has to be stable. */
+  private const val SLOT = "dinner"
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null
   private var view: View? = null
-  private val dismissRunnable = Runnable { hide() }
+  /**
+   * The card, kept through an accessibility unbind (uiautomator, `adb install -r`, a system rebind):
+   * the process lives on, so the card and its [pendingReply] are held in memory ([OverlayHold]) and
+   * drawn again when the host binds. Not persisted to disk — the reply callback can't be serialized,
+   * and a Call-everyone card isn't critical enough to survive the process being replaced.
+   */
+  private var hold = OverlayHold<DinnerCardModel>()
+  private var pendingReply: ((DinnerReply) -> Unit)? = null
+  private val timeout = Runnable { expire() }
 
+  /** The host bound: a card parked by an unbind comes back for the rest of its [SHOW_MS]. */
   fun attach(service: AccessibilityService) {
-    main.post { host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager }
+    main.post {
+      host = service; wm = service.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+      hold = hold.hostReady(OverlayHoldStore.now())
+      if (hold.shown) { Log.i(TAG, "dinner card back after a rebind"); draw() }
+    }
   }
 
-  fun detach() {
-    main.post { hide(); host = null; wm = null }
+  /** [service] unbound: the system takes the window; the card stays held until it binds again. */
+  fun detach(service: AccessibilityService) {
+    main.post {
+      if (host !== service) return@post // an older instance's unbind after the new one bound
+      removeView()
+      if (hold.held != null) Log.i(TAG, "accessibility host unbound; dinner card held")
+      hold = hold.hostLost(); host = null; wm = null
+    }
   }
 
+  /** A newer card replaces the one held, showing or parked. */
   fun show(model: DinnerCardModel, onReply: (DinnerReply) -> Unit) {
-    val ctx = host ?: run { Log.w(TAG, "card before the accessibility host attached; not shown"); return }
+    val now = OverlayHoldStore.now()
+    pendingReply = onReply
+    hold = hold.offer(SLOT, model, now + SHOW_MS)
+    if (hold.shown) draw() else { removeView(); schedule(now); Log.w(TAG, "dinner card held until the accessibility host binds") }
+  }
+
+  /** Dismissed (reply, swipe, tap outside, or stopped elsewhere): it is not brought back by a rebind. */
+  fun hide() {
+    hold = hold.dismiss()
+    pendingReply = null
+    main.removeCallbacks(timeout)
+    removeView()
+  }
+
+  private fun draw() {
+    val model = hold.held?.payload ?: return
+    val ctx = host ?: return
     val wmgr = wm ?: return
-    hide()
-    val root = buildRoot(ctx, model) { reply -> hide(); onReply(reply) }
+    val now = OverlayHoldStore.now()
+    val remaining = hold.remainingMs(now) ?: run { expire(); return }
+    removeView()
+    val reply = pendingReply
+    val root = buildRoot(ctx, model, remaining) { r -> hide(); reply?.invoke(r) }
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
-    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return }
+    // No window (the host is going away): stay held for the next bind.
+    runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); hold = hold.hostLost(); return }
     // Full-screen card: it would cover the YouTube player, so music pauses while it shows.
     YouTubeMusicEngine.setCovered(MusicCover.DINNER, true)
-    main.postDelayed(dismissRunnable, SHOW_MS)
+    schedule(now)
   }
 
-  fun hide() {
-    main.removeCallbacks(dismissRunnable)
+  private fun schedule(now: Long) {
+    main.removeCallbacks(timeout)
+    hold.remainingMs(now)?.let { main.postDelayed(timeout, it) }
+  }
+
+  private fun expire() {
+    hold = hold.expire(OverlayHoldStore.now())
+    if (hold.held == null) { pendingReply = null; removeView() } else schedule(OverlayHoldStore.now())
+  }
+
+  private fun removeView() {
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
     YouTubeMusicEngine.setCovered(MusicCover.DINNER, false)
   }
 
-  private fun buildRoot(ctx: Context, model: DinnerCardModel, onReply: (DinnerReply) -> Unit): View {
+  private fun buildRoot(ctx: Context, model: DinnerCardModel, remainingMs: Long, onReply: (DinnerReply) -> Unit): View {
     val dp = ctx.resources.displayMetrics.density
     fun px(v: Int) = (v * dp).toInt()
     val scrim = FrameLayout(ctx).apply { setBackgroundColor(SCRIM); setOnClickListener { hide() } }
@@ -117,7 +168,7 @@ internal object DinnerCardOverlay {
     card.addView(View(ctx).apply { setBackgroundColor(0x22FFFFFF) },
         LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, px(1)).apply { setMargins(px(56), 0, px(56), 0) })
     card.addView(footer(ctx, model, ::px, onReply))
-    card.addView(drainBar(ctx, ::px))
+    card.addView(drainBar(ctx, ::px, remainingMs))
     swipeToDismiss(card, px(160).toFloat())
     scrim.addView(card, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT,
         Gravity.CENTER).apply { setMargins(px(24), 0, px(24), 0) })
@@ -190,13 +241,14 @@ internal object DinnerCardOverlay {
         })
       }
 
-  /** The yellow bar drains over the card's lifetime (one 30 s animation, then nothing runs). */
-  private fun drainBar(ctx: Context, px: (Int) -> Int): View = View(ctx).apply {
+  /** The yellow bar drains over the card's remaining life; after a rebind it resumes from where it is. */
+  private fun drainBar(ctx: Context, px: (Int) -> Int, remainingMs: Long): View = View(ctx).apply {
     setBackgroundColor(ACCENT)
     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, px(8))
     pivotX = 0f
-    ObjectAnimator.ofFloat(this, View.SCALE_X, 1f, 0f).apply {
-      duration = SHOW_MS
+    val from = (remainingMs.toFloat() / SHOW_MS).coerceIn(0f, 1f)
+    ObjectAnimator.ofFloat(this, View.SCALE_X, from, 0f).apply {
+      duration = remainingMs.coerceAtLeast(0L)
       interpolator = LinearInterpolator()
       start()
     }
